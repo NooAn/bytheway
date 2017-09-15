@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">ByTheWay</string>
+    <string name="password">Пароль</string>
+    <string name="button_send">Отправить</string>
 </resources>
