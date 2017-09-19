@@ -1,7 +1,4 @@
-package ru.a1024bits.bytheway
-
-import retrofit2.http.GET
-import retrofit2.http.Path
+package ru.a1024bits.bytheway.model
 
 
 /**

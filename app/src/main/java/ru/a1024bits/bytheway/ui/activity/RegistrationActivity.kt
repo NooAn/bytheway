@@ -1,10 +1,7 @@
-package ru.a1024bits.bytheway
+package ru.a1024bits.bytheway.ui.activity
 
-import android.app.Dialog
 import android.arch.lifecycle.LifecycleActivity
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -19,6 +16,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.android.synthetic.main.activity_registration.*
+import ru.a1024bits.bytheway.R
 
 
 class RegistrationActivity : LifecycleActivity(), GoogleApiClient.OnConnectionFailedListener {
@@ -36,7 +34,8 @@ class RegistrationActivity : LifecycleActivity(), GoogleApiClient.OnConnectionFa
         mAuth = FirebaseAuth.getInstance();
         
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("51228349143-av2s208nris19uo3tm66i22e4narsrju.apps.googleusercontent.com")
+                //.requestIdToken("51228349143-av2s208nris19uo3tm66i22e4narsrju.apps.googleusercontent.com")
+                .requestIdToken(resources.getString(R.string.default_web_client_id))
                 .requestId()
                 .requestEmail()
                 .build()
@@ -52,16 +51,6 @@ class RegistrationActivity : LifecycleActivity(), GoogleApiClient.OnConnectionFa
             signIn()
         })
         
-    }
-    
-    private fun showPasswordDialog() {
-        val dialog = Dialog(this)
-        // dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setCancelable(true)
-        dialog.setContentView(R.layout.sign_up)
-        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.WHITE))
-        dialog.setTitle("Ваш пароль")
-        dialog.show()
     }
     
     private fun signIn() {

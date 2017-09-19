@@ -11,11 +11,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name="ru.a1024bits.bytheway.ui.activity.MainActivity">
         </activity>
-        <activity android:name=".RegistrationActivity">
+        <activity android:name="ru.a1024bits.bytheway.ui.activity.RegistrationActivity">
         </activity>
-        <activity android:name=".SplashActivity">
+        <activity android:name="ru.a1024bits.bytheway.ui.activity.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 

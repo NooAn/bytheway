@@ -1,4 +1,4 @@
-package ru.a1024bits.bytheway
+package ru.a1024bits.bytheway.ui.fragments
 
 import android.arch.lifecycle.LifecycleFragment
 import android.arch.lifecycle.Observer
@@ -10,8 +10,8 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import retrofit2.http.GET
-import retrofit2.http.Path
+import ru.a1024bits.bytheway.R
+import ru.a1024bits.bytheway.viewmodel.UserProfileViewModel
 
 
 /**
