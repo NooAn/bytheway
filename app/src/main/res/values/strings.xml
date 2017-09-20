@@ -4,5 +4,6 @@
     <string name="button_send">Отправить</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="fullname">Andrey Petrov</string>
+    <string name="datetrip">Дата путешествия</string>
 </resources>

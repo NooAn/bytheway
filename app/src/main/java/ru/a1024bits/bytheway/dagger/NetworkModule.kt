@@ -11,16 +11,13 @@ import javax.inject.Singleton
  */
 @Module
 class NetworkModule {
-    @Module
-    class NetworkModule {
-        
-        @Provides
-        @Singleton
-        fun provideRetrofit(): Retrofit {
-            return Retrofit.Builder()
-                    .baseUrl("https://fucking")
-                    .addConverterFactory(MoshiConverterFactory.create())
-                    .build()
-        }
+    
+    @Provides
+    @Singleton
+    fun provideRetrofit(): Retrofit {
+        return Retrofit.Builder()
+                .baseUrl("https://fucking")
+                .addConverterFactory(MoshiConverterFactory.create())
+                .build()
     }
 }

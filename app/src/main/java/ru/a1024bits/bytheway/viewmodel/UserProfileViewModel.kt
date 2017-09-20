@@ -4,7 +4,6 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.ViewModel
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.UserRepository
-import javax.inject.Inject
 
 
 /**
@@ -15,16 +14,13 @@ class UserProfileViewModel : ViewModel() {
     var user: LiveData<User>? = null
     private var userRepo: UserRepository? = null
     
-    @Inject
+    // @Inject
     fun UserProfileViewModel(userRepository: UserRepository) {
         this.userRepo = userRepository
     }
     
     fun init(userId: String) {
-        if (user != null) {
-            return
-        }
-        user = userRepo!!.getUsers(userID = 1)
+        user = userRepo?.getUsers(userID = 1)
     }
     
 }

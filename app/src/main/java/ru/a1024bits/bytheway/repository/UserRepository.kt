@@ -14,14 +14,15 @@ import javax.inject.Inject
 /**
  * Created by andrey.gusenkov on 19/09/2017.
  */
-class UserRepository @Inject constructor(webService: WebService) {
-    
-    private var webservice: WebService = webService
+class UserRepository @Inject constructor(val webService: WebService) {
     
     
     fun getUsers(userID: Int): LiveData<User> {
+        
         val data = MutableLiveData<User>()
-        webservice?.getUser(Integer.toString(userID))!!.enqueue(object : Callback<User> {
+        
+        webService.getUser(Integer.toString(userID)).enqueue(object : Callback<User> {
+            
             override fun onFailure(call: Call<User>?, t: Throwable?) {
                 Log.e("LOG", "ERROR in webservice", t)
             }

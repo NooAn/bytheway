@@ -1,7 +1,6 @@
 package ru.a1024bits.bytheway.dagger
 
 import dagger.Component
-import ru.a1024bits.bytheway.App
 import javax.inject.Singleton
 
 /**
@@ -14,6 +13,5 @@ import javax.inject.Singleton
         UserRepositoryModule::class))
 
 interface AppComponent {
-    //fun inject(userRepository: UserRepository)
-    fun inject(app: App)
+
 }
