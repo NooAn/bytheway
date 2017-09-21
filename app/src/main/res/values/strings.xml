@@ -6,4 +6,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="fullname">Andrey Petrov</string>
     <string name="datetrip">Дата путешествия</string>
+    <string name="money">Бюджет поездки</string>
+    <string name="description">Описание поездки</string>
+    <string name="city">Москва</string>
 </resources>
