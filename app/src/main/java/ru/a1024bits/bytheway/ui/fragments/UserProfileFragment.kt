@@ -63,7 +63,7 @@ class UserProfileFragment : LifecycleFragment(), OnMapReadyCallback {
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater!!.inflate(R.layout.fragment_user_profile, container, false)
         
-        mMapView = view?.findViewById<MapView>(R.id.mapView)
+        mMapView = view?.findViewById(R.id.mapView) as MapView?
         mMapView?.onCreate(savedInstanceState)
         
         mMapView?.onResume()// needed to get the map to display immediately
