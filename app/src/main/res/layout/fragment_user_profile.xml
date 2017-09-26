@@ -1,65 +1,172 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:paddingEnd="6dp"
+        android:paddingStart="6dp"
+        tools:context="ru.a1024bits.bytheway.ui.fragments.UserProfileFragment">
+
+        <LinearLayout
+            android:id="@+id/headerprofile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentStart="true"
+            android:layout_margin="5dp"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/profileImage"
+                android:layout_width="match_parent"
+                android:layout_height="95dp"
+                android:layout_marginTop="16dp"
+                android:contentDescription="Ava"
+                android:scaleType="fitCenter"
+                android:src="@drawable/googleg_standard_color_18"/>
+
+            <TextView
+                android:id="@+id/username"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@string/fullname"
+                android:textAlignment="center"
+                android:textSize="16sp"/>
+
+            <TextView
+                android:id="@+id/city"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/city"
+                android:textAlignment="center"
+                android:textSize="14sp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/socnetwork"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/headerprofile"
+            android:layout_gravity="center_horizontal|center"
+            android:layout_marginTop="10dp"
+            android:baselineAligned="false"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_weight="1.0"
+                android:src="@drawable/common_google_signin_btn_icon_dark"/>
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_weight="1.0"
+                android:src="@drawable/common_google_signin_btn_icon_dark"/>
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_weight="1.0"
+                android:src="@drawable/common_google_signin_btn_icon_dark"/>
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_weight="1.0"
+                android:src="@drawable/common_google_signin_btn_icon_dark"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/maplayout"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:layout_below="@+id/socnetwork"
+            android:layout_marginTop="10dp"
+            android:orientation="vertical">
+
+            <com.google.android.gms.maps.MapView
+                android:id="@+id/mapView"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/datetrip"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/maplayout"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/common_google_signin_btn_icon_dark"/>
+
+            <EditText
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/white"
-                tools:context="ru.a1024bits.bytheway.ui.fragments.UserProfileFragment">
+                android:hint="@string/datetrip"
+                android:inputType="datetime|date"
+                android:textSize="14sp"/>
+        </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/headerprofile"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="10dp"
-        android:orientation="vertical">
-
-        <ImageView
-            android:id="@+id/imageView"
+        <LinearLayout
+            android:id="@+id/moneyfortrip"
             android:layout_width="match_parent"
-            android:layout_height="95dp"
-            android:contentDescription="Ava"
-            android:scaleType="fitCenter"
-            android:src="@drawable/googleg_standard_color_18"/>
-
-        <TextView
-            android:id="@+id/username"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/datetrip"
             android:layout_marginTop="10dp"
-            android:text="@string/fullname"
-            android:textAlignment="center"/>
-    </LinearLayout>
+            android:orientation="horizontal">
 
-    <LinearLayout
-        android:id="@+id/maplayout"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_below="@+id/headerprofile"
-        android:layout_marginTop="10dp"
-        android:orientation="vertical">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/common_google_signin_btn_icon_dark"/>
 
-        <com.google.android.gms.maps.MapView
-            android:id="@+id/mapView"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="1"/>
-    </LinearLayout>
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="@string/money"
+                android:textSize="14sp"/>
+        </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/maplayout"
-        android:layout_marginTop="16dp"
-        android:orientation="vertical">
-
-
-        <TextView
+        <LinearLayout
+            android:id="@+id/descriptionprofile"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/datetrip"
-            android:textAlignment="center"/>
+            android:layout_height="match_parent"
+            android:layout_below="@+id/moneyfortrip"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
 
-    </LinearLayout>
-</RelativeLayout>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/common_google_signin_btn_icon_dark"/>
 
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="@string/description"
+                android:inputType="textMultiLine"
+                android:textSize="14sp"/>
+        </LinearLayout>
+    </RelativeLayout>
+
+</ScrollView>
