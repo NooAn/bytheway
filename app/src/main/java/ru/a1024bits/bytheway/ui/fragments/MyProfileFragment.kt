@@ -5,6 +5,7 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,10 +15,11 @@ import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.android.synthetic.main.fragment_user_profile.*
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.ProfileState
+import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.viewmodel.UserProfileViewModel
 
 
-class UserProfileFragment : LifecycleFragment(), OnMapReadyCallback {
+class MyProfileFragment : LifecycleFragment(), OnMapReadyCallback {
     
     
     private var viewModel: UserProfileViewModel? = null
@@ -34,12 +36,21 @@ class UserProfileFragment : LifecycleFragment(), OnMapReadyCallback {
     
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        Log.e("LOG", "function activity Created ")
         if (arguments != null) {
+            Log.e("LOG", "enter")
             val userId: String = arguments.getString(UID_KEY)
             viewModel = ViewModelProviders.of(this).get(UserProfileViewModel::class.java)
             viewModel?.init(userId)
             viewModel?.user?.observe(this, Observer {
-            
+                
+                Log.e("LOG", "observer only")
+                
+            })
+            viewModel?.user?.observe(this, object : Observer<User> {
+                override fun onChanged(t: User?) {
+                    Log.e("LOG", "onChanged")
+                }
             })
         }
     }
