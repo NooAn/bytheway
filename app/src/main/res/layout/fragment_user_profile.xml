@@ -65,7 +65,7 @@
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
-                android:src="@drawable/common_google_signin_btn_icon_dark"/>
+                android:src="@drawable/vk"/>
 
             <ImageView
                 android:id="@+id/fbIcon"

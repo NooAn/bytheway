@@ -13,7 +13,6 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.android.synthetic.main.fragment_user_profile.*
 import ru.a1024bits.bytheway.R
-import ru.a1024bits.bytheway.model.ProfileState
 import ru.a1024bits.bytheway.viewmodel.UserProfileViewModel
 
 
@@ -24,7 +23,6 @@ class UserProfileFragment : LifecycleFragment(), OnMapReadyCallback {
     
     private var mListener: OnFragmentInteractionListener? = null
     
-    private var mProfileState = ProfileState.MyProfile
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
