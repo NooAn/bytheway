@@ -99,7 +99,7 @@ class MyProfileFragment : LifecycleFragment(), OnMapReadyCallback {
     }
     
     private fun settingsSocialNetworkButtons() {
-        fbIcon.setOnClickListener(View.OnClickListener {
+        fbcon.setOnClickListener(View.OnClickListener {
         
         })
     }

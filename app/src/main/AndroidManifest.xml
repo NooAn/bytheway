@@ -5,27 +5,34 @@
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
+        android:name=".App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name="ru.a1024bits.bytheway.ui.activity.SplashActivity">
+        android:theme="@style/AppTheme.NoActionBar">
+        <activity android:name=".ui.activity.SplashActivity">
         </activity>
-        <activity android:name="ru.a1024bits.bytheway.ui.activity.RegistrationActivity">
+        <activity android:name=".ui.activity.RegistrationActivity">
         </activity>
-        <activity android:name="ru.a1024bits.bytheway.ui.activity.MainActivity">
+        <activity android:name=".ui.activity.MainActivity">
+
+        </activity>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDBqb2pdkfSx1ii31xwPsFf635j-cQB1tU"/>
+
+        <activity
+            android:name=".ui.activity.MenuActivity"
+            android:label="@string/title_activity_menu">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDBqb2pdkfSx1ii31xwPsFf635j-cQB1tU"/>
     </application>
 
 </manifest>

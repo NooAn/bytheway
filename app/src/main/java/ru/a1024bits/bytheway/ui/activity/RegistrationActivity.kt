@@ -34,7 +34,6 @@ class RegistrationActivity : LifecycleActivity(), GoogleApiClient.OnConnectionFa
         mAuth = FirebaseAuth.getInstance();
         
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                //.requestIdToken("51228349143-av2s208nris19uo3tm66i22e4narsrju.apps.googleusercontent.com")
                 .requestIdToken(resources.getString(R.string.default_web_client_id))
                 .requestId()
                 .requestEmail()

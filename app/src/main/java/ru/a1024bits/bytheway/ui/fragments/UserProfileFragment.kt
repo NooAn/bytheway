@@ -11,7 +11,6 @@ import android.view.ViewGroup
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import kotlinx.android.synthetic.main.fragment_user_profile.*
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.viewmodel.UserProfileViewModel
 
@@ -88,9 +87,7 @@ class UserProfileFragment : LifecycleFragment(), OnMapReadyCallback {
     }
     
     private fun settingsSocialNetworkButtons() {
-        fbIcon.setOnClickListener(View.OnClickListener {
-        
-        })
+
     }
     
     fun onButtonPressed() {
