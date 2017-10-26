@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <ru.a1024bits.aviaanimation.ui.util.AutoCompleteTextView
+        android:id="@+id/textview2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:imeOptions="flagNoExtractUi|actionSearch"
+        android:layout_toEndOf="@+id/startMarkerView"
+        android:hint="@string/city_start"
+        android:inputType="text|textAutoComplete|textCapSentences" />
+
+    <ImageView
+        android:id="@+id/startMarkerView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/textview4"
+        android:layout_alignParentStart="true"
+        android:layout_alignTop="@+id/textview2"
+        android:src="@drawable/googleg_standard_color_18" />
+
+
+    <ru.a1024bits.aviaanimation.ui.util.AutoCompleteTextView
+        android:id="@+id/textview4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textview2"
+        android:imeOptions="flagNoExtractUi|actionSearch"
+        android:layout_marginTop="16dp"
+        android:layout_toEndOf="@+id/startMarkerView"
+        android:hint="@string/city_end"
+        android:inputType="text|textAutoComplete|textCapSentences" />
+
+
+
+    <Button
+        android:id="@+id/buttonSearch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/textview4"
+        android:layout_marginTop="28dp"
+        android:text="@string/name_button_search" />
+
+</RelativeLayout>

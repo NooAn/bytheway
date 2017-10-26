@@ -9,4 +9,21 @@
     <string name="money">Бюджет поездки</string>
     <string name="description">Описание поездки</string>
     <string name="city">Москва</string>
+    <string name="drawer_item_map_search">Поиск попутчиков</string>
+    <string name="drawer_item_profile">Профиль</string>
+    <string name="title_activity_menu">bytheway</string>
+
+    <string name="city_end">Пункт назначения</string>
+    <string name="name_button_search">Нажми нежно!</string>
+    <string name="city_start">Пункт отправления</string>
+    <string name="title_section1">Section 1</string>
+    <string name="title_section2">Section 2</string>
+    <string name="title_section3">Section 3</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_example">Example action</string>
+
+    <string name="action_settings">Settings</string>
 </resources>

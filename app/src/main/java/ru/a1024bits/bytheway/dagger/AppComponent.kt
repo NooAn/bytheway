@@ -1,6 +1,7 @@
 package ru.a1024bits.bytheway.dagger
 
 import dagger.Component
+import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import javax.inject.Singleton
 
 /**
@@ -10,8 +11,11 @@ import javax.inject.Singleton
 @Singleton
 @Component(modules = arrayOf(AppModule::class,
         NetworkModule::class,
+        NavigationModule::class,
         UserRepositoryModule::class))
 
 interface AppComponent {
-
+    
+    fun inject(activity: MenuActivity);
+    
 }

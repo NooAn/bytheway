@@ -3,7 +3,6 @@ package ru.a1024bits.bytheway.dagger
 import dagger.Module
 import dagger.Provides
 import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Singleton
 
 /**
@@ -17,7 +16,6 @@ class NetworkModule {
     fun provideRetrofit(): Retrofit {
         return Retrofit.Builder()
                 .baseUrl("https://fucking")
-                .addConverterFactory(MoshiConverterFactory.create())
                 .build()
     }
 }

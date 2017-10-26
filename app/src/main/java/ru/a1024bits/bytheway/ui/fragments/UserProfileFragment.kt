@@ -11,9 +11,7 @@ import android.view.ViewGroup
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import kotlinx.android.synthetic.main.fragment_user_profile.*
 import ru.a1024bits.bytheway.R
-import ru.a1024bits.bytheway.model.ProfileState
 import ru.a1024bits.bytheway.viewmodel.UserProfileViewModel
 
 
@@ -24,7 +22,6 @@ class UserProfileFragment : LifecycleFragment(), OnMapReadyCallback {
     
     private var mListener: OnFragmentInteractionListener? = null
     
-    private var mProfileState = ProfileState.MyProfile
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,7 +62,7 @@ class UserProfileFragment : LifecycleFragment(), OnMapReadyCallback {
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater!!.inflate(R.layout.fragment_user_profile, container, false)
         
-        mMapView = view?.findViewById(R.id.mapView) as MapView?
+        mMapView = view?.findViewById<MapView>(R.id.mapView)
         mMapView?.onCreate(savedInstanceState)
         
         mMapView?.onResume()// needed to get the map to display immediately
@@ -90,9 +87,7 @@ class UserProfileFragment : LifecycleFragment(), OnMapReadyCallback {
     }
     
     private fun settingsSocialNetworkButtons() {
-        fbIcon.setOnClickListener(View.OnClickListener {
-        
-        })
+
     }
     
     fun onButtonPressed() {

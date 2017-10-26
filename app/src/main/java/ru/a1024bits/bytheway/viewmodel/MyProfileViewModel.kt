@@ -17,10 +17,6 @@ class MyProfileViewModel : ViewModel() {
     fun UserProfileViewModel(userRepository: UserRepository) {
         this.userRepo = userRepository
     }
-
-    override fun onCleared() {
-        super.onCleared()
-    }
     
     fun init(userId: String) {
         user = userRepo?.getUsers(userID = 1)
