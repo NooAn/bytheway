@@ -3,6 +3,7 @@ package ru.a1024bits.bytheway
 import android.app.Application
 import ru.a1024bits.bytheway.dagger.*
 import ru.terrakok.cicerone.Cicerone
+import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.Router
 
 /**
@@ -12,11 +13,9 @@ class App : Application() {
     companion object {
         lateinit var INSTANCE: App
         lateinit var component: AppComponent
-
     }
 
-
-    private var cicerone: Cicerone<Router>? = null
+    private lateinit var cicerone: Cicerone<Router>
 
     override fun onCreate() {
         super.onCreate()
@@ -28,12 +27,19 @@ class App : Application() {
                 .userRepositoryModule(UserRepositoryModule())
                 .build();
 
+        initCicerone()
+
     }
 
-    fun getInstance(): App? {
-        return INSTANCE;
+    private fun initCicerone() {
+        cicerone = Cicerone.create()
     }
 
+    val navigatorHolder: NavigatorHolder
+        get() = cicerone.navigatorHolder
+
+    val router: Router
+        get() = cicerone.router
 
     fun appComponent(): AppComponent = component
 
