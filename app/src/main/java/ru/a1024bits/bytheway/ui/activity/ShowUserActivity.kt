@@ -8,8 +8,12 @@ import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.adapter.ShowAllUsersAdapter
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.MockGeneratorData
+import java.util.*
 
 class ShowUsersActivity : AppCompatActivity() {
+    companion object {
+        private val random = Random()
+    }
     private lateinit var showingUsers: MutableList<User>
     private lateinit var showingUsersAdapter: ShowAllUsersAdapter
 
@@ -21,7 +25,9 @@ class ShowUsersActivity : AppCompatActivity() {
         var recyclerView: RecyclerView = findViewById(R.id.lazy_shower_users)
         showingUsersAdapter = ShowAllUsersAdapter(recyclerView, showingUsers, this, MockGeneratorData(object : MockWebService {
             override fun getChanUsers(fromCount: Long, count: Int): List<User> {
-                return (0..40).map { User("" + it, "" + it, it) }
+                return (0..40).map {
+                    User("" + random.nextInt(Integer.MAX_VALUE), "" +  random.nextInt(Integer.MAX_VALUE), random.nextInt(Integer.MAX_VALUE))
+                }
             }
 
         }))
