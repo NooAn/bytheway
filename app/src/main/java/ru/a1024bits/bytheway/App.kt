@@ -12,7 +12,6 @@ class App : Application() {
     companion object {
         lateinit var INSTANCE: App
         lateinit var component: AppComponent
-
     }
 
 
@@ -26,12 +25,12 @@ class App : Application() {
                 .networkModule(NetworkModule())
                 .navigationModule(NavigationModule())
                 .userRepositoryModule(UserRepositoryModule())
-                .build();
+                .build()
 
     }
 
     fun getInstance(): App? {
-        return INSTANCE;
+        return INSTANCE
     }
 
 
