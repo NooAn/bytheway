@@ -12,6 +12,7 @@ import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import ru.a1024bits.bytheway.R
+import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.viewmodel.UserProfileViewModel
 
 
@@ -140,9 +141,7 @@ class UserProfileFragment : LifecycleFragment(), OnMapReadyCallback {
         mMapView?.onLowMemory()
     }
     
-    interface OnFragmentInteractionListener {
-        fun onFragmentInteraction()
-    }
+
     
     companion object {
         // TODO: Rename parameter arguments, choose names that match

@@ -1,9 +1,9 @@
 package ru.a1024bits.bytheway.ui.activity
 
-import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentManager
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
@@ -12,12 +12,13 @@ import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.FrameLayout
 import android.widget.Toast
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
+import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.router.Screens
-import ru.a1024bits.bytheway.ui.fragments.ShowUsersFragment
+import ru.a1024bits.bytheway.ui.fragments.MapFragment
+import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment
 import ru.a1024bits.bytheway.ui.fragments.UserProfileFragment
 import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.android.SupportFragmentNavigator
@@ -25,7 +26,7 @@ import ru.terrakok.cicerone.commands.Command
 import ru.terrakok.cicerone.commands.Replace
 import javax.inject.Inject
 
-class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, UserProfileFragment.OnFragmentInteractionListener {
+class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, OnFragmentInteractionListener {
     var screenNames: ArrayList<String> = arrayListOf()
     private val STATE_SCREEN_NAMES = "state_screen_names"
 
@@ -36,43 +37,50 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onCreate(savedInstanceState)
         App.component.inject(this)
         setContentView(R.layout.activity_menu)
+//
+//        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+//        setSupportActionBar(toolbar)
+//
+//        val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
+//
+//        val toggle = ActionBarDrawerToggle(
+//                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+//        drawer.addDrawerListener(toggle)
+//        toggle.syncState()
+//
+//        val navigationView = findViewById<NavigationView>(R.id.nav_view)
+//        navigationView.setNavigationItemSelectedListener(this)
 
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        setSupportActionBar(toolbar)
+        addFragmentToActivity(supportFragmentManager, MyProfileFragment(), R.id.fragment_container)
+//        if (savedInstanceState == null) {
+//            navigator.applyCommand(Replace(Screens.USER_PROFILE_SCREEN, 1))
+//        } else {
+//            screenNames = savedInstanceState.getSerializable(STATE_SCREEN_NAMES) as ArrayList<String>
+//        }
+    }
 
-        val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
+    fun addFragmentToActivity(manager: FragmentManager, fragment: Fragment, frameId: Int) {
 
-        val toggle = ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
-        drawer.addDrawerListener(toggle)
-        toggle.syncState()
+        val transaction = manager.beginTransaction()
+        transaction.add(frameId, fragment)
+        transaction.addToBackStack(null).commit();
 
-        val navigationView = findViewById<NavigationView>(R.id.nav_view)
-        navigationView.setNavigationItemSelectedListener(this)
-
-
-        if (savedInstanceState == null) {
-            navigator.applyCommand(Replace(Screens.USER_PROFILE_SCREEN, 1))
-        } else {
-            screenNames = savedInstanceState.getSerializable(STATE_SCREEN_NAMES) as ArrayList<String>
-        }
-        startActivity(Intent(this, ShowUsersActivity::class.java))
     }
 
     override fun onBackPressed() {
-        val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START)
-        } else {
-            super.onBackPressed()
-        }
+//        val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
+//        if (drawer.isDrawerOpen(GravityCompat.START)) {
+//            drawer.closeDrawer(GravityCompat.START)
+//        } else {
+//            super.onBackPressed()
+//        }
     }
 
     val navigator = object : SupportFragmentNavigator(supportFragmentManager, R.id.fragment_container) {
         override fun createFragment(screenKey: String?, data: Any?): Fragment {
             Log.e("LOG", screenKey + " " + data)
 
-            return ShowUsersFragment()
+            return UserProfileFragment()
         }
 
         override fun showSystemMessage(message: String?) {
@@ -85,6 +93,7 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         override fun applyCommand(command: Command?) {
             super.applyCommand(command)
+            Log.e("LOG command", command.toString())
         }
     }
 
@@ -100,12 +109,14 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onResume() {
         super.onResume()
-        navigatorHolder.setNavigator(navigator)
+        App.INSTANCE.navigatorHolder.setNavigator(navigator)
+        //  navigatorHolder.setNavigator(navigator)
     }
 
     override fun onPause() {
         super.onPause()
-        navigatorHolder.removeNavigator()
+        App.INSTANCE.navigatorHolder.removeNavigator()
+        //navigatorHolder.removeNavigator()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -123,14 +134,16 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         if (id == R.id.profile_item) {
             navigator.applyCommand(Replace(Screens.USER_PROFILE_SCREEN, 1))
+            // App.INSTANCE.router.navigateTo(Screens.USER_PROFILE_SCREEN)
         } else if (id == R.id.search_item) {
-            navigator.applyCommand(Replace(Screens.SEARCH_MAP_SCREEN, 1))
+            App.INSTANCE.router.navigateTo(Screens.SEARCH_MAP_SCREEN)
+            //   navigator.applyCommand(Replace(Screens.SEARCH_MAP_SCREEN, 1))
         } else if (id == R.id.exit_item) {
 
         }
 
-        val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
-        drawer.closeDrawer(GravityCompat.START)
+//        val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
+//        drawer.closeDrawer(GravityCompat.START)
         return true
     }
 }
