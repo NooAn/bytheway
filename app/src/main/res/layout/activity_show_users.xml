@@ -7,10 +7,18 @@
     android:layout_height="match_parent"
     tools:context="ru.a1024bits.bytheway.ui.activity.ShowUsersActivity">
 
-
-    <fragment
-        android:id="@+id/fragment"
-        android:name="ru.a1024bits.bytheway.ui.fragments.ShowUsersFragment"
+    <android.support.v7.widget.RecyclerView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/lazy_shower_users"
+        android:name="com.example.testlazylist.usersListFragment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="match_parent"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        app:layoutManager="LinearLayoutManager"
+        tools:context="com.example.testlazylist.usersListActivity" />
+    <!--tools:listitem="@layout/user_list_content"-->
+
 </android.support.constraint.ConstraintLayout>

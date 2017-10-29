@@ -1,5 +1,6 @@
 package ru.a1024bits.bytheway.ui.activity
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.app.Fragment
@@ -57,6 +58,7 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         } else {
             screenNames = savedInstanceState.getSerializable(STATE_SCREEN_NAMES) as ArrayList<String>
         }
+        startActivity(Intent(this, ShowUsersActivity::class.java))
     }
     
     
