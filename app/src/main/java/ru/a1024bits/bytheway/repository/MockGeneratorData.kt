@@ -22,7 +22,7 @@ class MockGeneratorData @Inject constructor(private val webService: MockWebServi
             }
             val res = webService.getChanUsers(fromCount)
             for (i in res) {
-                senderElements.onNext(i)
+                publishProgress(i)
                 Log.d("tag", " " + i)
             }
             return null

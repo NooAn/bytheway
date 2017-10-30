@@ -32,7 +32,7 @@ class UserProfileFragment : LifecycleFragment(), OnMapReadyCallback {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         if (arguments != null) {
-            val userId: String = arguments.getString(UID_KEY)
+            val userId: String = arguments.getString(UID_KEY, "")
             viewModel = ViewModelProviders.of(this).get(UserProfileViewModel::class.java)
             viewModel?.init(userId)
             viewModel?.user?.observe(this, Observer {

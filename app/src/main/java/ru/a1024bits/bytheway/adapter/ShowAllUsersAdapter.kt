@@ -1,6 +1,7 @@
 package ru.a1024bits.bytheway.adapter;
 
-import android.app.Activity
+import android.content.Context
+import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
@@ -15,7 +16,7 @@ import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.MockGeneratorData
 
-class ShowAllUsersAdapter(recyclerView: RecyclerView, val users: MutableList<User>, val activity: Activity, var senderUsers: MockGeneratorData)
+class ShowAllUsersAdapter(recyclerView: RecyclerView, val context: Context, var senderUsers: MockGeneratorData)
     : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val VIEW_TYPE_ITEM = 0
     private val VIEW_TYPE_LOADING = 1
@@ -24,6 +25,7 @@ class ShowAllUsersAdapter(recyclerView: RecyclerView, val users: MutableList<Use
     private var lastVisibleItem: Int = 0
     private var totalItemCount: Int = 0
     private var setterUsersToThisAdapter: Observer<User>
+    private var users: MutableList<User> = ArrayList()
 
     init {
         setterUsersToThisAdapter = object : Observer<User> {
@@ -34,6 +36,10 @@ class ShowAllUsersAdapter(recyclerView: RecyclerView, val users: MutableList<Use
             override fun onComplete() {
                 isLoading = false
                 this@ShowAllUsersAdapter.notifyDataSetChanged()
+                notifyDataSetChanged()
+                Log.d("tag", "size  " + users.size)
+                recyclerView.adapter.notifyDataSetChanged()
+                Log.d("tag", "itemCount  " + recyclerView.adapter.itemCount)
             }
 
             override fun onSubscribe(d: Disposable) {}
@@ -51,12 +57,10 @@ class ShowAllUsersAdapter(recyclerView: RecyclerView, val users: MutableList<Use
                 lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition()
                 if (!isLoading && totalItemCount <= lastVisibleItem + visibleThreshold) {
                     isLoading = true
-                    this@ShowAllUsersAdapter.notifyDataSetChanged()
                     senderUsers.installChanUsers(setterUsersToThisAdapter, lastVisibleItem + 1L)
                 }
             }
         })
-        senderUsers.installChanUsers(setterUsersToThisAdapter, 0)
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -65,10 +69,10 @@ class ShowAllUsersAdapter(recyclerView: RecyclerView, val users: MutableList<Use
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder? {
         if (viewType == VIEW_TYPE_ITEM) {
-            val view = LayoutInflater.from(activity).inflate(R.layout.user_list_content, parent, false)
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.user_list_content, parent, false)
             return UserViewHolder(view)
         } else if (viewType == VIEW_TYPE_LOADING) {
-            val view = LayoutInflater.from(activity).inflate(R.layout.item_loading, parent, false)
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_loading, parent, false)
             return LoadingViewHolder(view)
         }
         return null
