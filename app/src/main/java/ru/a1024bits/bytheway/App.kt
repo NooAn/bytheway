@@ -14,9 +14,9 @@ class App : Application() {
         lateinit var INSTANCE: App
         lateinit var component: AppComponent
     }
-
+    
     private lateinit var cicerone: Cicerone<Router>
-
+    
     override fun onCreate() {
         super.onCreate()
         INSTANCE = this
@@ -26,21 +26,19 @@ class App : Application() {
                 .navigationModule(NavigationModule())
                 .userRepositoryModule(UserRepositoryModule())
                 .build();
-
         initCicerone()
-
     }
-
+    
     private fun initCicerone() {
         cicerone = Cicerone.create()
     }
-
+    
     val navigatorHolder: NavigatorHolder
         get() = cicerone.navigatorHolder
-
+    
     val router: Router
         get() = cicerone.router
-
+    
     fun appComponent(): AppComponent = component
-
+    
 }
