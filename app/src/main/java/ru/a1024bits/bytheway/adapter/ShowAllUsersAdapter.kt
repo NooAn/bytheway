@@ -15,8 +15,7 @@ import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.MockUserRepository
 
-class ShowAllUsersAdapter(recyclerView: RecyclerView, val context: Context, var senderUsers: MockUserRepository)
-    : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class ShowAllUsersAdapter(recyclerView: RecyclerView, val context: Context, var senderUsers: MockUserRepository) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val VIEW_TYPE_ITEM = 0
     private val VIEW_TYPE_LOADING = 1
     private var isLoading: Boolean = false
@@ -25,13 +24,13 @@ class ShowAllUsersAdapter(recyclerView: RecyclerView, val context: Context, var 
     private var totalItemCount: Int = 0
     private var setterUsersToThisAdapter: Observer<User>
     private var users: MutableList<User> = ArrayList()
-
+    
     init {
         setterUsersToThisAdapter = object : Observer<User> {
             override fun onError(e: Throwable) {
                 throw e
             }
-
+            
             override fun onComplete() {
                 isLoading = false
                 this@ShowAllUsersAdapter.notifyDataSetChanged()
@@ -40,13 +39,15 @@ class ShowAllUsersAdapter(recyclerView: RecyclerView, val context: Context, var 
                 recyclerView.adapter.notifyDataSetChanged()
                 Log.d("tag", "itemCount  " + recyclerView.adapter.itemCount)
             }
-
+            
             override fun onSubscribe(d: Disposable) {}
-
-            override fun onNext(t: User) {
-                t.let { users.add(it) }
+            
+            override fun onNext(user: User) {
+                user.let {
+                    users.add(it)
+                }
             }
-
+            
         }
         val linearLayoutManager = recyclerView.layoutManager as LinearLayoutManager
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -61,11 +62,11 @@ class ShowAllUsersAdapter(recyclerView: RecyclerView, val context: Context, var 
             }
         })
     }
-
+    
     override fun getItemViewType(position: Int): Int {
         return if (position == users.size) VIEW_TYPE_LOADING else VIEW_TYPE_ITEM
     }
-
+    
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder? {
         if (viewType == VIEW_TYPE_ITEM) {
             val view = LayoutInflater.from(parent.context).inflate(R.layout.user_list_content, parent, false)
@@ -76,7 +77,7 @@ class ShowAllUsersAdapter(recyclerView: RecyclerView, val context: Context, var 
         }
         return null
     }
-
+    
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder is UserViewHolder) {
             val contact = this.users[position]
@@ -87,15 +88,15 @@ class ShowAllUsersAdapter(recyclerView: RecyclerView, val context: Context, var 
             holder.progressBar.isIndeterminate = true
         }
     }
-
+    
     override fun getItemCount(): Int {
         return this.users.size + 1
     }
-
+    
     private inner class LoadingViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         var progressBar = view.findViewById<ProgressBar>(R.id.progressBar1)
     }
-
+    
     private inner class UserViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         var lastName = view.findViewById<TextView>(R.id.lastName_content_user)
         var name = view.findViewById<TextView>(R.id.name_content_user)

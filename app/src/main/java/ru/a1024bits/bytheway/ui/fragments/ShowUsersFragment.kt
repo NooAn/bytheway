@@ -11,18 +11,17 @@ import android.view.ViewGroup
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.adapter.ShowAllUsersAdapter
 import ru.a1024bits.bytheway.viewmodel.ShowUsersViewModel
-import ru.a1024bits.bytheway.viewmodel.UserProfileViewModel
 
 
-class ShowUsersFragment : Fragment(){
+class ShowUsersFragment : Fragment() {
     private lateinit var currentView: View
     private lateinit var viewModel: ShowUsersViewModel
-
+    
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         currentView = inflater.inflate(R.layout.fragment_show_users, container, false)
         return currentView
     }
-
+    
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(ShowUsersViewModel::class.java)
@@ -31,8 +30,8 @@ class ShowUsersFragment : Fragment(){
         recyclerView.layoutManager = LinearLayoutManager(this.context, LinearLayoutManager.VERTICAL, false)
         recyclerView.adapter = ShowAllUsersAdapter(recyclerView, this.context, viewModel.userRepo!!)
     }
-
-
+    
+    
     companion object {
         fun newInstance(): ShowUsersFragment {
             val fragment = ShowUsersFragment()
