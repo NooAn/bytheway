@@ -12,6 +12,9 @@
             android:id="@+id/search_item"
             android:icon="@drawable/ic_menu_slideshow"
             android:title="Поиск попутчиков"/>
+        <item
+            android:id="@+id/show_all_users"
+            android:title="показать пользователей"/>
     </group>
 
     <item android:title="">

@@ -6,7 +6,8 @@ package ru.a1024bits.bytheway.router
 class Screens {
     companion object {
         val USER_PROFILE_SCREEN = "user_profile_screen"
-        val SEARCH_MAP_SCREEN = "start activity screen"
-        val MAIN_ACTIVITY_SCREEN = "main activity screen"
+        val SEARCH_MAP_SCREEN = "start fragment screen"
+        val MAIN_ACTIVITY_SCREEN = "main fragment screen"
+        val ALL_USERS_SCREEN = "all_users_screen"
     }
 }

@@ -34,7 +34,7 @@ class MyProfileFragment : LifecycleFragment(), OnMapReadyCallback {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        Log.e("LOG", "function activity Created ")
+        Log.e("LOG", "function fragment Created ")
         if (arguments != null) {
             Log.e("LOG", "enter")
             val userId: String = arguments.getString(UID_KEY)
