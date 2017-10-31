@@ -14,6 +14,7 @@
             android:title="Поиск попутчиков"/>
         <item
             android:id="@+id/show_all_users"
+            android:icon="@drawable/ic_menu_slideshow"
             android:title="показать пользователей"/>
     </group>
 
