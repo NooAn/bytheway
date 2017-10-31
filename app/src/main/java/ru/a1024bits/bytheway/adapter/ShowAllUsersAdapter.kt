@@ -15,7 +15,7 @@ import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.MockUserRepository
 
-class ShowAllUsersAdapter(recyclerView: RecyclerView, val context: Context, var senderUsers: MockUserRepository)
+class ShowAllUsersAdapter(val recyclerView: RecyclerView, val context: Context, var senderUsers: MockUserRepository)
     : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val VIEW_TYPE_ITEM = 0
     private val VIEW_TYPE_LOADING = 1
@@ -35,10 +35,6 @@ class ShowAllUsersAdapter(recyclerView: RecyclerView, val context: Context, var 
             override fun onComplete() {
                 isLoading = false
                 this@ShowAllUsersAdapter.notifyDataSetChanged()
-                notifyDataSetChanged()
-                Log.d("tag", "size  " + users.size)
-                recyclerView.adapter.notifyDataSetChanged()
-                Log.d("tag", "itemCount  " + recyclerView.adapter.itemCount)
             }
 
             override fun onSubscribe(d: Disposable) {}
@@ -48,13 +44,15 @@ class ShowAllUsersAdapter(recyclerView: RecyclerView, val context: Context, var 
             }
 
         }
-        val linearLayoutManager = recyclerView.layoutManager as LinearLayoutManager
+//        val linearLayoutManager = recyclerView.layoutManager as LinearLayoutManager
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
+                val linearLayoutManager = recyclerView.layoutManager as LinearLayoutManager
                 totalItemCount = linearLayoutManager.itemCount
                 lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition()
-                if (!isLoading && totalItemCount <= lastVisibleItem + visibleThreshold) {
+//                if (!isLoading && totalItemCount <= lastVisibleItem + visibleThreshold) {
+                if (!isLoading && (recyclerView.layoutManager.itemCount - visibleThreshold) <= lastVisibleItem) {
                     isLoading = true
                     senderUsers.installChanUsers(setterUsersToThisAdapter, lastVisibleItem + 1L)
                 }
