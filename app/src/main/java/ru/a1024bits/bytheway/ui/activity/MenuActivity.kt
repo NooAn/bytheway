@@ -21,7 +21,7 @@ import ru.a1024bits.bytheway.router.Screens.Companion.SEARCH_MAP_SCREEN
 import ru.a1024bits.bytheway.router.Screens.Companion.USER_PROFILE_SCREEN
 import ru.a1024bits.bytheway.ui.fragments.MapFragment
 import ru.a1024bits.bytheway.ui.fragments.SearchFragment
-import ru.a1024bits.bytheway.ui.fragments.AllUsersFragmet
+import ru.a1024bits.bytheway.ui.fragments.AllUsersFragment
 import ru.a1024bits.bytheway.ui.fragments.UserProfileFragment
 import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.android.SupportFragmentNavigator
@@ -80,7 +80,7 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             else if (screenKey == SEARCH_MAP_SCREEN)
                 return MapFragment()
             else if (screenKey == ALL_USERS_SCREEN)
-                return AllUsersFragmet.newInstance()
+                return AllUsersFragment.newInstance()
             return SearchFragment()
         }
 

@@ -13,7 +13,7 @@ import ru.a1024bits.bytheway.adapter.ShowAllUsersAdapter
 import ru.a1024bits.bytheway.viewmodel.ShowUsersViewModel
 
 
-class AllUsersFragmet : Fragment(){
+class AllUsersFragment : Fragment(){
     private lateinit var currentView: View
     private lateinit var viewModel: ShowUsersViewModel
     private lateinit var showUsersAdapter: ShowAllUsersAdapter
@@ -34,8 +34,8 @@ class AllUsersFragmet : Fragment(){
 
 
     companion object {
-        fun newInstance(): AllUsersFragmet {
-            val fragment = AllUsersFragmet()
+        fun newInstance(): AllUsersFragment {
+            val fragment = AllUsersFragment()
             fragment.arguments = Bundle()
             return fragment
         }
