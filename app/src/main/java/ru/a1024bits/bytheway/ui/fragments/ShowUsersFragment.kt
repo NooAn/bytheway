@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.adapter.ShowAllUsersAdapter
 import ru.a1024bits.bytheway.viewmodel.ShowUsersViewModel
+import ru.a1024bits.bytheway.viewmodel.UserProfileViewModel
 
 
 class ShowUsersFragment : Fragment(){
@@ -25,7 +26,8 @@ class ShowUsersFragment : Fragment(){
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(ShowUsersViewModel::class.java)
-        val recyclerView: RecyclerView = currentView.findViewById(R.id.lazy_shower_users)
+        viewModel.init()
+        val recyclerView: RecyclerView = currentView.findViewById<RecyclerView>(R.id.lazy_shower_users)
         recyclerView.layoutManager = LinearLayoutManager(this.context, LinearLayoutManager.VERTICAL, false)
         recyclerView.adapter = ShowAllUsersAdapter(recyclerView, this.context, viewModel.userRepo!!)
     }
