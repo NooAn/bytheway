@@ -1,7 +1,6 @@
 package ru.a1024bits.bytheway.adapter;
 
 import android.content.Context
-import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
@@ -14,9 +13,9 @@ import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.User
-import ru.a1024bits.bytheway.repository.MockGeneratorData
+import ru.a1024bits.bytheway.repository.MockUserRepository
 
-class ShowAllUsersAdapter(recyclerView: RecyclerView, val context: Context, var senderUsers: MockGeneratorData)
+class ShowAllUsersAdapter(recyclerView: RecyclerView, val context: Context, var senderUsers: MockUserRepository)
     : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val VIEW_TYPE_ITEM = 0
     private val VIEW_TYPE_LOADING = 1

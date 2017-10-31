@@ -10,7 +10,8 @@ import ru.a1024bits.bytheway.MockWebService
 import ru.a1024bits.bytheway.model.User
 import javax.inject.Inject
 
-class MockGeneratorData @Inject constructor(private val webService: MockWebService) {
+class MockUserRepository @Inject constructor(private val webService: MockWebService) {
+
     class ValAs(private val fromCount: Long, private val senderElements: ObservableEmitter<User>, private val webService: MockWebService)
         : AsyncTask<Void, User, Void>() {
 
