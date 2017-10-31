@@ -24,7 +24,7 @@ class ShowAllUsersAdapter(recyclerView: RecyclerView, val context: Context, var 
     private var lastVisibleItem: Int = 0
     private var totalItemCount: Int = 0
     private var setterUsersToThisAdapter: Observer<User>
-    private var users: MutableList<User> = ArrayList()
+    var users: MutableList<User> = ArrayList()
 
     init {
         setterUsersToThisAdapter = object : Observer<User> {

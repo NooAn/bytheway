@@ -11,12 +11,12 @@ import android.view.ViewGroup
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.adapter.ShowAllUsersAdapter
 import ru.a1024bits.bytheway.viewmodel.ShowUsersViewModel
-import ru.a1024bits.bytheway.viewmodel.UserProfileViewModel
 
 
-class ShowUsersFragment : Fragment(){
+class AllUsersFragmet : Fragment(){
     private lateinit var currentView: View
     private lateinit var viewModel: ShowUsersViewModel
+    private lateinit var showUsersAdapter: ShowAllUsersAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         currentView = inflater.inflate(R.layout.fragment_show_users, container, false)
@@ -34,8 +34,8 @@ class ShowUsersFragment : Fragment(){
 
 
     companion object {
-        fun newInstance(): ShowUsersFragment {
-            val fragment = ShowUsersFragment()
+        fun newInstance(): AllUsersFragmet {
+            val fragment = AllUsersFragmet()
             fragment.arguments = Bundle()
             return fragment
         }
