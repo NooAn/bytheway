@@ -10,13 +10,30 @@ apply plugin: 'kotlin-kapt'
 android {
     compileSdkVersion 26
     buildToolsVersion "26.0.2"
+    flavorDimensions "default"
     defaultConfig {
         applicationId "ru.a1024bits.bytheway"
         minSdkVersion 21
         targetSdkVersion 26
         versionCode 1
+
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    productFlavors {
+        fake {
+            applicationId "fake.ru.a1024bits.bytheway"
+            versionCode 1
+            versionName "0.1"
+            dimension "default"
+
+        }
+        bytheway {
+            applicationId "ru.a1024bits.bytheway"
+            versionCode 1
+            versionName "0.1"
+            dimension "default"
+        }
     }
 
     buildTypes {
