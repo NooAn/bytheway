@@ -4,16 +4,14 @@ import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.os.Parcelable
 import android.support.v4.app.Fragment
-import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.adapter.ShowAllUsersAdapter
-import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.viewmodel.ShowUsersViewModel
-import java.util.ArrayList
+import java.util.*
 
 
 class AllUsersFragment : Fragment() {
@@ -37,7 +35,6 @@ class AllUsersFragment : Fragment() {
         viewModel = ViewModelProviders.of(this).get(ShowUsersViewModel::class.java)
         viewModel.init()
         showUsersAdapter = ShowAllUsersAdapter(recyclerView, this.context, viewModel.userRepo!!)
-//        recyclerView.layoutManager = LinearLayoutManager(this.context, LinearLayoutManager.VERTICAL, false)
         if (savedInstanceState != null) {
             recyclerView.layoutManager.onRestoreInstanceState(savedInstanceState.getParcelable(LIST_DISPLAYING_USERS))
             showUsersAdapter.users = savedInstanceState.getParcelableArrayList(LIST_USERS_IN_ADAPTER)
