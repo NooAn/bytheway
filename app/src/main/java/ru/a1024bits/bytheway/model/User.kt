@@ -11,12 +11,14 @@ data class User(val name: String, val lastName: String = "", val age: Int = 0, v
     constructor(parcel: Parcel) : this(
             parcel.readString(),
             parcel.readString(),
-            parcel.readInt())
+            parcel.readInt(),
+            parcel.readString())
     
     override fun writeToParcel(p0: Parcel, p1: Int) {
         p0.writeString(name)
         p0.writeString(lastName)
         p0.writeInt(age)
+        p0.writeString(urlPhoto)
     }
     
     override fun describeContents(): Int = 0
