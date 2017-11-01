@@ -20,16 +20,15 @@
 
             <ImageView
                 android:id="@+id/user_avatar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_width="@dimen/size_user_avatar"
+                android:layout_height="@dimen/size_user_avatar"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:scaleType="center"
                 app:srcCompat="@mipmap/ic_launcher_round" />
-
 
             <TableRow
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="5"
                 android:orientation="vertical">
 
                 <LinearLayout
@@ -38,19 +37,19 @@
                     android:orientation="vertical">
 
                     <TextView
-                    android:id="@+id/name_content_user"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textColor="@android:color/black"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                        android:id="@+id/name_content_user"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/black"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
 
                     <TextView
-                    android:id="@+id/lastName_content_user"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textColor="@android:color/black"
-                    android:textSize="12sp" />
+                        android:id="@+id/lastName_content_user"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/black"
+                        android:textSize="12sp" />
                 </LinearLayout>
             </TableRow>
         </TableRow>

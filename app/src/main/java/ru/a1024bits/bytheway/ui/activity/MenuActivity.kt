@@ -16,8 +16,10 @@ import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.router.Screens
+import ru.a1024bits.bytheway.router.Screens.Companion.ALL_USERS_SCREEN
 import ru.a1024bits.bytheway.router.Screens.Companion.SEARCH_MAP_SCREEN
 import ru.a1024bits.bytheway.router.Screens.Companion.USER_PROFILE_SCREEN
+import ru.a1024bits.bytheway.ui.fragments.AllUsersFragment
 import ru.a1024bits.bytheway.ui.fragments.MapFragment
 import ru.a1024bits.bytheway.ui.fragments.SearchFragment
 import ru.a1024bits.bytheway.ui.fragments.UserProfileFragment
@@ -72,11 +74,12 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     val navigator = object : SupportFragmentNavigator(supportFragmentManager, R.id.fragment_container) {
         override fun createFragment(screenKey: String?, data: Any?): Fragment {
             Log.e("LOG", screenKey + " " + data)
-            if (screenKey == USER_PROFILE_SCREEN)
-                return UserProfileFragment()
-            else if (screenKey == SEARCH_MAP_SCREEN)
-                return MapFragment()
-            return SearchFragment()
+            when (screenKey) {
+                USER_PROFILE_SCREEN -> return UserProfileFragment()
+                SEARCH_MAP_SCREEN -> return MapFragment()
+                ALL_USERS_SCREEN -> return AllUsersFragment.newInstance()
+                else -> return SearchFragment()
+            }
         }
         
         override fun showSystemMessage(message: String?) {
@@ -127,12 +130,13 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
         val id = item.itemId
-        
-        if (id == R.id.profile_item) {
-            navigator.applyCommand(Replace(Screens.USER_PROFILE_SCREEN, 1))
-        } else if (id == R.id.search_item) {
-            navigator.applyCommand(Replace(Screens.SEARCH_MAP_SCREEN, 1))
-        } else if (id == R.id.exit_item) {
+
+        when (id) {
+            R.id.profile_item -> navigator.applyCommand(Replace(Screens.USER_PROFILE_SCREEN, 1))
+            R.id.search_item -> navigator.applyCommand(Replace(Screens.SEARCH_MAP_SCREEN, 1))
+            R.id.all_users_item -> navigator.applyCommand(Replace(Screens.ALL_USERS_SCREEN, 1))
+            R.id.exit_item -> {
+            }
         }
         
         val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)

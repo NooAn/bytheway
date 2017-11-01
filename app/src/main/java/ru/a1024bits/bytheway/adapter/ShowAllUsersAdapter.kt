@@ -6,8 +6,11 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestManager
 import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
 import ru.a1024bits.bytheway.R
@@ -23,6 +26,7 @@ class ShowAllUsersAdapter(recyclerView: RecyclerView, val context: Context, var 
     private var lastVisibleItem: Int = 0
     private var totalItemCount: Int = 0
     private var setterUsersToThisAdapter: Observer<User>
+    private var glide: RequestManager = Glide.with(this.context)
     var users: MutableList<User> = ArrayList()
 
     init {
@@ -74,10 +78,10 @@ class ShowAllUsersAdapter(recyclerView: RecyclerView, val context: Context, var 
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder is UserViewHolder) {
-            val contact = this.users[position]
-            val userViewHolder = holder
-            userViewHolder.lastName.text = contact.lastName
-            userViewHolder.name.text = contact.name
+            val currentUser = this.users[position]
+            holder.lastName.text = currentUser.lastName
+            holder.name.text = currentUser.name
+            glide.load(currentUser.urlPhoto).into(holder.avatar)
         } else if (holder is LoadingViewHolder) {
             holder.progressBar.isIndeterminate = true
         }
@@ -94,5 +98,6 @@ class ShowAllUsersAdapter(recyclerView: RecyclerView, val context: Context, var 
     private inner class UserViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         var lastName = view.findViewById<TextView>(R.id.lastName_content_user)
         var name = view.findViewById<TextView>(R.id.name_content_user)
+        var avatar = view.findViewById<ImageView>(R.id.user_avatar)
     }
 }
