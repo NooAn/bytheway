@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/direction"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_below="@+id/socnetwork"
+    android:background="@color/colorPrimary"
+    android:paddingBottom="32dp"
+    android:paddingTop="32dp">
+
+    <TextView
+        android:id="@+id/textCityFrom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:layout_marginStart="24dp"
+        android:text="@string/city_from"
+        android:textColor="@color/textColor"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintLeft_toLeftOf="parent"
+        tools:ignore="MissingConstraints"/>
+
+    <TextView
+        android:id="@+id/textDateFrom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:text="@string/date_from"
+        android:textColor="@color/textColor"
+        android:textSize="13sp"
+        app:layout_constraintEnd_toEndOf="@+id/textCityFrom"
+        app:layout_constraintHorizontal_bias="0.071"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/textCityFrom"
+        app:layout_constraintTop_toBottomOf="@+id/textCityFrom"/>
+
+    <TextView
+        android:id="@+id/textCityTo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:layout_marginEnd="32dp"
+        android:text="@string/city_to"
+        android:textColor="@color/textColor"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintRight_toRightOf="parent"/>
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="128dp"
+        android:layout_height="17dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="14dp"
+        android:text="@string/date_to"
+        android:textColor="@color/textColor"
+        android:textSize="13sp"
+        app:layout_constraintEnd_toEndOf="@+id/textCityTo"
+        app:layout_constraintHorizontal_bias="0.142"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/textCityTo"
+        app:layout_constraintTop_toBottomOf="@+id/textCityTo"/>
+</android.support.constraint.ConstraintLayout>
