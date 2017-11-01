@@ -17,7 +17,7 @@ class MockUserRepository @Inject constructor(private val webService: MockWebServ
 
         override fun doInBackground(vararg p0: Void): Void? {
             try {
-                Thread.sleep(4000)
+                Thread.sleep(1000)
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             }

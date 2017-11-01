@@ -13,19 +13,20 @@ class ShowUsersViewModel : ViewModel() {
     companion object {
         var idCurrentUser = 0
     }
+
     var userRepo: MockUserRepository? = null
-    
+
     fun init() {
         Log.e("LOG", "init")
         this.userRepo = MockUserRepository(object : MockWebService {
             override fun getChanUsers(fromCount: Long, count: Int): List<User> {
                 val result: MutableList<User> = mutableListOf()
                 for (e in 1..20) {
-                    result.add(User("" + ++idCurrentUser, "" + idCurrentUser, idCurrentUser))
+                    result.add(User("Василий №" + ++idCurrentUser, "Кропоткин - ", idCurrentUser))
                 }
                 return result
             }
         })
     }
-    
+
 }
