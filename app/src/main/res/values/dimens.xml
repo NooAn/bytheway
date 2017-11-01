@@ -11,4 +11,5 @@
     <dimen name="nav_header_height">176dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="margin_left_profile">16dp</dimen>
+    <dimen name="size_user_avatar">50dp</dimen>
 </resources>

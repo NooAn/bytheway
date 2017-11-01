@@ -25,6 +25,9 @@ class AllUsersFragment : Fragment() {
         return currentView
     }
 
+//    Glide.with(this).load("https://www.ischool.berkeley.edu/sites/default/files/default_images/avatar.jpeg")
+//    .into((findViewById(R.id.imageView) as ImageView))
+
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recyclerView = currentView.findViewById(R.id.lazy_display_users)
