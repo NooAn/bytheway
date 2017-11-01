@@ -26,7 +26,7 @@ class ShowUsersFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(ShowUsersViewModel::class.java)
         viewModel.init()
-        val recyclerView: RecyclerView = currentView.findViewById<RecyclerView>(R.id.lazy_shower_users)
+        val recyclerView: RecyclerView = currentView.findViewById<RecyclerView>(R.id.lazy_display_users)
         recyclerView.layoutManager = LinearLayoutManager(this.context, LinearLayoutManager.VERTICAL, false)
         recyclerView.adapter = ShowAllUsersAdapter(recyclerView, this.context, viewModel.userRepo!!)
     }

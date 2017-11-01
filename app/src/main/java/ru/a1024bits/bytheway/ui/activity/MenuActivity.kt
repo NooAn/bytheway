@@ -16,11 +16,11 @@ import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.router.Screens
+import ru.a1024bits.bytheway.router.Screens.Companion.MY_PROFILE_SCREEN
 import ru.a1024bits.bytheway.router.Screens.Companion.SEARCH_MAP_SCREEN
-import ru.a1024bits.bytheway.router.Screens.Companion.USER_PROFILE_SCREEN
 import ru.a1024bits.bytheway.ui.fragments.MapFragment
+import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment
 import ru.a1024bits.bytheway.ui.fragments.SearchFragment
-import ru.a1024bits.bytheway.ui.fragments.UserProfileFragment
 import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.android.SupportFragmentNavigator
 import ru.terrakok.cicerone.commands.Command
@@ -53,7 +53,7 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         navigationView.setNavigationItemSelectedListener(this)
         
         if (savedInstanceState == null) {
-            navigator.applyCommand(Replace(Screens.USER_PROFILE_SCREEN, 1))
+            navigator.applyCommand(Replace(Screens.MY_PROFILE_SCREEN, 1))
         } else {
             screenNames = savedInstanceState.getSerializable(STATE_SCREEN_NAMES) as ArrayList<String>
         }
@@ -72,8 +72,8 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     val navigator = object : SupportFragmentNavigator(supportFragmentManager, R.id.fragment_container) {
         override fun createFragment(screenKey: String?, data: Any?): Fragment {
             Log.e("LOG", screenKey + " " + data)
-            if (screenKey == USER_PROFILE_SCREEN)
-                return UserProfileFragment()
+            if (screenKey == MY_PROFILE_SCREEN)
+                return MyProfileFragment()
             else if (screenKey == SEARCH_MAP_SCREEN)
                 return MapFragment()
             return SearchFragment()
@@ -105,13 +105,11 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     
     override fun onResume() {
         super.onResume()
-        // App.INSTANCE.navigatorHolder.setNavigator(navigator)
         navigatorHolder.setNavigator(navigator)
     }
     
     override fun onPause() {
         super.onPause()
-        //  App.INSTANCE.navigatorHolder.removeNavigator()
         navigatorHolder.removeNavigator()
     }
     
@@ -129,7 +127,7 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val id = item.itemId
         
         if (id == R.id.profile_item) {
-            navigator.applyCommand(Replace(Screens.USER_PROFILE_SCREEN, 1))
+            navigator.applyCommand(Replace(Screens.MY_PROFILE_SCREEN, 1))
         } else if (id == R.id.search_item) {
             navigator.applyCommand(Replace(Screens.SEARCH_MAP_SCREEN, 1))
         } else if (id == R.id.exit_item) {
