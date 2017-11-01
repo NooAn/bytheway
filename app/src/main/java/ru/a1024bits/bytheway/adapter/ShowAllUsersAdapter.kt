@@ -67,7 +67,7 @@ class ShowAllUsersAdapter(recyclerView: RecyclerView, val context: Context, var 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder? {
         if (viewType == VIEW_TYPE_ITEM) {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.all_users_content_user, parent, false)
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_content_users, parent, false)
             return UserViewHolder(view)
         } else if (viewType == VIEW_TYPE_LOADING) {
             val view = LayoutInflater.from(parent.context).inflate(R.layout.item_loading, parent, false)
