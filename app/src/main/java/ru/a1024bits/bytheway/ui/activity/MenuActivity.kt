@@ -19,10 +19,7 @@ import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.router.Screens.Companion.ALL_USERS_SCREEN
 import ru.a1024bits.bytheway.router.Screens.Companion.SEARCH_MAP_SCREEN
 import ru.a1024bits.bytheway.router.Screens.Companion.USER_PROFILE_SCREEN
-import ru.a1024bits.bytheway.ui.fragments.AllUsersFragment
-import ru.a1024bits.bytheway.ui.fragments.MapFragment
-import ru.a1024bits.bytheway.ui.fragments.SearchFragment
-import ru.a1024bits.bytheway.ui.fragments.UserProfileFragment
+import ru.a1024bits.bytheway.ui.fragments.*
 import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.android.SupportFragmentNavigator
 import ru.terrakok.cicerone.commands.Command
@@ -75,7 +72,7 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         override fun createFragment(screenKey: String?, data: Any?): Fragment {
             Log.e("LOG", screenKey + " " + data)
             when (screenKey) {
-                USER_PROFILE_SCREEN -> return UserProfileFragment()
+                USER_PROFILE_SCREEN -> return MyProfileFragment()
                 SEARCH_MAP_SCREEN -> return MapFragment()
                 ALL_USERS_SCREEN -> return AllUsersFragment.newInstance()
                 else -> return SearchFragment()

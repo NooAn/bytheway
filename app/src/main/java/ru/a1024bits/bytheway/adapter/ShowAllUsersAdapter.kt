@@ -92,7 +92,7 @@ class ShowAllUsersAdapter(recyclerView: RecyclerView, val context: Context, var 
     }
 
     private inner class LoadingViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        var progressBar = view.findViewById<ProgressBar>(R.id.progressBar1)
+        var progressBar = view.findViewById<ProgressBar>(R.id.progressBar)
     }
 
     private inner class UserViewHolder(view: View) : RecyclerView.ViewHolder(view) {

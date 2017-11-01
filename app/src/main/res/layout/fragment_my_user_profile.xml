@@ -1,9 +1,7 @@
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
 
 
     <RelativeLayout
@@ -12,7 +10,7 @@
         android:background="@color/white"
         tools:context="ru.a1024bits.bytheway.ui.fragments.UserProfileFragment">
 
-        <include layout="@layout/profile_main_image"/>
+        <include layout="@layout/profile_main_image" />
 
         <LinearLayout
             android:id="@+id/headerprofile"
@@ -33,7 +31,7 @@
                 android:text="@string/fullname"
                 android:textAlignment="center"
                 android:textSize="20sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/city"
@@ -43,7 +41,7 @@
                 android:freezesText="true"
                 android:text="@string/city"
                 android:textAlignment="center"
-                android:textSize="14sp"/>
+                android:textSize="14sp" />
         </LinearLayout>
 
 
@@ -65,13 +63,12 @@
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
-                android:src="@drawable/vk"/>
+                android:src="@drawable/vk" />
 
             <View
                 android:layout_width="1dp"
                 android:layout_height="30dp"
-                android:background="@color/colorAccent"
-                />
+                android:background="@color/colorAccent" />
 
             <ImageView
                 android:id="@+id/whatsUpIcon"
@@ -80,13 +77,12 @@
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
-                android:src="@drawable/whats_icon__2_"/>
+                android:src="@drawable/whats_icon__2_" />
 
             <View
                 android:layout_width="1dp"
                 android:layout_height="30dp"
-                android:background="@color/colorAccent"
-                />
+                android:background="@color/colorAccent" />
 
             <ImageView
                 android:id="@+id/tgIcon"
@@ -96,13 +92,12 @@
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
                 android:src="@drawable/tg_color"
-                android:visibility="invisible"/>
+                android:visibility="invisible" />
 
             <View
                 android:layout_width="1dp"
                 android:layout_height="30dp"
-                android:background="@color/colorAccent"
-                />
+                android:background="@color/colorAccent" />
 
             <ImageView
                 android:id="@+id/fbcon"
@@ -111,13 +106,12 @@
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
-                android:src="@drawable/fb_color"/>
+                android:src="@drawable/fb_color" />
 
             <View
                 android:layout_width="1dp"
                 android:layout_height="30dp"
-                android:background="@color/colorAccent"
-                />
+                android:background="@color/colorAccent" />
 
             <ImageView
                 android:id="@+id/csIcon"
@@ -126,29 +120,27 @@
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
-                android:src="@drawable/cs_color"/>
+                android:src="@drawable/cs_color" />
 
         </LinearLayout>
 
         <include
             android:id="@+id/direction"
 
-            layout="@layout/profile_direction"/>
+            layout="@layout/profile_direction" />
 
         <LinearLayout
             android:id="@+id/maplayout"
             android:layout_width="match_parent"
             android:layout_height="150dp"
-
             android:layout_below="@+id/direction"
-            android:layout_marginTop="10dp"
             android:orientation="vertical">
 
             <com.google.android.gms.maps.MapView
                 android:id="@+id/mapView"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:layout_weight="1"/>
+                android:layout_weight="1" />
         </LinearLayout>
 
         <LinearLayout
@@ -164,7 +156,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="@string/date_trip"
-                android:textSize="16sp"/>
+                android:textSize="16sp" />
 
         </LinearLayout>
 
@@ -183,7 +175,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="@string/method_move"
-                android:textSize="16sp"/>
+                android:textSize="16sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -201,7 +193,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="@string/money"
-                android:textSize="16sp"/>
+                android:textSize="16sp" />
 
 
             <SeekBar
@@ -213,13 +205,13 @@
                 android:max="1000"
                 android:progress="50"
                 android:progressTint="@color/colorLine"
-                android:thumbTint="@color/colorLine"/>
+                android:thumbTint="@color/colorLine" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="12dp"
-                android:text="@string/budget"/>
+                android:text="@string/budget" />
 
 
         </LinearLayout>
@@ -235,9 +227,9 @@
 
             <TextView
                 android:layout_width="match_parent"
-                android:textSize="14sp"
                 android:layout_height="match_parent"
-                android:text="@string/add_info_profile"/>
+                android:text="@string/add_info_profile"
+                android:textSize="14sp" />
 
             <EditText
                 android:layout_width="match_parent"
@@ -245,10 +237,18 @@
                 android:backgroundTint="@color/colorLine"
                 android:hint="@string/description"
                 android:inputType="textMultiLine"
-                android:textSize="14sp"/>
+                android:textSize="14sp" />
         </LinearLayout>
 
-
+        <Button
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/descriptionprofile"
+            android:layout_marginEnd="19dp"
+            android:layout_marginTop="12dp"
+            android:padding="24dp"
+            android:text="Save" />
     </RelativeLayout>
 
 
