@@ -34,4 +34,5 @@
     <string name="method_move">Способ передвижения</string>
     <string name="budget">1000 руб.</string>
     <string name="add_info_profile">Дополнительная информация</string>
+    <string name="date">Дата</string>
 </resources>

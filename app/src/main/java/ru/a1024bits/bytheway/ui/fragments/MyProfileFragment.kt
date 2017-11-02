@@ -9,6 +9,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import com.borax12.materialdaterangepicker.date.DatePickerDialog
+import com.borax12.materialdaterangepicker.time.RadialPickerLayout
+import com.borax12.materialdaterangepicker.time.TimePickerDialog
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
@@ -16,9 +20,9 @@ import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.viewmodel.UserProfileViewModel
+import java.util.*
 
-
-class MyProfileFragment : LifecycleFragment(), OnMapReadyCallback {
+class MyProfileFragment : LifecycleFragment(), OnMapReadyCallback, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
     
     
     private var viewModel: UserProfileViewModel? = null
@@ -55,6 +59,8 @@ class MyProfileFragment : LifecycleFragment(), OnMapReadyCallback {
     override fun onResume() {
         super.onResume()
         mMapView?.onResume()
+//        val dpd = activity.fragmentManager.findFragmentByTag("Datepickerdialog") as DatePickerDialog
+//        dpd?.setOnDateSetListener(this)
     }
     
     override fun onMapReady(map: GoogleMap?) {
@@ -73,8 +79,8 @@ class MyProfileFragment : LifecycleFragment(), OnMapReadyCallback {
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater!!.inflate(R.layout.fragment_my_user_profile, container, false)
         Log.e("LOG", "function activity create view ")
-        
         mMapView = view?.findViewById<MapView>(R.id.mapView)
+        val datetrip = view?.findViewById<TextView>(R.id.choice_date)
         mMapView?.onCreate(savedInstanceState)
         
         mMapView?.onResume()// needed to get the map to display immediately
@@ -88,14 +94,31 @@ class MyProfileFragment : LifecycleFragment(), OnMapReadyCallback {
         
         mMapView?.getMapAsync(this)
         
-        // latitude and longitude
-        val latitude = 17.385044
-        val longitude = 78.486671
         
-        // create marker
-        val marker = MarkerOptions().position(
-                LatLng(latitude, longitude)).title("Hello Maps")
+        datetrip?.setOnClickListener({
+            val now = Calendar.getInstance()
+            val dateDialog = com.borax12.materialdaterangepicker.date.DatePickerDialog.newInstance(
+                    this@MyProfileFragment,
+                    now.get(Calendar.YEAR),
+                    now.get(Calendar.MONTH),
+                    now.get(Calendar.DAY_OF_MONTH)
+            )
+            dateDialog.isAutoHighlight = true
+            dateDialog.show(activity.fragmentManager, "Datepickerdialog")
+        })
+        
         return view;
+    }
+    
+    override fun onDateSet(view: DatePickerDialog, year: Int, monthOfYear: Int, dayOfMonth: Int, yearEnd: Int, monthOfYearEnd: Int, dayOfMonthEnd: Int) {
+        var monthOfYear = monthOfYear
+        var monthOfYearEnd = monthOfYearEnd
+        val date = "You picked the following date: From- " + dayOfMonth + "/" + ++monthOfYear + "/" + year + " To " + dayOfMonthEnd + "/" + ++monthOfYearEnd + "/" + yearEnd
+        Log.e("LOG date:", "date:" + date);
+    }
+    
+    override fun onTimeSet(view: RadialPickerLayout?, hourOfDay: Int, minute: Int, hourOfDayEnd: Int, minuteEnd: Int) {
+    
     }
     
     private fun settingsSocialNetworkButtons() {
@@ -115,6 +138,7 @@ class MyProfileFragment : LifecycleFragment(), OnMapReadyCallback {
             throw RuntimeException(context!!.toString() + " must implement OnFragmentInteractionListener")
         }
     }
+    
     
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
