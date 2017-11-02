@@ -1,6 +1,6 @@
 package ru.a1024bits.bytheway.adapter;
 
-import android.content.Context
+import android.app.Activity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -16,8 +16,9 @@ import io.reactivex.disposables.Disposable
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.MockUserRepository
+import ru.a1024bits.bytheway.ui.activity.MenuActivity
 
-class ShowAllUsersAdapter(recyclerView: RecyclerView, val context: Context, var senderUsers: MockUserRepository)
+class ShowAllUsersAdapter(recyclerView: RecyclerView, val context: Activity, var senderUsers: MockUserRepository)
     : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val VIEW_TYPE_ITEM = 0
     private val VIEW_TYPE_LOADING = 1
@@ -82,6 +83,11 @@ class ShowAllUsersAdapter(recyclerView: RecyclerView, val context: Context, var 
             holder.lastName.text = currentUser.lastName
             holder.name.text = currentUser.name
             glide.load(currentUser.urlPhoto).into(holder.avatar)
+            holder.itemView.setOnClickListener {
+                if (context is MenuActivity){
+                    context.showUserSimpleProfile(currentUser)
+                }
+            }
         } else if (holder is LoadingViewHolder) {
             holder.progressBar.isIndeterminate = true
         }

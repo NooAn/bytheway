@@ -28,7 +28,7 @@ class ShowUsersFragment : Fragment() {
         viewModel.init()
         val recyclerView: RecyclerView = currentView.findViewById(R.id.lazy_display_users)
         recyclerView.layoutManager = LinearLayoutManager(this.context, LinearLayoutManager.VERTICAL, false)
-        recyclerView.adapter = ShowAllUsersAdapter(recyclerView, this.context, viewModel.userRepo!!)
+        recyclerView.adapter = ShowAllUsersAdapter(recyclerView, this.activity, viewModel.userRepo!!)
     }
     
     
