@@ -37,7 +37,7 @@ class AllUsersFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(ShowUsersViewModel::class.java)
         viewModel.init()
-        showUsersAdapter = ShowAllUsersAdapter(recyclerView, this.context, viewModel.userRepo!!)
+        showUsersAdapter = ShowAllUsersAdapter(recyclerView, this.activity, viewModel.userRepo!!)
         if (savedInstanceState != null) {
             recyclerView.layoutManager.onRestoreInstanceState(savedInstanceState.getParcelable(LIST_DISPLAYING_USERS))
             showUsersAdapter.users = savedInstanceState.getParcelableArrayList(LIST_USERS_IN_ADAPTER)
