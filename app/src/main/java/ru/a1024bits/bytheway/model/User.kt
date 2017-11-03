@@ -7,7 +7,7 @@ import android.os.Parcelable
 /**
  * Created by andrey.gusenkov on 18/09/2017.
  */
-data class User(val name: String, val lastName: String = "", val age: Int = 0, val urlPhoto: String = "https://www.ischool.berkeley.edu/sites/default/files/default_images/avatar.jpeg") : Parcelable {
+data class User(var name: String = "", var lastName: String = "", var age: Int = 0, val urlPhoto: String = "https://www.ischool.berkeley.edu/sites/default/files/default_images/avatar.jpeg") : Parcelable {
     constructor(parcel: Parcel) : this(
             parcel.readString(),
             parcel.readString(),

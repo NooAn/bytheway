@@ -2,6 +2,8 @@ package ru.a1024bits.bytheway.dagger
 
 import dagger.Component
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
+import ru.a1024bits.bytheway.ui.fragments.AllUsersFragment
+import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment
 import javax.inject.Singleton
 
 /**
@@ -15,7 +17,8 @@ import javax.inject.Singleton
         UserRepositoryModule::class))
 
 interface AppComponent {
-    
     fun inject(activity: MenuActivity);
+    fun inject(fragment: AllUsersFragment);
+    fun inject(myProfileFragment: MyProfileFragment) {}
     
 }

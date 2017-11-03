@@ -18,8 +18,8 @@ class MyProfileViewModel : ViewModel() {
         this.userRepo = userRepository
     }
     
-    fun init(userId: String) {
-        user = userRepo?.getUsers(userID = 1)
+    fun init(userId: Long) {
+        user = userRepo?.getUserById(userId)
     }
     
 }

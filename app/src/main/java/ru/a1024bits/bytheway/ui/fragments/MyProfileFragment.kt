@@ -16,11 +16,14 @@ import com.borax12.materialdaterangepicker.time.TimePickerDialog
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.firebase.firestore.FirebaseFirestore
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.viewmodel.UserProfileViewModel
 import java.util.*
+import kotlin.collections.HashMap
+
 
 class MyProfileFragment : LifecycleFragment(), OnMapReadyCallback, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
     
@@ -29,9 +32,13 @@ class MyProfileFragment : LifecycleFragment(), OnMapReadyCallback, DatePickerDia
     
     private var mListener: OnFragmentInteractionListener? = null
     
+    var db = FirebaseFirestore.getInstance()
+    val TAG = "MyProfileFragment"
+    
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
     }
     
     
@@ -54,6 +61,33 @@ class MyProfileFragment : LifecycleFragment(), OnMapReadyCallback, DatePickerDia
                 }
             })
         }
+        
+        val user = HashMap<String, Any>()
+        user.put("name", "Ada")
+        user.put("last_name", "Lovelace")
+        user.put("age", 1815)
+        
+        Log.e("LOG", db.app.uid + db.app.name + " " + db.firestoreSettings.host)
+        
+        // Add a new document with a generated ID
+        db.collection("users")
+                .add(user)
+                .addOnSuccessListener { documentReference ->
+                    Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.id)
+                }
+                .addOnFailureListener { e -> Log.w(TAG, "Error adding document", e) }
+        
+        db.collection("users")
+                .get()
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        for (document in task.result) {
+                            Log.d(TAG, document.id + " => " + document.data)
+                        }
+                    } else {
+                        Log.w(TAG, "Error getting documents.", task.exception)
+                    }
+                }
     }
     
     override fun onResume() {

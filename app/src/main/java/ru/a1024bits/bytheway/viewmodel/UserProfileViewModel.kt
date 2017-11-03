@@ -20,7 +20,7 @@ class UserProfileViewModel : ViewModel() {
     }
     
     fun init(userId: String) {
-        user = userRepo?.getUsers(userID = 1)
+        user = userRepo?.getUserById(userID = 1)
     }
     
 }
