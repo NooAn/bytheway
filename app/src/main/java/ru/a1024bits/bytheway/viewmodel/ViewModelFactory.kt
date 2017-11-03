@@ -11,14 +11,11 @@ import javax.inject.Singleton
 /**
  * Created by andrey.gusenkov on 03/11/2017.
  */
-@Suppress("UNCHECKED_CAST")
-@Singleton
+
 class ViewModelFactory @Inject
-constructor(
-        private val creators: Map<Class<out ViewModel>,
-                @JvmSuppressWildcards Provider<ViewModel>>
-) : ViewModelProvider.Factory {
-    
+constructor(private val creators: Map<Class<out ViewModel>, @JvmSuppressWildcards Provider<ViewModel>>)
+    : ViewModelProvider.Factory {
+    @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         var creator: Provider<out ViewModel>? = creators[modelClass]
         if (creator == null) {
@@ -37,6 +34,6 @@ constructor(
         } catch (e: Exception) {
             throw RuntimeException(e)
         }
-        
+
     }
 }
