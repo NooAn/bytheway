@@ -198,20 +198,21 @@
 
             <SeekBar
                 style="@style/Widget.AppCompat.SeekBar"
+                android:id="@+id/choose_price_travel"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_marginTop="24dp"
                 android:layout_weight="1"
-                android:max="1000"
-                android:progress="50"
+                android:max="30"
+                android:progress="1"
                 android:progressTint="@color/colorLine"
                 android:thumbTint="@color/colorLine" />
 
             <TextView
+                android:id="@+id/display_price_travel"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="12dp"
-                android:text="@string/budget" />
+                android:layout_marginTop="12dp" />
 
 
         </LinearLayout>

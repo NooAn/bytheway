@@ -9,9 +9,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SeekBar
+import android.widget.TextView
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import kotlinx.android.synthetic.*
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
@@ -73,6 +76,21 @@ class MyProfileFragment : LifecycleFragment(), OnMapReadyCallback {
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater!!.inflate(R.layout.fragment_my_user_profile, container, false)
         Log.e("LOG", "function activity create view ")
+
+        val displayPriceTravel = view.findViewById<TextView>(R.id.display_price_travel)
+        displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(0)
+        view.findViewById<SeekBar>(R.id.choose_price_travel).setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+            override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
+                displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(fibbonaci(p1))
+            }
+
+            override fun onStartTrackingTouch(p0: SeekBar?) {
+            }
+
+            override fun onStopTrackingTouch(p0: SeekBar?) {
+            }
+
+        })
         
         mMapView = view?.findViewById<MapView>(R.id.mapView)
         mMapView?.onCreate(savedInstanceState)
@@ -95,7 +113,7 @@ class MyProfileFragment : LifecycleFragment(), OnMapReadyCallback {
         // create marker
         val marker = MarkerOptions().position(
                 LatLng(latitude, longitude)).title("Hello Maps")
-        return view;
+        return view
     }
     
     private fun settingsSocialNetworkButtons() {
@@ -149,6 +167,18 @@ class MyProfileFragment : LifecycleFragment(), OnMapReadyCallback {
     override fun onLowMemory() {
         super.onLowMemory()
         mMapView?.onLowMemory()
+    }
+
+    fun fibbonaci(n: Int): Int {
+        var prev = 0
+        var next = 1
+        var result = 0
+        for (i in 0 until n) {
+            result = prev + next
+            prev = next
+            next = result
+        }
+        return result
     }
     
     companion object {
