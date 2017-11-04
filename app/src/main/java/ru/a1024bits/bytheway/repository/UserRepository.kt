@@ -1,6 +1,7 @@
 package ru.a1024bits.bytheway.repository
 
 import android.arch.lifecycle.LiveData
+import android.support.v7.widget.RecyclerView
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import ru.a1024bits.bytheway.model.User
@@ -18,7 +19,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) {
     }
 
     //Rx wrapper
-    fun getUsers(): ArrayList<User> {
+    fun getUsers(adapter: RecyclerView.Adapter<RecyclerView.ViewHolder>): ArrayList<User> {
         val user = User()
         val listUser = arrayListOf<User>()
         store.collection("users")
@@ -32,16 +33,17 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) {
                             user.lastName = document.data.getValue("last_name") as String
                             listUser.add(user)
                         }
+                        adapter.notifyDataSetChanged()
                     } else {
                         Log.w(TAG, "Error getting documents.", task.exception)
                     }
                 }
 
-        return listUser;
+        return listUser
     }
 
     fun getUserById(userID: Long): LiveData<User>? {
-        return null;
+        return null
     }
 
 

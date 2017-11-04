@@ -41,34 +41,19 @@ class AllUsersFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         App.component.inject(this)
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(ShowUsersViewModel::class.java)
-        showUsersAdapter = ShowAllUsersAdapter(recyclerView, this.context)
+        showUsersAdapter = ShowAllUsersAdapter(this.context)
         recyclerView.adapter = showUsersAdapter
-        if (savedInstanceState != null) {
-            // recyclerView.layoutManager.onRestoreInstanceState(savedInstanceState.getParcelable(LIST_DISPLAYING_USERS))
-            // showUsersAdapter.users = savedInstanceState.getParcelableArrayList(LIST_USERS_IN_ADAPTER)
-        }
 
-        viewModel.getAllUsers().observe(this, object : Observer<List<User>> {
-            override fun onChanged(list: List<User>?) {
-                Log.e("LOG", "onChanged")
-                if (list != null) {
-                    showUsersAdapter.addItems(list)
-                }
+        viewModel.getAllUsers(showUsersAdapter).observe(this, Observer<List<User>> { list ->
+            Log.e("LOG", "onChanged")
+            if (list != null) {
+                showUsersAdapter.addItems(list)
             }
         })
 
     }
 
-    override fun onSaveInstanceState(outState: Bundle?) {
-        super.onSaveInstanceState(outState)
-        //outState?.putParcelable(LIST_DISPLAYING_USERS, recyclerView.layoutManager.onSaveInstanceState())
-        //outState?.putParcelableArrayList(LIST_USERS_IN_ADAPTER, showUsersAdapter.users as ArrayList<out Parcelable>)
-    }
-
-
     companion object {
-        val LIST_DISPLAYING_USERS = "LIST_DISPLAYING_USERS"
-        val LIST_USERS_IN_ADAPTER = "LIST_USERS_IN_ADAPTER"
         fun newInstance(): AllUsersFragment {
             val fragment = AllUsersFragment()
             fragment.arguments = Bundle()
