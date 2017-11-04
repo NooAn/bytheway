@@ -22,18 +22,18 @@ import ru.a1024bits.bytheway.viewmodel.UserProfileViewModel
 
 
 class MyProfileFragment : LifecycleFragment(), OnMapReadyCallback {
-    
-    
+
+
     private var viewModel: UserProfileViewModel? = null
-    
+
     private var mListener: OnFragmentInteractionListener? = null
-    
-    
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
-    
-    
+
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         Log.e("LOG", "function fragment Created ")
@@ -43,9 +43,9 @@ class MyProfileFragment : LifecycleFragment(), OnMapReadyCallback {
             viewModel = ViewModelProviders.of(this).get(UserProfileViewModel::class.java)
             viewModel?.init(userId)
             viewModel?.user?.observe(this, Observer {
-                
+
                 Log.e("LOG", "observer only")
-                
+
             })
             viewModel?.user?.observe(this, object : Observer<User> {
                 override fun onChanged(t: User?) {
@@ -54,32 +54,32 @@ class MyProfileFragment : LifecycleFragment(), OnMapReadyCallback {
             })
         }
     }
-    
+
     override fun onResume() {
         super.onResume()
         mMapView?.onResume()
     }
-    
+
     override fun onMapReady(map: GoogleMap?) {
         if (googleMap != null)
             this.googleMap = map
-        
+
         googleMap?.addMarker(MarkerOptions().position(CENTRE).title("Hello, Dude!"))
-        
+
         // Zooming to the Campus location
         googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(CENTRE, ZOOM))
     }
-    
+
     private var mMapView: MapView? = null
     private var googleMap: GoogleMap? = null
-    
+
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater!!.inflate(R.layout.fragment_my_user_profile, container, false)
         Log.e("LOG", "function activity create view ")
 
         val displayPriceTravel = view.findViewById<TextView>(R.id.display_price_travel)
         displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(0)
-        view.findViewById<SeekBar>(R.id.choose_price_travel).setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+        view.findViewById<SeekBar>(R.id.choose_price_travel).setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
                 displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(fibbonaci(p1))
             }
@@ -91,40 +91,40 @@ class MyProfileFragment : LifecycleFragment(), OnMapReadyCallback {
             }
 
         })
-        
+
         mMapView = view?.findViewById<MapView>(R.id.mapView)
         mMapView?.onCreate(savedInstanceState)
-        
+
         mMapView?.onResume()// needed to get the map to display immediately
-        
+
         try {
             MapsInitializer.initialize(activity.applicationContext)
         } catch (e: Exception) {
             e.printStackTrace()
         }
         settingsSocialNetworkButtons()
-        
+
         mMapView?.getMapAsync(this)
-        
+
         // latitude and longitude
         val latitude = 17.385044
         val longitude = 78.486671
-        
+
         // create marker
         val marker = MarkerOptions().position(
                 LatLng(latitude, longitude)).title("Hello Maps")
         return view
     }
-    
+
     private fun settingsSocialNetworkButtons() {
     }
-    
+
     fun onButtonPressed() {
         if (mListener != null) {
             mListener!!.onFragmentInteraction()
         }
     }
-    
+
     override fun onAttach(context: Context?) {
         super.onAttach(context)
         if (context is OnFragmentInteractionListener) {
@@ -133,37 +133,37 @@ class MyProfileFragment : LifecycleFragment(), OnMapReadyCallback {
             throw RuntimeException(context!!.toString() + " must implement OnFragmentInteractionListener")
         }
     }
-    
+
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
         mMapView?.onSaveInstanceState(outState)
     }
-    
+
     override fun onDetach() {
         super.onDetach()
         mListener = null
     }
-    
+
     override fun onPause() {
         super.onPause()
         mMapView?.onPause()
     }
-    
+
     override fun onStart() {
         super.onStart()
         mMapView?.onStart()
     }
-    
+
     override fun onStop() {
         super.onStop()
         mMapView?.onStop()
     }
-    
+
     override fun onDestroy() {
         super.onDestroy()
         mMapView?.onDestroy()
     }
-    
+
     override fun onLowMemory() {
         super.onLowMemory()
         mMapView?.onLowMemory()
@@ -180,7 +180,7 @@ class MyProfileFragment : LifecycleFragment(), OnMapReadyCallback {
         }
         return result
     }
-    
+
     companion object {
         // TODO: Rename parameter arguments, choose names that match
         // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -188,7 +188,7 @@ class MyProfileFragment : LifecycleFragment(), OnMapReadyCallback {
         private val UID_KEY = "uid"
         val CENTRE: LatLng = LatLng(-23.570991, -46.649886)
         val ZOOM = 9f
-        
+
         fun newInstance(param1: String, param2: String): UserProfileFragment {
             val fragment = UserProfileFragment()
             val args = Bundle()

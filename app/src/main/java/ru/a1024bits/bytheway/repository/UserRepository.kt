@@ -1,12 +1,8 @@
 package ru.a1024bits.bytheway.repository
 
 import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MutableLiveData
 import android.util.Log
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import ru.a1024bits.bytheway.WebService
+import com.google.firebase.firestore.FirebaseFirestore
 import ru.a1024bits.bytheway.model.User
 import javax.inject.Inject
 
@@ -14,25 +10,39 @@ import javax.inject.Inject
 /**
  * Created by andrey.gusenkov on 19/09/2017.
  */
-class UserRepository @Inject constructor(val webService: WebService) {
-    
-    
-    fun getUsers(userID: Int): LiveData<User> {
-        
-        val data = MutableLiveData<User>()
-        
-        webService.getUser(Integer.toString(userID)).enqueue(object : Callback<User> {
-            
-            override fun onFailure(call: Call<User>?, t: Throwable?) {
-                Log.e("LOG", "ERROR in webservice", t)
-            }
-            
-            override fun onResponse(call: Call<User>, response: Response<User>) {
-                data.value = response.body()
-            }
-        })
-        return data;
+class UserRepository @Inject constructor(val store: FirebaseFirestore) {
+    var TAG = "LOG UserRepository"
+
+    init {
+        Log.e("LOG", "init repos2")
     }
-    
-    
+
+    //Rx wrapper
+    fun getUsers(): ArrayList<User> {
+        val user = User()
+        val listUser = arrayListOf<User>()
+        store.collection("users")
+                .get()
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        for (document in task.result) {
+                            Log.d(TAG, document.id + " => " + document.data)
+                            user.name = document.data.getValue("name") as String
+                            user.age = document.data.getValue("age") as Long
+                            user.lastName = document.data.getValue("last_name") as String
+                            listUser.add(user)
+                        }
+                    } else {
+                        Log.w(TAG, "Error getting documents.", task.exception)
+                    }
+                }
+
+        return listUser;
+    }
+
+    fun getUserById(userID: Long): LiveData<User>? {
+        return null;
+    }
+
+
 }

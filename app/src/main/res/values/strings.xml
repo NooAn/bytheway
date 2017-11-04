@@ -6,7 +6,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="fullname">Andrey Petrov</string>
     <string name="datetrip">Дата</string>
-    <string name="type_money">рублей: </string>
+    <string name="type_money">Рублей: </string>
     <string name="money">Бюджет поездки</string>
     <string name="description">Описание поездки</string>
     <string name="city">Москва, Россия</string>
@@ -35,4 +35,5 @@
     <string name="method_move">Способ передвижения</string>
     <string name="budget">1000 руб.</string>
     <string name="add_info_profile">Дополнительная информация</string>
+    <string name="date">Дата</string>
 </resources>

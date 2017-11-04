@@ -1,9 +1,8 @@
 package ru.a1024bits.bytheway.dagger
 
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
-import retrofit2.Retrofit
-import ru.a1024bits.bytheway.WebService
 import ru.a1024bits.bytheway.repository.UserRepository
 import javax.inject.Singleton
 
@@ -15,9 +14,9 @@ class UserRepositoryModule {
     
     @Provides
     @Singleton
-    fun providesWebService(retrofit: Retrofit): WebService? = retrofit.create(WebService::class.java)
+    fun provideUserRepository(store: FirebaseFirestore): UserRepository = UserRepository(store)
     
     @Provides
     @Singleton
-    fun provideUserRepository(webService: WebService) : UserRepository = UserRepository(webService)
+    fun providesFirestoreRepository(): FirebaseFirestore = FirebaseFirestore.getInstance()
 }
