@@ -51,9 +51,7 @@ class MyProfileFragment : LifecycleFragment(), OnMapReadyCallback, DatePickerDia
             viewModel = ViewModelProviders.of(this).get(UserProfileViewModel::class.java)
             viewModel?.init(userId)
             viewModel?.user?.observe(this, Observer {
-                
                 Log.e("LOG", "observer only")
-                
             })
             viewModel?.user?.observe(this, object : Observer<User> {
                 override fun onChanged(t: User?) {

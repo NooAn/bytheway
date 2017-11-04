@@ -12,11 +12,11 @@ import javax.inject.Inject
  */
 class UserRepository @Inject constructor(val store: FirebaseFirestore) {
     var TAG = "LOG UserRepository"
-    
+
     init {
         Log.e("LOG", "init repos2")
     }
-    
+
     //Rx wrapper
     fun getUsers(): ArrayList<User> {
         val user = User()
@@ -28,7 +28,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) {
                         for (document in task.result) {
                             Log.d(TAG, document.id + " => " + document.data)
                             user.name = document.data.getValue("name") as String
-                            user.age = document.data.getValue("age") as Int
+                            user.age = document.data.getValue("age") as Long
                             user.lastName = document.data.getValue("last_name") as String
                             listUser.add(user)
                         }
@@ -36,13 +36,13 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) {
                         Log.w(TAG, "Error getting documents.", task.exception)
                     }
                 }
-        
+
         return listUser;
     }
-    
+
     fun getUserById(userID: Long): LiveData<User>? {
         return null;
     }
-    
-    
+
+
 }

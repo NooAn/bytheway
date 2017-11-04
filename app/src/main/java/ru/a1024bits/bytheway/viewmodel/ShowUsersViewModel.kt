@@ -17,33 +17,33 @@ class ShowUsersViewModel @Inject constructor(var userRepository: UserRepository)
     companion object {
         var idCurrentUser = 0
     }
-    
+
     var mockRepo: MockUserRepository? = null
     var listUser: LiveData<List<User>>? = null
-    
+
     fun getAllUsers(): LiveData<List<User>> {
         Log.e("LOG", "init repos1 $userRepository")
         if (listUser == null) {
             listUser = MutableLiveData()
             (listUser as MutableLiveData<List<User>>).setValue(userRepository.getUsers())
-            
+
         }
         return listUser as MutableLiveData<List<User>>
     }
-    
-    
+
+
     fun init() {
         Log.e("LOG", "init")
         this.mockRepo = MockUserRepository(object : MockWebService {
             override fun getChanUsers(fromCount: Long, count: Int): List<User> {
                 val result: MutableList<User> = mutableListOf()
                 for (e in 1..20) {
-                    result.add(User("Василий №" + ++idCurrentUser, "Кропоткин - ", idCurrentUser))
+                    result.add(User("Василий №" + ++idCurrentUser, "Кропоткин - ", idCurrentUser.toLong()))
                 }
                 return result
             }
         })
     }
-    
-    
+
+
 }
