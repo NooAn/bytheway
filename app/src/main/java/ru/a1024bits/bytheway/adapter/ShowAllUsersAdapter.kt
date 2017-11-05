@@ -2,6 +2,7 @@ package ru.a1024bits.bytheway.adapter;
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +15,7 @@ import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
 
-class ShowAllUsersAdapter(val context: Context) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class ShowAllUsersAdapter(val context: Context) : RecyclerView.Adapter<ShowAllUsersAdapter.UserViewHolder>() {
     private val VIEW_TYPE_ITEM = 0
     private val VIEW_TYPE_LOADING = 1
 
@@ -30,21 +31,14 @@ class ShowAllUsersAdapter(val context: Context) : RecyclerView.Adapter<RecyclerV
         notifyDataSetChanged()
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder? {
-        if (viewType == VIEW_TYPE_ITEM) {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
             return UserViewHolder(
                     LayoutInflater.from(parent.context).inflate(R.layout.item_content_users, parent, false)
             )
-        } else if (viewType == VIEW_TYPE_LOADING) {
-            return LoadingViewHolder(
-                    LayoutInflater.from(parent.context).inflate(R.layout.item_loading, parent, false)
-            )
-        }
-        return null
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (holder is UserViewHolder) {
+    override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
+        Log.d("LOG", "onBindViewHolder on position: " + position)
             val currentUser = users[position]
             holder.lastName.text = currentUser.lastName
             holder.name.text = currentUser.name
@@ -54,20 +48,13 @@ class ShowAllUsersAdapter(val context: Context) : RecyclerView.Adapter<RecyclerV
                     context.showUserSimpleProfile(currentUser)
                 }
             }
-        } else if (holder is LoadingViewHolder) {
-            holder.progressBar.isIndeterminate = true
-        }
     }
 
     override fun getItemCount(): Int {
-        return if (users.isEmpty()) 1 else users.size
+        return users.size
     }
 
-    private inner class LoadingViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        var progressBar = view.findViewById<ProgressBar>(R.id.progressBar)
-    }
-
-    private inner class UserViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    inner class UserViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         var lastName = view.findViewById<TextView>(R.id.lastName_content_user)
         var name = view.findViewById<TextView>(R.id.name_content_user)
         var avatar = view.findViewById<ImageView>(R.id.user_avatar)

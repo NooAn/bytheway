@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.adapter.ShowAllUsersAdapter
@@ -34,7 +35,6 @@ class AllUsersFragment : Fragment() {
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recyclerView = currentView.findViewById(R.id.lazy_display_users)
-
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -44,12 +44,13 @@ class AllUsersFragment : Fragment() {
         showUsersAdapter = ShowAllUsersAdapter(this.context)
         recyclerView.adapter = showUsersAdapter
 
-        viewModel.getAllUsers(showUsersAdapter).observe(this, Observer<List<User>> { list ->
+        val observer = Observer<List<User>> { list ->
             Log.e("LOG", "onChanged")
             if (list != null) {
                 showUsersAdapter.addItems(list)
             }
-        })
+        }
+        viewModel.getAllUsers(observer).observe(this, observer)
 
     }
 
