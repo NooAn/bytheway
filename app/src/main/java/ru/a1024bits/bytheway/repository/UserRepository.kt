@@ -40,8 +40,8 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) {
         return listUser;
     }
 
-    fun getUserById(userID: Long): LiveData<User>? {
-        return null;
+    fun getUserById(userID: Long): User {
+        return User("Andrey");
     }
 
 
