@@ -1,25 +1,40 @@
 package ru.a1024bits.bytheway.viewmodel
 
-import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
+import android.text.Editable
+import android.util.Log
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.UserRepository
+import javax.inject.Inject
 
 /**
  * Created by andrey.gusenkov on 25/09/2017.
  */
-class MyProfileViewModel : ViewModel() {
+class MyProfileViewModel @Inject constructor(var userRepository: UserRepository) : ViewModel() {
     private var userId: String? = null
-    var user: LiveData<User>? = null
-    private var userRepo: UserRepository? = null
+    val user: MutableLiveData<User> = MutableLiveData<User>()
 
-    // @Inject
-    fun UserProfileViewModel(userRepository: UserRepository) {
-        this.userRepo = userRepository
+    fun load(userId: Long) {
+        Log.e("LOG", "start load user: $userId")
+        userRepository.getUserById(userId)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        for (document in task.result) {
+                            val profile = User()
+                            profile.name = document.data.getValue("name") as String
+                            profile.age = document.data.getValue("age") as Long
+                            profile.lastName = document.data.getValue("last_name") as String
+                            user.setValue(profile)
+                            break
+                        }
+                    }
+                }
+        Log.e("LOG", "end load user: $userId")
     }
 
-    fun init(userId: Long) {
-        userRepo?.getUserById(userId)
+    fun saveLinks(textLinks: Editable) {
+        Log.e("LOG", textLinks.toString())
     }
 
 }

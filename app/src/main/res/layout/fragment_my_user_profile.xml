@@ -63,7 +63,8 @@
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
-                android:src="@drawable/vk" />
+                android:src="@drawable/vk_gray"
+                tools:src="@drawable/vk" />
 
             <View
                 android:layout_width="1dp"
@@ -77,7 +78,8 @@
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
-                android:src="@drawable/whats_icon__2_" />
+                android:src="@drawable/whats_grey"
+                tools:src="@drawable/whats_icon__2_" />
 
             <View
                 android:layout_width="1dp"
@@ -106,7 +108,8 @@
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
-                android:src="@drawable/fb_color" />
+                android:src="@drawable/fb_grey"
+                tools:src="@drawable/fb_color" />
 
             <View
                 android:layout_width="1dp"
@@ -120,7 +123,8 @@
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
-                android:src="@drawable/cs_color" />
+                android:src="@drawable/cs_grey"
+                tools:src="@drawable/cs_color" />
 
         </LinearLayout>
 

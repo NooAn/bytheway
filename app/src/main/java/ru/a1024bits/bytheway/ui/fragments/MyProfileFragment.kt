@@ -1,32 +1,37 @@
 package ru.a1024bits.bytheway.ui.fragments
 
-import android.arch.lifecycle.LifecycleFragment
 import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
+import android.support.v4.app.Fragment
+import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.SeekBar
-import android.widget.TextView
+import android.widget.*
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import kotlinx.android.synthetic.*
+import kotlinx.android.synthetic.main.fragment_my_user_profile.*
+import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
+import ru.a1024bits.bytheway.model.SocialNetwork
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
-import ru.a1024bits.bytheway.viewmodel.UserProfileViewModel
+import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
+import javax.inject.Inject
 
 
-class MyProfileFragment : LifecycleFragment(), OnMapReadyCallback {
+class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
 
-    private var viewModel: UserProfileViewModel? = null
+    private var viewModel: MyProfileViewModel? = null
 
     private var mListener: OnFragmentInteractionListener? = null
+    @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,23 +41,37 @@ class MyProfileFragment : LifecycleFragment(), OnMapReadyCallback {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        App.component.inject(this)
         Log.e("LOG", "function fragment Created ")
         if (arguments != null) {
-            Log.e("LOG", "enter")
             val userId: String = arguments.getString(UID_KEY)
-            viewModel = ViewModelProviders.of(this).get(UserProfileViewModel::class.java)
-            viewModel?.init(userId)
-            viewModel?.user?.observe(this, Observer {
-
-                Log.e("LOG", "observer only")
-
-            })
-            viewModel?.user?.observe(this, object : Observer<User> {
-                override fun onChanged(t: User?) {
-                    Log.e("LOG", "onChanged")
-                }
-            })
         }
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
+
+        viewModel?.user?.observe(this, Observer<User> { user ->
+            Log.e("LOG", "fill Profile: $user")
+            fillProfile(user);
+        })
+
+        viewModel!!.load(1)
+    }
+
+    private fun fillProfile(user: User?) {
+        username.text = StringBuilder(user?.name).append(" ").append(user?.lastName)
+        city.text = user?.city
+
+        for (name in user?.socialNetwork!!) {
+            when (name) {
+                SocialNetwork.VK -> vkIcon.setImageResource(R.drawable.vk)
+                SocialNetwork.CS -> csIcon.setImageResource(R.drawable.cs_color)
+                SocialNetwork.FB -> fbcon.setImageResource(R.drawable.fb_color)
+                SocialNetwork.WHATSUP -> whatsUpIcon.setImageResource(R.drawable.whats_icon__2_)
+            }
+        }
+
+//        for (nameCity in user?.cities!!) {
+//
+//        }
     }
 
     override fun onResume() {
@@ -92,9 +111,22 @@ class MyProfileFragment : LifecycleFragment(), OnMapReadyCallback {
 
         })
 
+        view.findViewById<ImageView>(R.id.vkIcon).setOnClickListener {
+            openDialogVk()
+        }
+        view.findViewById<ImageView>(R.id.fbcon).setOnClickListener {
+            openDialogDb()
+        }
+        view.findViewById<ImageView>(R.id.whatsUpIcon).setOnClickListener({
+            openDialogWhatsUp();
+        })
+        view.findViewById<ImageView>(R.id.fbcon).setOnClickListener({
+            openDialogFB()
+        })
+
+
         mMapView = view?.findViewById<MapView>(R.id.mapView)
         mMapView?.onCreate(savedInstanceState)
-
         mMapView?.onResume()// needed to get the map to display immediately
 
         try {
@@ -102,22 +134,38 @@ class MyProfileFragment : LifecycleFragment(), OnMapReadyCallback {
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        settingsSocialNetworkButtons()
-
         mMapView?.getMapAsync(this)
-
-        // latitude and longitude
-        val latitude = 17.385044
-        val longitude = 78.486671
-
-        // create marker
-        val marker = MarkerOptions().position(
-                LatLng(latitude, longitude)).title("Hello Maps")
         return view
     }
 
-    private fun settingsSocialNetworkButtons() {
+    private fun openDialogFB() {
+        val simpleAlert = AlertDialog.Builder(activity).create()
+        simpleAlert.setTitle("Ссылки на социальные сети")
+        simpleAlert.setMessage("Здесь вы можете указать ваши контактные данные для того что бы вас смогли найти другие путешественики")
+        val inflater = this.layoutInflater
+        val dialogView = inflater.inflate(R.layout.custom_dialog_profile_soc_network, null)
+        simpleAlert.setView(dialogView)
+
+        simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Сохранить", { dialogInterface, i ->
+            viewModel?.saveLinks(dialogView.findViewById<EditText>(R.id.fbEditText).text)
+            Toast.makeText(activity.applicationContext, "Сохранено $'dialogView.findViewById<EditText>(R.id.fbEditText).text'", Toast.LENGTH_SHORT).show()
+        })
+
+        simpleAlert.show()
+
     }
+
+    private fun openDialogWhatsUp() {
+
+    }
+
+    private fun openDialogDb() {
+
+    }
+
+    private fun openDialogVk() {
+    }
+
 
     fun onButtonPressed() {
         if (mListener != null) {
@@ -182,8 +230,6 @@ class MyProfileFragment : LifecycleFragment(), OnMapReadyCallback {
     }
 
     companion object {
-        // TODO: Rename parameter arguments, choose names that match
-        // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
         private val ARG_PARAM1 = "param1"
         private val UID_KEY = "uid"
         val CENTRE: LatLng = LatLng(-23.570991, -46.649886)
