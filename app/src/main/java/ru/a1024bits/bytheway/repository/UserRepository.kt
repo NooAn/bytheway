@@ -5,6 +5,7 @@ import android.arch.lifecycle.Observer
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import com.google.android.gms.tasks.Task
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import ru.a1024bits.bytheway.model.User
@@ -31,8 +32,8 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) : IUsersR
         return store.collection("users").get()
     }
 
-   override fun getUserById(userID: Long): Task<QuerySnapshot> {
-        return store.collection("users").get();
+    override fun getUserById(userID: Long): Task<DocumentSnapshot> {
+        return store.collection("users").document("$userID").get();
     }
 
 

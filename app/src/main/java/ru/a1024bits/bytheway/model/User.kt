@@ -31,7 +31,6 @@ enum class SocialNetwork {
     WHATSUP,
     CS,
     FB
-
 }
 
 data class User(var name: String = "",
