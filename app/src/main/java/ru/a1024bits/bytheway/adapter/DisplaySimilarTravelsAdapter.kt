@@ -14,7 +14,8 @@ import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
 
-class ShowAllUsersAdapter(val context: Context) : RecyclerView.Adapter<ShowAllUsersAdapter.UserViewHolder>() {
+
+class DisplaySimilarTravelsAdapter(val context: Context) : RecyclerView.Adapter<DisplaySimilarTravelsAdapter.UserViewHolder>() {
     private var glide: RequestManager = Glide.with(this.context)
     var users: MutableList<User> = ArrayList()
 
@@ -22,25 +23,27 @@ class ShowAllUsersAdapter(val context: Context) : RecyclerView.Adapter<ShowAllUs
     fun addItems(list: List<User>) {
         this.users = list as MutableList<User>
         notifyDataSetChanged()
+        Log.d("LOG", "addItems: " + list)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
-            return UserViewHolder(
-                    LayoutInflater.from(parent.context).inflate(R.layout.item_content_all_users, parent, false)
-            )
+        return UserViewHolder(
+                LayoutInflater.from(parent.context).inflate(R.layout.item_content_similar_travel, parent, false)
+        )
     }
 
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
         Log.d("LOG", "onBindViewHolder on position: " + position)
-            val currentUser = users[position]
-            holder.lastName.text = currentUser.lastName
-            holder.name.text = currentUser.name
-            glide.load(currentUser.urlPhoto).into(holder.avatar)
-            holder.itemView.setOnClickListener {
-                if (context is MenuActivity) {
-                    context.showUserSimpleProfile(currentUser)
-                }
+        val currentUser = users[position]
+        holder.lastName.text = currentUser.lastName
+        holder.name.text = currentUser.name
+        holder.percentSimilarTravel.text = StringBuilder().append(currentUser.percentsSimilarTravel).append(" %")
+        glide.load(currentUser.urlPhoto).into(holder.avatar)
+        holder.itemView.setOnClickListener {
+            if (context is MenuActivity) {
+                context.showUserSimpleProfile(currentUser)
             }
+        }
     }
 
     override fun getItemCount(): Int {
@@ -51,5 +54,6 @@ class ShowAllUsersAdapter(val context: Context) : RecyclerView.Adapter<ShowAllUs
         var lastName = view.findViewById<TextView>(R.id.lastName_content_user)
         var name = view.findViewById<TextView>(R.id.name_content_user)
         var avatar = view.findViewById<ImageView>(R.id.user_avatar)
+        var percentSimilarTravel = view.findViewById<TextView>(R.id.percent_similar_travel)
     }
 }
