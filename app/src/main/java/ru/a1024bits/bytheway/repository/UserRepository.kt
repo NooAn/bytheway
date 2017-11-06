@@ -4,7 +4,9 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Observer
 import android.support.v7.widget.RecyclerView
 import android.util.Log
+import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
 import ru.a1024bits.bytheway.model.User
 import javax.inject.Inject
 
@@ -20,27 +22,9 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) {
     }
 
     //Rx wrapper
-    fun getUsers(observer: Observer<List<User>>): ArrayList<User> {
-        val user = User()
-        val listUser = arrayListOf<User>()
-        store.collection("users")
+    fun getUsers(): Task<QuerySnapshot> {
+        return store.collection("users")
                 .get()
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        for (document in task.result) {
-                            Log.d(TAG, document.id + " => " + document.data)
-                            user.name = document.data.getValue("name") as String
-                            user.age = document.data.getValue("age") as Long
-                            user.lastName = document.data.getValue("last_name") as String
-                            listUser.add(user)
-                        }
-                        observer.onChanged(listUser)
-                    } else {
-                        Log.w(TAG, "Error getting documents.", task.exception)
-                    }
-                }
-
-        return listUser
     }
 
     fun getUserById(userID: Long): LiveData<User>? {

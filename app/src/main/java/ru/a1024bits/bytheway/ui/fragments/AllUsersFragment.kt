@@ -44,14 +44,14 @@ class AllUsersFragment : Fragment() {
         showUsersAdapter = ShowAllUsersAdapter(this.context)
         recyclerView.adapter = showUsersAdapter
 
-        val observer = Observer<List<User>> { list ->
-            Log.e("LOG", "onChanged")
+        viewModel.userLiveData.observe(this, Observer<User> { list ->
+            Log.e("LOG", "onChanged $list")
             if (list != null) {
-                showUsersAdapter.addItems(list)
+                Log.e("LOG", "update $list")
+                showUsersAdapter.addItem(list)
             }
-        }
-        viewModel.getAllUsers(observer).observe(this, observer)
-
+        })
+        viewModel.getAllUsers()
     }
 
     companion object {

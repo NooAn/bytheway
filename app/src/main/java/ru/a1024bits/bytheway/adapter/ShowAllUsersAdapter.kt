@@ -31,23 +31,28 @@ class ShowAllUsersAdapter(val context: Context) : RecyclerView.Adapter<ShowAllUs
         notifyDataSetChanged()
     }
 
+    fun addItem(user: User) {
+        this.users.add(user)
+        notifyDataSetChanged()
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
-            return UserViewHolder(
-                    LayoutInflater.from(parent.context).inflate(R.layout.item_content_users, parent, false)
-            )
+        return UserViewHolder(
+                LayoutInflater.from(parent.context).inflate(R.layout.item_content_users, parent, false)
+        )
     }
 
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
         Log.d("LOG", "onBindViewHolder on position: " + position)
-            val currentUser = users[position]
-            holder.lastName.text = currentUser.lastName
-            holder.name.text = currentUser.name
-            glide.load(currentUser.urlPhoto).into(holder.avatar)
-            holder.itemView.setOnClickListener {
-                if (context is MenuActivity) {
-                    context.showUserSimpleProfile(currentUser)
-                }
+        val currentUser = users[position]
+        holder.lastName.text = currentUser.lastName
+        holder.name.text = currentUser.name
+        glide.load(currentUser.urlPhoto).into(holder.avatar)
+        holder.itemView.setOnClickListener {
+            if (context is MenuActivity) {
+                context.showUserSimpleProfile(currentUser)
             }
+        }
     }
 
     override fun getItemCount(): Int {
