@@ -10,4 +10,6 @@ interface IUsersRepository {
     fun getUsers(): Task<QuerySnapshot>
     fun getSimilarUsersTravels(data: Filter, observer: Observer<List<User>>): List<User>
     fun getUserById(userID: Long): Task<DocumentSnapshot>
+    fun changeUserProfile(map: HashMap<String, Any>, id: String): Task<Void>
+    fun addUser(user: User): Task<Void>
 }
