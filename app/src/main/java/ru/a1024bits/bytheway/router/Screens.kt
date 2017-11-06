@@ -10,5 +10,6 @@ class Screens {
         val SEARCH_MAP_SCREEN = "start fragment screen"
         val MAIN_ACTIVITY_SCREEN = "main fragment screen"
         val ALL_USERS_SCREEN = "all_users_screen"
+        val SIMILAR_TRAVELS_SCREEN = "similar_travel_screen"
     }
 }

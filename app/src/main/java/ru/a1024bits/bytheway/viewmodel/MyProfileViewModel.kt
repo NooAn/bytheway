@@ -12,14 +12,14 @@ class MyProfileViewModel : ViewModel() {
     private var userId: String? = null
     var user: LiveData<User>? = null
     private var userRepo: UserRepository? = null
-    
+
     // @Inject
     fun UserProfileViewModel(userRepository: UserRepository) {
         this.userRepo = userRepository
     }
-    
+
     fun init(userId: Long) {
-        user = userRepo?.getUserById(userId)
+        userRepo?.getUserById(userId)
     }
-    
+
 }

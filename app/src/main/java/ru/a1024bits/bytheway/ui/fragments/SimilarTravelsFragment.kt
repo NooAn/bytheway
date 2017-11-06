@@ -12,50 +12,55 @@ import android.view.View
 import android.view.ViewGroup
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
-import ru.a1024bits.bytheway.adapter.ShowAllUsersAdapter
+import ru.a1024bits.bytheway.adapter.DisplaySimilarTravelsAdapter
 import ru.a1024bits.bytheway.model.User
+import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.viewmodel.ShowUsersViewModel
+import java.util.*
 import javax.inject.Inject
 
-
-class AllUsersFragment : Fragment() {
+class SimilarTravelsFragment : Fragment() {
     private lateinit var currentView: View
     private lateinit var viewModel: ShowUsersViewModel
-    private lateinit var showUsersAdapter: ShowAllUsersAdapter
+    private lateinit var showUsersAdapter: DisplaySimilarTravelsAdapter
     private lateinit var recyclerView: RecyclerView
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        currentView = inflater.inflate(R.layout.fragment_display_all_users, container, false)
+        currentView = inflater.inflate(R.layout.fragment_display_similar_user_travels, container, false)
         return currentView
     }
 
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        recyclerView = currentView.findViewById(R.id.display_all_users)
+        recyclerView = currentView.findViewById(R.id.display_similar_user_travels)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         App.component.inject(this)
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(ShowUsersViewModel::class.java)
-        showUsersAdapter = ShowAllUsersAdapter(this.context)
+        showUsersAdapter = DisplaySimilarTravelsAdapter(this.context)
         recyclerView.adapter = showUsersAdapter
 
-        viewModel.userLiveData.observe(this, Observer<User> { list ->
-            Log.e("LOG", "onChanged $list")
+        val observer = Observer<List<User>> { list ->
+            Log.e("LOG", "onChanged " + list + " - size")
             if (list != null) {
-                Log.e("LOG", "update $list")
-                showUsersAdapter.addItem(list)
+                val random = Random()
+                for (user in list) {
+                    user.percentsSimilarTravel = random.nextInt(100)
+                    Log.e("tag", "11user percents: " + user.percentsSimilarTravel + " \n")
+                }
+                showUsersAdapter.addItems(list)
             }
-        })
-        viewModel.getAllUsers()
+        }
+        viewModel.getSimilarUsersTravels(Filter(/* some data for filtering*/), observer).observe(this, observer)
     }
 
     companion object {
-        fun newInstance(): AllUsersFragment {
-            val fragment = AllUsersFragment()
+        fun newInstance(): SimilarTravelsFragment {
+            val fragment = SimilarTravelsFragment()
             fragment.arguments = Bundle()
             return fragment
         }

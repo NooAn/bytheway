@@ -12,7 +12,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
-import kotlinx.android.synthetic.main.item_content_users.view.*
+import kotlinx.android.synthetic.main.item_content_all_users.view.*
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.User
@@ -20,6 +20,7 @@ import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.router.Screens.Companion.ALL_USERS_SCREEN
 import ru.a1024bits.bytheway.router.Screens.Companion.SEARCH_MAP_SCREEN
+import ru.a1024bits.bytheway.router.Screens.Companion.SIMILAR_TRAVELS_SCREEN
 import ru.a1024bits.bytheway.router.Screens.Companion.USER_PROFILE_SCREEN
 import ru.a1024bits.bytheway.ui.fragments.*
 import ru.terrakok.cicerone.NavigatorHolder
@@ -78,21 +79,20 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     val navigator = object : SupportFragmentNavigator(supportFragmentManager, R.id.fragment_container) {
         override fun createFragment(screenKey: String?, data: Any?): Fragment {
             Log.e("LOG", screenKey + " " + data)
-            var result: Fragment
-            if (data is User)
-                result = UserProfileFragment.newInstance(data.name, data.lastName)
+            return if (data is User)
+                UserProfileFragment.newInstance(data.name, data.lastName)
             else
                 when (screenKey) {
                     USER_PROFILE_SCREEN -> return MyProfileFragment()
                     SEARCH_MAP_SCREEN -> return MapFragment()
                     ALL_USERS_SCREEN -> return AllUsersFragment.newInstance()
+                    SIMILAR_TRAVELS_SCREEN -> return SimilarTravelsFragment.newInstance()
                     else -> return SearchFragment()
                 }
-            return result
         }
 
         override fun showSystemMessage(message: String?) {
-            Toast.makeText(this@MenuActivity, message, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this@MenuActivity, message, Toast.LENGTH_SHORT).show()
         }
 
         override fun exit() {
@@ -144,6 +144,7 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.profile_item -> navigator.applyCommand(Replace(Screens.USER_PROFILE_SCREEN, 1))
             R.id.search_item -> navigator.applyCommand(Replace(Screens.SEARCH_MAP_SCREEN, 1))
             R.id.all_users_item -> navigator.applyCommand(Replace(Screens.ALL_USERS_SCREEN, 1))
+            R.id.similar_travel_item -> navigator.applyCommand(Replace(Screens.SIMILAR_TRAVELS_SCREEN, 1))
             R.id.exit_item -> {
             }
         }

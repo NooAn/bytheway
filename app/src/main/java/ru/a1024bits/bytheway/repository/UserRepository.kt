@@ -14,21 +14,25 @@ import javax.inject.Inject
 /**
  * Created by andrey.gusenkov on 19/09/2017.
  */
-class UserRepository @Inject constructor(val store: FirebaseFirestore) {
+class UserRepository @Inject constructor(val store: FirebaseFirestore) : IUsersRepository {
+
     var TAG = "LOG UserRepository"
 
     init {
         Log.e("LOG", "init repos2")
     }
 
-    //Rx wrapper
-    fun getUsers(): Task<QuerySnapshot> {
-        return store.collection("users")
-                .get()
+    override fun getSimilarUsersTravels(data: Filter, observer: Observer<List<User>>): List<User> {
+        return arrayListOf()
     }
 
-    fun getUserById(userID: Long): LiveData<User>? {
-        return null
+    //Rx wrapper
+    override fun getUsers(): Task<QuerySnapshot> {
+        return store.collection("users").get()
+    }
+
+   override fun getUserById(userID: Long): Task<QuerySnapshot> {
+        return store.collection("users").get();
     }
 
 
