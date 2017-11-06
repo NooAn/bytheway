@@ -29,6 +29,10 @@ import ru.terrakok.cicerone.commands.Command
 import ru.terrakok.cicerone.commands.Replace
 import javax.inject.Inject
 
+
+
+// test github push
+
 class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, OnFragmentInteractionListener {
     var screenNames: ArrayList<String> = arrayListOf()
     private val STATE_SCREEN_NAMES = "state_screen_names"
