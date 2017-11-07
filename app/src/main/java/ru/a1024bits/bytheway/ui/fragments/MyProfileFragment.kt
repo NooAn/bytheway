@@ -12,9 +12,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestManager
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.fragment_my_user_profile.*
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
@@ -38,7 +41,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
     }
 
-
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         App.component.inject(this)
@@ -53,7 +55,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             fillProfile(user);
         })
 
-        viewModel!!.load(1)
+        viewModel!!.load(FirebaseAuth.getInstance().currentUser?.uid.orEmpty())
     }
 
     private fun fillProfile(user: User?) {

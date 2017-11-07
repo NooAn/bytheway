@@ -20,8 +20,8 @@ import javax.inject.Inject
 class MyProfileViewModel @Inject constructor(var userRepository: UserRepository) : ViewModel() {
     val user: MutableLiveData<User> = MutableLiveData<User>()
     val load: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
-    
-    fun load(userId: Long) {
+
+    fun load(userId: String) {
         Log.e("LOG", "start load user: $userId")
         userRepository.getUserById(userId)
                 .addOnFailureListener {
@@ -31,17 +31,17 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                     val profile = User()
                     profile.name = document.data.getValue("name") as String
                     profile.age = document.data.getValue("age") as Long
-                    profile.lastName = document.data.getValue("last_name") as String
+//                    profile.lastName = document.data.getValue("last_name") as String
                     user.setValue(profile)
                 }
         Log.e("LOG", "end load user: $userId")
     }
-    
+
     fun saveLinks(textLinks: Editable) {
         Log.e("LOG", textLinks.toString())
     }
-    
-    
+
+
     fun ifUserNotExistThenSave(currentUser: FirebaseUser?) {
         val store = FirebaseFirestore.getInstance()
         val docRef = store.collection(COLLECTION_USERS).document(currentUser?.uid.toString());
@@ -51,9 +51,10 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                     val document = task.getResult();
                     if (!document.exists()) {
                         // Пользователя нет в системе, добавляем.
-                        
                         userRepository.addUser(User().apply {
-                            name = currentUser?.displayName.toString()
+                            val list = currentUser?.displayName?.split(" ")
+                            name = list?.get(0).toString()
+                            lastName = list?.get(1).toString()
                             id = currentUser?.uid.toString()
                             email = currentUser?.email.toString()
                             phone = currentUser?.phoneNumber.toString()
@@ -68,7 +69,7 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                     } else {
                         // Пользователь уже существует и не нужно тогда добавлять его
                         Log.d("LOG", "DocumentSnapshot data: " + task.getResult().getData());
-                        load.value = false
+                        load.value = true
                     }
                 } else {
                     load.value = false
@@ -77,8 +78,8 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
             }
         }
         )
-        
+
         currentUser?.getUid()
     }
-    
+
 }

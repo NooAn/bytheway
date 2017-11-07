@@ -14,31 +14,31 @@ const val COLLECTION_USERS = "users"
  * Created by andrey.gusenkov on 19/09/2017.
  */
 class UserRepository @Inject constructor(val store: FirebaseFirestore) : IUsersRepository {
-    
+
     var TAG = "LOG UserRepository"
-    
+
     init {
         Log.e("LOG", "init repos2")
     }
-    
+
     override fun getSimilarUsersTravels(data: Filter, observer: Observer<List<User>>): List<User> {
         return arrayListOf()
     }
-    
+
     //Rx wrapper
     override fun getUsers(): Task<QuerySnapshot> {
         return store.collection(COLLECTION_USERS).get()
     }
-    
-    override fun getUserById(userID: Long): Task<DocumentSnapshot> {
-        return store.collection(COLLECTION_USERS).document(userID.toString()).get();
+
+    override fun getUserById(userID: String): Task<DocumentSnapshot> {
+        return store.collection(COLLECTION_USERS).document(userID).get();
     }
-    
+
     override fun addUser(user: User): Task<Void> {
         if (user.id == "1") throw FirebaseFirestoreException("User id is not set", FirebaseFirestoreException.Code.ABORTED)
         return store.collection(COLLECTION_USERS).document(user.id).set(user)
     }
-    
+
     override fun changeUserProfile(map: HashMap<String, Any>, id: String): Task<Void> {
         val documentRef = store.collection(COLLECTION_USERS).document(id);
         return store.runTransaction(object : Transaction.Function<Void> {
@@ -49,5 +49,5 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) : IUsersR
             }
         })
     }
-    
+
 }

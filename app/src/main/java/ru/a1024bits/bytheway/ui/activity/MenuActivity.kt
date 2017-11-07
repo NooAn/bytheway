@@ -11,8 +11,14 @@ import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.ImageView
 import android.widget.Toast
+import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestManager
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.item_content_all_users.view.*
+import kotlinx.android.synthetic.main.nav_header_main.*
+import kotlinx.android.synthetic.main.profile_main_image.view.*
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.User
@@ -35,10 +41,13 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     @Inject
     lateinit var navigatorHolder: NavigatorHolder;
+    private var glide: RequestManager? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         App.component.inject(this)
+        glide = Glide.with(this)
+
         setContentView(R.layout.activity_menu)
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
@@ -53,6 +62,13 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         val navigationView = findViewById<NavigationView>(R.id.nav_view)
         navigationView.setNavigationItemSelectedListener(this)
+        val hView = navigationView.getHeaderView(0)
+        val image = hView.findViewById<ImageView>(R.id.menu_image_avatar)
+
+        Log.e("LOG", FirebaseAuth.getInstance().currentUser?.photoUrl.toString() + " " + image.toString())
+        glide?.load(FirebaseAuth.getInstance().currentUser?.photoUrl)
+                ?.into(image)
+        // how make name and city!!?
 
         if (savedInstanceState == null) {
             navigator.applyCommand(Replace(Screens.USER_PROFILE_SCREEN, 1))
