@@ -17,6 +17,11 @@ import ru.a1024bits.bytheway.adapter.ShowAllUsersAdapter
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.viewmodel.ShowUsersViewModel
 import javax.inject.Inject
+import android.support.v4.view.MenuItemCompat.getActionView
+import android.content.Context.SEARCH_SERVICE
+import android.app.SearchManager
+import android.content.Context
+import android.widget.Toast
 
 
 class AllUsersFragment : Fragment() {
@@ -42,7 +47,7 @@ class AllUsersFragment : Fragment() {
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recyclerView = currentView.findViewById(R.id.display_all_users)
-        viewContainFilters =  LayoutInflater.from(context).inflate( R.layout.searching_parameters, null)
+        viewContainFilters = LayoutInflater.from(context).inflate(R.layout.searching_parameters, null)
         //in onClick on batterKnife
         currentView.findViewById<View>(R.id.parameters_search_text).setOnClickListener {
             val search_parameters = currentView.findViewById<LinearLayout>(R.id.search_parameters)
@@ -53,14 +58,31 @@ class AllUsersFragment : Fragment() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater) {
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.all_users_menu, menu)
+
+        val searchView = menu.findItem(R.id.search_all_users_item).actionView as SearchView
+        searchView.setSearchableInfo(
+                (context.getSystemService(Context.SEARCH_SERVICE) as SearchManager).getSearchableInfo(activity.componentName))
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                Toast.makeText(context, query, Toast.LENGTH_SHORT).show()
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+//                adapter.getFilter().filter(newText);
+                Log.d("tag"," search:: " + newText)
+                return false
+            }
+
+        })
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.app_bar_search -> {
+            R.id.search_all_users_item -> {
                 true
             }
             else -> super.onOptionsItemSelected(item)

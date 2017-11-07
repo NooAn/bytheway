@@ -5,7 +5,7 @@
     <item
         android:id="@+id/search_all_users_item"
         android:icon="@drawable/ic_search_black_24dp"
-        appcompat:showAsAction="always"
+        appcompat:showAsAction="always|collapseActionView"
         android:title="Search"
         appcompat:actionViewClass="android.support.v7.widget.SearchView" />
 
