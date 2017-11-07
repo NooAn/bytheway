@@ -9,8 +9,6 @@ import android.widget.Filterable
 import android.widget.BaseAdapter
 import android.widget.Filter
 import android.widget.TextView
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import ru.a1024bits.aviaanimation.ui.RepositoryAviaCity
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.AviaCity
