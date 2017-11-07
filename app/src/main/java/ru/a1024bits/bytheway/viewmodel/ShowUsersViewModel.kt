@@ -31,7 +31,12 @@ class ShowUsersViewModel @Inject constructor(var userRepository: UserRepository)
                             Log.d(TAG, document.id + " => " + document.data)
                             user.name = document.data.getValue("name") as String
                             user.age = document.data.getValue("age") as Long
-                            user.lastName = document.data.getValue("last_name") as String
+                            try {
+                                user.lastName = document.data.getValue("lastName") as String
+                            } catch (e: NoSuchElementException) {
+                                user.lastName = document.data.getValue("last_name") as String
+                                Log.d("tag", e.toString())
+                            }
                             userLiveData.setValue(user)
                         }
                     } else {

@@ -6,10 +6,11 @@ import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.SearchView
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.widget.FrameLayout
+import android.widget.LinearLayout
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.adapter.ShowAllUsersAdapter
@@ -23,18 +24,49 @@ class AllUsersFragment : Fragment() {
     private lateinit var viewModel: ShowUsersViewModel
     private lateinit var showUsersAdapter: ShowAllUsersAdapter
     private lateinit var recyclerView: RecyclerView
+    private lateinit var viewContainFilters: View
+    private var isDisplayFilters = true
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        currentView = inflater.inflate(R.layout.fragment_display_all_users, container, false)
-        return currentView
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
     }
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        currentView = inflater.inflate(R.layout.fragment_display_all_users1, container, false)
+        return currentView
+    }
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recyclerView = currentView.findViewById(R.id.display_all_users)
+        viewContainFilters =  LayoutInflater.from(context).inflate( R.layout.searching_parameters, null)
+        //in onClick on batterKnife
+        currentView.findViewById<View>(R.id.parameters_search_text).setOnClickListener {
+            val search_parameters = currentView.findViewById<LinearLayout>(R.id.search_parameters)
+            if (isDisplayFilters) search_parameters.addView(viewContainFilters)
+            else search_parameters.removeView(viewContainFilters)
+
+            isDisplayFilters = !isDisplayFilters
+        }
     }
+
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.all_users_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.app_bar_search -> {
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
