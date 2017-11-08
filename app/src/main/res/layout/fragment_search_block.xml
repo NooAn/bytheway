@@ -1,51 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="8dp">
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white"
+                android:orientation="vertical"
+                android:padding="8dp">
 
-    <ru.a1024bits.aviaanimation.ui.util.AutoCompleteTextView
-        android:id="@+id/textview2"
+    <TextView
+        android:id="@+id/text_from_city"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
-        android:imeOptions="flagNoExtractUi|actionSearch"
+        android:layout_marginTop="16dp"
         android:layout_toEndOf="@+id/startMarkerView"
+        android:background="@drawable/textlines"
         android:hint="@string/city_start"
-        android:inputType="text|textAutoComplete|textCapSentences" />
+        android:inputType="text|textAutoComplete|textCapSentences"
+        android:textSize="16sp"/>
+
 
     <ImageView
         android:id="@+id/startMarkerView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/textview4"
+        android:layout_alignBottom="@+id/text_to_city"
         android:layout_alignParentStart="true"
-        android:layout_alignTop="@+id/textview2"
-        android:src="@drawable/googleg_standard_color_18" />
+        android:layout_alignTop="@+id/text_from_city"
+        android:padding="10dp"
+        android:src="@drawable/ic_point_one_2"/>
 
 
-    <ru.a1024bits.aviaanimation.ui.util.AutoCompleteTextView
-        android:id="@+id/textview4"
+    <TextView
+        android:id="@+id/text_to_city"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/textview2"
-        android:imeOptions="flagNoExtractUi|actionSearch"
+        android:layout_below="@+id/text_from_city"
         android:layout_marginTop="16dp"
         android:layout_toEndOf="@+id/startMarkerView"
+        android:background="@drawable/textlines"
         android:hint="@string/city_end"
-        android:inputType="text|textAutoComplete|textCapSentences" />
-
-
-
-    <Button
-        android:id="@+id/buttonSearch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_below="@id/textview4"
-        android:layout_marginTop="28dp"
-        android:text="@string/name_button_search" />
+        android:textSize="16sp"/>
 
 </RelativeLayout>

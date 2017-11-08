@@ -20,7 +20,7 @@ import javax.inject.Inject
 class MyProfileViewModel @Inject constructor(var userRepository: UserRepository) : ViewModel() {
     val user: MutableLiveData<User> = MutableLiveData<User>()
     val load: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
-
+    
     fun load(userId: String) {
         Log.e("LOG", "start load user: $userId")
         userRepository.getUserById(userId)
@@ -28,20 +28,21 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                     Log.e("LOG", "error ${it.message}")
                 }
                 .addOnSuccessListener { document ->
-                    val profile = User()
-                    profile.name = document.data.getValue("name") as String
-                    profile.age = document.data.getValue("age") as Long
-//                    profile.lastName = document.data.getValue("last_name") as String
+                    val profile = document.toObject(User::class.java)
+//                    val profile = User()
+//                    profile.name = document.data.getValue("name") as String
+//                    profile.age = document.data.getValue("age") as Long
+////                    profile.lastName = document.data.getValue("last_name") as String
                     user.setValue(profile)
                 }
         Log.e("LOG", "end load user: $userId")
     }
-
+    
     fun saveLinks(textLinks: Editable) {
         Log.e("LOG", textLinks.toString())
     }
-
-
+    
+    
     fun ifUserNotExistThenSave(currentUser: FirebaseUser?) {
         val store = FirebaseFirestore.getInstance()
         val docRef = store.collection(COLLECTION_USERS).document(currentUser?.uid.toString());
@@ -76,10 +77,7 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                     Log.d("LOG", "get failed with ", task.getException());
                 }
             }
-        }
-        )
-
-        currentUser?.getUid()
+        })
     }
-
+    
 }

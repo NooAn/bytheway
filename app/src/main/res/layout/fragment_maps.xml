@@ -1,7 +1,7 @@
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+                                                 xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                 android:layout_width="match_parent"
+                                                 android:layout_height="match_parent">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appBarLayout"
@@ -14,6 +14,7 @@
             android:id="@+id/collapsingToolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@color/white"
             android:fitsSystemWindows="true"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
@@ -24,7 +25,7 @@
                 android:layout_height="400dp"
                 android:minHeight="100dp"
                 app:layout_collapseMode="parallax"
-                app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed" />
+                app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed"/>
 
         </android.support.design.widget.CollapsingToolbarLayout>
 
@@ -38,10 +39,40 @@
         <FrameLayout
             android:id="@+id/fragment_container_box"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
+            android:layout_height="wrap_content">
+        </FrameLayout>
 
     </android.support.v4.widget.NestedScrollView>
 
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_gravity="bottom"
+        android:baselineAligned="true"
+        android:orientation="horizontal"
+        >
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:layout_weight="1"
+            android:background="@color/white"
+            android:drawableLeft="@drawable/places_ic_clear"
+            android:text="@string/save"
+            android:textColor="@color/colorPrimary"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:layout_weight="1"
+            android:background="@color/white"
+            android:drawableLeft="@drawable/places_ic_search"
+            android:text="@string/name_button_search"
+            android:textColor="@color/colorPrimary"/>
+    </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>
