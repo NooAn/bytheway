@@ -71,18 +71,18 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         username.text = StringBuilder(user?.name).append(" ").append(user?.lastName)
         city.text = user?.city
 
-        if (user?.cities != null) {
-            val lastIndexArr = user.cities?.size - 1
-            textCityFrom.text = user.cities?.get(0)
-            textCityTo.text = user.cities?.get(lastIndexArr)
+        if (user?.cities!= null&& user?.cities.size>0) {
+            val lastIndexArr = user?.cities.size - 1
+            textCityFrom.text = user?.cities.get(0)
+            textCityTo.text = user?.cities.get(lastIndexArr)
         }
 
         val formatDate = SimpleDateFormat("dd.MM.yyyy")
 
-        if (user?.dates != null) {
-            var lastIndexArr = user?.dates?.size - 1
-            val dayBegin = formatDate.format(Date(user?.dates[0]))
-            val dayArrival = formatDate.format(Date(user?.dates[lastIndexArr]))
+        if (user?.dates != null&&user?.dates.size>0) {
+            var lastIndexArr = user!!.dates?.size - 1
+            val dayBegin = formatDate.format(Date(user?.dates.get(0)))
+            val dayArrival = formatDate.format(Date(user?.dates.get(lastIndexArr)))
             textDateFrom.text = dayBegin
             textView5.text = dayArrival
         }
