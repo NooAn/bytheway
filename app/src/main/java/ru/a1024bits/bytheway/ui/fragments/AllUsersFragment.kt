@@ -1,27 +1,25 @@
 package ru.a1024bits.bytheway.ui.fragments
 
+import android.app.SearchManager
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SearchView
 import android.util.Log
 import android.view.*
-import android.widget.FrameLayout
+import android.widget.Button
 import android.widget.LinearLayout
+import android.widget.Toast
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.adapter.ShowAllUsersAdapter
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.viewmodel.ShowUsersViewModel
 import javax.inject.Inject
-import android.support.v4.view.MenuItemCompat.getActionView
-import android.content.Context.SEARCH_SERVICE
-import android.app.SearchManager
-import android.content.Context
-import android.widget.Toast
 
 
 class AllUsersFragment : Fragment() {
@@ -31,6 +29,7 @@ class AllUsersFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var viewContainFilters: View
     private var isDisplayFilters = true
+    private var isFilterSelectMan = true
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
 
 
@@ -40,7 +39,7 @@ class AllUsersFragment : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        currentView = inflater.inflate(R.layout.fragment_display_all_users1, container, false)
+        currentView = inflater.inflate(R.layout.fragment_display_all_users, container, false)
         return currentView
     }
 
@@ -48,11 +47,20 @@ class AllUsersFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         recyclerView = currentView.findViewById(R.id.display_all_users)
         viewContainFilters = LayoutInflater.from(context).inflate(R.layout.searching_parameters, null)
-        //in onClick on batterKnife
+        //on @onClick in batterKnife
         currentView.findViewById<View>(R.id.parameters_search_text).setOnClickListener {
             val search_parameters = currentView.findViewById<LinearLayout>(R.id.search_parameters)
-            if (isDisplayFilters) search_parameters.addView(viewContainFilters)
-            else search_parameters.removeView(viewContainFilters)
+            if (isDisplayFilters) {
+                search_parameters.addView(viewContainFilters)
+                val choose_sex = search_parameters.findViewById<Button>(R.id.choose_sex)
+                //on @onClick in batterKnife
+                choose_sex.setOnClickListener {
+                    if (isFilterSelectMan) choose_sex.text = context.getString(R.string.man)
+                    else choose_sex.text = context.getString(R.string.woman)
+
+                    isFilterSelectMan = !isFilterSelectMan
+                }
+            } else search_parameters.removeView(viewContainFilters)
 
             isDisplayFilters = !isDisplayFilters
         }
@@ -73,7 +81,7 @@ class AllUsersFragment : Fragment() {
 
             override fun onQueryTextChange(newText: String): Boolean {
 //                adapter.getFilter().filter(newText);
-                Log.d("tag"," search:: " + newText)
+                Log.d("tag", " search:: " + newText)
                 return false
             }
 

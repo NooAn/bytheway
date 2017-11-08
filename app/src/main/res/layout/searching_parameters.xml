@@ -1,18 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
     <Button
-        android:id="@+id/button3"
+        android:id="@+id/start_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="some filters" />
+        android:layout_marginBottom="17dp"
+        android:layout_marginEnd="17dp"
+        android:text="start Date" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/end_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="some filters" />
-</LinearLayout>
+        android:layout_toEndOf="@id/start_date"
+        android:text="end Date" />
+
+    <EditText
+        android:id="@+id/start_budget"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/start_date"
+        android:layout_marginEnd="17dp"
+        android:hint="start budget"
+        android:inputType="number" />
+
+
+    <EditText
+        android:id="@+id/end_budget"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/start_date"
+        android:layout_toEndOf="@+id/start_budget"
+        android:hint="end budget"
+        android:inputType="number" />
+
+    <EditText
+        android:id="@+id/start_age"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/start_budget"
+        android:layout_marginEnd="17dp"
+        android:hint="start Age"
+        android:inputType="number" />
+
+
+    <EditText
+        android:id="@+id/end_age"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/start_budget"
+        android:layout_toEndOf="@+id/start_age"
+        android:hint="end age"
+        android:inputType="number" />
+
+    <EditText
+        android:id="@+id/start_city"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/start_age"
+        android:layout_marginEnd="17dp"
+        android:hint="start city" />
+
+
+    <EditText
+        android:id="@+id/end_city"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/start_age"
+        android:layout_toEndOf="@+id/start_city"
+        android:hint="end city" />
+
+    <Button
+        android:id="@+id/choose_sex"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/start_city"
+        android:text="sex" />
+
+    <Button
+        android:id="@+id/save_parameters"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/choose_sex"
+        android:text="save parameters" />
+
+
+</RelativeLayout>
