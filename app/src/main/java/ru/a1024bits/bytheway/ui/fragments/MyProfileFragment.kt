@@ -19,6 +19,8 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.fragment_my_user_profile.*
+import kotlinx.android.synthetic.main.profile_direction.*
+import kotlinx.android.synthetic.main.profile_main_image.*
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.SocialNetwork
@@ -26,6 +28,8 @@ import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import javax.inject.Inject
+import java.util.Date
+import java.text.SimpleDateFormat
 
 
 class MyProfileFragment : Fragment(), OnMapReadyCallback {
@@ -41,6 +45,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
     }
 
+
+    private var glide: RequestManager = Glide.with(this.context)
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         App.component.inject(this)
@@ -52,7 +58,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
         viewModel?.user?.observe(this, Observer<User> { user ->
             Log.e("LOG", "fill Profile: $user")
-            fillProfile(user);
+            fillProfile(user)
+            
         })
 
         viewModel!!.load(FirebaseAuth.getInstance().currentUser?.uid.orEmpty())
@@ -61,6 +68,31 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
     private fun fillProfile(user: User?) {
         username.text = StringBuilder(user?.name).append(" ").append(user?.lastName)
         city.text = user?.city
+
+
+
+
+        if (user?.cities!=null) {
+            var lastIndexArr = user?.cities?.size - 1
+            textCityFrom.text = user?.cities?.get(0)
+            textCityTo.text = user?.cities?.get(lastIndexArr)
+        }
+
+        val formatDate=SimpleDateFormat("dd.MM.yyyy")
+
+        if (user?.dates!=null){
+            var lastIndexArr = user?.dates?.size - 1
+            val dayBegin=formatDate.format(Date(user?.dates[0]))
+            val dayArrival=formatDate.format(Date(user?.dates[lastIndexArr]))
+            textDateFrom.text=dayBegin
+            textView5.text=dayArrival
+        }
+
+
+
+
+
+        glide.load(user?.urlPhoto).into(image_avatar)
 
         for (name in user?.socialNetwork!!) {
             when (name) {
