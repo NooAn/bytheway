@@ -26,6 +26,4 @@ class RepositoryAviaCity {
             return retrofit.create(CitysService::class.java)
         }
     }
-
-    fun getCities(term: String, types: String = "airport") = create().getCities(term, locale = "ru", types = types);
 }

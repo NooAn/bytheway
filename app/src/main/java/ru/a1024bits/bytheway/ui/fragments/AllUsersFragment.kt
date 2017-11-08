@@ -1,15 +1,19 @@
 package ru.a1024bits.bytheway.ui.fragments
 
+import android.app.SearchManager
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.SearchView
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.Toast
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.adapter.ShowAllUsersAdapter
@@ -23,18 +27,76 @@ class AllUsersFragment : Fragment() {
     private lateinit var viewModel: ShowUsersViewModel
     private lateinit var showUsersAdapter: ShowAllUsersAdapter
     private lateinit var recyclerView: RecyclerView
+    private lateinit var viewContainFilters: View
+    private var isDisplayFilters = true
+    private var isFilterSelectMan = true
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
+
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         currentView = inflater.inflate(R.layout.fragment_display_all_users, container, false)
         return currentView
     }
 
-
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recyclerView = currentView.findViewById(R.id.display_all_users)
+        viewContainFilters = LayoutInflater.from(context).inflate(R.layout.searching_parameters, null)
+        //on @onClick in batterKnife
+        currentView.findViewById<View>(R.id.parameters_search_text).setOnClickListener {
+            val search_parameters = currentView.findViewById<LinearLayout>(R.id.search_parameters)
+            if (isDisplayFilters) {
+                search_parameters.addView(viewContainFilters)
+                val choose_sex = search_parameters.findViewById<Button>(R.id.choose_sex)
+                //on @onClick in batterKnife
+                choose_sex.setOnClickListener {
+                    if (isFilterSelectMan) choose_sex.text = context.getString(R.string.man)
+                    else choose_sex.text = context.getString(R.string.woman)
+
+                    isFilterSelectMan = !isFilterSelectMan
+                }
+            } else search_parameters.removeView(viewContainFilters)
+
+            isDisplayFilters = !isDisplayFilters
+        }
     }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.all_users_menu, menu)
+
+        val searchView = menu.findItem(R.id.search_all_users_item).actionView as SearchView
+        searchView.setSearchableInfo(
+                (context.getSystemService(Context.SEARCH_SERVICE) as SearchManager).getSearchableInfo(activity.componentName))
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                Toast.makeText(context, query, Toast.LENGTH_SHORT).show()
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+//                adapter.getFilter().filter(newText);
+                Log.d("tag", " search:: " + newText)
+                return false
+            }
+
+        })
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.search_all_users_item -> {
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)

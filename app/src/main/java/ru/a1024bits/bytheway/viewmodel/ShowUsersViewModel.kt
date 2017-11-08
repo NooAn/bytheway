@@ -5,9 +5,6 @@ import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModel
 import android.util.Log
-import android.util.Log.i
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.rxkotlin.toObservable
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.repository.UserRepository
@@ -31,7 +28,12 @@ class ShowUsersViewModel @Inject constructor(var userRepository: UserRepository)
                             Log.d(TAG, document.id + " => " + document.data)
                             user.name = document.data.getValue("name") as String
                             user.age = document.data.getValue("age") as Long
-                            user.lastName = document.data.getValue("last_name") as String
+                            try {
+                                user.lastName = document.data.getValue("lastName") as String
+                            } catch (e: NoSuchElementException) {
+                                user.lastName = document.data.getValue("last_name") as String
+                                Log.d("tag", e.toString())
+                            }
                             userLiveData.setValue(user)
                         }
                     } else {

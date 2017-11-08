@@ -29,10 +29,6 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                 }
                 .addOnSuccessListener { document ->
                     val profile = document.toObject(User::class.java)
-//                    val profile = User()
-//                    profile.name = document.data.getValue("name") as String
-//                    profile.age = document.data.getValue("age") as Long
-////                    profile.lastName = document.data.getValue("last_name") as String
                     user.setValue(profile)
                 }
         Log.e("LOG", "end load user: $userId")
