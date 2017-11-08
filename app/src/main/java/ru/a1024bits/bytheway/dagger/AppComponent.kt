@@ -2,6 +2,7 @@ package ru.a1024bits.bytheway.dagger
 
 import dagger.Component
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
+import ru.a1024bits.bytheway.ui.activity.RegistrationActivity
 import ru.a1024bits.bytheway.ui.fragments.AllUsersFragment
 import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment
 import ru.a1024bits.bytheway.ui.fragments.SimilarTravelsFragment
@@ -25,5 +26,6 @@ interface AppComponent {
     fun inject(fragment: SimilarTravelsFragment)
     fun inject(mainViewModel: ShowUsersViewModel)
     fun inject(myProfileFragment: MyProfileFragment) {}
-
+    fun inject(registrationActivity: RegistrationActivity)
+    
 }

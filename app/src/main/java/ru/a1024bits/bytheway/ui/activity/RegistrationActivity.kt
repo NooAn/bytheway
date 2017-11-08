@@ -1,6 +1,9 @@
 package ru.a1024bits.bytheway.ui.activity
 
 import android.arch.lifecycle.LifecycleActivity
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProvider
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -13,10 +16,12 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.android.synthetic.main.activity_registration.*
+import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
+import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
+import javax.inject.Inject
 
 
 class RegistrationActivity : LifecycleActivity(), GoogleApiClient.OnConnectionFailedListener {
@@ -24,14 +29,18 @@ class RegistrationActivity : LifecycleActivity(), GoogleApiClient.OnConnectionFa
     
     }
     
+    
+    private var viewModel: MyProfileViewModel? = null
+    @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
+    
     private val RC_SIGN_IN = 9001
-    private var mAuth: FirebaseAuth? = null
+    private val mAuth = FirebaseAuth.getInstance();
     private var mGoogleApiClient: GoogleApiClient? = null
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_registration)
-        mAuth = FirebaseAuth.getInstance();
+        App.component.inject(this)
         
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(resources.getString(R.string.default_web_client_id))
@@ -44,12 +53,14 @@ class RegistrationActivity : LifecycleActivity(), GoogleApiClient.OnConnectionFa
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build()
         
+        Log.e("LOG", mAuth?.currentUser.toString())
+        
         signInButton.setSize(SignInButton.SIZE_STANDARD)
         signInButton.setOnClickListener({
-            // showPasswordDialog();
             signIn()
         })
         
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
     }
     
     private fun signIn() {
@@ -59,19 +70,11 @@ class RegistrationActivity : LifecycleActivity(), GoogleApiClient.OnConnectionFa
     
     override fun onStart() {
         super.onStart()
-        var currentUser: FirebaseUser? = mAuth?.currentUser;
-        updateUI(currentUser)
     }
     
-    private fun updateUI(currentUser: FirebaseUser?) {
-        Log.d("LOG", currentUser.toString() + currentUser?.photoUrl + currentUser?.displayName)
-        //impl in future for help
-    }
     
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
         super.onActivityResult(requestCode, resultCode, data)
-        
-        
         if (requestCode == RC_SIGN_IN) {
             val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
             handleSignInResult(result)
@@ -79,18 +82,14 @@ class RegistrationActivity : LifecycleActivity(), GoogleApiClient.OnConnectionFa
     }
     
     private fun handleSignInResult(result: GoogleSignInResult) {
-        Log.d("LOG", "handleSignInResult: ${result.isSuccess} ${result.status.statusMessage} ${result.status.statusCode} ${result.status}")
         if (result.isSuccess) {
             // Signed in successfully, show authenticated UI.
             val acct = result.signInAccount
-            // mStatusTextView.setText(getString(R.string.signed_in_fmt, acct!!.displayName))
-            Toast.makeText(this, acct!!.displayName, Toast.LENGTH_SHORT).show();
-            updateUI(true)
-            firebaseAuthWithGoogle(acct)
+            firebaseAuthWithGoogle(acct!!)
         } else {
             // Signed out, show unauthenticated UI.
             if (result.status.statusCode != 200) {
-                Log.d("LOG", "Problems with enternet")
+                Log.d("LOG", "Problems with enternet ${result.status.statusCode} and ${result.status.toString()}")
             }
             updateUI(false)
         }
@@ -106,23 +105,33 @@ class RegistrationActivity : LifecycleActivity(), GoogleApiClient.OnConnectionFa
                     if (task.isSuccessful) {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d("LOG", "signInWithCredential:success")
-                        val user = mAuth!!.getCurrentUser()
-                        updateUI(user)
+                        updateUI(true)
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w("LOG", "signInWithCredential:failure", task.exception)
                         Toast.makeText(this, "Authentication failed.",
                                 Toast.LENGTH_SHORT).show()
-                        updateUI(null)
                     }
                 }
     }
     
     private fun updateUI(signedIn: Boolean) {
         if (signedIn) {
-            Toast.makeText(this, "It's Okay!", Toast.LENGTH_SHORT).show()
+            Log.e("LOG2", mAuth?.currentUser?.photoUrl.toString())
+            viewModel?.load?.observe(this, object : Observer<Boolean> {
+                override fun onChanged(upload: Boolean?) {
+                    if (upload?.equals(true)!!) {
+                        startActivity(Intent(this@RegistrationActivity, MenuActivity::class.java))
+                    } else {
+                        Toast.makeText(this@RegistrationActivity, "Error for registration", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            })
+            viewModel?.ifUserNotExistThenSave(mAuth.currentUser)
         } else {
             Toast.makeText(this, "Not allowed Google", Toast.LENGTH_SHORT).show()
         }
     }
+    
+    
 }

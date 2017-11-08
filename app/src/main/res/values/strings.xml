@@ -15,7 +15,7 @@
     <string name="title_activity_menu">bytheway</string>
 
     <string name="city_end">Пункт назначения</string>
-    <string name="name_button_search">Нажми нежно!</string>
+    <string name="name_button_search">Поиск попутчиков</string>
     <string name="city_start">Пункт отправления</string>
     <string name="title_section1">Section 1</string>
     <string name="title_section2">Section 2</string>
@@ -39,4 +39,5 @@
     <string name="sex">sex</string>
     <string name="man">man</string>
     <string name="woman">woman</string>
+    <string name="save_filter">Сохранить</string>
 </resources>

@@ -14,20 +14,21 @@ import ru.a1024bits.bytheway.viewmodel.ViewModelFactory
  */
 @Module
 abstract class ViewModelModule {
-
+    
     @Binds
     @IntoMap
     @ViewModelKey(ShowUsersViewModel::class)
     // Bind your View Model here
     abstract fun bindShowViewModel(mainViewModel: ShowUsersViewModel): ViewModel
-
-
+    
+    
     @Binds
     @IntoMap
     @ViewModelKey(MyProfileViewModel::class)
     abstract fun bindMyProfileViewModel(mainViewModel: MyProfileViewModel): ViewModel
-
+    
+    
     @Binds
     abstract fun bindViewModelFactory(factory: ViewModelFactory): ViewModelProvider.Factory
-
+    
 }

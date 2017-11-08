@@ -1,8 +1,5 @@
 package ru.a1024bits.bytheway.model
 
-import android.os.Parcel
-import android.os.Parcelable
-
 
 /**
  * Created by andrey.gusenkov on 18/09/2017.
@@ -29,6 +26,8 @@ data class User(var name: String = "",
                 var lastName: String = "",
                 var age: Long = 0,
                 var id: String = "0",
+                var email: String = "",
+                var phone: String = "",
                 var route: ArrayList<String> = arrayListOf(),
                 var cities: ArrayList<String> = arrayListOf(),
                 var method: ArrayList<Method> = arrayListOf(),

@@ -12,14 +12,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
-        <activity android:name=".ui.activity.SplashActivity">
-        </activity>
-        <activity android:name=".ui.activity.RegistrationActivity">
-        </activity>
-
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDBqb2pdkfSx1ii31xwPsFf635j-cQB1tU"/>
+        <activity android:name=".ui.activity.SplashActivity"></activity>
+        <activity android:name=".ui.activity.RegistrationActivity"></activity>
 
         <activity
             android:name=".ui.activity.MenuActivity"
@@ -30,6 +24,10 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDBqb2pdkfSx1ii31xwPsFf635j-cQB1tU"/>
     </application>
 
 </manifest>

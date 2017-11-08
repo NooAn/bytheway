@@ -8,7 +8,7 @@ import ru.a1024bits.bytheway.model.User
 import javax.inject.Inject
 
 
-private const val COLLECTION_USERS = "users"
+const val COLLECTION_USERS = "users"
 
 /**
  * Created by andrey.gusenkov on 19/09/2017.
@@ -30,6 +30,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) : IUsersR
         return store.collection(COLLECTION_USERS).get()
     }
 
+<<<<<<< HEAD
     fun getUsers(filter: Filter): Task<QuerySnapshot> {
         val query =  store.collection(COLLECTION_USERS)
         if ((filter.startBudget != 0) && (filter.endBudget != 0)) {
@@ -54,8 +55,8 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) : IUsersR
         return store.collection(COLLECTION_USERS).get()
     }
 
-    override fun getUserById(userID: Long): Task<DocumentSnapshot> {
-        return store.collection(COLLECTION_USERS).document(userID.toString()).get();
+    override fun getUserById(userID: String): Task<DocumentSnapshot> {
+        return store.collection(COLLECTION_USERS).document(userID).get()
     }
 
     override fun addUser(user: User): Task<Void> {

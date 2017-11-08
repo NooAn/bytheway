@@ -1,6 +1,5 @@
 package ru.a1024bits.aviaanimation.ui
 
-import io.reactivex.Observable
 import retrofit2.http.GET
 import retrofit2.http.Query
 import ru.a1024bits.bytheway.model.AviaCity
@@ -19,5 +18,5 @@ interface CitysService {
     fun getCities(@Query("term") term: String,
                   @Query("locale") locale: String = "ru",
                   @Query("types[]") types: String
-    ): Observable<List<AviaCity>>
+    ): Observable
 }
