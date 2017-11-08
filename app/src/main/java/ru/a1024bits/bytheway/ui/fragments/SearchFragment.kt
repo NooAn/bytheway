@@ -24,21 +24,19 @@ import ru.a1024bits.bytheway.R
  * Created by andrey.gusenkov on 29/09/2017.
  */
 class SearchFragment : Fragment() {
-    
-    
-    fun changeCityNameFrom(name: String) {
-    
-    }
-    
+
+
+
+
     var PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM = 1
     var PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO = 2
-    
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         Log.e("LOG code:", requestCode.toString() + " " + resultCode + " " + PlaceAutocomplete.getPlace(activity, data))
-        
+
         // FIXME refactoring in viewModel
-        
+
         if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM) {
             if (resultCode == AppCompatActivity.RESULT_OK) {
                 val place = PlaceAutocomplete.getPlace(activity, data);
@@ -62,31 +60,30 @@ class SearchFragment : Fragment() {
             }
         }
     }
-    
+
     var firstPoint: LatLng? = null
     var secondPoint: LatLng? = null
-    
+
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater!!.inflate(R.layout.fragment_search_block, container, false)
-        
+
         val nameCityFrom = view.findViewById<TextView>(R.id.text_from_city)
         val nameCityTo = view.findViewById<TextView>(R.id.text_to_city)
-        
+
         activity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-        
-        
+
         nameCityTo.setOnClickListener {
             sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO);
         }
-        
+
         nameCityFrom.setOnClickListener {
             sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM)
         }
-        
+
         return view
     }
-    
-    
+
+
     private fun sendIntentForSearch(code: Int) {
         try {
             val typeFilter = AutocompleteFilter.Builder()

@@ -97,7 +97,6 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             drawer.closeDrawer(GravityCompat.START)
         } else {
             drawer.openDrawer(GravityCompat.START)
-//            super.onBackPressed()
         }
     }
     

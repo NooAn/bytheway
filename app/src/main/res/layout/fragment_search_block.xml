@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/white"
-                android:orientation="vertical"
-                android:padding="8dp">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical"
+    android:padding="16dp">
 
     <TextView
         android:id="@+id/text_from_city"
@@ -15,9 +15,10 @@
         android:layout_marginTop="16dp"
         android:layout_toEndOf="@+id/startMarkerView"
         android:background="@drawable/textlines"
+        android:drawableEnd="@drawable/ic_shape"
         android:hint="@string/city_start"
         android:inputType="text|textAutoComplete|textCapSentences"
-        android:textSize="16sp"/>
+        android:textSize="16sp" />
 
 
     <ImageView
@@ -28,7 +29,7 @@
         android:layout_alignParentStart="true"
         android:layout_alignTop="@+id/text_from_city"
         android:padding="10dp"
-        android:src="@drawable/ic_point_one_2"/>
+        android:src="@drawable/ic_point_one_2" />
 
 
     <TextView
@@ -36,10 +37,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/text_from_city"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="24dp"
         android:layout_toEndOf="@+id/startMarkerView"
         android:background="@drawable/textlines"
+        android:drawableEnd="@drawable/ic_shape"
         android:hint="@string/city_end"
-        android:textSize="16sp"/>
+        android:textSize="16sp" />
 
 </RelativeLayout>
