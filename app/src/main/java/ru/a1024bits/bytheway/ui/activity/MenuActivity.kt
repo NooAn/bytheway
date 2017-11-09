@@ -20,6 +20,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.places.Places
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
@@ -38,6 +39,12 @@ import ru.terrakok.cicerone.commands.Replace
 import javax.inject.Inject
 
 class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, OnFragmentInteractionListener, GoogleApiClient.OnConnectionFailedListener {
+    override fun onSetPoint(l: LatLng, pos : Int) {
+        val mapFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as MapFragment
+        mapFragment.setMarker(l, pos)
+
+    }
+
     override fun onConnectionFailed(p0: ConnectionResult) {
     
     }

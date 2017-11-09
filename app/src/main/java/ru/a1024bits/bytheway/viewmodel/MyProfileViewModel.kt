@@ -20,7 +20,7 @@ import javax.inject.Inject
 class MyProfileViewModel @Inject constructor(var userRepository: UserRepository) : ViewModel() {
     val user: MutableLiveData<User> = MutableLiveData<User>()
     val load: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
-    
+
     fun load(userId: String) {
         Log.e("LOG", "start load user: $userId")
         userRepository.getUserById(userId)
@@ -33,12 +33,12 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                 }
         Log.e("LOG", "end load user: $userId")
     }
-    
+
     fun saveLinks(textLinks: Editable) {
         Log.e("LOG", textLinks.toString())
     }
-    
-    
+
+
     fun ifUserNotExistThenSave(currentUser: FirebaseUser?) {
         val store = FirebaseFirestore.getInstance()
         val docRef = store.collection(COLLECTION_USERS).document(currentUser?.uid.toString());
@@ -75,5 +75,10 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
             }
         })
     }
-    
+
+    fun test() {
+        load.value = false
+        load.value = true
+    }
+
 }
