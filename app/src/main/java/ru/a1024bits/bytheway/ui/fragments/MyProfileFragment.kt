@@ -47,7 +47,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
     }
 
 
-    private var glide: RequestManager = Glide.with(this)
+    /*private var glide: RequestManager = Glide.with(this)*/
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -65,7 +65,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         viewModel?.user?.observe(this, Observer<User> { user ->
             Log.e("LOG", "fill Profile: $user")
             fillProfile(user)
-            val hashMapUser=getHashMapUser(user)
+          /*  val hashMapUser=getHashMapUser(user)*/
        /*     val userRepository=UserRepository()
             changeUserProfile(hashMapUser, user?.id)*/
 
