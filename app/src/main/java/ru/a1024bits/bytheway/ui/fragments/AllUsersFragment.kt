@@ -7,6 +7,8 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.widget.DividerItemDecoration
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SearchView
 import android.util.Log
@@ -31,18 +33,18 @@ class AllUsersFragment : Fragment() {
     private var isDisplayFilters = true
     private var isFilterSelectMan = true
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
-
-
+    
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
     }
-
+    
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         currentView = inflater.inflate(R.layout.fragment_display_all_users, container, false)
         return currentView
     }
-
+    
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recyclerView = currentView.findViewById(R.id.display_all_users)
@@ -57,19 +59,19 @@ class AllUsersFragment : Fragment() {
                 choose_sex.setOnClickListener {
                     if (isFilterSelectMan) choose_sex.text = context.getString(R.string.man)
                     else choose_sex.text = context.getString(R.string.woman)
-
+                    
                     isFilterSelectMan = !isFilterSelectMan
                 }
             } else search_parameters.removeView(viewContainFilters)
-
+            
             isDisplayFilters = !isDisplayFilters
         }
     }
-
+    
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.all_users_menu, menu)
-
+        
         val searchView = menu.findItem(R.id.search_all_users_item).actionView as SearchView
         searchView.setSearchableInfo(
                 (context.getSystemService(Context.SEARCH_SERVICE) as SearchManager).getSearchableInfo(activity.componentName))
@@ -78,16 +80,16 @@ class AllUsersFragment : Fragment() {
                 Toast.makeText(context, query, Toast.LENGTH_SHORT).show()
                 return true
             }
-
+            
             override fun onQueryTextChange(newText: String): Boolean {
 //                adapter.getFilter().filter(newText);
                 Log.d("tag", " search:: " + newText)
                 return false
             }
-
+            
         })
     }
-
+    
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.search_all_users_item -> {
@@ -96,15 +98,18 @@ class AllUsersFragment : Fragment() {
             else -> super.onOptionsItemSelected(item)
         }
     }
-
-
+    
+    
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         App.component.inject(this)
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(ShowUsersViewModel::class.java)
         showUsersAdapter = ShowAllUsersAdapter(this.context)
         recyclerView.adapter = showUsersAdapter
-
+        recyclerView.setHasFixedSize(true)
+        recyclerView.layoutManager = LinearLayoutManager(context)
+        val dividerItemDecoration = DividerItemDecoration(recyclerView.context, DividerItemDecoration.VERTICAL)
+        recyclerView.addItemDecoration(dividerItemDecoration)
         viewModel.userLiveData.observe(this, Observer<User> { list ->
             Log.e("LOG", "onChanged $list")
             if (list != null) {
@@ -114,7 +119,7 @@ class AllUsersFragment : Fragment() {
         })
         viewModel.getAllUsers()
     }
-
+    
     companion object {
         fun newInstance(): AllUsersFragment {
             val fragment = AllUsersFragment()

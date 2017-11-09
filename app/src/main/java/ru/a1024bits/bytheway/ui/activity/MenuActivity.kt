@@ -15,6 +15,7 @@ import android.widget.ImageView
 import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
+import com.bumptech.glide.request.RequestOptions
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.places.Places
@@ -69,9 +70,10 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val hView = navigationView.getHeaderView(0)
         val image = hView.findViewById<ImageView>(R.id.menu_image_avatar)
         
-        Log.e("LOG", FirebaseAuth.getInstance().currentUser?.photoUrl.toString() + " " + image.toString())
         glide?.load(FirebaseAuth.getInstance().currentUser?.photoUrl)
+                ?.apply(RequestOptions.circleCropTransform())
                 ?.into(image)
+        
         // how make name and city!!?
         
         if (savedInstanceState == null) {
@@ -102,8 +104,6 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     
     private var mGoogleApiClient: GoogleApiClient? = null
     
-    
-
     
     val navigator = object : SupportFragmentNavigator(supportFragmentManager, R.id.fragment_container) {
         override fun createFragment(screenKey: String?, data: Any?): Fragment {
@@ -146,13 +146,11 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     
     override fun onResume() {
         super.onResume()
-        // App.INSTANCE.navigatorHolder.setNavigator(navigator)
         navigatorHolder.setNavigator(navigator)
     }
     
     override fun onPause() {
         super.onPause()
-        //  App.INSTANCE.navigatorHolder.removeNavigator()
         navigatorHolder.removeNavigator()
     }
     
