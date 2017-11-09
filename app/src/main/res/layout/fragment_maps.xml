@@ -61,7 +61,7 @@
             android:layout_weight="1"
             android:background="@color/white"
             android:drawableLeft="@drawable/places_ic_clear"
-            android:text="@string/save"
+            android:text="@string/save_filter"
             android:textColor="@color/colorPrimary"/>
 
         <Button
