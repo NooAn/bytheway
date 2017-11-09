@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
@@ -47,11 +48,13 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     @Inject
     lateinit var navigatorHolder: NavigatorHolder;
     private var glide: RequestManager? = null
+    var mainUser: User? = null
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         App.component.inject(this)
         glide = Glide.with(this)
+        
         
         setContentView(R.layout.activity_menu)
         
@@ -73,6 +76,11 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         glide?.load(FirebaseAuth.getInstance().currentUser?.photoUrl)
                 ?.apply(RequestOptions.circleCropTransform())
                 ?.into(image)
+        
+        val fullName = hView.findViewById<TextView>(R.id.menu_fullname)
+        fullName.text = FirebaseAuth.getInstance().currentUser?.displayName
+        val cityName = hView.findViewById<TextView>(R.id.menu_city_name)
+        
         
         // how make name and city!!?
         

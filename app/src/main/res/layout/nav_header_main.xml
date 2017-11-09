@@ -13,8 +13,9 @@
 
     <ImageView
         android:id="@+id/menu_image_avatar"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_marginTop="8dp"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:scaleType="center"
         tools:srcCompat="@mipmap/ic_launcher"/>
@@ -25,12 +26,14 @@
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:text="Ваня Комаров"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@color/white"/>
 
     <TextView
         android:id="@+id/menu_city_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="г. Москва"/>
+        android:text="г. Москва"
+        android:textColor="@color/white"/>
 
 </LinearLayout>
