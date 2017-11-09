@@ -33,7 +33,7 @@
     <string name="budget">1000 руб.</string>
     <string name="add_info_profile">Дополнительная информация</string>
     <string name="date">Дата</string>
-    <string name="save">Сохранить</string>
+    <string name="save_filter">Сохранить фильтры</string>
     <string name="sex">sex</string>
     <string name="man">man</string>
     <string name="woman">woman</string>
