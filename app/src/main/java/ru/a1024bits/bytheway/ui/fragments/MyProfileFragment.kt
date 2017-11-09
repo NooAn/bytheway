@@ -23,6 +23,7 @@ import kotlinx.android.synthetic.main.profile_direction.*
 import kotlinx.android.synthetic.main.profile_main_image.*
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
+import ru.a1024bits.bytheway.model.Method
 import ru.a1024bits.bytheway.model.SocialNetwork
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
@@ -46,25 +47,32 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
     }
 
 
-    private var glide: RequestManager? = null
+    private var glide: RequestManager = Glide.with(this)
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+
         App.component.inject(this)
-        glide = Glide.with(this)
+
         Log.e("LOG", "function fragment Created ")
         if (arguments != null) {
             val userId: String = arguments.getString(UID_KEY)
         }
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
 
+
+
         viewModel?.user?.observe(this, Observer<User> { user ->
             Log.e("LOG", "fill Profile: $user")
             fillProfile(user)
+            val hashMapUser=getHashMapUser(user)
+       /*     val userRepository=UserRepository()
+            changeUserProfile(hashMapUser, user?.id)*/
 
         })
 
         viewModel!!.load(FirebaseAuth.getInstance().currentUser?.uid.orEmpty())
+
     }
 
     private fun fillProfile(user: User?) {
@@ -89,9 +97,9 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
 
 
+      //  glide?.load(user?.urlPhoto)?.into(image_avatar)
 
 
-        glide?.load(user?.urlPhoto)?.into(image_avatar)
 
         for (name in user?.socialNetwork!!) {
             when (name) {
@@ -101,7 +109,16 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
                 SocialNetwork.WHATSUP -> whatsUpIcon.setImageResource(R.drawable.whats_icon__2_)
             }
         }
-
+        for (method in user?.method!!) {
+            when (method) {
+                Method.TRAIN -> vkIcon.setImageResource(R.drawable.ic_directions_railway)
+                Method.BUS -> csIcon.setImageResource(R.drawable.ic_directions_bus)
+                Method.CAR -> fbcon.setImageResource(R.drawable.ic_directions_car)
+                Method.PLANE -> whatsUpIcon.setImageResource(R.drawable.ic_flight)
+                Method.HITCHHIKING -> whatsUpIcon.setImageResource(R.drawable.ic_directions_hitchhiking)
+               /* Method.BOAT -> whatsUpIcon.setImageResource(R.drawable.ic_boat)*/
+            }
+        }
 //        for (nameCity in user?.cities!!) {
 //
 //        }
@@ -131,6 +148,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
         val displayPriceTravel = view.findViewById<TextView>(R.id.display_price_travel)
         displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(0)
+
+
         view.findViewById<SeekBar>(R.id.choose_price_travel).setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
                 displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(fibbonaci(p1))
@@ -275,5 +294,28 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             fragment.arguments = args
             return fragment
         }
+    }
+
+
+    fun getHashMapUser(user: User?):HashMap<String,Any?>{
+        var hashMap=HashMap<String,Any?>()
+        hashMap.set("name", user?.name)
+        hashMap.set("lastName", user?.lastName)
+        hashMap.set("id", user?.id)
+        hashMap.set("phone", user?.phone)
+        hashMap.set("route", user?.route)
+        hashMap.set("cities", user?.cities)
+        hashMap.set("method", user?.method)
+        hashMap.set("dates", user?.dates)
+        hashMap.set("budget", user?.budget)
+        hashMap.set("city", user?.city)
+        hashMap.set("percentsSimilarTravel", user?.percentsSimilarTravel)
+        hashMap.set("addInformation", user?.addInformation)
+        hashMap.set("sex", user?.sex)
+        hashMap.set("socialNetwork", user?.socialNetwork)
+        hashMap.set("data", user?.data)
+        hashMap.set("urlPhoto", user?.urlPhoto)
+
+        return hashMap
     }
 }// Required empty public constructor
