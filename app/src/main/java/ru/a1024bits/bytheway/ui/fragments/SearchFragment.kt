@@ -49,7 +49,6 @@ class SearchFragment : Fragment() {
         viewModel?.load?.observe(this, Observer {
             Log.e("LOG", "observer search fragment")
         })
-        mCallback?.onSetPoint(LatLng(55.0, 55.0), 1)
     }
 
     var mCallback: OnFragmentInteractionListener? = null
@@ -95,8 +94,7 @@ class SearchFragment : Fragment() {
             if (resultCode == AppCompatActivity.RESULT_OK) {
                 val place = PlaceAutocomplete.getPlace(activity, data);
                 text_from_city.text = place.name;
-                firstPoint = place.latLng
-                drawMarkerMap(place.latLng)
+                mCallback?.onSetPoint(place.latLng, PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM)
             } else {
                 val status = PlaceAutocomplete.getStatus(activity, data);
                 Log.i("LOG", status.getStatusMessage() + " ");
@@ -107,17 +105,13 @@ class SearchFragment : Fragment() {
             if (resultCode == AppCompatActivity.RESULT_OK) {
                 val place = PlaceAutocomplete.getPlace(activity, data);
                 text_to_city.text = place.name
-                secondPoint = place.latLng
+                mCallback?.onSetPoint(place.latLng, PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO)
             } else {
                 val status = PlaceAutocomplete.getStatus(activity, data);
                 Log.i("LOG", status.getStatusMessage() + " ");
                 text_to_city.text = ""
             }
         }
-    }
-
-    private fun drawMarkerMap(latLng: LatLng) {
-
     }
 
     private fun sendIntentForSearch(code: Int) {

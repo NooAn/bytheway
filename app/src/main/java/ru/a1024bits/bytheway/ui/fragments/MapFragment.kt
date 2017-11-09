@@ -35,7 +35,7 @@ import android.app.Activity
  */
 class MapFragment : Fragment(), OnMapReadyCallback {
 
-    private lateinit var mMap: GoogleMap
+    private var mMap: GoogleMap? = null
     private var mMapView: MapView? = null
 
     private var viewModel: MyProfileViewModel? = null
@@ -95,9 +95,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         this.mMap = googleMap
         val constLocation = LatLng(50.0, 50.0);
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(constLocation));
+        mMap?.moveCamera(CameraUpdateFactory.newLatLng(constLocation));
 
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(3F));
+        mMap?.animateCamera(CameraUpdateFactory.zoomTo(3F));
 
     }
 
@@ -117,7 +117,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         // Changing marker icon
         markerOptions.icon(bitmapDescriptorFromVector(activity, R.drawable.plane)).rotation(getBearing(listPointPath.first(), listPointPath[1]))
 
-        marker = mMap.addMarker(markerOptions);
+        marker = mMap?.addMarker(markerOptions);
         animateMarker()
         // - delete after
         val d = (Math.abs(endLocation.latitude) - Math.abs(fromLocation.latitude)) / 2
@@ -136,8 +136,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         Log.i("LOG", point3.toString())
         Log.i("LOG", point2.toString())
 
-        mMap.addMarker(MarkerOptions().position(point2).title("point2"))
-        mMap.addMarker(MarkerOptions().position(point3).title("point3"))
+        mMap?.addMarker(MarkerOptions().position(point2).title("point2"))
+        mMap?.addMarker(MarkerOptions().position(point3).title("point3"))
     }
 
     var listPointPath: ArrayList<LatLng> = ArrayList()
@@ -201,7 +201,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         polyOptions.color(strokeColor)
         polyOptions.pattern(PATTERN_POLYGON_ALPHA)
         //  mMap.clear()
-        mMap.addPolyline(polyOptions)
+        mMap?.addPolyline(polyOptions)
 
     }
 
@@ -211,10 +211,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     fun setMarker(point: LatLng, position: Int) {
+        Log.e("LOg", point.toString() + " " + position)
         if (position == 1)
-            mMap.addMarker(MarkerOptions().position(point).title("Старт"))
+            mMap!!.addMarker(MarkerOptions().position(point).title("Старт"))
         if (position == 2)
-            mMap.addMarker(MarkerOptions().position(point).title("Финиш"))
+            mMap?.addMarker(MarkerOptions().position(point).title("Финиш"))
     }
 
 }
