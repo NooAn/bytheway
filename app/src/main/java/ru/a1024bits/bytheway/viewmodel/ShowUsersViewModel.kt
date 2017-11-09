@@ -20,11 +20,11 @@ class ShowUsersViewModel @Inject constructor(var userRepository: UserRepository)
     val TAG = "showUserViewModel"
 
     fun getAllUsers() {
-        val user = User()
         userRepository.getUsers()
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         for (document in task.result) {
+                            val user = User()
                             Log.d(TAG, document.id + " => " + document.data)
                             user.name = document.data.getValue("name") as String
                             user.age = document.data.getValue("age") as Long
