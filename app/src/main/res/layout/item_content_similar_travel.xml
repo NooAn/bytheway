@@ -28,7 +28,7 @@
         app:layout_constraintStart_toEndOf="@+id/user_avatar" />
 
     <TextView
-        android:id="@+id/lastName_content_user"
+        android:id="@+id/text_city"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginBottom="8dp"

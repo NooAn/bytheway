@@ -12,8 +12,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import com.bumptech.glide.Glide
-import com.bumptech.glide.RequestManager
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
@@ -34,20 +32,22 @@ import java.text.SimpleDateFormat
 
 
 class MyProfileFragment : Fragment(), OnMapReadyCallback {
-
-
+    
+    
     private var viewModel: MyProfileViewModel? = null
-
+    
     private var mListener: OnFragmentInteractionListener? = null
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
-
-
+    
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
 
 
+
     /*private var glide: RequestManager = Glide.with(this)*/
+
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -60,8 +60,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         }
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
 
-
-
         viewModel?.user?.observe(this, Observer<User> { user ->
             Log.e("LOG", "fill Profile: $user")
             fillProfile(user)
@@ -70,14 +68,15 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             changeUserProfile(hashMapUser, user?.id)*/
 
         })
-
+        
         viewModel!!.load(FirebaseAuth.getInstance().currentUser?.uid.orEmpty())
 
     }
-
+    
     private fun fillProfile(user: User?) {
         username.text = StringBuilder(user?.name).append(" ").append(user?.lastName)
         city.text = user?.city
+
 
         if (user?.cities!= null&& user?.cities.size>0) {
             val lastIndexArr = user?.cities.size - 1
@@ -123,29 +122,29 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 //
 //        }
     }
-
+    
     override fun onResume() {
         super.onResume()
         mMapView?.onResume()
     }
-
+    
     override fun onMapReady(map: GoogleMap?) {
         if (googleMap != null)
             this.googleMap = map
-
+        
         googleMap?.addMarker(MarkerOptions().position(CENTRE).title("Hello, Dude!"))
-
+        
         // Zooming to the Campus location
         googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(CENTRE, ZOOM))
     }
-
+    
     private var mMapView: MapView? = null
     private var googleMap: GoogleMap? = null
-
+    
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater!!.inflate(R.layout.fragment_my_user_profile, container, false)
         Log.e("LOG", "function activity create view ")
-
+        
         val displayPriceTravel = view.findViewById<TextView>(R.id.display_price_travel)
         displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(0)
 
@@ -154,15 +153,15 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
                 displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(fibbonaci(p1))
             }
-
+            
             override fun onStartTrackingTouch(p0: SeekBar?) {
             }
-
+            
             override fun onStopTrackingTouch(p0: SeekBar?) {
             }
-
+            
         })
-
+        
         view.findViewById<ImageView>(R.id.vkIcon).setOnClickListener {
             openDialogVk()
         }
@@ -175,12 +174,17 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         view.findViewById<ImageView>(R.id.fbcon).setOnClickListener({
             openDialogFB()
         })
-
-
+        
+        
         mMapView = view?.findViewById<MapView>(R.id.mapView)
-        mMapView?.onCreate(savedInstanceState)
+        try {
+            mMapView?.onCreate(savedInstanceState)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
         mMapView?.onResume()// needed to get the map to display immediately
-
+        
+        
         try {
             MapsInitializer.initialize(activity.applicationContext)
         } catch (e: Exception) {
@@ -189,7 +193,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         mMapView?.getMapAsync(this)
         return view
     }
-
+    
     private fun openDialogFB() {
         val simpleAlert = AlertDialog.Builder(activity).create()
         simpleAlert.setTitle("Ссылки на социальные сети")
@@ -197,34 +201,34 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         val inflater = this.layoutInflater
         val dialogView = inflater.inflate(R.layout.custom_dialog_profile_soc_network, null)
         simpleAlert.setView(dialogView)
-
+        
         simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Сохранить", { dialogInterface, i ->
             viewModel?.saveLinks(dialogView.findViewById<EditText>(R.id.fbEditText).text)
             Toast.makeText(activity.applicationContext, "Сохранено $'dialogView.findViewById<EditText>(R.id.fbEditText).text'", Toast.LENGTH_SHORT).show()
         })
-
+        
         simpleAlert.show()
-
+        
     }
-
+    
     private fun openDialogWhatsUp() {
-
+    
     }
-
+    
     private fun openDialogDb() {
-
+    
     }
-
+    
     private fun openDialogVk() {
     }
-
-
+    
+    
     fun onButtonPressed() {
         if (mListener != null) {
             mListener!!.onFragmentInteraction()
         }
     }
-
+    
     override fun onAttach(context: Context?) {
         super.onAttach(context)
         if (context is OnFragmentInteractionListener) {
@@ -233,42 +237,42 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             throw RuntimeException(context!!.toString() + " must implement OnFragmentInteractionListener")
         }
     }
-
+    
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
         mMapView?.onSaveInstanceState(outState)
     }
-
+    
     override fun onDetach() {
         super.onDetach()
         mListener = null
     }
-
+    
     override fun onPause() {
         super.onPause()
         mMapView?.onPause()
     }
-
+    
     override fun onStart() {
         super.onStart()
         mMapView?.onStart()
     }
-
+    
     override fun onStop() {
         super.onStop()
         mMapView?.onStop()
     }
-
+    
     override fun onDestroy() {
         super.onDestroy()
         mMapView?.onDestroy()
     }
-
+    
     override fun onLowMemory() {
         super.onLowMemory()
         mMapView?.onLowMemory()
     }
-
+    
     fun fibbonaci(n: Int): Int {
         var prev = 0
         var next = 1
@@ -280,13 +284,13 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         }
         return result
     }
-
+    
     companion object {
         private val ARG_PARAM1 = "param1"
         private val UID_KEY = "uid"
         val CENTRE: LatLng = LatLng(-23.570991, -46.649886)
         val ZOOM = 9f
-
+        
         fun newInstance(param1: String, param2: String): UserProfileFragment {
             val fragment = UserProfileFragment()
             val args = Bundle()
@@ -297,7 +301,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
     }
 
 
-    fun getHashMapUser(user: User?):HashMap<String,Any?>{
+/*    fun getHashMapUser(user: User?):HashMap<String,Any?>{
         var hashMap=HashMap<String,Any?>()
         hashMap.set("name", user?.name)
         hashMap.set("lastName", user?.lastName)
@@ -317,5 +321,5 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         hashMap.set("urlPhoto", user?.urlPhoto)
 
         return hashMap
-    }
+    }*/
 }// Required empty public constructor
