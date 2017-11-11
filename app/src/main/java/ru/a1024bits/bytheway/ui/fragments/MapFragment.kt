@@ -49,7 +49,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         viewModel?.load?.observe(this, android.arch.lifecycle.Observer {
             Log.e("LOG", "observer map fragment")
         })
-        viewModel?.test()
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {

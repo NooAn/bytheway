@@ -15,11 +15,12 @@ enum class Method {
     BOAT
 }
 
-enum class SocialNetwork {
-    VK,
-    WHATSUP,
-    CS,
-    FB
+enum class SocialNetwork(val link: String) {
+    VK(""),
+    WHATSAAP(""),
+    CS(""),
+    FB(""),
+    TG("")
 }
 
 data class User(var name: String = "",
@@ -28,6 +29,7 @@ data class User(var name: String = "",
                 var id: String = "0",
                 var email: String = "",
                 var phone: String = "",
+                var countTrip: Int = 0,
                 var route: ArrayList<String> = arrayListOf(),
                 var cities: ArrayList<String> = arrayListOf(),
                 var method: ArrayList<Method> = arrayListOf(),

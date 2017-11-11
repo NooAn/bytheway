@@ -75,7 +75,6 @@
             android:layout_weight="1"
             android:drawableStart="@drawable/places_ic_search"
             android:text="@string/name_button_search"
-            android:textColor="@color/colorPrimary"
             android:theme="@style/WhiteButton" />
     </LinearLayout>
 

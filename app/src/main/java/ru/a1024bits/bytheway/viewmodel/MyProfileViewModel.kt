@@ -9,6 +9,7 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import ru.a1024bits.bytheway.model.SocialNetwork
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.COLLECTION_USERS
 import ru.a1024bits.bytheway.repository.UserRepository
@@ -20,6 +21,7 @@ import javax.inject.Inject
 class MyProfileViewModel @Inject constructor(var userRepository: UserRepository) : ViewModel() {
     val user: MutableLiveData<User> = MutableLiveData<User>()
     val load: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
+    val error: MutableLiveData<Int> = MutableLiveData<Int>()
 
     fun load(userId: String) {
         Log.e("LOG", "start load user: $userId")
@@ -34,8 +36,17 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
         Log.e("LOG", "end load user: $userId")
     }
 
-    fun saveLinks(textLinks: Editable) {
-        Log.e("LOG", textLinks.toString())
+    fun saveLinks(textLinks: Editable, socNetwork: SocialNetwork) {
+        Log.e("LOG", "saveLinks")
+        val map: HashMap<String, Any> = hashMapOf()
+        map.put("link", socNetwork)
+        userRepository.changeUserProfile(map, "GEN3tMlbhaNLdpuKhCSgLgcg7mI3")
+                .addOnFailureListener {
+                    error.value = 1
+                }
+                .addOnCompleteListener {
+                    Log.e("LOG", "oncomplete")
+                }
     }
 
 
@@ -76,9 +87,22 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
         })
     }
 
-    fun test() {
-        load.value = false
-        load.value = true
+    fun sendUserData(map: HashMap<String, Any>, id: String) {
+        userRepository.changeUserProfile(map, id)
+                .addOnCompleteListener {
+                    //fixme
+                    Log.e("LOG", "complete user")
+
+                }
+                .addOnFailureListener {
+                    Log.e("LOG", "fail user")
+                    //fixme Здесь обработка лоадера и показь пользователю ошибку загрузки ну не здеь а во вью. пример как эт осделать смотри в вью моделаър
+                }
+                .addOnSuccessListener {
+                    Log.e("LOG", "ok send user")
+                    //fixme
+                }
     }
+
 
 }

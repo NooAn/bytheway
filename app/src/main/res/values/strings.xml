@@ -9,7 +9,7 @@
     <string name="type_money">Рублей: </string>
     <string name="money">Бюджет поездки</string>
     <string name="description">Описание поездки</string>
-    <string name="city">Москва, Россия</string>
+    <string name="city">Родной город</string>
     <string name="drawer_item_map_search">Поиск попутчиков</string>
     <string name="drawer_item_profile">Профиль</string>
     <string name="title_activity_menu">ByTheWay</string>
@@ -38,5 +38,9 @@
     <string name="sex">sex</string>
     <string name="man">man</string>
     <string name="woman">woman</string>
+    <string name="add_new_trip">+ Создать  поездку</string>
+    <string name="sex_and_age">Пол, возраст</string>
+    <string name="born_year">Год рождения</string>
+    <string name="name">Имя</string>
 
 </resources>
