@@ -95,14 +95,20 @@ class AllUsersFragment : Fragment() {
         save_parameters.setOnClickListener {
             if (start_age_parameter.text.toString().isNotEmpty())
                 filter.startAge = Integer.parseInt(start_age_parameter.text.toString())
+            else filter.startAge = 0
             if (end_age_parameter.text.toString().isNotEmpty())
                 filter.endAge = Integer.parseInt(end_age_parameter.text.toString())
+            else filter.endAge = 0
             if (start_budget_parameter.text.toString().isNotEmpty())
                 filter.startBudget = Integer.parseInt(start_budget_parameter.text.toString())
+            else filter.startBudget = 0
             if (end_budget_parameter.text.toString().isNotEmpty())
                 filter.endBudget = Integer.parseInt(end_budget_parameter.text.toString())
-//            filter.startDate = calendarStartDate.timeInMillis
-//            filter.endDate = calendarEndDate.timeInMillis
+            else filter.endBudget = 0
+
+            filter.startCity = start_city_parameter.text.toString()
+            filter.endCity = end_city_parameter.text.toString()
+
             loading_where_load_users.visibility = View.VISIBLE
             viewModel.getAllUsers(filter)
         }
@@ -147,7 +153,7 @@ class AllUsersFragment : Fragment() {
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-                if ("".equals(newText)){
+                if ("".equals(newText)) {
                     loading_where_load_users.visibility = View.VISIBLE
                     viewModel.getAllUsers(filter)
                 }
