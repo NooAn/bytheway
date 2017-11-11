@@ -11,7 +11,6 @@ import android.support.v4.app.Fragment
 import android.support.v7.widget.SearchView
 import android.util.Log
 import android.view.*
-import android.widget.Toast
 import kotlinx.android.synthetic.main.fragment_display_all_users.*
 import kotlinx.android.synthetic.main.searching_parameters_block.*
 import ru.a1024bits.bytheway.App
@@ -22,6 +21,7 @@ import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.viewmodel.ShowUsersViewModel
 import java.util.*
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 
 class AllUsersFragment : Fragment() {
@@ -103,6 +103,7 @@ class AllUsersFragment : Fragment() {
                 filter.endBudget = Integer.parseInt(end_budget_parameter.text.toString())
 //            filter.startDate = calendarStartDate.timeInMillis
 //            filter.endDate = calendarEndDate.timeInMillis
+            loading_where_load_users.visibility = View.VISIBLE
             viewModel.getAllUsers(filter)
         }
 
@@ -132,14 +133,24 @@ class AllUsersFragment : Fragment() {
         searchView.setSearchableInfo(
                 (context.getSystemService(Context.SEARCH_SERVICE) as SearchManager).getSearchableInfo(activity.componentName))
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String): Boolean {
-                Toast.makeText(context, query, Toast.LENGTH_SHORT).show()
-                //todo search in all fields in all users and if
+            override fun onQueryTextSubmit(quer: String): Boolean {
+                val query = quer.toLowerCase()
+                val result = ArrayList<User>()
+                showUsersAdapter.users.filterTo(result) {
+                    it.cities.contains(query) || it.name.toLowerCase().contains(query) || it.email.toLowerCase().contains(query) ||
+                            it.age.toString().contains(query) || it.budget.toString().contains(query) ||
+                            it.city.toLowerCase().contains(query) || it.lastName.toLowerCase().contains(query) ||
+                            it.phone.contains(query) || it.route.contains(query)
+                }
+                showUsersAdapter.setItems(result)
                 return true
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-                Log.d("tag", " search:: " + newText)
+                if ("".equals(newText)){
+                    loading_where_load_users.visibility = View.VISIBLE
+                    viewModel.getAllUsers(filter)
+                }
                 return false
             }
 
@@ -171,6 +182,7 @@ class AllUsersFragment : Fragment() {
                 loading_where_load_users.visibility = View.GONE
             }
         })
+        loading_where_load_users.visibility = View.VISIBLE
         viewModel.getAllUsers(filter)
     }
 

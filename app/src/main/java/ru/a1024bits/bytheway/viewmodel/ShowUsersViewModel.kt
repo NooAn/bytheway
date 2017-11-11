@@ -5,6 +5,7 @@ import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModel
 import android.util.Log
+import android.widget.ProgressBar
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.repository.UserRepository
@@ -23,18 +24,13 @@ class ShowUsersViewModel @Inject constructor(var userRepository: UserRepository)
         userRepository.getUsers(filter)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        val result : MutableList<User> = ArrayList()
+                        val result: MutableList<User> = ArrayList()
                         for (document in task.result) {
                             val user = User()
                             Log.d(TAG, document.id + " => " + document.data)
                             user.name = document.data.getValue("name") as String
                             user.age = document.data.getValue("age") as Long
-                            try {
-                                user.lastName = document.data.getValue("lastName") as String
-                            } catch (e: NoSuchElementException) {
-                                user.lastName = document.data.getValue("last_name") as String
-                                Log.d("tag", e.toString())
-                            }
+                            user.lastName = document.data.getValue("lastName") as String
                             result.add(user)
                         }
                         usersLiveData.setValue(result)

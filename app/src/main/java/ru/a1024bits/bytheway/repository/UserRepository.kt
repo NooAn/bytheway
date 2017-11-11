@@ -27,11 +27,11 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) : IUsersR
     }
 
     //Rx wrapper
-    override fun getUsers(): Task<QuerySnapshot> {
-        return store.collection(COLLECTION_USERS).get()
-    }
+//    override fun getUsers(): Task<QuerySnapshot> {
+//        return store.collection(COLLECTION_USERS).get()
+//    }
 
-    fun getUsers(filter: Filter): Task<QuerySnapshot> {
+    override fun getUsers(filter: Filter): Task<QuerySnapshot> {
         val query = store.collection(COLLECTION_USERS)
         if ((filter.startBudget != 0) && (filter.endBudget != 0)) {
             query.whereGreaterThanOrEqualTo("budget", filter.startBudget).whereLessThanOrEqualTo("budget", filter.endBudget)

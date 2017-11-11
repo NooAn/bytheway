@@ -7,7 +7,7 @@ import com.google.firebase.firestore.QuerySnapshot
 import ru.a1024bits.bytheway.model.User
 
 interface IUsersRepository {
-    fun getUsers(): Task<QuerySnapshot>
+    fun getUsers(filter: Filter): Task<QuerySnapshot>
     fun getSimilarUsersTravels(data: Filter, observer: Observer<List<User>>): List<User>
     fun getUserById(userID: String): Task<DocumentSnapshot>
     fun changeUserProfile(map: HashMap<String, Any>, id: String): Task<Void>

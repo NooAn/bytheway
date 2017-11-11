@@ -19,13 +19,7 @@ class ShowAllUsersAdapter(val context: Context) : RecyclerView.Adapter<ShowAllUs
     var users: MutableList<User> = ArrayList()
 
 
-    fun addItems(list: List<User>) {
-        this.users = list as MutableList<User>
-        notifyDataSetChanged()
-    }
-
     fun setItems(users: List<User>) {
-//        this.users.addAll(users)
         this.users = users as MutableList<User>
         notifyDataSetChanged()
     }
@@ -37,7 +31,6 @@ class ShowAllUsersAdapter(val context: Context) : RecyclerView.Adapter<ShowAllUs
     }
 
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
-        Log.d("LOG", "onBindViewHolder on position: " + position)
         val currentUser = users[position]
         holder.lastName.text = currentUser.lastName
         holder.name.text = currentUser.name
