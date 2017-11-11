@@ -1,5 +1,6 @@
 package ru.a1024bits.bytheway.ui.fragments
 
+import android.app.DatePickerDialog
 import android.app.SearchManager
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
@@ -7,62 +8,119 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SearchView
 import android.util.Log
 import android.view.*
-import android.widget.Button
-import android.widget.LinearLayout
 import android.widget.Toast
+import kotlinx.android.synthetic.main.fragment_display_all_users.*
+import kotlinx.android.synthetic.main.searching_parameters_block.*
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.adapter.ShowAllUsersAdapter
 import ru.a1024bits.bytheway.model.User
+import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.viewmodel.ShowUsersViewModel
+import java.util.*
 import javax.inject.Inject
 
 
 class AllUsersFragment : Fragment() {
-    private lateinit var currentView: View
+    private lateinit var filter: Filter
+    private var calendarStartDate: Calendar = Calendar.getInstance()
+    private var calendarEndDate: Calendar = Calendar.getInstance()
     private lateinit var viewModel: ShowUsersViewModel
     private lateinit var showUsersAdapter: ShowAllUsersAdapter
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var viewContainFilters: View
-    private var isDisplayFilters = true
-    private var isFilterSelectMan = true
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        if (savedInstanceState != null) {
+            filter = savedInstanceState.getSerializable("filter") as Filter
+            if (filter.startDate > 0) calendarStartDate.time = Date(filter.startDate)
+            if (filter.endDate > 0) calendarEndDate.time = Date(filter.endDate)
+        } else {
+            filter = Filter()
+            calendarEndDate.set(Calendar.MONTH, calendarEndDate.get(Calendar.MONTH) + 3)
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        currentView = inflater.inflate(R.layout.fragment_display_all_users, container, false)
-        return currentView
+        return inflater.inflate(R.layout.fragment_display_all_users, container, false)
     }
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        recyclerView = currentView.findViewById(R.id.display_all_users)
-        viewContainFilters = LayoutInflater.from(context).inflate(R.layout.searching_parameters, null)
-        //on @onClick in batterKnife
-        currentView.findViewById<View>(R.id.parameters_search_text).setOnClickListener {
-            val search_parameters = currentView.findViewById<LinearLayout>(R.id.search_parameters)
-            if (isDisplayFilters) {
-                search_parameters.addView(viewContainFilters)
-                val choose_sex = search_parameters.findViewById<Button>(R.id.choose_sex)
-                //on @onClick in batterKnife
-                choose_sex.setOnClickListener {
-                    if (isFilterSelectMan) choose_sex.text = context.getString(R.string.man)
-                    else choose_sex.text = context.getString(R.string.woman)
+        start_city_parameter.setText(filter.startCity)
+        end_city_parameter.setText(filter.endCity)
+        if (filter.endAge > 0)
+            end_age_parameter.setText(filter.endAge.toString(10))
+        if (filter.startAge > 0)
+            start_age_parameter.setText(filter.startAge.toString(10))
+        if (filter.startBudget > 0)
+            start_budget_parameter.setText(filter.startBudget.toString(10))
+        if (filter.endBudget > 0)
+            end_budget_parameter.setText(filter.endBudget.toString(10))
+        choose_sex_parameter.text = when {
+            filter.sex == 1 -> context.getString(R.string.man)
+            filter.sex == 2 -> context.getString(R.string.woman)
+            else -> "choose sex"
+        }
 
-                    isFilterSelectMan = !isFilterSelectMan
+        start_date_parameter.setOnClickListener {
+            DatePickerDialog(activity, DatePickerDialog.OnDateSetListener { dialog, year, month, day ->
+                calendarStartDate.set(year, month, day)
+                filter.startDate = calendarStartDate.timeInMillis
+                dialog.updateDate(year, month, day)
+            },
+                    calendarStartDate.get(Calendar.YEAR),
+                    calendarStartDate.get(Calendar.MONTH),
+                    calendarStartDate.get(Calendar.DAY_OF_MONTH))
+                    .show()
+        }
+
+        end_date_parameter.setOnClickListener {
+            DatePickerDialog(activity, DatePickerDialog.OnDateSetListener { dialog, year, month, day ->
+                calendarEndDate.set(year, month, day)
+                filter.endDate = calendarEndDate.timeInMillis
+                dialog.updateDate(year, month, day)
+            },
+                    calendarEndDate.get(Calendar.YEAR),
+                    calendarEndDate.get(Calendar.MONTH),
+                    calendarEndDate.get(Calendar.DAY_OF_MONTH))
+                    .show()
+        }
+
+        save_parameters.setOnClickListener {
+            if (start_age_parameter.text.toString().isNotEmpty())
+                filter.startAge = Integer.parseInt(start_age_parameter.text.toString())
+            if (end_age_parameter.text.toString().isNotEmpty())
+                filter.endAge = Integer.parseInt(end_age_parameter.text.toString())
+            if (start_budget_parameter.text.toString().isNotEmpty())
+                filter.startBudget = Integer.parseInt(start_budget_parameter.text.toString())
+            if (end_budget_parameter.text.toString().isNotEmpty())
+                filter.endBudget = Integer.parseInt(end_budget_parameter.text.toString())
+//            filter.startDate = calendarStartDate.timeInMillis
+//            filter.endDate = calendarEndDate.timeInMillis
+            viewModel.getAllUsers(filter)
+        }
+
+        parameters_search_text.setOnClickListener {
+            if (block_search_parameters.visibility == View.GONE) {
+                block_search_parameters.visibility = View.VISIBLE
+                choose_sex_parameter.setOnClickListener {
+                    if (choose_sex_parameter.text == context.getString(R.string.man)) {
+                        filter.sex = 2
+                        choose_sex_parameter.text = context.getString(R.string.woman)
+                    } else {
+                        filter.sex = 1
+                        choose_sex_parameter.text = context.getString(R.string.man)
+                    }
                 }
-            } else search_parameters.removeView(viewContainFilters)
-
-            isDisplayFilters = !isDisplayFilters
+            } else {
+                block_search_parameters.visibility = View.GONE
+            }
         }
     }
 
@@ -74,13 +132,13 @@ class AllUsersFragment : Fragment() {
         searchView.setSearchableInfo(
                 (context.getSystemService(Context.SEARCH_SERVICE) as SearchManager).getSearchableInfo(activity.componentName))
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
+            override fun onQueryTextSubmit(query: String): Boolean {
                 Toast.makeText(context, query, Toast.LENGTH_SHORT).show()
+                //todo search in all fields in all users and if
                 return true
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-//                adapter.getFilter().filter(newText);
                 Log.d("tag", " search:: " + newText)
                 return false
             }
@@ -103,22 +161,27 @@ class AllUsersFragment : Fragment() {
         App.component.inject(this)
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(ShowUsersViewModel::class.java)
         showUsersAdapter = ShowAllUsersAdapter(this.context)
-        recyclerView.adapter = showUsersAdapter
+        display_all_users.adapter = showUsersAdapter
 
-        viewModel.userLiveData.observe(this, Observer<User> { list ->
+        viewModel.usersLiveData.observe(this, Observer<List<User>> { list ->
             Log.e("LOG", "onChanged $list")
             if (list != null) {
                 Log.e("LOG", "update $list")
-                showUsersAdapter.addItem(list)
+                showUsersAdapter.setItems(list)
+                loading_where_load_users.visibility = View.GONE
             }
         })
-        viewModel.getAllUsers()
+        viewModel.getAllUsers(filter)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putSerializable("filter", filter)
     }
 
     companion object {
         fun newInstance(): AllUsersFragment {
             val fragment = AllUsersFragment()
-            fragment.arguments = Bundle()
             return fragment
         }
     }

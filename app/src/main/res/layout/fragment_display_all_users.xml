@@ -8,7 +8,7 @@
     android:orientation="vertical">
 
     <LinearLayout
-        android:id="@+id/search_parameters"
+        android:id="@+id/view_contain_block_parameters"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
@@ -22,6 +22,13 @@
             android:layout_marginLeft="17dp"
             android:layout_marginTop="19dp"
             android:text="+Параметры поиска" />
+
+        <include
+            android:id="@+id/block_search_parameters"
+            layout="@layout/searching_parameters_block"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
     </LinearLayout>
 
     <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"

@@ -16,13 +16,14 @@ import javax.inject.Inject
 class ShowUsersViewModel @Inject constructor(var userRepository: UserRepository) : ViewModel() {
 
     var listUser: MutableLiveData<List<User>> = MutableLiveData<List<User>>()
-    var userLiveData: MutableLiveData<User> = MutableLiveData<User>()
+    var usersLiveData: MutableLiveData<List<User>> = MutableLiveData<List<User>>()
     val TAG = "showUserViewModel"
 
-    fun getAllUsers() {
-        userRepository.getUsers()
+    fun getAllUsers(filter: Filter) {
+        userRepository.getUsers(filter)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
+                        val result : MutableList<User> = ArrayList()
                         for (document in task.result) {
                             val user = User()
                             Log.d(TAG, document.id + " => " + document.data)
@@ -34,8 +35,9 @@ class ShowUsersViewModel @Inject constructor(var userRepository: UserRepository)
                                 user.lastName = document.data.getValue("last_name") as String
                                 Log.d("tag", e.toString())
                             }
-                            userLiveData.setValue(user)
+                            result.add(user)
                         }
+                        usersLiveData.setValue(result)
                     } else {
                         Log.w(TAG, "Error getting documents.", task.exception)
                     }

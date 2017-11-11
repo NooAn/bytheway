@@ -24,8 +24,9 @@ class ShowAllUsersAdapter(val context: Context) : RecyclerView.Adapter<ShowAllUs
         notifyDataSetChanged()
     }
 
-    fun addItem(user: User) {
-        this.users.add(user)
+    fun setItems(users: List<User>) {
+//        this.users.addAll(users)
+        this.users = users as MutableList<User>
         notifyDataSetChanged()
     }
 
