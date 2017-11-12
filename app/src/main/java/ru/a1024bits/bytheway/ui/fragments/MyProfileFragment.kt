@@ -355,7 +355,26 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    private var methods: ArrayList<Method> = arrayListOf()
 
+    private var dates: ArrayList<Long> = arrayListOf()
+
+    private var sex: Int = -1
+
+    private var cities: ArrayList<String> = arrayListOf()
+
+    fun getHashMapUser(): HashMap<String, Any> {
+        val hashMap = HashMap<String, Any>()
+
+        hashMap.set("cities", cities)
+        hashMap.set("method", methods)
+        hashMap.set("dates", dates)
+        hashMap.set("budget", budget)
+        hashMap.set("addInformation", add_info_user.text.toString())
+        hashMap.set("sex", sex)
+        hashMap.put("countTrip", 1)
+        Log.e("LOG", hashMap.toString())
+        return hashMap
 
     }
 }
