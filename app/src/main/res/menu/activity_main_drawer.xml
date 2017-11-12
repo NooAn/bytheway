@@ -1,34 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:tools="http://schemas.android.com/tools"
-      tools:showIn="navigation_view">
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
 
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/profile_item"
             android:icon="@drawable/ic_menu_slideshow"
-            android:title="Профиль"/>
+            android:title="Профиль" />
         <item
             android:id="@+id/search_item"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="Поиск попутчиков"/>
+            android:icon="@drawable/ic_flight"
+            android:title="Поиск попутчиков" />
         <item
             android:id="@+id/all_users_item"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="Все пользователи"/>
+            android:icon="@drawable/ic_directions_bus"
+            android:title="Все пользователи" />
         <item
             android:id="@+id/similar_travel_item"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="совпадающие маршруты"/>
-    </group>
+            android:icon="@drawable/ic_directions_hitchhiking"
+            android:title="Пользователи" />
+        <item
+            android:id="@+id/feedback"
+            android:icon="@drawable/plane"
+            android:title="Обратная связь" />
+        <item
+            android:id="@+id/exit_item"
+            android:icon="@drawable/ic_directions_car"
+            android:title="Выход" />
 
-    <item android:title="">
-        <menu>
-            <item
-                android:id="@+id/exit_item"
-                android:icon="@drawable/ic_menu_slideshow"
-                android:title="Выход"/>
-        </menu>
-    </item>
+    </group>
 
 </menu>
