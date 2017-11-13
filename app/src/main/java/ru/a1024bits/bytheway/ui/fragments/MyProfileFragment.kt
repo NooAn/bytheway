@@ -94,6 +94,32 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
         }
 
+        var gender=when (user.sex){
+            1->"М"
+            2->"Ж"
+            else-> {""
+            }
+        }
+
+        if (user.sex!=0){
+            sex=user.sex
+
+            if(user.age>0){
+                sex_and_age.text=StringBuilder(gender).append(", ").append(user.age)
+            }else{
+                sex_and_age.text=gender
+            }
+        }
+
+        if (user.age>0){
+            age=user.age
+            if (user.sex!=0){
+               sex_and_age.text=StringBuilder(gender).append(", ").append(user.age)
+            }else{
+                sex_and_age.text=user.age.toString()
+            }
+        }
+
         glide?.load(user.urlPhoto)
                 ?.apply(RequestOptions.circleCropTransform())
                 ?.into(image_avatar)
@@ -273,6 +299,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             sendUserInfoToServer()
         })
 
+        
+
 
         mMapView = view?.findViewById<MapView>(R.id.mapView)
         mMapView?.onCreate(savedInstanceState)
@@ -426,6 +454,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
     private var sex: Int = -1
 
+    private var age: Long=0
+
     private var cities: ArrayList<String> = arrayListOf()
 
     fun getHashMapUser(): HashMap<String, Any> {
@@ -437,6 +467,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         hashMap.set("budget", budget)
         hashMap.set("addInformation", add_info_user.text.toString())
         hashMap.set("sex", sex)
+        hashMap.set("age", age)
         hashMap.put("countTrip", 1)
         Log.e("LOG", hashMap.toString())
         return hashMap
