@@ -76,6 +76,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             val lastIndexArr = user.cities.size - 1
             textCityFrom.text = user.cities.get(0)
             textCityTo.text = user.cities.get(lastIndexArr)
+            cities.add(user.cities.get(0))
+            cities.add(user.cities.get(lastIndexArr))
 
         }
 
@@ -87,6 +89,9 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             val dayArrival = formatDate.format(Date(user.dates.get(lastIndexArr)))
             textDateFrom.text = dayBegin
             textView5.text = dayArrival
+            dates.add(user.dates.get(0))
+            dates.add(user.dates.get(lastIndexArr))
+
         }
 
         glide?.load(user.urlPhoto)
@@ -107,11 +112,16 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         }
         for (method in user.method) {
             when (method) {
-                Method.TRAIN -> vkIcon.setImageResource(R.drawable.ic_directions_railway)
-                Method.BUS -> csIcon.setImageResource(R.drawable.ic_directions_bus)
-                Method.CAR -> fbcon.setImageResource(R.drawable.ic_directions_car)
-                Method.PLANE -> whatsUpIcon.setImageResource(R.drawable.ic_flight)
-                Method.HITCHHIKING -> whatsUpIcon.setImageResource(R.drawable.ic_directions_hitchhiking)
+                Method.TRAIN -> {directions_railway.setImageResource(R.drawable.ic_directions_railway)
+                    methods.add(Method.TRAIN)}
+                Method.BUS -> {directions_bus.setImageResource(R.drawable.ic_directions_bus)
+                    methods.add(Method.BUS)}
+                Method.CAR -> {directions_car.setImageResource(R.drawable.ic_directions_car)
+                    methods.add(Method.CAR)}
+                Method.PLANE -> {directions_flight.setImageResource(R.drawable.ic_flight)
+                    methods.add(Method.PLANE)}
+                Method.HITCHHIKING -> {csIcon1.setImageResource(R.drawable.ic_directions_hitchhiking)
+                    methods.add(Method.HITCHHIKING)}
                 else -> {
                 }
             }
@@ -180,6 +190,15 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         this code copy for others icon_method
          */
         view.findViewById<ImageView>(R.id.directions_car).setOnClickListener({
+
+            if (checkInMethods(Method.CAR)){
+                directions_car.setImageResource(R.drawable.ic_directions_car_grey)
+                methods.remove(Method.CAR)
+            }else {
+                directions_car.setImageResource(R.drawable.ic_directions_car)
+                methods.add(Method.CAR)
+            }
+
             // directions_car.setImageDrawable(resources(R.drawable.ic_directions_car)) // put only gray color!
             // do change icons and add method ( or delete)  in @methods
 
@@ -187,14 +206,51 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             // И в случае когда у нас уже есть Машина с сервера, то тоже удаляем.
             // изменить условие
 
-            if (true) methods.add(Method.CAR)
-            else methods.remove(Method.CAR)
+          //  if (true) methods.add(Method.CAR)
+          //  else methods.remove(Method.CAR)
         })
 
         view.findViewById<ImageView>(R.id.directions_railway).setOnClickListener({
-            // see above
+            if (checkInMethods(Method.TRAIN)){
+                directions_railway.setImageResource(R.drawable.ic_directions_railway_grey)
+                methods.remove(Method.TRAIN)
+            }else {
+                directions_railway.setImageResource(R.drawable.ic_directions_railway)
+                methods.add(Method.TRAIN)
+            }
         })
-        // ... e.t.c.
+
+        view.findViewById<ImageView>(R.id.directions_bus).setOnClickListener({
+            if (checkInMethods(Method.BUS)){
+                directions_bus.setImageResource(R.drawable.ic_directions_bus_grey)
+                methods.remove(Method.BUS)
+            }else {
+                directions_bus.setImageResource(R.drawable.ic_directions_bus)
+                methods.add(Method.BUS)
+            }
+        })
+
+        view.findViewById<ImageView>(R.id.directions_flight).setOnClickListener({
+            if (checkInMethods(Method.PLANE)){
+                directions_flight.setImageResource(R.drawable.ic_flight_grey)
+                methods.remove(Method.PLANE)
+            }else {
+                directions_flight.setImageResource(R.drawable.ic_flight)
+                methods.add(Method.PLANE)
+            }
+        })
+
+        view.findViewById<ImageView>(R.id.csIcon1).setOnClickListener({
+            if (checkInMethods(Method.HITCHHIKING)){
+                csIcon1.setImageResource(R.drawable.ic_directions_hitchhiking)
+                methods.remove(Method.HITCHHIKING)
+            }else {
+                csIcon1.setImageResource(R.drawable.ic_directions_hitchhiking_grey)
+                methods.add(Method.HITCHHIKING)
+            }
+        })
+
+
         view.findViewById<TextView>(R.id.add)
         view.findViewById<TextView>(R.id.new_trip_text).setOnClickListener {
             hideBlockNewTrip()
@@ -207,7 +263,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             openDialog(SocialNetwork.CS)
         }
         view.findViewById<ImageView>(R.id.whatsUpIcon).setOnClickListener({
-            openDialog(SocialNetwork.WHATSAAP);
+            openDialog(SocialNetwork.WHATSAAP)
         })
         view.findViewById<ImageView>(R.id.fbcon).setOnClickListener({
             openDialog(SocialNetwork.FB)
@@ -356,6 +412,15 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
     }
 
     private var methods: ArrayList<Method> = arrayListOf()
+
+    fun checkInMethods( method: Method):Boolean{
+
+       var result=false
+        for (item in methods) {
+            if (method == item) result = true
+        }
+        return result
+    }
 
     private var dates: ArrayList<Long> = arrayListOf()
 

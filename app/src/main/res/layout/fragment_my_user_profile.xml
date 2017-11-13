@@ -200,7 +200,8 @@
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
-                android:src="@drawable/ic_directions_car" />
+                android:src="@drawable/ic_directions_car_grey"
+                tools:src="@drawable/ic_directions_car" />
 
             <View
                 android:layout_width="1dp"
@@ -214,7 +215,8 @@
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
-                android:src="@drawable/ic_directions_railway" />
+                android:src="@drawable/ic_directions_railway_grey"
+                tools:src="@drawable/ic_directions_railway"/>
 
             <View
                 android:layout_width="1dp"
@@ -228,7 +230,8 @@
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
-                android:src="@drawable/ic_directions_bus" />
+                android:src="@drawable/ic_directions_bus_grey"
+                tools:src="@drawable/ic_directions_bus"/>
 
             <View
                 android:layout_width="1dp"
@@ -242,7 +245,8 @@
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
-                android:src="@drawable/ic_flight" />
+                android:src="@drawable/ic_flight_grey"
+                tools:src="@drawable/ic_flight" />
 
             <View
                 android:layout_width="1dp"
@@ -256,7 +260,8 @@
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
-                android:src="@drawable/ic_directions_hitchhiking" />
+                android:src="@drawable/ic_directions_hitchhiking_grey"
+                tools:src="@drawable/ic_directions_hitchhiking"/>
 
         </LinearLayout>
 
