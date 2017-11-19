@@ -2,91 +2,217 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="10dp"
+    android:layout_marginRight="10dp">
 
-    <Button
+    <EditText
+        android:id="@+id/start_city_parameter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:hint="откудa" />
+    <!--android:layout_alignEnd="@id/cancel_parameters"-->
+
+    <EditText
+        android:id="@+id/end_city_parameter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/start_city_parameter"
+        android:layout_marginBottom="16dp"
+        android:hint="Куда" />
+    <!--android:layout_alignEnd="@id/cancel_parameters"-->
+
+    <TextView
+        android:id="@+id/date_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/end_city_parameter"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="70dp"
+        android:text="дата"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/from_date_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/end_city_parameter"
+        android:layout_marginEnd="20dp"
+        android:layout_toEndOf="@+id/date_text"
+        android:text="c"
+        android:textSize="18sp" />
+
+    <Spinner
         android:id="@+id/start_date_parameter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="17dp"
-        android:layout_marginEnd="17dp"
-        android:text="start Date" />
+        android:layout_below="@id/end_city_parameter"
+        android:layout_toEndOf="@id/from_date_text" />
 
-    <Button
+    <TextView
+        android:id="@+id/by_date_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/end_city_parameter"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="40dp"
+        android:layout_toEndOf="@+id/start_date_parameter"
+        android:text="по"
+        android:textSize="18sp" />
+
+    <Spinner
         android:id="@+id/end_date_parameter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/start_date_parameter"
-        android:text="end Date" />
+        android:layout_below="@id/end_city_parameter"
+        android:layout_toEndOf="@id/by_date_text" />
+
+
+    <TextView
+        android:id="@+id/sex_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/date_text"
+        android:layout_marginBottom="16dp"
+        android:text="пол"
+        android:textSize="18sp" />
+
+    <RadioGroup
+        android:id="@+id/sex_buttons"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/from_date_text"
+        android:layout_below="@id/date_text"
+        android:orientation="horizontal">
+        <!--android:checkedButton="@id/sex_Any"-->
+
+        <RadioButton
+            android:id="@+id/sex_M"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="М" />
+
+        <RadioButton
+            android:id="@+id/sex_W"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Ж" />
+
+        <RadioButton
+            android:id="@+id/sex_Any"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Любой" />
+    </RadioGroup>
+
+
+    <TextView
+        android:id="@+id/age_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/sex_text"
+        android:layout_marginBottom="16dp"
+        android:text="возраст"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/from_age_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/from_date_text"
+        android:layout_below="@id/sex_text"
+        android:text="от"
+        android:textSize="18sp" />
+
+    <Spinner
+        android:id="@+id/start_age_parameter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@id/start_date_parameter"
+        android:layout_below="@id/sex_text"
+        android:layout_toEndOf="@id/from_age_text" />
+
+    <TextView
+        android:id="@+id/by_age_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/by_date_text"
+        android:layout_below="@id/sex_text"
+        android:text="до"
+        android:textSize="18sp" />
+
+    <Spinner
+        android:id="@+id/end_age_parameter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/end_date_parameter"
+        android:layout_below="@id/sex_text" />
+
+
+    <TextView
+        android:id="@+id/budget_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/age_text"
+        android:layout_marginBottom="40dp"
+        android:text="бюджет"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/from_budget_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/from_date_text"
+        android:layout_below="@id/age_text"
+        android:text="от"
+        android:textSize="18sp" />
 
     <EditText
         android:id="@+id/start_budget_parameter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/start_date_parameter"
-        android:layout_marginEnd="17dp"
-        android:hint="start budget"
-        android:inputType="number" />
+        android:layout_alignEnd="@+id/start_date_parameter"
+        android:layout_alignStart="@+id/start_date_parameter"
+        android:layout_below="@id/age_text"
+        android:layout_toEndOf="@id/from_budget_text" />
 
+
+    <TextView
+        android:id="@+id/by_budget_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/by_date_text"
+        android:layout_below="@id/age_text"
+        android:text="до"
+        android:textSize="18sp" />
 
     <EditText
         android:id="@+id/end_budget_parameter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/start_date_parameter"
-        android:layout_toEndOf="@+id/start_budget_parameter"
-        android:hint="end budget"
-        android:inputType="number" />
-
-    <EditText
-        android:id="@+id/start_age_parameter"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/start_budget_parameter"
-        android:layout_marginEnd="17dp"
-        android:hint="start Age"
-        android:inputType="number" />
-
-
-    <EditText
-        android:id="@+id/end_age_parameter"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/start_budget_parameter"
-        android:layout_toEndOf="@+id/start_age_parameter"
-        android:hint="end age"
-        android:inputType="number" />
-
-    <EditText
-        android:id="@+id/start_city_parameter"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/start_age_parameter"
-        android:layout_marginEnd="17dp"
-        android:hint="start city" />
-
-
-    <EditText
-        android:id="@+id/end_city_parameter"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/start_age_parameter"
-        android:layout_toEndOf="@+id/start_city_parameter"
-        android:hint="end city" />
-
-    <Button
-        android:id="@+id/choose_sex_parameter"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/start_city_parameter"
-        android:text="sex" />
+        android:layout_alignEnd="@+id/end_date_parameter"
+        android:layout_alignStart="@+id/end_date_parameter"
+        android:layout_below="@id/age_text" />
 
     <Button
         android:id="@+id/save_parameters"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/choose_sex_parameter"
-        android:text="save parameters" />
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/budget_text"
+        android:text="Поиск" />
 
+    <Button
+        android:id="@+id/cancel_parameters"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/budget_text"
+        android:layout_toStartOf="@id/save_parameters"
+        android:text="Отмена" />
+    <!--android:layout_toStartOf="@id/save_parameters"-->
 
 </RelativeLayout>

@@ -4,7 +4,7 @@ import java.io.Serializable
 
 
 data class Filter(var startAge: Int = 0,
-                  var endAge: Int = 0,
+                  var endAge: Int = 120,
                   var startBudget: Int = 0,
                   var endBudget: Int = 0,
                   var startCity: String = "",
