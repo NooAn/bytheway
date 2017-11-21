@@ -32,7 +32,7 @@
                 tools:text="@string/fullname" />
 
             <TextView
-                android:id="@+id/city"
+                android:id="@+id/cityview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"

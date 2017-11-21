@@ -22,6 +22,8 @@ import ru.a1024bits.bytheway.adapter.ShowAllUsersAdapter
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.viewmodel.ShowUsersViewModel
 import javax.inject.Inject
+import android.view.animation.AnimationUtils
+
 
 
 class AllUsersFragment : Fragment() {
@@ -44,16 +46,27 @@ class AllUsersFragment : Fragment() {
         currentView = inflater.inflate(R.layout.fragment_display_all_users, container, false)
         return currentView
     }
-    
+
+
+
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recyclerView = currentView.findViewById(R.id.display_all_users)
         viewContainFilters = LayoutInflater.from(context).inflate(R.layout.searching_parameters, null)
+        val  transitionOn=AnimationUtils.loadAnimation(context, R.anim.transition_on)
+        val  transitionOut=AnimationUtils.loadAnimation(context, R.anim.transition_out)
+        viewContainFilters.setOnClickListener {
+
+
+        }
         //on @onClick in batterKnife
         currentView.findViewById<View>(R.id.parameters_search_text).setOnClickListener {
             val search_parameters = currentView.findViewById<LinearLayout>(R.id.search_parameters)
+
             if (isDisplayFilters) {
+
                 search_parameters.addView(viewContainFilters)
+                viewContainFilters.startAnimation(transitionOn)
                 val choose_sex = search_parameters.findViewById<Button>(R.id.choose_sex)
                 //on @onClick in batterKnife
                 choose_sex.setOnClickListener {
@@ -62,8 +75,10 @@ class AllUsersFragment : Fragment() {
                     
                     isFilterSelectMan = !isFilterSelectMan
                 }
-            } else search_parameters.removeView(viewContainFilters)
-            
+            } else {
+                search_parameters.removeView(viewContainFilters)
+                viewContainFilters.startAnimation(transitionOut)
+            }
             isDisplayFilters = !isDisplayFilters
         }
     }

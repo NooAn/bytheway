@@ -7,7 +7,6 @@ import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
-import android.text.Layout
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -44,8 +43,26 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
     }
 
+    private var name=""
+    private var lastName=""
+    private var city=""
+    private var methods: ArrayList<Method> = arrayListOf()
+
+    private var socNet: ArrayList<SocialNetwork> = arrayListOf()
+
+    private var dates: ArrayList<Long> = arrayListOf()
+
+    private var sex: Int = 0
+
+    private var age: Long=0
+
+    private var cities: ArrayList<String> = arrayListOf()
+
+    private var budget: Long = 0 // default const
 
     private var glide: RequestManager? = null
+
+
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -67,7 +84,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
     private fun fillProfile(user: User) {
         username.text = StringBuilder(user.name).append(" ").append(user.lastName)
-        if (user.city.length > 0) city.text = user.city
+        if (user.city.length > 0) cityview.text = user.city
         if (user.countTrip == 0) {
             showBlockAddTrip()
             hideBlockTravelInforamtion()
@@ -93,32 +110,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             dates.add(user.dates.get(lastIndexArr))
 
         }
+            fillAgeSex(user.age,user.sex)
 
-        var gender=when (user.sex){
-            1->"М"
-            2->"Ж"
-            else-> {""
-            }
-        }
-
-        if (user.sex!=0){
-            sex=user.sex
-
-            if(user.age>0){
-                sex_and_age.text=StringBuilder(gender).append(", ").append(user.age)
-            }else{
-                sex_and_age.text=gender
-            }
-        }
-
-        if (user.age>0){
-            age=user.age
-            if (user.sex!=0){
-               sex_and_age.text=StringBuilder(gender).append(", ").append(user.age)
-            }else{
-                sex_and_age.text=user.age.toString()
-            }
-        }
 
         glide?.load(user.urlPhoto)
                 ?.apply(RequestOptions.circleCropTransform())
@@ -150,6 +143,39 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
                     methods.add(Method.HITCHHIKING)}
                 else -> {
                 }
+            }
+        }
+
+
+        if (user.budget>0){
+            budget=user.budget
+        }
+    }
+
+    fun fillAgeSex(userAge:Long, userSex:Int){
+        var gender=when (userSex){
+            1->"М"
+            2->"Ж"
+            else-> {""
+            }
+        }
+
+        if (userSex!=0){
+            sex=userSex
+
+            if(userAge>0){
+                sex_and_age.text=StringBuilder(gender).append(", ").append(userAge)
+            }else{
+                sex_and_age.text=gender
+            }
+        }
+
+        if (userAge>0){
+            age=userAge
+            if (userSex!=0){
+                sex_and_age.text=StringBuilder(gender).append(", ").append(userAge)
+            }else{
+                sex_and_age.text=userAge.toString()
             }
         }
     }
@@ -186,13 +212,13 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
     private var mMapView: MapView? = null
     private var googleMap: GoogleMap? = null
-    private var budget: Int = -1 // default const
+
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater!!.inflate(R.layout.fragment_my_user_profile, container, false)
         Log.e("LOG", "function activity create view ")
 
         val displayPriceTravel = view.findViewById<TextView>(R.id.display_price_travel)
-        displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(0)
+        displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(budget)
 
         view.findViewById<LinearLayout>(R.id.headerprofile).setOnClickListener({
             openSettingDialog()
@@ -212,9 +238,9 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
         })
 
-        /*
-        this code copy for others icon_method
-         */
+
+
+
         view.findViewById<ImageView>(R.id.directions_car).setOnClickListener({
 
             if (checkInMethods(Method.CAR)){
@@ -284,22 +310,31 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         }
         view.findViewById<ImageView>(R.id.vkIcon).setOnClickListener {
             openDialog(SocialNetwork.VK)
+            vkIcon.setImageResource(R.drawable.vk)
+
         }
         view.findViewById<ImageView>(R.id.csIcon).setOnClickListener {
             openDialog(SocialNetwork.CS)
+            csIcon.setImageResource(R.drawable.cs_color)
         }
         view.findViewById<ImageView>(R.id.whatsUpIcon).setOnClickListener({
             openDialog(SocialNetwork.WHATSAAP)
+            whatsUpIcon.setImageResource(R.drawable.whats_icon__2_)
         })
         view.findViewById<ImageView>(R.id.fbcon).setOnClickListener({
             openDialog(SocialNetwork.FB)
+            fbcon.setImageResource(R.drawable.fb_color)
+        })
+        view.findViewById<ImageView>(R.id.tgIcon).setOnClickListener({
+            openDialog(SocialNetwork.TG)
+            tgIcon.setImageResource(R.drawable.tg_color)
         })
         view.findViewById<Button>(R.id.button_save_travel_info).setOnClickListener({
             Log.e("LOG", "save travel")
             sendUserInfoToServer()
         })
 
-        
+
 
 
         mMapView = view?.findViewById<MapView>(R.id.mapView)
@@ -339,13 +374,51 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         val inflater = this.layoutInflater
         val dialogView = inflater.inflate(R.layout.custom_dialog_profile_inforamtion, null)
         simpleAlert.setView(dialogView)
+        val nameChoose=dialogView.findViewById<View>(R.id.dialog_name)as EditText
+        nameChoose.setText(name)
+        val lastNameChoose=dialogView.findViewById<View>(R.id.dialog_last_name)as EditText
+        lastNameChoose.setText(lastName)
+        val cityChoose=dialogView.findViewById<View>(R.id.dialog_city)as EditText
+        cityChoose.setText(city)
+        val ageChoose=dialogView.findViewById<View>(R.id.dialog_age)as EditText
+        ageChoose.setText(age.toString())
+        val man=dialogView.findViewById<RadioButton>(R.id.man)
+
+        val woman=dialogView.findViewById<RadioButton>(R.id.woman)
+        val sexChoose=dialogView.findViewById<RadioGroup>(R.id.sex)
+        if (sex==1){
+            sexChoose.check(man.id)
+
+        }else if (sex==2){
+            sexChoose.check(woman.id)
+        }
         simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Сохранить", { dialogInterface, i ->
+
+
+                if (man.isChecked){
+                    sex=1
+                 }else if (woman.isChecked){
+                    sex=2
+                }else sex=0
+            age=ageChoose?.getText().toString().toLong()
+            fillAgeSex(age,sex)
+                 Log.e("LOG","выбранный пол:$sex ")
+                 name=nameChoose?.getText().toString()
+
+            lastName=lastNameChoose?.getText().toString()
+            username.text = StringBuilder(name).append(" ").append(lastName)
+            city=cityChoose?.getText().toString()
+            cityview.text=(city)
+            Log.e("LOG","выбранное имя:$name ...фамилия $lastName")
+       
 
         })
         simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, "Отмена", { dialogInterface, i ->
 
         })
         simpleAlert.show()
+
+
     }
 
     private fun openDialog(socialNetwork: SocialNetwork) {
@@ -359,6 +432,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             viewModel?.saveLinks(dialogView.findViewById<EditText>(R.id.socLinkText).text, socialNetwork)
         })
         simpleAlert.show()
+        socNet.add(socialNetwork)
+
     }
 
 
@@ -412,10 +487,10 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         mMapView?.onLowMemory()
     }
 
-    fun fibbonaci(n: Int): Int {
-        var prev = 0
-        var next = 1
-        var result = 0
+    fun fibbonaci(n: Int): Long {
+        var prev:Long = 0
+        var next:Long = 1
+        var result:Long = 0
         for (i in 0 until n) {
             result = prev + next
             prev = next
@@ -439,7 +514,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private var methods: ArrayList<Method> = arrayListOf()
+
 
     fun checkInMethods( method: Method):Boolean{
 
@@ -450,19 +525,17 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         return result
     }
 
-    private var dates: ArrayList<Long> = arrayListOf()
 
-    private var sex: Int = -1
-
-    private var age: Long=0
-
-    private var cities: ArrayList<String> = arrayListOf()
 
     fun getHashMapUser(): HashMap<String, Any> {
         val hashMap = HashMap<String, Any>()
 
+        hashMap.set("name", name)
+        hashMap.set("lastName", lastName)
+        hashMap.set("city", city)
         hashMap.set("cities", cities)
         hashMap.set("method", methods)
+        hashMap.set("socNet", socNet)
         hashMap.set("dates", dates)
         hashMap.set("budget", budget)
         hashMap.set("addInformation", add_info_user.text.toString())
