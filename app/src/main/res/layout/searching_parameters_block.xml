@@ -7,7 +7,7 @@
     android:layout_marginRight="10dp">
 
     <EditText
-        android:id="@+id/start_city_parameter"
+        android:id="@+id/startCity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
@@ -15,10 +15,10 @@
     <!--android:layout_alignEnd="@id/cancel_parameters"-->
 
     <EditText
-        android:id="@+id/end_city_parameter"
+        android:id="@+id/endCity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/start_city_parameter"
+        android:layout_below="@id/startCity"
         android:layout_marginBottom="16dp"
         android:hint="Куда" />
     <!--android:layout_alignEnd="@id/cancel_parameters"-->
@@ -27,7 +27,7 @@
         android:id="@+id/date_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/end_city_parameter"
+        android:layout_below="@id/endCity"
         android:layout_marginBottom="16dp"
         android:layout_marginEnd="70dp"
         android:text="дата"
@@ -37,35 +37,35 @@
         android:id="@+id/from_date_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/end_city_parameter"
+        android:layout_below="@id/endCity"
         android:layout_marginEnd="20dp"
         android:layout_toEndOf="@+id/date_text"
         android:text="c"
         android:textSize="18sp" />
 
     <Spinner
-        android:id="@+id/start_date_parameter"
+        android:id="@+id/startDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/end_city_parameter"
+        android:layout_below="@id/endCity"
         android:layout_toEndOf="@id/from_date_text" />
 
     <TextView
         android:id="@+id/by_date_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/end_city_parameter"
+        android:layout_below="@id/endCity"
         android:layout_marginEnd="16dp"
         android:layout_marginStart="40dp"
-        android:layout_toEndOf="@+id/start_date_parameter"
+        android:layout_toEndOf="@+id/startDate"
         android:text="по"
         android:textSize="18sp" />
 
     <Spinner
-        android:id="@+id/end_date_parameter"
+        android:id="@+id/endDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/end_city_parameter"
+        android:layout_below="@id/endCity"
         android:layout_toEndOf="@id/by_date_text" />
 
 
@@ -79,7 +79,7 @@
         android:textSize="18sp" />
 
     <RadioGroup
-        android:id="@+id/sex_buttons"
+        android:id="@+id/sexButtons"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/from_date_text"
@@ -129,10 +129,10 @@
         android:textSize="18sp" />
 
     <Spinner
-        android:id="@+id/start_age_parameter"
+        android:id="@+id/startAge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@id/start_date_parameter"
+        android:layout_alignStart="@id/startDate"
         android:layout_below="@id/sex_text"
         android:layout_toEndOf="@id/from_age_text" />
 
@@ -146,10 +146,10 @@
         android:textSize="18sp" />
 
     <Spinner
-        android:id="@+id/end_age_parameter"
+        android:id="@+id/endAge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/end_date_parameter"
+        android:layout_alignStart="@+id/endDate"
         android:layout_below="@id/sex_text" />
 
 
@@ -172,11 +172,11 @@
         android:textSize="18sp" />
 
     <EditText
-        android:id="@+id/start_budget_parameter"
+        android:id="@+id/startBudget"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/start_date_parameter"
-        android:layout_alignStart="@+id/start_date_parameter"
+        android:layout_alignEnd="@+id/startDate"
+        android:layout_alignStart="@+id/startDate"
         android:layout_below="@id/age_text"
         android:layout_toEndOf="@id/from_budget_text" />
 
@@ -191,15 +191,15 @@
         android:textSize="18sp" />
 
     <EditText
-        android:id="@+id/end_budget_parameter"
+        android:id="@+id/endBudget"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/end_date_parameter"
-        android:layout_alignStart="@+id/end_date_parameter"
+        android:layout_alignEnd="@+id/endDate"
+        android:layout_alignStart="@+id/endDate"
         android:layout_below="@id/age_text" />
 
     <Button
-        android:id="@+id/save_parameters"
+        android:id="@+id/saveParameters"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
@@ -207,11 +207,11 @@
         android:text="Поиск" />
 
     <Button
-        android:id="@+id/cancel_parameters"
+        android:id="@+id/cancelParameters"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/budget_text"
-        android:layout_toStartOf="@id/save_parameters"
+        android:layout_toStartOf="@id/saveParameters"
         android:text="Отмена" />
     <!--android:layout_toStartOf="@id/save_parameters"-->
 

@@ -12,7 +12,6 @@ import android.util.Log
 import android.view.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Spinner
 import kotlinx.android.synthetic.main.fragment_display_all_users.*
 import kotlinx.android.synthetic.main.searching_parameters_block.*
 import ru.a1024bits.bytheway.App
@@ -22,7 +21,6 @@ import ru.a1024bits.bytheway.adapter.ShowAllUsersAdapter
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.viewmodel.ShowUsersViewModel
-import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 
@@ -62,30 +60,30 @@ class AllUsersFragment : Fragment() {
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        start_city_parameter.setText(filter.startCity)
-        end_city_parameter.setText(filter.endCity)
+        startCity.setText(filter.startCity)
+        endCity.setText(filter.endCity)
 
-        start_age_parameter.adapter = ArrayAdapter<String>(context, android.R.layout.simple_spinner_item,
+        startAge.adapter = ArrayAdapter<String>(context, android.R.layout.simple_spinner_item,
                 extension.yearsOldUsers)
-        start_age_parameter.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        startAge.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(p0: AdapterView<*>?) {}
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, p3: Long) {
                 if (countInitialElements++ < SIZE_INITIAL_ELEMENTS && tempStartAge >= 0) {
-                    start_age_parameter.setSelection(tempStartAge)
+                    startAge.setSelection(tempStartAge)
                     return
                 }
                 tempStartAge = position
             }
         }
 
-        end_age_parameter.adapter = ArrayAdapter<String>(context, android.R.layout.simple_spinner_item,
+        endAge.adapter = ArrayAdapter<String>(context, android.R.layout.simple_spinner_item,
                 extension.yearsOldUsers)
-        end_age_parameter.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        endAge.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(p0: AdapterView<*>?) {}
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, p3: Long) {
                 if (countInitialElements++ < SIZE_INITIAL_ELEMENTS) {
                     val settingAge = if (tempEndAge >= 0) tempEndAge else extension.yearsOldUsers.size - 1
-                    end_age_parameter.setSelection(settingAge)
+                    endAge.setSelection(settingAge)
                     tempEndAge = settingAge
                     return
                 }
@@ -93,29 +91,29 @@ class AllUsersFragment : Fragment() {
             }
         }
 
-        start_date_parameter.adapter = ArrayAdapter<String>(context, android.R.layout.simple_spinner_item,
+        startDate.adapter = ArrayAdapter<String>(context, android.R.layout.simple_spinner_item,
                 extension.getDaysInEndDataStr())
-        start_date_parameter.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        startDate.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(p0: AdapterView<*>?) {}
             override fun onItemSelected(p0: AdapterView<*>?, view: View?, position: Int, p3: Long) {
                 if (countInitialElements++ < SIZE_INITIAL_ELEMENTS) {
                     val settingDate = extension.getPositionFromDate(tempStartDate, false)
                     tempStartDate = extension.daysInMonths[settingDate]
-                    start_date_parameter.setSelection(settingDate)
+                    startDate.setSelection(settingDate)
                     return
                 }
                 tempStartDate = extension.daysInMonths[position]
             }
         }
-        end_date_parameter.adapter = ArrayAdapter<String>(context, android.R.layout.simple_spinner_item,
+        endDate.adapter = ArrayAdapter<String>(context, android.R.layout.simple_spinner_item,
                 extension.getDaysInEndDataStr())
-        end_date_parameter.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        endDate.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(p0: AdapterView<*>?) {}
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, p3: Long) {
                 if (countInitialElements++ < SIZE_INITIAL_ELEMENTS) {
                     val settingDate = extension.getPositionFromDate(tempEndDate, true)
                     tempEndDate = extension.daysInMonths[settingDate]
-                    end_date_parameter.setSelection(settingDate)
+                    endDate.setSelection(settingDate)
                     return
                 }
                 tempEndDate = extension.daysInMonths[position]
@@ -123,61 +121,61 @@ class AllUsersFragment : Fragment() {
         }
 
         if (filter.startBudget > 0)
-            start_budget_parameter.setText(filter.startBudget.toString())
+            startBudget.setText(filter.startBudget.toString())
         if (filter.endBudget > 0)
-            end_budget_parameter.setText(filter.endBudget.toString())
+            endBudget.setText(filter.endBudget.toString())
 
-        sex_buttons.setOnCheckedChangeListener { _, id ->
+        sexButtons.setOnCheckedChangeListener { _, id ->
             tempSex = when (id) {
                 sex_M.id -> 1
                 sex_W.id -> 2
                 else -> 0
             }
         }
-        sex_buttons.check(when (tempSex) {
+        sexButtons.check(when (tempSex) {
             1 -> sex_M.id
             2 -> sex_W.id
             else -> sex_Any.id
         })
 
-        save_parameters.setOnClickListener {
+        saveParameters.setOnClickListener {
             filter.startAge = tempStartAge
             filter.endAge = tempEndAge
             filter.startDate = tempStartDate
             filter.endDate = tempEndDate
-            if (start_budget_parameter.text.toString().isNotEmpty())
-                filter.startBudget = Integer.parseInt(start_budget_parameter.text.toString())
+            if (startBudget.text.toString().isNotEmpty())
+                filter.startBudget = Integer.parseInt(startBudget.text.toString())
             else filter.startBudget = 0
-            if (end_budget_parameter.text.toString().isNotEmpty())
-                filter.endBudget = Integer.parseInt(end_budget_parameter.text.toString())
+            if (endBudget.text.toString().isNotEmpty())
+                filter.endBudget = Integer.parseInt(endBudget.text.toString())
             else filter.endBudget = 0
             filter.sex = tempSex
-            filter.startCity = start_city_parameter.text.toString()
-            filter.endCity = end_city_parameter.text.toString()
+            filter.startCity = startCity.text.toString()
+            filter.endCity = endCity.text.toString()
 
             loading_where_load_users.visibility = View.VISIBLE
             viewModel.getAllUsers(filter)
         }
 
-        cancel_parameters.setOnClickListener {
-            sex_buttons.check(when (tempSex) {
+        cancelParameters.setOnClickListener {
+            sexButtons.check(when (tempSex) {
                 1 -> sex_M.id
                 2 -> sex_W.id
                 else -> sex_Any.id
             })
-            start_age_parameter.setSelection(filter.startAge)
-            end_age_parameter.setSelection(filter.endAge)
-            start_date_parameter.setSelection(extension.getPositionFromDate(filter.startDate, false))
-            end_date_parameter.setSelection(extension.getPositionFromDate(filter.endDate, true))
+            startAge.setSelection(filter.startAge)
+            endAge.setSelection(filter.endAge)
+            startDate.setSelection(extension.getPositionFromDate(filter.startDate, false))
+            endDate.setSelection(extension.getPositionFromDate(filter.endDate, true))
 
             if (filter.startBudget > 0)
-                start_budget_parameter.setText(filter.startBudget.toString())
+                startBudget.setText(filter.startBudget.toString())
             if (filter.endBudget > 0)
-                end_budget_parameter.setText(filter.endBudget.toString())
+                endBudget.setText(filter.endBudget.toString())
 
         }
 
-        parameters_search_text.setOnClickListener {
+        searchParametersText.setOnClickListener {
             if (block_search_parameters.visibility == View.GONE) {
                 block_search_parameters.visibility = View.VISIBLE
             } else {
