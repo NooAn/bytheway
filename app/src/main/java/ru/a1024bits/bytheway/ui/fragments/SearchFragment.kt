@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.ImageButton
 import android.widget.TextView
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException
 import com.google.android.gms.common.GooglePlayServicesRepairableException
@@ -80,7 +81,7 @@ class SearchFragment : Fragment() {
             sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM)
         }
 
-        swap_cities.setOnClickListener {
+        view.findViewById<ImageButton>(R.id.swap_cities).setOnClickListener {
             val tempString = text_from_city.text
             text_from_city.text = text_to_city.text
             text_to_city.text = tempString
