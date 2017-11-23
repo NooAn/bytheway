@@ -29,24 +29,27 @@ class ShowUsersViewModel @Inject constructor(var userRepository: UserRepository)
                     if (task.isSuccessful) {
                         val result: MutableList<User> = ArrayList()
                         for (document in task.result) {
-                            val user = User()
-                            Log.d(TAG, document.id + " => " + document.data)
-                            initializeUserFromDocument(user, document)
+                            try {
+                                val user = User()
+                                Log.d(TAG, document.id + " => " + document.data)
+                                initializeUserFromDocument(user, document)
 
-                            if ((filter.startBudget > 0) && (filter.endBudget > 0))
-                                if (user.budget < filter.startBudget || user.budget > filter.endBudget) continue
-                            if ((filter.startDate > 0L) && (filter.endDate > 0L))
-                                if (user.data < filter.startDate || user.data > filter.endDate) continue
-                            if ((filter.startAge > 0) && (filter.endAge > 0))
-                                if (user.age < filter.startAge || user.age > filter.endAge) continue
-                            if (filter.sex != 0)
-                                if (user.sex != filter.sex) continue
-                            if ("" != filter.startCity)
-                                if (!user.cities.contains(filter.startCity)) continue
-                            if ("" != filter.endCity)
-                                if (!user.cities.contains(filter.endCity)) continue
+                                if ((filter.startBudget > 0) && (filter.endBudget > 0))
+                                    if (user.budget < filter.startBudget || user.budget > filter.endBudget) continue
+                                if ((filter.startDate > 0L) && (filter.endDate > 0L))
+                                    if (user.data < filter.startDate || user.data > filter.endDate) continue
+                                if ((filter.startAge > 0) && (filter.endAge > 0))
+                                    if (user.age < filter.startAge || user.age > filter.endAge) continue
+                                if (filter.sex != 0)
+                                    if (user.sex != filter.sex) continue
+                                if ("" != filter.startCity)
+                                    if (!user.cities.contains(filter.startCity)) continue
+                                if ("" != filter.endCity)
+                                    if (!user.cities.contains(filter.endCity)) continue
 
-                            result.add(user)
+                                result.add(user)
+                            } catch (e: Exception) {
+                            }
                         }
                         usersLiveData.setValue(result)
                     } else {
