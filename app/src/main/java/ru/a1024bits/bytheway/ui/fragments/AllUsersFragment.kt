@@ -254,9 +254,6 @@ class AllUsersFragment : Fragment() {
     }
 
     companion object {
-        fun newInstance(): AllUsersFragment {
-            val fragment = AllUsersFragment()
-            return fragment
-        }
+        fun newInstance(): AllUsersFragment = AllUsersFragment()
     }
 }

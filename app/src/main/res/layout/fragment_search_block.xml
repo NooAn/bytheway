@@ -10,7 +10,7 @@
         android:id="@+id/text_from_city"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
+        android:layout_toStartOf="@+id/swap_cities"
         android:layout_alignParentTop="true"
         android:layout_marginTop="16dp"
         android:layout_toEndOf="@+id/startMarkerView"
@@ -34,14 +34,24 @@
 
     <TextView
         android:id="@+id/text_to_city"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/text_from_city"
         android:layout_marginTop="24dp"
         android:layout_toEndOf="@+id/startMarkerView"
+        android:layout_toStartOf="@+id/swap_cities"
         android:background="@drawable/textlines"
         android:drawableEnd="@drawable/ic_shape"
         android:hint="@string/city_end"
         android:textSize="16sp" />
+
+    <ImageButton
+        android:id="@+id/swap_cities"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/text_from_city"
+        android:layout_marginStart="16dp"
+        android:background="@drawable/swap_cities"/>
 
 </RelativeLayout>

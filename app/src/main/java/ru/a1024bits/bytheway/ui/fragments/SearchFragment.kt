@@ -80,6 +80,12 @@ class SearchFragment : Fragment() {
             sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM)
         }
 
+        swap_cities.setOnClickListener {
+            val tempString = text_from_city.text
+            text_from_city.text = text_to_city.text
+            text_to_city.text = tempString
+        }
+
         return view
     }
 
