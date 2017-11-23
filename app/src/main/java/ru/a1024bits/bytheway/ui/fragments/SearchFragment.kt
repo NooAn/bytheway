@@ -82,9 +82,9 @@ class SearchFragment : Fragment() {
         }
 
         view.findViewById<ImageButton>(R.id.swap_cities).setOnClickListener {
-            val tempString = text_from_city.text
-            text_from_city.text = text_to_city.text
-            text_to_city.text = tempString
+            val tempString = nameCityFrom.text
+            nameCityFrom.text = nameCityTo.text
+            nameCityTo.text = tempString
         }
 
         return view
