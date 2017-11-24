@@ -9,13 +9,13 @@
     <string name="type_money">Рублей: </string>
     <string name="money">Бюджет поездки</string>
     <string name="description">Описание поездки</string>
-    <string name="city">Родной город</string>
+    <string name="city">Москва, Россия</string>
     <string name="drawer_item_map_search">Поиск попутчиков</string>
     <string name="drawer_item_profile">Профиль</string>
-    <string name="title_activity_menu">ByTheWay</string>
+    <string name="title_activity_menu">bytheway</string>
 
     <string name="city_end">Пункт назначения</string>
-    <string name="name_button_search">Поиск</string>
+    <string name="name_button_search">Нажми нежно!</string>
     <string name="city_start">Пункт отправления</string>
     <string name="title_section1">Section 1</string>
     <string name="title_section2">Section 2</string>
@@ -34,13 +34,22 @@
     <string name="add_info_profile">Дополнительная информация</string>
     <string name="date">Дата</string>
     <string name="save_filter">Сохранить фильтры</string>
-    <string name="save">Сохранить</string>
     <string name="sex">sex</string>
     <string name="man">man</string>
     <string name="woman">woman</string>
-    <string name="add_new_trip">+ Создать  поездку</string>
-    <string name="sex_and_age">Пол, возраст</string>
-    <string name="born_year">Год рождения</string>
-    <string name="name">Имя</string>
 
+    <string-array name="months_array">
+        <item>янв.</item>
+        <item>фев.</item>
+        <item>март</item>
+        <item>апр.</item>
+        <item>май.</item>
+        <item>июнь</item>
+        <item>июль</item>
+        <item>авг.</item>
+        <item>сен.</item>
+        <item>окт.</item>
+        <item>ноя.</item>
+        <item>дек.</item>
+    </string-array>
 </resources>
