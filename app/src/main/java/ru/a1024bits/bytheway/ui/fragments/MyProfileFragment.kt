@@ -511,7 +511,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         return result
     }
 
-
     fun getHashMapUser(): HashMap<String, Any> {
         val hashMap = HashMap<String, Any>()
         hashMap.set("name", name)
@@ -528,6 +527,5 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         hashMap.put("countTrip", 1)
         Log.e("LOG", hashMap.toString())
         return hashMap
-
     }
 }

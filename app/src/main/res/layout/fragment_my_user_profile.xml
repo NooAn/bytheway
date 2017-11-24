@@ -145,7 +145,8 @@
         <include
             android:id="@+id/direction"
             layout="@layout/profile_direction"
-            android:visibility="visible" />
+            android:visibility="gone"
+            tools:visibility="visible" />
 
         <LinearLayout
             android:id="@+id/maplayout"

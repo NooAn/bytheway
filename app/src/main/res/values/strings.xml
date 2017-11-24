@@ -39,7 +39,7 @@
     <string name="woman">woman</string>
     <string name="name">Имя</string>
     <string name="save">Сохранить</string>
-    <string name="sex_and_age">Пол</string>
+    <string name="sex_and_age">Пол, возраст</string>
     <string name="add_new_trip">+ Создать поездку</string>
 
     <string-array name="months_array">
