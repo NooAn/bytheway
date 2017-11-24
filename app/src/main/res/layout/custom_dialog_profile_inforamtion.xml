@@ -6,25 +6,60 @@
     android:layout_height="wrap_content">
 
     <EditText
-        android:id="@+id/dialog_last_name"
+        android:id="@+id/dialog_name"
         android:layout_width="match_parent"
         android:hint="@string/name"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/textView2" />
+        app:layout_constraintBottom_toTopOf="@+id/dialog_last_name" />
+    <EditText
+        android:id="@+id/dialog_last_name"
+        android:layout_width="match_parent"
+        android:hint="Фамилия"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/dialog_city" />
+    <EditText
+        android:id="@+id/dialog_city"
+        android:layout_width="match_parent"
+        android:hint="Город"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/dialog_age" />
+    <EditText
+        android:id="@+id/dialog_age"
+        android:layout_width="match_parent"
+        android:hint="Возраст"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/sex" />
 
-    <TextView
-        android:id="@+id/textView2"
+    <RadioGroup
+        android:id="@+id/sex"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:text="Пол"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.03"
         app:layout_constraintStart_toStartOf="parent"
-        tools:ignore="MissingConstraints" />
+        tools:ignore="MissingConstraints" >
+        <RadioButton
+            android:id="@+id/man"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Мужчина"
+            />
+        <RadioButton
+            android:id="@+id/woman"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Женщина"
+            />
+
+    </RadioGroup>
 
     <android.support.constraint.Guideline
         android:id="@+id/guideline2"

@@ -45,9 +45,11 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     }
 
+
     override fun onConnectionFailed(p0: ConnectionResult) {
 
     }
+
 
     var screenNames: ArrayList<String> = arrayListOf()
     private val STATE_SCREEN_NAMES = "state_screen_names"
