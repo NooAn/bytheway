@@ -36,11 +36,10 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
         Log.e("LOG", "end load user: $userId")
     }
 
-    fun saveLinks(textLinks: Editable, socNetwork: SocialNetwork) {
-        Log.e("LOG", "saveLinks")
+    fun saveLinks(textLinks: Editable, socNetwork: SocialNetwork, id: String) {
         val map: HashMap<String, Any> = hashMapOf()
         map.put("link", socNetwork)
-        userRepository.changeUserProfile(map, "GEN3tMlbhaNLdpuKhCSgLgcg7mI3")
+        userRepository.changeUserProfile(map, id)
                 .addOnFailureListener {
                     error.value = 1
                 }
@@ -92,7 +91,6 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                 .addOnCompleteListener {
                     //fixme
                     Log.e("LOG", "complete user")
-
                 }
                 .addOnFailureListener {
                     Log.e("LOG", "fail user")
@@ -103,6 +101,4 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                     //fixme
                 }
     }
-
-
 }

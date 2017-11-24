@@ -151,6 +151,8 @@
             android:id="@+id/maplayout"
             android:layout_width="match_parent"
             android:layout_height="150dp"
+            android:visibility="gone"
+            tools:visibility="visible"
             android:layout_below="@+id/direction"
             android:orientation="vertical">
 
@@ -166,7 +168,8 @@
             android:id="@+id/method_moving"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-
+            android:visibility="gone"
+            tools:visibility="visible"
             android:layout_below="@+id/maplayout"
             android:layout_marginEnd="@dimen/margin_left_profile"
             android:layout_marginStart="@dimen/margin_left_profile"
@@ -185,6 +188,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@+id/method_moving"
+            android:visibility="gone"
+            tools:visibility="visible"
             android:layout_gravity="center_horizontal|center"
             android:layout_marginBottom="24dp"
             android:layout_marginEnd="@dimen/margin_left_profile"
@@ -262,26 +267,25 @@
                 android:layout_weight="1.0"
                 android:src="@drawable/ic_directions_hitchhiking_grey"
                 tools:src="@drawable/ic_directions_hitchhiking"/>
-
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/moneyfortrip"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:visibility="gone"
+            tools:visibility="visible"
             android:layout_below="@+id/layout_method_moving"
             android:layout_marginEnd="@dimen/margin_left_profile"
             android:layout_marginStart="@dimen/margin_left_profile"
             android:layout_marginTop="24dp"
             android:orientation="vertical">
 
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="@string/money"
                 android:textSize="16sp" />
-
 
             <SeekBar
                 android:id="@+id/choose_price_travel"
@@ -313,6 +317,8 @@
             android:layout_marginEnd="@dimen/margin_left_profile"
             android:layout_marginStart="@dimen/margin_left_profile"
             android:layout_marginTop="24dp"
+            android:visibility="gone"
+            tools:visibility="visible"
             android:orientation="vertical">
 
             <TextView
@@ -322,7 +328,6 @@
                 android:textSize="16sp" />
 
             <EditText
-              
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:id="@+id/add_info_user"
@@ -333,14 +338,14 @@
         </LinearLayout>
 
         <Button
-
-
             android:id="@+id/button_save_travel_info"
             android:layout_width="150dp"
             android:layout_height="match_parent"
             android:layout_alignParentEnd="true"
             android:layout_below="@+id/descriptionprofile"
             android:layout_marginEnd="19dp"
+            android:visibility="gone"
+            tools:visibility="visible"
             android:layout_marginTop="12dp"
             android:padding="24dp"
             android:text="Сохранить"
@@ -353,6 +358,8 @@
             android:layout_below="@+id/descriptionprofile"
             android:layout_marginEnd="19dp"
             android:layout_marginTop="12dp"
+            android:visibility="gone"
+            tools:visibility="visible"
             android:padding="24dp"
             android:text="Удалить"
             android:theme="@style/WhiteButton" />

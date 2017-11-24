@@ -126,7 +126,7 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         override fun createFragment(screenKey: String?, data: Any?): Fragment {
             Log.e("LOG", screenKey + " " + data)
             return if (data is User)
-                UserProfileFragment.newInstance(data.name, data.lastName)
+                UserProfileFragment.newInstance(data.id)
             else
                 when (screenKey) {
                     USER_PROFILE_SCREEN -> return MyProfileFragment()
