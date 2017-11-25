@@ -24,11 +24,15 @@ import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.places.Places
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
+import retrofit2.Call
+import ru.a1024bits.bytheway.AirWebService
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
+import ru.a1024bits.bytheway.model.AccessToken
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.router.Screens
+import ru.a1024bits.bytheway.router.Screens.Companion.AIR_SUCCES_SCREEN
 import ru.a1024bits.bytheway.router.Screens.Companion.ALL_USERS_SCREEN
 import ru.a1024bits.bytheway.router.Screens.Companion.LOGIN_APP_IN_THE_AIR
 import ru.a1024bits.bytheway.router.Screens.Companion.SEARCH_MAP_SCREEN
@@ -36,6 +40,7 @@ import ru.a1024bits.bytheway.router.Screens.Companion.SIMILAR_TRAVELS_SCREEN
 import ru.a1024bits.bytheway.router.Screens.Companion.USER_PROFILE_SCREEN
 import ru.a1024bits.bytheway.router.Screens.Companion.USER_SINHRONIZED_SCREEN
 import ru.a1024bits.bytheway.ui.fragments.*
+import ru.a1024bits.bytheway.util.ServiceGenerator
 import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.android.SupportFragmentNavigator
 import ru.terrakok.cicerone.commands.Command
@@ -144,7 +149,7 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 when (screenKey) {
                     USER_PROFILE_SCREEN -> return MyProfileFragment()
                     SEARCH_MAP_SCREEN -> return MapFragment()
-                //LOGIN_APP_IN_THE_AIR -> return
+                    AIR_SUCCES_SCREEN -> return AirSuccesfullFragment()
                     USER_SINHRONIZED_SCREEN -> return AppInTheAirSinchronizedFragment()
                     ALL_USERS_SCREEN -> return AllUsersFragment.newInstance()
                     SIMILAR_TRAVELS_SCREEN -> return SimilarTravelsFragment.newInstance()
@@ -183,13 +188,22 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // the intent filter defined in AndroidManifest will handle the return from ACTION_VIEW intent
         val uri = intent.data
         if (uri != null && uri.toString().startsWith(redirectUri)) {
+            Log.e("LOGI:", uri.toString())
             // use the parameter your API exposes for the code (mostly it's "code")
             val code = uri.getQueryParameter("code")
             if (code != null) {
+
+                Log.e("LOGI:", "code $code")
                 // get access token
                 // we'll do that in a minute
+                val loginService  = ServiceGenerator(AirWebService::class.java, clientId, clientSecret);
+            Call<AccessToken> call = loginService.getAccessToken(code, "authorization_code,refresh_token,client_credentials");
+            AccessToken accessToken = call.execute().body();
+                navigator.applyCommand(Replace(Screens.AIR_SUCCES_SCREEN, 1))
             } else if (uri.getQueryParameter("error") != null) {
                 // show an error message here
+                Log.e("LOGI:", "error: ${uri.getQueryParameter("error")}")
+
             }
         }
     }

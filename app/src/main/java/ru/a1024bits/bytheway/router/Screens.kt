@@ -13,5 +13,6 @@ class Screens {
         val ALL_USERS_SCREEN = "all_users_screen"
         val SIMILAR_TRAVELS_SCREEN = "similar_travel_screen"
         val LOGIN_APP_IN_THE_AIR = "login_app_in_the_air"
+        val AIR_SUCCES_SCREEN = "air_succes_screen"
     }
 }

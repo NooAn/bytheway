@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
@@ -44,48 +45,56 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/sinch_margin_left"
         android:layout_marginTop="32dp"
-        android:text="@string/app_sinchronized"
-        android:textSize="20dp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="38dp"
-        android:layout_marginStart="@dimen/sinch_margin_left"
-        android:layout_marginTop="24dp"
-        android:text="@string/text_sinch_app_air"
+        android:text="@string/text_air_succesful_add"
+        android:textAlignment="center"
         android:textSize="16sp" />
 
     <ImageView
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="56dp"
-        android:src="@drawable/guys" />
+        android:layout_marginTop="42dp"
+        android:src="@drawable/plane_air_app" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="bottom"
+    <View
+        android:layout_width="1dp"
+        android:layout_height="30dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="24dp"
+        android:background="@color/colorPrimary" />
+
+    <TextView
+        android:id="@+id/city_from_air"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="24dp"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        tools:text="@string/exampleCity" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="31 мая 2017"
+        android:textAlignment="center"
+        android:textSize="13sp" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginStart="@dimen/sinch_margin_left">
 
         <Button
-            android:id="@+id/button_sinch"
+            android:id="@+id/button_miss"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:text="@string/sinch_button"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:text="@string/air_next_profile"
             android:theme="@style/WhiteButton" />
-
-        <Button
-            android:id="@+id/button_miss"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:text="@string/miss"
-            android:theme="@style/WhiteButton" />
-    </LinearLayout>
+    </RelativeLayout>
 
 </LinearLayout>

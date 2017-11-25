@@ -41,7 +41,8 @@
     <string name="save">Сохранить</string>
     <string name="sex_and_age">Пол, возраст</string>
     <string name="add_new_trip">+ Создать поездку</string>
-    <string name="app_in_the_air">App in the Air \nPersonal flight assistant</string>
+    <string name="app_in_the_air">App in the Air</string>
+    <string name="personal_flight_assistant">Personal flight assistant</string>
     <string name="app_sinchronized">Синхронизация с App in the Air</string>
     <string name="text_sinch_app_air">Для автоматического создания поездок и быстрого поиска попутчиков мы можем добавить ваши рейсы  из приложения App in the Air.</string>
     <string name="sinch_button">СИНХРОНИЗИРОВАТЬ</string>
@@ -61,4 +62,10 @@
         <item>ноя.</item>
         <item>дек.</item>
     </string-array>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="air_next_profile">Перейти в профиль</string>
+    <string name="text_air_succesful_add">Ваши поездки успешно добавлены! </string>
+    <string name="exampleCity">Берлин - Москва</string>
 </resources>
