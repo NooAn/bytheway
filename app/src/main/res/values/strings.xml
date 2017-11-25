@@ -41,6 +41,11 @@
     <string name="save">Сохранить</string>
     <string name="sex_and_age">Пол, возраст</string>
     <string name="add_new_trip">+ Создать поездку</string>
+    <string name="app_in_the_air">App in the Air \nPersonal flight assistant</string>
+    <string name="app_sinchronized">Синхронизация с App in the Air</string>
+    <string name="text_sinch_app_air">Для автоматического создания поездок и быстрого поиска попутчиков мы можем добавить ваши рейсы  из приложения App in the Air.</string>
+    <string name="sinch_button">СИНХРОНИЗИРОВАТЬ</string>
+    <string name="miss">пропустить</string>
 
     <string-array name="months_array">
         <item>янв.</item>
