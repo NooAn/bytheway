@@ -39,7 +39,7 @@ data class User(var name: String = "",
                 var percentsSimilarTravel: Int = 0,
                 var addInformation: String = "",
                 var sex: Int = 0,
-                var socialNetwork: ArrayList<SocialNetwork> = arrayListOf(SocialNetwork.VK, SocialNetwork.FB),
+                var socialNetwork: ArrayList<SocialNetwork> = arrayListOf(),
                 var data: Long = 0,
                 var urlPhoto: String = "https://www.ischool.berkeley.edu/sites/default/files/default_images/avatar.jpeg") {
 }

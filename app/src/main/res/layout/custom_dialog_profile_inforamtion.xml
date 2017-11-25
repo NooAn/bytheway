@@ -6,25 +6,64 @@
     android:layout_height="wrap_content">
 
     <EditText
-        android:id="@+id/dialog_last_name"
+        android:id="@+id/dialog_name"
         android:layout_width="match_parent"
-        android:hint="@string/name"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/textView2" />
+        android:hint="@string/name"
+        app:layout_constraintBottom_toTopOf="@+id/dialog_last_name" />
+
+    <EditText
+        android:id="@+id/dialog_last_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:hint="Фамилия"
+        app:layout_constraintBottom_toTopOf="@+id/dialog_city" />
+
+    <EditText
+        android:id="@+id/dialog_city"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:hint="Город"
+        app:layout_constraintBottom_toTopOf="@+id/dialog_year" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/dialog_year"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:hint="Год рождения"
+        app:layout_constraintBottom_toTopOf="@+id/sex" />
+
+
+    <RadioGroup
+        android:id="@+id/sex"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:text="Пол"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.03"
         app:layout_constraintStart_toStartOf="parent"
-        tools:ignore="MissingConstraints" />
+        tools:ignore="MissingConstraints">
+
+        <RadioButton
+            android:id="@+id/man"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="М" />
+
+        <RadioButton
+            android:id="@+id/woman"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ж" />
+
+    </RadioGroup>
 
     <android.support.constraint.Guideline
         android:id="@+id/guideline2"
@@ -32,5 +71,6 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_begin="20dp" />
+
 
 </android.support.constraint.ConstraintLayout>

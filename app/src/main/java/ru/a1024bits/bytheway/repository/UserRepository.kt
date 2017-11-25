@@ -64,7 +64,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) : IUsersR
         return store.runTransaction(object : Transaction.Function<Void> {
             override fun apply(transaction: Transaction): Void? {
                 map.put("timestamp", FieldValue.serverTimestamp());
-                transaction.set(documentRef, map)
+                transaction.update(documentRef, map)
                 return null
             }
         })

@@ -32,7 +32,7 @@
                 tools:text="@string/fullname" />
 
             <TextView
-                android:id="@+id/city"
+                android:id="@+id/cityview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
@@ -71,8 +71,8 @@
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
-                android:src="@drawable/vk_gray"
-                tools:src="@drawable/vk" />
+                android:src="@drawable/ic_vk_gray"
+                tools:src="@drawable/ic_vk_gray" />
 
             <View
                 android:layout_width="1dp"
@@ -86,8 +86,8 @@
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
-                android:src="@drawable/whats_grey"
-                tools:src="@drawable/whats_icon__2_" />
+                android:src="@drawable/ic_whats_icon_grey"
+                tools:src="@drawable/ic_whats_icon_color" />
 
             <View
                 android:layout_width="1dp"
@@ -101,8 +101,9 @@
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
-                android:src="@drawable/tg_color"
-                android:visibility="invisible" />
+                android:src="@drawable/tg_grey"
+                android:visibility="visible"
+                tools:src="@drawable/ic_tg_color" />
 
             <View
                 android:layout_width="1dp"
@@ -116,8 +117,8 @@
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
-                android:src="@drawable/fb_grey"
-                tools:src="@drawable/fb_color" />
+                android:src="@drawable/ic_fb_grey"
+                tools:src="@drawable/ic_fb_color" />
 
             <View
                 android:layout_width="1dp"
@@ -131,8 +132,8 @@
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
-                android:src="@drawable/cs_grey"
-                tools:src="@drawable/cs_color" />
+                android:src="@drawable/ic_cs_grey"
+                tools:src="@drawable/ic_cs_color" />
 
         </LinearLayout>
 
@@ -145,14 +146,17 @@
         <include
             android:id="@+id/direction"
             layout="@layout/profile_direction"
-            android:visibility="visible" />
+            android:visibility="gone"
+            tools:visibility="visible" />
 
         <LinearLayout
             android:id="@+id/maplayout"
             android:layout_width="match_parent"
             android:layout_height="150dp"
             android:layout_below="@+id/direction"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="gone"
+            tools:visibility="visible">
 
             <com.google.android.gms.maps.MapView
                 android:id="@+id/mapView"
@@ -166,12 +170,13 @@
             android:id="@+id/method_moving"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-
             android:layout_below="@+id/maplayout"
             android:layout_marginEnd="@dimen/margin_left_profile"
             android:layout_marginStart="@dimen/margin_left_profile"
             android:layout_marginTop="24dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="gone"
+            tools:visibility="visible">
 
             <TextView
                 android:layout_width="match_parent"
@@ -191,7 +196,9 @@
             android:layout_marginStart="@dimen/margin_left_profile"
             android:layout_marginTop="24dp"
             android:baselineAligned="false"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:visibility="gone"
+            tools:visibility="visible">
 
             <ImageView
                 android:id="@+id/directions_car"
@@ -200,7 +207,8 @@
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
-                android:src="@drawable/ic_directions_car" />
+                android:src="@drawable/ic_directions_car_grey"
+                tools:src="@drawable/ic_directions_car" />
 
             <View
                 android:layout_width="1dp"
@@ -214,7 +222,8 @@
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
-                android:src="@drawable/ic_directions_railway" />
+                android:src="@drawable/ic_directions_railway_grey"
+                tools:src="@drawable/ic_directions_railway" />
 
             <View
                 android:layout_width="1dp"
@@ -228,7 +237,8 @@
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
-                android:src="@drawable/ic_directions_bus" />
+                android:src="@drawable/ic_directions_bus_grey"
+                tools:src="@drawable/ic_directions_bus" />
 
             <View
                 android:layout_width="1dp"
@@ -242,7 +252,8 @@
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
-                android:src="@drawable/ic_flight" />
+                android:src="@drawable/ic_flight_grey"
+                tools:src="@drawable/ic_flight" />
 
             <View
                 android:layout_width="1dp"
@@ -256,8 +267,8 @@
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
-                android:src="@drawable/ic_directions_hitchhiking" />
-
+                android:src="@drawable/ic_directions_hitchhiking_grey"
+                tools:src="@drawable/ic_directions_hitchhiking" />
         </LinearLayout>
 
         <LinearLayout
@@ -268,15 +279,15 @@
             android:layout_marginEnd="@dimen/margin_left_profile"
             android:layout_marginStart="@dimen/margin_left_profile"
             android:layout_marginTop="24dp"
-            android:orientation="vertical">
-
+            android:orientation="vertical"
+            android:visibility="gone"
+            tools:visibility="visible">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="@string/money"
                 android:textSize="16sp" />
-
 
             <SeekBar
                 android:id="@+id/choose_price_travel"
@@ -308,7 +319,9 @@
             android:layout_marginEnd="@dimen/margin_left_profile"
             android:layout_marginStart="@dimen/margin_left_profile"
             android:layout_marginTop="24dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="gone"
+            tools:visibility="visible">
 
             <TextView
                 android:layout_width="match_parent"
@@ -317,9 +330,9 @@
                 android:textSize="16sp" />
 
             <EditText
+                android:id="@+id/add_info_user"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:id="@+id/add_info_user"
                 android:backgroundTint="@color/colorLine"
                 android:hint="@string/description"
                 android:inputType="textMultiLine"
@@ -336,7 +349,9 @@
             android:layout_marginTop="12dp"
             android:padding="24dp"
             android:text="Сохранить"
-            android:theme="@style/WhiteButton" />
+            android:theme="@style/WhiteButton"
+            android:visibility="gone"
+            tools:visibility="visible" />
 
         <Button
             android:id="@+id/button_remove_travel_info"
@@ -347,7 +362,9 @@
             android:layout_marginTop="12dp"
             android:padding="24dp"
             android:text="Удалить"
-            android:theme="@style/WhiteButton" />
+            android:theme="@style/WhiteButton"
+            android:visibility="gone"
+            tools:visibility="visible" />
     </RelativeLayout>
 
 
