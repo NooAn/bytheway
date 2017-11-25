@@ -144,7 +144,7 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 when (screenKey) {
                     USER_PROFILE_SCREEN -> return MyProfileFragment()
                     SEARCH_MAP_SCREEN -> return MapFragment()
-                    //LOGIN_APP_IN_THE_AIR -> return
+                //LOGIN_APP_IN_THE_AIR -> return
                     USER_SINHRONIZED_SCREEN -> return AppInTheAirSinchronizedFragment()
                     ALL_USERS_SCREEN -> return AllUsersFragment.newInstance()
                     SIMILAR_TRAVELS_SCREEN -> return SimilarTravelsFragment.newInstance()
@@ -179,6 +179,19 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onResume() {
         super.onResume()
         navigatorHolder.setNavigator(navigator)
+
+        // the intent filter defined in AndroidManifest will handle the return from ACTION_VIEW intent
+        val uri = intent.data
+        if (uri != null && uri.toString().startsWith(redirectUri)) {
+            // use the parameter your API exposes for the code (mostly it's "code")
+            val code = uri.getQueryParameter("code")
+            if (code != null) {
+                // get access token
+                // we'll do that in a minute
+            } else if (uri.getQueryParameter("error") != null) {
+                // show an error message here
+            }
+        }
     }
 
     override fun onPause() {
