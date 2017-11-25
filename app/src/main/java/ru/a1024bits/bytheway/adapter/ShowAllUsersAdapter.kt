@@ -2,7 +2,6 @@ package ru.a1024bits.bytheway.adapter;
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -30,12 +29,12 @@ class ShowAllUsersAdapter(val context: Context) : RecyclerView.Adapter<ShowAllUs
         )
     }
 
-    override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: UserViewHolder?, position: Int) {
         val currentUser = users[position]
-        holder.lastName.text = currentUser.lastName
-        holder.name.text = currentUser.name
-        glide.load(currentUser.urlPhoto).into(holder.avatar)
-        holder.itemView.setOnClickListener {
+        holder?.lastName?.text = currentUser.lastName
+        holder?.name?.text = currentUser.name
+        glide.load(currentUser.urlPhoto).into(holder?.avatar)
+        holder?.itemView?.setOnClickListener {
             if (context is MenuActivity) {
                 context.showUserSimpleProfile(currentUser)
             }

@@ -151,7 +151,7 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
-        outState!!.putSerializable(STATE_SCREEN_NAMES, screenNames as java.io.Serializable)
+        outState?.putSerializable(STATE_SCREEN_NAMES, screenNames as java.io.Serializable)
     }
 
     override fun onFragmentInteraction() {

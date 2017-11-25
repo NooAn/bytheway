@@ -38,26 +38,31 @@ class SearchFragment : Fragment() {
 
         // FIXME refactoring in viewModel
 
-        if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM) {
-            if (resultCode == AppCompatActivity.RESULT_OK) {
-                val place = PlaceAutocomplete.getPlace(activity, data);
-                text_from_city.text = place.name;
-                firstPoint = place.latLng
-            } else {
-                val status = PlaceAutocomplete.getStatus(activity, data);
-                Log.i("LOG", status.getStatusMessage() + " ");
-                text_from_city.text = "";
+        when (requestCode) {
+            PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM -> when (resultCode) {
+                AppCompatActivity.RESULT_OK -> {
+                    val place = PlaceAutocomplete.getPlace(activity, data);
+                    text_from_city.text = place.name;
+                    firstPoint = place.latLng
+                }
+                else -> {
+                    val status = PlaceAutocomplete.getStatus(activity, data);
+                    Log.i("LOG", status.getStatusMessage() + " ");
+                    text_from_city.text = "";
+                }
             }
-        }
-        if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO) {
-            if (resultCode == AppCompatActivity.RESULT_OK) {
-                val place = PlaceAutocomplete.getPlace(activity, data);
-                text_to_city.text = place.name
-                secondPoint = place.latLng
-            } else {
-                val status = PlaceAutocomplete.getStatus(activity, data);
-                Log.i("LOG", status.getStatusMessage() + " ");
-                text_to_city.text = ""
+
+            PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO -> when (resultCode) {
+                AppCompatActivity.RESULT_OK -> {
+                    val place = PlaceAutocomplete.getPlace(activity, data);
+                    text_to_city.text = place.name
+                    secondPoint = place.latLng
+                }
+                else -> {
+                    val status = PlaceAutocomplete.getStatus(activity, data);
+                    Log.i("LOG", status.getStatusMessage() + " ");
+                    text_to_city.text = ""
+                }
             }
         }
     }
@@ -66,25 +71,25 @@ class SearchFragment : Fragment() {
     var secondPoint: LatLng? = null
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater!!.inflate(R.layout.fragment_search_block, container, false)
+        val view = inflater?.inflate(R.layout.fragment_search_block, container, false)
 
-        val nameCityFrom = view.findViewById<TextView>(R.id.text_from_city)
-        val nameCityTo = view.findViewById<TextView>(R.id.text_to_city)
+        val nameCityFrom = view?.findViewById<TextView>(R.id.text_from_city)
+        val nameCityTo = view?.findViewById<TextView>(R.id.text_to_city)
 
-        activity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+        activity.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
-        nameCityTo.setOnClickListener {
+        nameCityTo?.setOnClickListener {
             sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO);
         }
 
-        nameCityFrom.setOnClickListener {
+        nameCityFrom?.setOnClickListener {
             sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM)
         }
 
-        view.findViewById<ImageButton>(R.id.swap_cities).setOnClickListener {
-            val tempString = nameCityFrom.text
-            nameCityFrom.text = nameCityTo.text
-            nameCityTo.text = tempString
+        view?.findViewById<ImageButton>(R.id.swap_cities)?.setOnClickListener {
+            val tempString = nameCityFrom?.text
+            nameCityFrom?.text = nameCityTo?.text
+            nameCityTo?.text = tempString
         }
 
         return view

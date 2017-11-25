@@ -85,7 +85,7 @@ class RegistrationActivity : LifecycleActivity(), GoogleApiClient.OnConnectionFa
         if (result.isSuccess) {
             // Signed in successfully, show authenticated UI.
             val acct = result.signInAccount
-            firebaseAuthWithGoogle(acct!!)
+            acct?.let { account -> firebaseAuthWithGoogle(account) } //maybe not this variant
         } else {
             // Signed out, show unauthenticated UI.
             if (result.status.statusCode != 200) {
@@ -100,8 +100,8 @@ class RegistrationActivity : LifecycleActivity(), GoogleApiClient.OnConnectionFa
         
         val credential = GoogleAuthProvider.getCredential(acct.idToken, null)
         
-        mAuth!!.signInWithCredential(credential)
-                .addOnCompleteListener(this) { task ->
+        mAuth?.signInWithCredential(credential)
+                ?.addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d("LOG", "signInWithCredential:success")
