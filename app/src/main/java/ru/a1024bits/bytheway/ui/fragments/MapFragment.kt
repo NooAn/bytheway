@@ -254,4 +254,26 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         return builder.build()
     }
 
+    private fun getDirectionsUrl(origin: LatLng, dest: LatLng): String {
+
+        // Origin of route
+        val strOrigin = "origin=${origin.latitude},${origin.longitude}"
+
+        // Destination of route
+        val strDest = "destination=${dest.latitude},${dest.longitude}"
+
+        // Sensor enabled
+        val sensor = "sensor=false"
+
+        // Building the parameters to the web service
+        val parameters = "$strOrigin&$strDest&$sensor"
+
+        // Output format
+        val output = "json"
+
+        // Building the url to the web service
+
+        return "https://maps.googleapis.com/maps/api/directions/$output?$parameters"
+    }
+
 }
