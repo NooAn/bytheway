@@ -80,6 +80,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             Log.e("LOG", "fill Profile: $user")
             if (user != null) fillProfile(user)
         })
+
         viewModel!!.load(uid)
     }
 
@@ -97,7 +98,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             textCityTo.text = user.cities.get(lastIndexArr)
             cities.add(user.cities.get(0))
             cities.add(user.cities.get(lastIndexArr))
-
         }
 
         val formatDate = SimpleDateFormat("dd.MM.yyyy")
@@ -121,11 +121,11 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         for (name in user.socialNetwork) {
 
             when (name) {
-                SocialNetwork.VK -> vkIcon.setImageResource(R.drawable.vk)
-                SocialNetwork.CS -> csIcon.setImageResource(R.drawable.cs_color)
-                SocialNetwork.FB -> fbcon.setImageResource(R.drawable.fb_color)
-                SocialNetwork.WHATSAAP -> whatsUpIcon.setImageResource(R.drawable.whats_icon__2_)
-                SocialNetwork.TG -> tgIcon.setImageResource(R.drawable.tg_color)
+                SocialNetwork.VK -> vkIcon.setImageResource(R.drawable.ic_vk_color)
+                SocialNetwork.CS -> csIcon.setImageResource(R.drawable.ic_cs_color)
+                SocialNetwork.FB -> fbcon.setImageResource(R.drawable.ic_fb_color)
+                SocialNetwork.WHATSAAP -> whatsUpIcon.setImageResource(R.drawable.ic_whats_icon_color)
+                SocialNetwork.TG -> tgIcon.setImageResource(R.drawable.ic_tg_color)
 
             }
         }
@@ -306,24 +306,24 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         }
         view.findViewById<ImageView>(R.id.vkIcon).setOnClickListener {
             openDialog(SocialNetwork.VK)
-            vkIcon.setImageResource(R.drawable.vk)
+            vkIcon.setImageResource(R.drawable.ic_vk_color)
 
         }
         view.findViewById<ImageView>(R.id.csIcon).setOnClickListener {
             openDialog(SocialNetwork.CS)
-            csIcon.setImageResource(R.drawable.cs_color)
+            csIcon.setImageResource(R.drawable.ic_cs_color)
         }
         view.findViewById<ImageView>(R.id.whatsUpIcon).setOnClickListener({
             openDialog(SocialNetwork.WHATSAAP)
-            whatsUpIcon.setImageResource(R.drawable.whats_icon__2_)
+            whatsUpIcon.setImageResource(R.drawable.ic_whats_icon_color)
         })
         view.findViewById<ImageView>(R.id.fbcon).setOnClickListener({
             openDialog(SocialNetwork.FB)
-            fbcon.setImageResource(R.drawable.fb_color)
+            fbcon.setImageResource(R.drawable.ic_fb_color)
         })
         view.findViewById<ImageView>(R.id.tgIcon).setOnClickListener({
             openDialog(SocialNetwork.TG)
-            tgIcon.setImageResource(R.drawable.tg_color)
+            tgIcon.setImageResource(R.drawable.ic_tg_color)
         })
         view.findViewById<Button>(R.id.button_save_travel_info).setOnClickListener({
             Log.e("LOG", "save travel")
@@ -344,7 +344,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun sendUserInfoToServer() {
-        viewModel?.sendUserData(getHashMapUser(),uid)
+        viewModel?.sendUserData(getHashMapUser(), uid)
     }
 
     private fun showBlockTravelInformation() {
@@ -373,7 +373,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         lastNameChoose.setText(lastName)
         val cityChoose = dialogView.findViewById<View>(R.id.dialog_city) as EditText
         cityChoose.setText(city)
-        val ageChoose = dialogView.findViewById<View>(R.id.dialog_age) as EditText
+        val ageChoose = dialogView.findViewById<View>(R.id.dialog_year) as EditText
         ageChoose.setText(age.toString())
         val man = dialogView.findViewById<RadioButton>(R.id.man)
 

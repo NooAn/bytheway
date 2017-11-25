@@ -42,9 +42,7 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onSetPoint(l: LatLng, pos: Int) {
         val mapFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as MapFragment
         mapFragment.setMarker(l, pos)
-
     }
-
 
     override fun onConnectionFailed(p0: ConnectionResult) {
 
