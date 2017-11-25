@@ -21,8 +21,8 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="https://www.appintheair.mobi/blank"
-                    android:scheme="your" />
+                    android:host="www.appintheair.mobi"
+                    android:scheme="https" />
             </intent-filter>
         </activity>
 

@@ -49,7 +49,6 @@ class AppInTheAirSinchronizedFragment : Fragment() {
         }
         button_sinch.setOnClickListener {
             //open app_in_the_air
-           // (activity as MenuActivity).navigator.applyCommand(Replace(Screens.LOGIN_APP_IN_THE_AIR, 1))
             login()
         }
     }

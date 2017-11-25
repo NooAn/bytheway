@@ -13,11 +13,13 @@ interface AirWebService {
     @POST("/login")
     fun basicLogin(): Call<ResponseBody>
 
-    @FormUrlEncoded
-    @POST("/token")
+    @GET("/oauth/token")
     fun getAccessToken(
-            @Field("code") code: String,
-            @Field("grant_type") grantType: String): Call<AccessToken>
+            @Query("code") code: String,
+            @Query("client_id") id: String,
+            @Query("client_secret") clientSecret: String,
+            @Query("redirect_uri") uri: String,
+            @Query("grant_type") grantType: String): Call<AccessToken>
 
     @GET("/users")
     fun getUserProfile(@Query("fromCount") fromCount: Long, @Query("count") count: Int = 20): List<User>
