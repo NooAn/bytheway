@@ -6,4 +6,6 @@
     <color name="white">#f7f7f9</color>
     <color name="textColor">#fff</color>
     <color name="colorLine">#009688</color>
+
+    <color name="greyInactive">#1F000000</color>
 </resources>

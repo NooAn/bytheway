@@ -65,6 +65,7 @@
             android:orientation="horizontal">
 
             <ImageView
+                tools:ignore="ContentDescription"
                 android:id="@+id/vkIcon"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -80,6 +81,7 @@
                 android:background="@color/colorAccent" />
 
             <ImageView
+                tools:ignore="ContentDescription"
                 android:id="@+id/whatsUpIcon"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -95,6 +97,7 @@
                 android:background="@color/colorAccent" />
 
             <ImageView
+                tools:ignore="ContentDescription"
                 android:id="@+id/tgIcon"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -110,6 +113,7 @@
                 android:background="@color/colorAccent" />
 
             <ImageView
+                tools:ignore="ContentDescription"
                 android:id="@+id/fbcon"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -125,6 +129,7 @@
                 android:background="@color/colorAccent" />
 
             <ImageView
+                tools:ignore="ContentDescription"
                 android:id="@+id/csIcon"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -194,6 +199,7 @@
             android:orientation="horizontal">
 
             <ImageView
+                tools:ignore="ContentDescription"
                 android:id="@+id/directions_car"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -209,6 +215,7 @@
                 android:background="@color/colorAccent" />
 
             <ImageView
+                tools:ignore="ContentDescription"
                 android:id="@+id/directions_railway"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -224,6 +231,7 @@
                 android:background="@color/colorAccent" />
 
             <ImageView
+                tools:ignore="ContentDescription"
                 android:id="@+id/directions_bus"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -239,6 +247,7 @@
                 android:background="@color/colorAccent" />
 
             <ImageView
+                tools:ignore="ContentDescription"
                 android:id="@+id/directions_flight"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -254,6 +263,7 @@
                 android:background="@color/colorAccent" />
 
             <ImageView
+                tools:ignore="ContentDescription"
                 android:id="@+id/csIcon1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
