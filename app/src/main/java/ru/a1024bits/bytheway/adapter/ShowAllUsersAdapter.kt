@@ -32,7 +32,6 @@ class ShowAllUsersAdapter(val context: Context) : RecyclerView.Adapter<ShowAllUs
 
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
         val currentUser = users[position]
-        holder.lastName.text = currentUser.lastName
         holder.name.text = currentUser.name
         glide.load(currentUser.urlPhoto).into(holder.avatar)
         holder.itemView.setOnClickListener {
@@ -47,7 +46,6 @@ class ShowAllUsersAdapter(val context: Context) : RecyclerView.Adapter<ShowAllUs
     }
 
     inner class UserViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        var lastName = view.findViewById<TextView>(R.id.lastName_content_user)
         var name = view.findViewById<TextView>(R.id.name_content_user)
         var avatar = view.findViewById<ImageView>(R.id.user_avatar)
     }

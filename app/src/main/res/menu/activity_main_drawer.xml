@@ -24,10 +24,6 @@
             android:id="@+id/feedback"
             android:icon="@drawable/plane"
             android:title="Обратная связь" />
-        <item
-            android:id="@+id/exit_item"
-            android:icon="@drawable/ic_directions_car"
-            android:title="Выход" />
 
     </group>
 

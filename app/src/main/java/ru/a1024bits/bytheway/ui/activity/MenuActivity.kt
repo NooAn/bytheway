@@ -11,6 +11,7 @@ import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -22,6 +23,7 @@ import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.places.Places
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.android.synthetic.main.activity_menu.*
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.User
@@ -102,6 +104,11 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 .addApi(Places.PLACE_DETECTION_API)
                 .enableAutoManage(this, this)
                 .build()
+
+        sing_out.setOnClickListener {
+            FirebaseAuth.getInstance().signOut()
+            finishAffinity()
+        }
     }
 
     fun showUserSimpleProfile(displayingUser: User) {
@@ -187,8 +194,6 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.search_item -> navigator.applyCommand(Replace(Screens.SEARCH_MAP_SCREEN, 1))
             R.id.all_users_item -> navigator.applyCommand(Replace(Screens.ALL_USERS_SCREEN, 1))
             R.id.similar_travel_item -> navigator.applyCommand(Replace(Screens.SIMILAR_TRAVELS_SCREEN, 1))
-            R.id.exit_item -> {
-            }
         }
 
         val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)

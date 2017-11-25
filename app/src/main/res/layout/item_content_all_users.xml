@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                             xmlns:app="http://schemas.android.com/apk/res-auto"
-                                             xmlns:tools="http://schemas.android.com/tools"
-                                             android:layout_width="match_parent"
-                                             android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
 
-                                             android:background="?android:selectableItemBackground"
-                                             android:orientation="horizontal"
-                                             android:padding="10dp">
+    android:background="?android:selectableItemBackground"
+    android:orientation="horizontal"
+    android:padding="10dp">
 
     <ImageView
         android:id="@+id/user_avatar"
@@ -15,7 +15,7 @@
         android:layout_height="@dimen/size_user_avatar"
         android:scaleType="center"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:srcCompat="@mipmap/ic_launcher_round"/>
+        app:srcCompat="@mipmap/ic_launcher_round" />
 
 
     <TextView
@@ -26,7 +26,7 @@
         android:text="Николаев Алексей"
         android:textSize="16sp"
         android:textStyle="bold"
-        app:layout_constraintStart_toEndOf="@+id/user_avatar"/>
+        app:layout_constraintStart_toEndOf="@+id/user_avatar" />
 
     <TextView
         android:id="@+id/text_city"
@@ -42,8 +42,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/user_avatar"
         app:layout_constraintEnd_toEndOf="@+id/name_content_user"
         app:layout_constraintStart_toStartOf="@+id/name_content_user"
-        app:layout_constraintTop_toBottomOf="@+id/name_content_user"/>
-
+        app:layout_constraintTop_toBottomOf="@+id/name_content_user" />
 
 
 </android.support.constraint.ConstraintLayout>
