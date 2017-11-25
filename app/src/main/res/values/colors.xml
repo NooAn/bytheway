@@ -3,8 +3,10 @@
     <color name="colorPrimary">#006889</color>
     <color name="colorPrimaryDark">#003d5c</color>
     <color name="colorAccent">#009688</color>
-    <color name="white">#f7f7f9</color>
+    <color name="hint">#c9c9c9</color>
+    <color name="white">#fff</color>
     <color name="textColor">#fff</color>
+    <color name="gray">#AEAEAE</color>
     <color name="colorLine">#009688</color>
 
     <color name="greyInactive">#1F000000</color>

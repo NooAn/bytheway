@@ -7,7 +7,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="@color/hint"
         android:paddingEnd="6dp"
         android:paddingStart="6dp"
         tools:context="ru.a1024bits.bytheway.ui.fragments.UserProfileFragment">
@@ -66,7 +66,7 @@
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
-                android:src="@drawable/vk"/>
+                android:src="@drawable/ic_vk_gray"/>
 
             <ImageView
                 android:id="@+id/whatsUpIcon"
@@ -75,7 +75,7 @@
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
-                android:src="@drawable/whats_icon__2_"/>
+                android:src="@drawable/ic_whats_icon_color"/>
 
             <ImageView
                 android:id="@+id/tgIcon"
@@ -84,7 +84,7 @@
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
-                android:src="@drawable/tg_color"/>
+                android:src="@drawable/ic_tg_color"/>
 
             <ImageView
                 android:id="@+id/fbcon"
@@ -93,7 +93,7 @@
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
-                android:src="@drawable/fb_color"/>
+                android:src="@drawable/ic_fb_color"/>
 
             <ImageView
                 android:id="@+id/csIcon"
@@ -102,7 +102,7 @@
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
-                android:src="@drawable/cs_color"/>
+                android:src="@drawable/ic_cs_color"/>
         </LinearLayout>
 
         <LinearLayout

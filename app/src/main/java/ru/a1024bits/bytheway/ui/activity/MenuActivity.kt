@@ -1,5 +1,7 @@
 package ru.a1024bits.bytheway.ui.activity
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.app.Fragment
@@ -28,14 +30,17 @@ import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.router.Screens.Companion.ALL_USERS_SCREEN
+import ru.a1024bits.bytheway.router.Screens.Companion.LOGIN_APP_IN_THE_AIR
 import ru.a1024bits.bytheway.router.Screens.Companion.SEARCH_MAP_SCREEN
 import ru.a1024bits.bytheway.router.Screens.Companion.SIMILAR_TRAVELS_SCREEN
 import ru.a1024bits.bytheway.router.Screens.Companion.USER_PROFILE_SCREEN
+import ru.a1024bits.bytheway.router.Screens.Companion.USER_SINHRONIZED_SCREEN
 import ru.a1024bits.bytheway.ui.fragments.*
 import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.android.SupportFragmentNavigator
 import ru.terrakok.cicerone.commands.Command
 import ru.terrakok.cicerone.commands.Replace
+import java.util.prefs.Preferences
 import javax.inject.Inject
 
 class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, OnFragmentInteractionListener, GoogleApiClient.OnConnectionFailedListener {
@@ -46,11 +51,9 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         mapFragment.setMarker(l, pos)
     }
 
-
     override fun onConnectionFailed(p0: ConnectionResult) {
 
     }
-
 
     var screenNames: ArrayList<String> = arrayListOf()
     private val STATE_SCREEN_NAMES = "state_screen_names"
@@ -64,7 +67,6 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onCreate(savedInstanceState)
         App.component.inject(this)
         glide = Glide.with(this)
-
 
         setContentView(R.layout.activity_menu)
 
@@ -95,7 +97,10 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // how make name and city!!?
 
         if (savedInstanceState == null) {
-            navigator.applyCommand(Replace(Screens.USER_PROFILE_SCREEN, 1))
+            if (true) {
+                navigator.applyCommand(Replace(Screens.USER_SINHRONIZED_SCREEN, 1))
+            } else
+                navigator.applyCommand(Replace(Screens.USER_PROFILE_SCREEN, 1))
         } else {
             screenNames = savedInstanceState.getSerializable(STATE_SCREEN_NAMES) as ArrayList<String>
         }
@@ -105,6 +110,15 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 .addApi(Places.PLACE_DETECTION_API)
                 .enableAutoManage(this, this)
                 .build()
+    }
+
+    private fun isFirstEnter(): Boolean {
+        val APP_PREFERENCES = "string_save"
+        val sharePreferences = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE)
+        val FIRST_ENTER = "first_enter_in_app"
+        val first = sharePreferences.getBoolean(FIRST_ENTER, true)
+        sharePreferences.edit().putBoolean(FIRST_ENTER, false).apply()
+        return first;
     }
 
     fun showUserSimpleProfile(displayingUser: User) {
@@ -127,11 +141,13 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         override fun createFragment(screenKey: String?, data: Any?): Fragment {
             Log.e("LOG", screenKey + " " + data)
             return if (data is User)
-                UserProfileFragment.newInstance(data.name, data.lastName)
+                UserProfileFragment.newInstance(data.id)
             else
                 when (screenKey) {
                     USER_PROFILE_SCREEN -> return MyProfileFragment()
                     SEARCH_MAP_SCREEN -> return MapFragment()
+                //LOGIN_APP_IN_THE_AIR -> return
+                    USER_SINHRONIZED_SCREEN -> return AppInTheAirSinchronizedFragment()
                     ALL_USERS_SCREEN -> return AllUsersFragment.newInstance()
                     SIMILAR_TRAVELS_SCREEN -> return SimilarTravelsFragment.newInstance()
                     else -> return SearchFragment()
@@ -165,6 +181,19 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onResume() {
         super.onResume()
         navigatorHolder.setNavigator(navigator)
+
+        // the intent filter defined in AndroidManifest will handle the return from ACTION_VIEW intent
+        val uri = intent.data
+        if (uri != null && uri.toString().startsWith(redirectUri)) {
+            // use the parameter your API exposes for the code (mostly it's "code")
+            val code = uri.getQueryParameter("code")
+            if (code != null) {
+                // get access token
+                // we'll do that in a minute
+            } else if (uri.getQueryParameter("error") != null) {
+                // show an error message here
+            }
+        }
     }
 
     override fun onPause() {
