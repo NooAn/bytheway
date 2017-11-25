@@ -1,8 +1,10 @@
 package ru.a1024bits.bytheway.util
 
 import android.text.TextUtils
+import android.util.Log
 import com.squareup.okhttp.Credentials
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -39,10 +41,10 @@ class ServiceGenerator {
             serviceClass: Class<S>, authToken: String): S {
         if (!TextUtils.isEmpty(authToken)) {
             val interceptor = AuthenticationInterceptor(authToken)
-
+            Log.e("LOG", authToken.toString())
             if (!httpClient.interceptors().contains(interceptor)) {
                 httpClient.addInterceptor(interceptor)
-
+                httpClient.addInterceptor(HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY })
                 builder.client(httpClient.build())
                 retrofit = builder.build()
             }

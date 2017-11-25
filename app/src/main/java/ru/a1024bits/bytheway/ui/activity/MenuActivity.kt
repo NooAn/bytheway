@@ -25,6 +25,8 @@ import com.google.android.gms.location.places.Places
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
 import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import ru.a1024bits.bytheway.AirWebService
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
@@ -196,10 +198,22 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 Log.e("LOGI:", "code $code")
                 // get access token
                 // we'll do that in a minute
-                val loginService  = ServiceGenerator(AirWebService::class.java, clientId, clientSecret);
-            Call<AccessToken> call = loginService.getAccessToken(code, "authorization_code,refresh_token,client_credentials");
-            AccessToken accessToken = call.execute().body();
-                navigator.applyCommand(Replace(Screens.AIR_SUCCES_SCREEN, 1))
+                val generator = ServiceGenerator()
+                val loginService = generator.createService(AirWebService::class.java, clientId, clientSecret);
+                val call = loginService.getAccessToken(code, clientId, clientSecret, redirectUri,
+                        "authorization_code,refresh_token,client_credentials");
+                call.enqueue(object : Callback<AccessToken?> {
+                    override fun onFailure(call: Call<AccessToken?>?, t: Throwable?) {
+                        Log.e("LOG", "on Fail")
+                    }
+
+                    override fun onResponse(call: Call<AccessToken?>?, response: Response<AccessToken?>?) {
+                        val accessToken = response?.body()
+                        Log.e("LOGI", " ${accessToken?.accessToken} ${accessToken?.getTokenType()}")
+                        navigator.applyCommand(Replace(Screens.AIR_SUCCES_SCREEN, 1))
+                    }
+                })
+
             } else if (uri.getQueryParameter("error") != null) {
                 // show an error message here
                 Log.e("LOGI:", "error: ${uri.getQueryParameter("error")}")
