@@ -10,8 +10,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.ImageButton
-import android.widget.TextView
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException
 import com.google.android.gms.common.GooglePlayServicesRepairableException
 import com.google.android.gms.location.places.AutocompleteFilter
@@ -19,14 +17,14 @@ import com.google.android.gms.location.places.ui.PlaceAutocomplete
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.android.synthetic.main.fragment_search_block.*
 import ru.a1024bits.bytheway.R
+import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
+import ru.a1024bits.bytheway.util.DecimalInputFilter
 
 
 /**
  * Created by andrey.gusenkov on 29/09/2017.
  */
 class SearchFragment : Fragment() {
-
-
 
 
     var PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM = 1
@@ -42,13 +40,14 @@ class SearchFragment : Fragment() {
             PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM -> when (resultCode) {
                 AppCompatActivity.RESULT_OK -> {
                     val place = PlaceAutocomplete.getPlace(activity, data);
-                    text_from_city.text = place.name;
+                    text_from_city.text = place.name
                     firstPoint = place.latLng
+                    firstPoint?.let { latLng -> (activity as OnFragmentInteractionListener).onSetPoint(latLng, 1) }
                 }
                 else -> {
                     val status = PlaceAutocomplete.getStatus(activity, data);
                     Log.i("LOG", status.getStatusMessage() + " ");
-                    text_from_city.text = "";
+                    text_from_city.text = ""
                 }
             }
 
@@ -57,10 +56,11 @@ class SearchFragment : Fragment() {
                     val place = PlaceAutocomplete.getPlace(activity, data);
                     text_to_city.text = place.name
                     secondPoint = place.latLng
+                    secondPoint?.let { latLng -> (activity as OnFragmentInteractionListener).onSetPoint(latLng, 2) }
                 }
                 else -> {
                     val status = PlaceAutocomplete.getStatus(activity, data);
-                    Log.i("LOG", status.getStatusMessage() + " ");
+                    Log.i("LOG", status.statusMessage + " ");
                     text_to_city.text = ""
                 }
             }
@@ -73,28 +73,30 @@ class SearchFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater?.inflate(R.layout.fragment_search_block, container, false)
 
-        val nameCityFrom = view?.findViewById<TextView>(R.id.text_from_city)
-        val nameCityTo = view?.findViewById<TextView>(R.id.text_to_city)
-
         activity.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-
-        nameCityTo?.setOnClickListener {
-            sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO);
-        }
-
-        nameCityFrom?.setOnClickListener {
-            sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM)
-        }
-
-        view?.findViewById<ImageButton>(R.id.swap_cities)?.setOnClickListener {
-            val tempString = nameCityFrom?.text
-            nameCityFrom?.text = nameCityTo?.text
-            nameCityTo?.text = tempString
-        }
 
         return view
     }
 
+    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        text_from_city.setOnClickListener {
+            sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM)
+        }
+        text_to_city.setOnClickListener {
+            sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO)
+        }
+
+        swap_cities.setOnClickListener {
+            val tempString = text_from_city.text
+            text_from_city.text = text_to_city.text
+            text_to_city.text = tempString
+        }
+
+        budgetFromValue.filters = arrayOf(DecimalInputFilter())
+        budgetToValue.filters = arrayOf(DecimalInputFilter())
+    }
 
     private fun sendIntentForSearch(code: Int) {
         try {

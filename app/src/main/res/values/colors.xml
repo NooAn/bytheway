@@ -8,4 +8,8 @@
     <color name="textColor">#fff</color>
     <color name="gray">#AEAEAE</color>
     <color name="colorLine">#009688</color>
+
+    <color name="greyInactive">#1F000000</color>
+    <color name="greyTravelTypeDivider">#80989898</color>
+    <color name="midGrey">#80000000</color>
 </resources>

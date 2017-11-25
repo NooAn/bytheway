@@ -51,7 +51,9 @@ import java.util.prefs.Preferences
 import javax.inject.Inject
 
 class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, OnFragmentInteractionListener, GoogleApiClient.OnConnectionFailedListener {
+
     override fun onSetPoint(l: LatLng, pos: Int) {
+
         val mapFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as MapFragment
         mapFragment.setMarker(l, pos)
     }
