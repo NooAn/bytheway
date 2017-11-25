@@ -43,9 +43,14 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
     }
 
-    private var name=""
-    private var lastName=""
-    private var city=""
+    private var uid = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
+
+    private var name = ""
+
+    private var lastName = ""
+
+    private var city = ""
+
     private var methods: ArrayList<Method> = arrayListOf()
 
     private var socNet: ArrayList<SocialNetwork> = arrayListOf()
@@ -54,14 +59,13 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
     private var sex: Int = 0
 
-    private var age: Long=0
+    private var age: Long = 0
 
     private var cities: ArrayList<String> = arrayListOf()
 
     private var budget: Long = 0 // default const
 
     private var glide: RequestManager? = null
-
 
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -77,8 +81,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             if (user != null) fillProfile(user)
         })
 
-        viewModel!!.load(FirebaseAuth.getInstance().currentUser?.uid.orEmpty())
-
+        viewModel!!.load(uid)
     }
 
 
@@ -95,7 +98,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             textCityTo.text = user.cities.get(lastIndexArr)
             cities.add(user.cities.get(0))
             cities.add(user.cities.get(lastIndexArr))
-
         }
 
         val formatDate = SimpleDateFormat("dd.MM.yyyy")
@@ -105,77 +107,85 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             val dayBegin = formatDate.format(Date(user.dates.get(0)))
             val dayArrival = formatDate.format(Date(user.dates.get(lastIndexArr)))
             textDateFrom.text = dayBegin
-            textView5.text = dayArrival
+            dateArrived.text = dayArrival
             dates.add(user.dates.get(0))
             dates.add(user.dates.get(lastIndexArr))
-
         }
-            fillAgeSex(user.age,user.sex)
 
+        fillAgeSex(user.age, user.sex)
 
         glide?.load(user.urlPhoto)
                 ?.apply(RequestOptions.circleCropTransform())
                 ?.into(image_avatar)
 
-
         for (name in user.socialNetwork) {
 
             when (name) {
-                SocialNetwork.VK -> vkIcon.setImageResource(R.drawable.vk)
-                SocialNetwork.CS -> csIcon.setImageResource(R.drawable.cs_color)
-                SocialNetwork.FB -> fbcon.setImageResource(R.drawable.fb_color)
-                SocialNetwork.WHATSAAP -> whatsUpIcon.setImageResource(R.drawable.whats_icon__2_)
-                SocialNetwork.TG -> tgIcon.setImageResource(R.drawable.tg_color)
+                SocialNetwork.VK -> vkIcon.setImageResource(R.drawable.ic_vk_color)
+                SocialNetwork.CS -> csIcon.setImageResource(R.drawable.ic_cs_color)
+                SocialNetwork.FB -> fbcon.setImageResource(R.drawable.ic_fb_color)
+                SocialNetwork.WHATSAAP -> whatsUpIcon.setImageResource(R.drawable.ic_whats_icon_color)
+                SocialNetwork.TG -> tgIcon.setImageResource(R.drawable.ic_tg_color)
 
             }
         }
         for (method in user.method) {
             when (method) {
-                Method.TRAIN -> {directions_railway.setImageResource(R.drawable.ic_directions_railway)
-                    methods.add(Method.TRAIN)}
-                Method.BUS -> {directions_bus.setImageResource(R.drawable.ic_directions_bus)
-                    methods.add(Method.BUS)}
-                Method.CAR -> {directions_car.setImageResource(R.drawable.ic_directions_car)
-                    methods.add(Method.CAR)}
-                Method.PLANE -> {directions_flight.setImageResource(R.drawable.ic_flight)
-                    methods.add(Method.PLANE)}
-                Method.HITCHHIKING -> {csIcon1.setImageResource(R.drawable.ic_directions_hitchhiking)
-                    methods.add(Method.HITCHHIKING)}
+                Method.TRAIN -> {
+                    directions_railway.setImageResource(R.drawable.ic_directions_railway)
+                    methods.add(Method.TRAIN)
+                }
+                Method.BUS -> {
+                    directions_bus.setImageResource(R.drawable.ic_directions_bus)
+                    methods.add(Method.BUS)
+                }
+                Method.CAR -> {
+                    directions_car.setImageResource(R.drawable.ic_directions_car)
+                    methods.add(Method.CAR)
+                }
+                Method.PLANE -> {
+                    directions_flight.setImageResource(R.drawable.ic_flight)
+                    methods.add(Method.PLANE)
+                }
+                Method.HITCHHIKING -> {
+                    csIcon1.setImageResource(R.drawable.ic_directions_hitchhiking)
+                    methods.add(Method.HITCHHIKING)
+                }
                 else -> {
                 }
             }
         }
 
 
-        if (user.budget>0){
-            budget=user.budget
+        if (user.budget > 0) {
+            budget = user.budget
         }
     }
 
-    fun fillAgeSex(userAge:Long, userSex:Int){
-        var gender=when (userSex){
-            1->"М"
-            2->"Ж"
-            else-> {""
+    fun fillAgeSex(userAge: Long, userSex: Int) {
+        var gender = when (userSex) {
+            1 -> "М"
+            2 -> "Ж"
+            else -> {
+                ""
             }
         }
 
-        if (userSex!=0){
-            sex=userSex
-
-            if(userAge>0){
-                sex_and_age.text=StringBuilder(gender).append(", ").append(userAge)
-            }else{
-                sex_and_age.text=gender
+        if (userSex != 0) {
+            sex = userSex
+            if (userAge > 0) {
+                sex_and_age.text = StringBuilder(gender).append(", ").append(userAge)
+            } else {
+                sex_and_age.text = gender
             }
         }
 
-        if (userAge>0){
-            age=userAge
-            if (userSex!=0){
-                sex_and_age.text=StringBuilder(gender).append(", ").append(userAge)
-            }else{
-                sex_and_age.text=userAge.toString()
+        if (userAge > 0) {
+            age = userAge
+            if (userSex != 0) {
+                sex_and_age.text = StringBuilder(gender).append(", ").append(userAge)
+            } else {
+                sex_and_age.text = userAge.toString()
             }
         }
     }
@@ -215,7 +225,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater!!.inflate(R.layout.fragment_my_user_profile, container, false)
-        Log.e("LOG", "function activity create view ")
 
         val displayPriceTravel = view.findViewById<TextView>(R.id.display_price_travel)
         displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(budget)
@@ -238,56 +247,67 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
         })
 
-
-
-
         view.findViewById<ImageView>(R.id.directions_car).setOnClickListener({
 
+
             if (Method.CAR in methods){
+
                 directions_car.setImageResource(R.drawable.ic_directions_car_grey)
                 methods.remove(Method.CAR)
-            }else {
+            } else {
                 directions_car.setImageResource(R.drawable.ic_directions_car)
                 methods.add(Method.CAR)
             }
+
 
         })
 
         view.findViewById<ImageView>(R.id.directions_railway).setOnClickListener({
             if (Method.TRAIN in methods){
+
+        })
+
+        view.findViewById<ImageView>(R.id.directions_railway).setOnClickListener({
+
                 directions_railway.setImageResource(R.drawable.ic_directions_railway_grey)
                 methods.remove(Method.TRAIN)
-            }else {
+            } else {
                 directions_railway.setImageResource(R.drawable.ic_directions_railway)
                 methods.add(Method.TRAIN)
             }
         })
 
         view.findViewById<ImageView>(R.id.directions_bus).setOnClickListener({
+
             if (Method.BUS in methods){
+
                 directions_bus.setImageResource(R.drawable.ic_directions_bus_grey)
                 methods.remove(Method.BUS)
-            }else {
+            } else {
                 directions_bus.setImageResource(R.drawable.ic_directions_bus)
                 methods.add(Method.BUS)
             }
         })
 
         view.findViewById<ImageView>(R.id.directions_flight).setOnClickListener({
+
             if (Method.PLANE in methods){
+
                 directions_flight.setImageResource(R.drawable.ic_flight_grey)
                 methods.remove(Method.PLANE)
-            }else {
+            } else {
                 directions_flight.setImageResource(R.drawable.ic_flight)
                 methods.add(Method.PLANE)
             }
         })
 
         view.findViewById<ImageView>(R.id.csIcon1).setOnClickListener({
+
             if (Method.HITCHHIKING in methods){
+
                 csIcon1.setImageResource(R.drawable.ic_directions_hitchhiking)
                 methods.remove(Method.HITCHHIKING)
-            }else {
+            } else {
                 csIcon1.setImageResource(R.drawable.ic_directions_hitchhiking_grey)
                 methods.add(Method.HITCHHIKING)
             }
@@ -301,32 +321,29 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         }
         view.findViewById<ImageView>(R.id.vkIcon).setOnClickListener {
             openDialog(SocialNetwork.VK)
-            vkIcon.setImageResource(R.drawable.vk)
+            vkIcon.setImageResource(R.drawable.ic_vk_color)
 
         }
         view.findViewById<ImageView>(R.id.csIcon).setOnClickListener {
             openDialog(SocialNetwork.CS)
-            csIcon.setImageResource(R.drawable.cs_color)
+            csIcon.setImageResource(R.drawable.ic_cs_color)
         }
         view.findViewById<ImageView>(R.id.whatsUpIcon).setOnClickListener({
             openDialog(SocialNetwork.WHATSAAP)
-            whatsUpIcon.setImageResource(R.drawable.whats_icon__2_)
+            whatsUpIcon.setImageResource(R.drawable.ic_whats_icon_color)
         })
         view.findViewById<ImageView>(R.id.fbcon).setOnClickListener({
             openDialog(SocialNetwork.FB)
-            fbcon.setImageResource(R.drawable.fb_color)
+            fbcon.setImageResource(R.drawable.ic_fb_color)
         })
         view.findViewById<ImageView>(R.id.tgIcon).setOnClickListener({
             openDialog(SocialNetwork.TG)
-            tgIcon.setImageResource(R.drawable.tg_color)
+            tgIcon.setImageResource(R.drawable.ic_tg_color)
         })
         view.findViewById<Button>(R.id.button_save_travel_info).setOnClickListener({
             Log.e("LOG", "save travel")
             sendUserInfoToServer()
         })
-
-
-
 
         mMapView = view?.findViewById<MapView>(R.id.mapView)
         mMapView?.onCreate(savedInstanceState)
@@ -342,7 +359,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun sendUserInfoToServer() {
-        viewModel?.sendUserData(getHashMapUser(), FirebaseAuth.getInstance().currentUser?.uid!!)
+        viewModel?.sendUserData(getHashMapUser(), uid)
     }
 
     private fun showBlockTravelInformation() {
@@ -365,51 +382,47 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         val inflater = this.layoutInflater
         val dialogView = inflater.inflate(R.layout.custom_dialog_profile_inforamtion, null)
         simpleAlert.setView(dialogView)
-        val nameChoose=dialogView.findViewById<View>(R.id.dialog_name)as EditText
+        val nameChoose = dialogView.findViewById<View>(R.id.dialog_name) as EditText
         nameChoose.setText(name)
-        val lastNameChoose=dialogView.findViewById<View>(R.id.dialog_last_name)as EditText
+        val lastNameChoose = dialogView.findViewById<View>(R.id.dialog_last_name) as EditText
         lastNameChoose.setText(lastName)
-        val cityChoose=dialogView.findViewById<View>(R.id.dialog_city)as EditText
+        val cityChoose = dialogView.findViewById<View>(R.id.dialog_city) as EditText
         cityChoose.setText(city)
-        val ageChoose=dialogView.findViewById<View>(R.id.dialog_age)as EditText
+        val ageChoose = dialogView.findViewById<View>(R.id.dialog_year) as EditText
         ageChoose.setText(age.toString())
-        val man=dialogView.findViewById<RadioButton>(R.id.man)
+        val man = dialogView.findViewById<RadioButton>(R.id.man)
 
-        val woman=dialogView.findViewById<RadioButton>(R.id.woman)
-        val sexChoose=dialogView.findViewById<RadioGroup>(R.id.sex)
-        if (sex==1){
+        val woman = dialogView.findViewById<RadioButton>(R.id.woman)
+        val sexChoose = dialogView.findViewById<RadioGroup>(R.id.sex)
+        if (sex == 1) {
             sexChoose.check(man.id)
 
-        }else if (sex==2){
+        } else if (sex == 2) {
             sexChoose.check(woman.id)
         }
         simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Сохранить", { dialogInterface, i ->
+            if (man.isChecked) {
+                sex = 1
+            } else if (woman.isChecked) {
+                sex = 2
+            } else sex = 0
+            age = ageChoose.getText().toString().toLong()
+            fillAgeSex(age, sex)
+            Log.e("LOG", "выбранный пол:$sex ")
+            name = nameChoose?.getText().toString()
 
-
-                if (man.isChecked){
-                    sex=1
-                 }else if (woman.isChecked){
-                    sex=2
-                }else sex=0
-            age=ageChoose?.getText().toString().toLong()
-            fillAgeSex(age,sex)
-                 Log.e("LOG","выбранный пол:$sex ")
-                 name=nameChoose?.getText().toString()
-
-            lastName=lastNameChoose?.getText().toString()
+            lastName = lastNameChoose?.getText().toString()
             username.text = StringBuilder(name).append(" ").append(lastName)
-            city=cityChoose?.getText().toString()
-            cityview.text=(city)
-            Log.e("LOG","выбранное имя:$name ...фамилия $lastName")
-       
+            city = cityChoose?.getText().toString()
+            cityview.text = (city)
+            Log.e("LOG", "выбранное имя:$name ...фамилия $lastName")
+
 
         })
         simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, "Отмена", { dialogInterface, i ->
 
         })
         simpleAlert.show()
-
-
     }
 
     private fun openDialog(socialNetwork: SocialNetwork) {
@@ -420,11 +433,10 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         val dialogView = inflater.inflate(R.layout.custom_dialog_profile_soc_network, null)
         simpleAlert.setView(dialogView)
         simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Сохранить", { dialogInterface, i ->
-            viewModel?.saveLinks(dialogView.findViewById<EditText>(R.id.socLinkText).text, socialNetwork)
+            viewModel?.saveLinks(dialogView.findViewById<EditText>(R.id.socLinkText).text, socialNetwork, uid)
         })
         simpleAlert.show()
         socNet.add(socialNetwork)
-
     }
 
 
@@ -479,9 +491,9 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
     }
 
     fun fibbonaci(n: Int): Long {
-        var prev:Long = 0
-        var next:Long = 1
-        var result:Long = 0
+        var prev: Long = 0
+        var next: Long = 1
+        var result: Long = 0
         for (i in 0 until n) {
             result = prev + next
             prev = next
@@ -507,9 +519,9 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
 
 
+
     fun getHashMapUser(): HashMap<String, Any> {
         val hashMap = HashMap<String, Any>()
-
         hashMap.set("name", name)
         hashMap.set("lastName", lastName)
         hashMap.set("city", city)
@@ -524,6 +536,5 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         hashMap.put("countTrip", 1)
         Log.e("LOG", hashMap.toString())
         return hashMap
-
     }
 }
