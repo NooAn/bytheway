@@ -4,12 +4,13 @@
     android:focusableInTouchMode="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/hint"
+    android:background="@color/white"
     android:orientation="vertical"
     android:padding="16dp">
 
     <TextView
         android:id="@+id/text_from_city"
+        android:textColor="@color/mdtp_dark_gray"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -38,6 +39,7 @@
 
     <TextView
         android:id="@+id/text_to_city"
+        android:textColor="@color/mdtp_dark_gray"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/text_from_city"
