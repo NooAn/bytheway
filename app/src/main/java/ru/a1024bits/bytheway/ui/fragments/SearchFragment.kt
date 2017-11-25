@@ -19,6 +19,7 @@ import com.google.android.gms.location.places.ui.PlaceAutocomplete
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.android.synthetic.main.fragment_search_block.*
 import ru.a1024bits.bytheway.R
+import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 
 
 /**
@@ -44,6 +45,7 @@ class SearchFragment : Fragment() {
                     val place = PlaceAutocomplete.getPlace(activity, data);
                     text_from_city.text = place.name;
                     firstPoint = place.latLng
+                    firstPoint?.let { latLng -> (activity as OnFragmentInteractionListener).onSetPoint(latLng, 1) }
                 }
                 else -> {
                     val status = PlaceAutocomplete.getStatus(activity, data);
@@ -57,6 +59,7 @@ class SearchFragment : Fragment() {
                     val place = PlaceAutocomplete.getPlace(activity, data);
                     text_to_city.text = place.name
                     secondPoint = place.latLng
+                    secondPoint?.let { latLng -> (activity as OnFragmentInteractionListener).onSetPoint(latLng, 2) }
                 }
                 else -> {
                     val status = PlaceAutocomplete.getStatus(activity, data);

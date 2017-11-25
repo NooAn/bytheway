@@ -11,6 +11,7 @@ import android.support.design.widget.AppBarLayout
 import android.support.design.widget.CoordinatorLayout
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
+import android.support.v4.util.ArrayMap
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -22,6 +23,7 @@ import ru.a1024bits.aviaanimation.ui.util.LatLngInterpolator
 import ru.a1024bits.aviaanimation.ui.util.MarkerAnimation
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
+import ru.a1024bits.bytheway.util.createMarker
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import java.util.*
 import javax.inject.Inject
@@ -35,6 +37,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private var mMap: GoogleMap? = null
     private var mMapView: MapView? = null
+
+    private val points: ArrayMap<Int, MarkerOptions> by lazy { ArrayMap<Int, MarkerOptions>() }
 
     private var viewModel: MyProfileViewModel? = null
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -105,7 +109,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val markerOptions = MarkerOptions().position(fromLocation).anchor(0.5F, 1.0F).flat(true);
 
 
-        var t: Double = 0.0
+        var t = 0.0
         while (t < 1.000001) {
             listPointPath.add(LatLngInterpolator.CurveBezie().calculateBezierFunction(t, fromLocation, endLocation))
             t += 0.01F
@@ -208,11 +212,31 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     fun setMarker(point: LatLng, position: Int) {
+        mMap?.clear()
+
         Log.e("LOg", point.toString() + " " + position)
-        if (position == 1)
-            mMap?.addMarker(MarkerOptions().position(point).title("Старт"))
-        if (position == 2)
-            mMap?.addMarker(MarkerOptions().position(point).title("Финиш"))
+        if (position == 1) {
+            points.put(key = position, value = point.createMarker("Старт"))
+        }
+        if (position == 2) {
+            points.put(key = position, value = point.createMarker("Финиш"))
+        }
+
+        //add markers on map
+        points.map { it.value }.map { marker -> mMap?.addMarker(marker) }
+
+        //animate camera to show markers
+        when (points.size) {
+            1 -> mMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(points.valueAt(0).position,7F/* zoom level */))
+            else -> mMap?.animateCamera(CameraUpdateFactory.newLatLngBounds(createLatLngBounds(points),
+                    resources.getDimensionPixelSize(R.dimen.latLngBoundsPadding)))
+        }
+    }
+
+    private fun createLatLngBounds(points: ArrayMap<Int, MarkerOptions>): LatLngBounds {
+        val builder = LatLngBounds.builder()
+        points.map { latLng -> builder.include(latLng.value?.position) }
+        return builder.build()
     }
 
 }
