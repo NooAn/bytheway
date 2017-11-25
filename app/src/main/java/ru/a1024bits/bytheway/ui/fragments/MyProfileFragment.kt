@@ -243,7 +243,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
         view.findViewById<ImageView>(R.id.directions_car).setOnClickListener({
 
-            if (checkInMethods(Method.CAR)){
+            if (Method.CAR in methods){
                 directions_car.setImageResource(R.drawable.ic_directions_car_grey)
                 methods.remove(Method.CAR)
             }else {
@@ -251,19 +251,10 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
                 methods.add(Method.CAR)
             }
 
-            // directions_car.setImageDrawable(resources(R.drawable.ic_directions_car)) // put only gray color!
-            // do change icons and add method ( or delete)  in @methods
-
-            // Если пользователь выбрал машину то надо добавить, если он повторно нажал на кнопку то удаляем.
-            // И в случае когда у нас уже есть Машина с сервера, то тоже удаляем.
-            // изменить условие
-
-          //  if (true) methods.add(Method.CAR)
-          //  else methods.remove(Method.CAR)
         })
 
         view.findViewById<ImageView>(R.id.directions_railway).setOnClickListener({
-            if (checkInMethods(Method.TRAIN)){
+            if (Method.TRAIN in methods){
                 directions_railway.setImageResource(R.drawable.ic_directions_railway_grey)
                 methods.remove(Method.TRAIN)
             }else {
@@ -273,7 +264,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         })
 
         view.findViewById<ImageView>(R.id.directions_bus).setOnClickListener({
-            if (checkInMethods(Method.BUS)){
+            if (Method.BUS in methods){
                 directions_bus.setImageResource(R.drawable.ic_directions_bus_grey)
                 methods.remove(Method.BUS)
             }else {
@@ -283,7 +274,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         })
 
         view.findViewById<ImageView>(R.id.directions_flight).setOnClickListener({
-            if (checkInMethods(Method.PLANE)){
+            if (Method.PLANE in methods){
                 directions_flight.setImageResource(R.drawable.ic_flight_grey)
                 methods.remove(Method.PLANE)
             }else {
@@ -293,7 +284,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         })
 
         view.findViewById<ImageView>(R.id.csIcon1).setOnClickListener({
-            if (checkInMethods(Method.HITCHHIKING)){
+            if (Method.HITCHHIKING in methods){
                 csIcon1.setImageResource(R.drawable.ic_directions_hitchhiking)
                 methods.remove(Method.HITCHHIKING)
             }else {
@@ -512,17 +503,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             fragment.arguments = args
             return fragment
         }
-    }
-
-
-
-    fun checkInMethods( method: Method):Boolean{
-
-       var result=false
-        for (item in methods) {
-            if (method == item) result = true
-        }
-        return result
     }
 
 
