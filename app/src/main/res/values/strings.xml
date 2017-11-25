@@ -56,4 +56,10 @@
         <item>ноя.</item>
         <item>дек.</item>
     </string-array>
+    
+    <string name="travelCar">Машина</string>
+    <string name="travelTrain">Поезд</string>
+    <string name="travelBus">Автобус</string>
+    <string name="travelPlane">Самолет</string>
+    <string name="travelHitchHicking">Автостоп</string>
 </resources>

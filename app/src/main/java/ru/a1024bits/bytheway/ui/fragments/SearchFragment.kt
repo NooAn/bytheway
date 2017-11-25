@@ -18,6 +18,7 @@ import com.google.android.gms.maps.model.LatLng
 import kotlinx.android.synthetic.main.fragment_search_block.*
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
+import ru.a1024bits.bytheway.util.DecimalInputFilter
 
 
 /**
@@ -92,6 +93,9 @@ class SearchFragment : Fragment() {
             text_from_city.text = text_to_city.text
             text_to_city.text = tempString
         }
+
+        budgetFromValue.filters = arrayOf(DecimalInputFilter())
+        budgetToValue.filters = arrayOf(DecimalInputFilter())
     }
 
     private fun sendIntentForSearch(code: Int) {

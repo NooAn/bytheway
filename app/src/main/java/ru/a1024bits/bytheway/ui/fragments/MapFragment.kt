@@ -16,6 +16,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
 import kotlinx.android.synthetic.main.fragment_maps.*
@@ -87,6 +88,20 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         params.behavior = behavior
         appBarLayout.layoutParams = params
 
+
+        mapFragmentRoot.viewTreeObserver.addOnGlobalLayoutListener(object: ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                mapFragmentRoot.viewTreeObserver.removeOnGlobalLayoutListener(this)
+
+                val targetMapHeight = mapFragmentRoot.height - resources.getDimensionPixelSize(R.dimen.chooseDestinationLayoutHeight)
+                val mapParams = map.layoutParams
+
+                mapParams.height = targetMapHeight
+                map.layoutParams = mapParams
+
+                mapFragmentScrollView.scrollTo(0,0)
+            }
+        })
     }
 
 
