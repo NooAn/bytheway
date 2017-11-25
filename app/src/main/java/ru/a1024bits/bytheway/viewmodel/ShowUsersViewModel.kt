@@ -23,6 +23,7 @@ class ShowUsersViewModel @Inject constructor(var userRepository: UserRepository)
     var usersLiveData: MutableLiveData<List<User>> = MutableLiveData<List<User>>()
     val TAG = "showUserViewModel"
 
+
     fun getAllUsers(filter: Filter) {
         userRepository.getUsers()
                 .addOnCompleteListener { task ->
@@ -88,12 +89,9 @@ class ShowUsersViewModel @Inject constructor(var userRepository: UserRepository)
             user.city = document.data.getValue("city") as String
     }
 
-
     fun getSimilarUsersTravels(data: Filter, observer: Observer<List<User>>): LiveData<List<User>> {
         Log.e("LOG", "init repos1 $userRepository")
         userRepository.getSimilarUsersTravels(data, observer)
         return listUser as MutableLiveData<List<User>>
     }
-
-
 }

@@ -138,7 +138,7 @@
                 android:layout_height="match_parent"
                 android:hint="@string/datetrip"
                 android:inputType="datetime|date"
-                android:textSize="14sp"/>
+                android:textSize="14sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -158,7 +158,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:hint="@string/money"
-                android:textSize="14sp"/>
+                android:textSize="14sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -179,7 +179,7 @@
                 android:layout_height="match_parent"
                 android:hint="@string/description"
                 android:inputType="textMultiLine"
-                android:textSize="14sp"/>
+                android:textSize="14sp" />
         </LinearLayout>
     </RelativeLayout>
 

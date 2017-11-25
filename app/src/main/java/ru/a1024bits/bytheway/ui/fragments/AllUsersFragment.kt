@@ -22,7 +22,6 @@ import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.viewmodel.ShowUsersViewModel
 import javax.inject.Inject
-import kotlin.collections.ArrayList
 
 
 class AllUsersFragment : Fragment() {
