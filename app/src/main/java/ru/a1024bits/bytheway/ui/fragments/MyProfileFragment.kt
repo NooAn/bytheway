@@ -29,9 +29,10 @@ import ru.a1024bits.bytheway.model.SocialNetwork
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
-import javax.inject.Inject
-import java.util.Date
 import java.text.SimpleDateFormat
+import java.util.Date
+import javax.inject.Inject
+import kotlin.collections.HashMap
 
 
 class MyProfileFragment : Fragment(), OnMapReadyCallback {
@@ -77,7 +78,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             if (user != null) fillProfile(user)
         })
 
-        viewModel!!.load(FirebaseAuth.getInstance().currentUser?.uid.orEmpty())
+        viewModel?.load(FirebaseAuth.getInstance().currentUser?.uid.orEmpty())
 
     }
 
@@ -214,20 +215,20 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
     private var googleMap: GoogleMap? = null
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater!!.inflate(R.layout.fragment_my_user_profile, container, false)
+        val view = inflater?.inflate(R.layout.fragment_my_user_profile, container, false)
         Log.e("LOG", "function activity create view ")
 
-        val displayPriceTravel = view.findViewById<TextView>(R.id.display_price_travel)
-        displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(budget)
+        val displayPriceTravel = view?.findViewById<TextView>(R.id.display_price_travel)
+        displayPriceTravel?.text = StringBuilder(getString(R.string.type_money)).append(budget)
 
-        view.findViewById<LinearLayout>(R.id.headerprofile).setOnClickListener({
+        view?.findViewById<LinearLayout>(R.id.headerprofile)?.setOnClickListener({
             openSettingDialog()
         })
 
-        view.findViewById<SeekBar>(R.id.choose_price_travel).setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        view?.findViewById<SeekBar>(R.id.choose_price_travel)?.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, number: Int, p2: Boolean) {
                 budget = fibbonaci(number)
-                displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(budget)
+                displayPriceTravel?.text = StringBuilder(getString(R.string.type_money)).append(budget)
             }
 
             override fun onStartTrackingTouch(p0: SeekBar?) {
@@ -241,7 +242,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
 
 
-        view.findViewById<ImageView>(R.id.directions_car).setOnClickListener({
+        view?.findViewById<ImageView>(R.id.directions_car)?.setOnClickListener({
 
             if (checkInMethods(Method.CAR)){
                 directions_car.setImageResource(R.drawable.ic_directions_car_grey)
@@ -262,7 +263,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
           //  else methods.remove(Method.CAR)
         })
 
-        view.findViewById<ImageView>(R.id.directions_railway).setOnClickListener({
+        view?.findViewById<ImageView>(R.id.directions_railway)?.setOnClickListener({
             if (checkInMethods(Method.TRAIN)){
                 directions_railway.setImageResource(R.drawable.ic_directions_railway_grey)
                 methods.remove(Method.TRAIN)
@@ -272,7 +273,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             }
         })
 
-        view.findViewById<ImageView>(R.id.directions_bus).setOnClickListener({
+        view?.findViewById<ImageView>(R.id.directions_bus)?.setOnClickListener({
             if (checkInMethods(Method.BUS)){
                 directions_bus.setImageResource(R.drawable.ic_directions_bus_grey)
                 methods.remove(Method.BUS)
@@ -282,7 +283,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             }
         })
 
-        view.findViewById<ImageView>(R.id.directions_flight).setOnClickListener({
+        view?.findViewById<ImageView>(R.id.directions_flight)?.setOnClickListener({
             if (checkInMethods(Method.PLANE)){
                 directions_flight.setImageResource(R.drawable.ic_flight_grey)
                 methods.remove(Method.PLANE)
@@ -292,7 +293,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             }
         })
 
-        view.findViewById<ImageView>(R.id.csIcon1).setOnClickListener({
+        view?.findViewById<ImageView>(R.id.csIcon1)?.setOnClickListener({
             if (checkInMethods(Method.HITCHHIKING)){
                 csIcon1.setImageResource(R.drawable.ic_directions_hitchhiking)
                 methods.remove(Method.HITCHHIKING)
@@ -303,33 +304,33 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         })
 
 
-        view.findViewById<TextView>(R.id.add)
-        view.findViewById<TextView>(R.id.new_trip_text).setOnClickListener {
+        view?.findViewById<TextView>(R.id.add)
+        view?.findViewById<TextView>(R.id.new_trip_text)?.setOnClickListener {
             hideBlockNewTrip()
             showBlockTravelInformation()
         }
-        view.findViewById<ImageView>(R.id.vkIcon).setOnClickListener {
+        view?.findViewById<ImageView>(R.id.vkIcon)?.setOnClickListener {
             openDialog(SocialNetwork.VK)
             vkIcon.setImageResource(R.drawable.vk)
 
         }
-        view.findViewById<ImageView>(R.id.csIcon).setOnClickListener {
+        view?.findViewById<ImageView>(R.id.csIcon)?.setOnClickListener {
             openDialog(SocialNetwork.CS)
             csIcon.setImageResource(R.drawable.cs_color)
         }
-        view.findViewById<ImageView>(R.id.whatsUpIcon).setOnClickListener({
+        view?.findViewById<ImageView>(R.id.whatsUpIcon)?.setOnClickListener({
             openDialog(SocialNetwork.WHATSAAP)
             whatsUpIcon.setImageResource(R.drawable.whats_icon__2_)
         })
-        view.findViewById<ImageView>(R.id.fbcon).setOnClickListener({
+        view?.findViewById<ImageView>(R.id.fbcon)?.setOnClickListener({
             openDialog(SocialNetwork.FB)
             fbcon.setImageResource(R.drawable.fb_color)
         })
-        view.findViewById<ImageView>(R.id.tgIcon).setOnClickListener({
+        view?.findViewById<ImageView>(R.id.tgIcon)?.setOnClickListener({
             openDialog(SocialNetwork.TG)
             tgIcon.setImageResource(R.drawable.tg_color)
         })
-        view.findViewById<Button>(R.id.button_save_travel_info).setOnClickListener({
+        view?.findViewById<Button>(R.id.button_save_travel_info)?.setOnClickListener({
             Log.e("LOG", "save travel")
             sendUserInfoToServer()
         })
@@ -351,7 +352,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun sendUserInfoToServer() {
-        viewModel?.sendUserData(getHashMapUser(), FirebaseAuth.getInstance().currentUser?.uid!!)
+        viewModel?.sendUserData(getHashMapUser(), FirebaseAuth.getInstance().currentUser?.uid.orEmpty())
     }
 
     private fun showBlockTravelInformation() {
@@ -438,9 +439,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
 
     fun onButtonPressed() {
-        if (mListener != null) {
-            mListener!!.onFragmentInteraction()
-        }
+        mListener?.onFragmentInteraction()
     }
 
     override fun onAttach(context: Context?) {
@@ -448,7 +447,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         if (context is OnFragmentInteractionListener) {
             mListener = context
         } else {
-            throw RuntimeException(context!!.toString() + " must implement OnFragmentInteractionListener")
+            throw RuntimeException(context?.toString() + " must implement OnFragmentInteractionListener")
         }
     }
 

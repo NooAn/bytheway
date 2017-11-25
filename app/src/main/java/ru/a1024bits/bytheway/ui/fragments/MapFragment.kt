@@ -22,12 +22,10 @@ import ru.a1024bits.aviaanimation.ui.util.LatLngInterpolator
 import ru.a1024bits.aviaanimation.ui.util.MarkerAnimation
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
-import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
-import android.app.Activity
 
 
 /**
@@ -52,11 +50,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater!!.inflate(R.layout.fragment_maps, container, false)
+        val view = inflater?.inflate(R.layout.fragment_maps, container, false)
 
         collapsingToolbar?.setContentScrimColor(getResources().getColor(R.color.colorAccent))
 
-        mMapView = view.findViewById<MapView>(R.id.map)
+        mMapView = view?.findViewById<MapView>(R.id.map)
 
         mMapView?.onCreate(savedInstanceState)
 
@@ -212,7 +210,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     fun setMarker(point: LatLng, position: Int) {
         Log.e("LOg", point.toString() + " " + position)
         if (position == 1)
-            mMap!!.addMarker(MarkerOptions().position(point).title("Старт"))
+            mMap?.addMarker(MarkerOptions().position(point).title("Старт"))
         if (position == 2)
             mMap?.addMarker(MarkerOptions().position(point).title("Финиш"))
     }

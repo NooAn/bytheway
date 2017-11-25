@@ -61,7 +61,7 @@ class UserProfileFragment : LifecycleFragment(), OnMapReadyCallback {
     private var googleMap: GoogleMap? = null
     
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater!!.inflate(R.layout.fragment_user_profile, container, false)
+        val view = inflater?.inflate(R.layout.fragment_user_profile, container, false)
         
         mMapView = view?.findViewById<MapView>(R.id.mapView)
         mMapView?.onCreate(savedInstanceState)
@@ -92,9 +92,7 @@ class UserProfileFragment : LifecycleFragment(), OnMapReadyCallback {
     }
     
     fun onButtonPressed() {
-        if (mListener != null) {
-            mListener!!.onFragmentInteraction()
-        }
+        mListener?.onFragmentInteraction()
     }
     
     override fun onAttach(context: Context?) {
@@ -102,7 +100,7 @@ class UserProfileFragment : LifecycleFragment(), OnMapReadyCallback {
         if (context is OnFragmentInteractionListener) {
             mListener = context
         } else {
-            throw RuntimeException(context!!.toString() + " must implement OnFragmentInteractionListener")
+            throw RuntimeException(context?.toString() + " must implement OnFragmentInteractionListener")
         }
     }
     

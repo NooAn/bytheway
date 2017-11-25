@@ -31,7 +31,7 @@ class MarkerAnimation {
                 val v = animation.animatedFraction
                 val newPosition = latLngInterpolator.interpolate(v, startPosition, finalPosition)
                 marker?.setRotation(getBearing(marker.position, newPosition))
-                Log.e("LOG MARKER", " ${marker!!.position} == ${newPosition}")
+                Log.e("LOG MARKER", " ${marker?.position} == ${newPosition}")
             } catch (ex: Exception) {
                 ex.printStackTrace()
             }
