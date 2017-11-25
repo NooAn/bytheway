@@ -87,15 +87,24 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
     private fun fillProfile(user: User) {
         username.text = StringBuilder(user.name).append(" ").append(user.lastName)
-        if (user.city.length > 0) cityview.text = user.city
+
+        lastName = user.lastName
+        name = user.name
+
+        if (user.city.length > 0) {
+            cityview.text = user.city
+            city = user.city
+        }
+
         if (user.countTrip == 0) {
             showBlockAddTrip()
             hideBlockTravelInforamtion()
         }
+
         if (user.cities.size > 0) {
             val lastIndexArr = user.cities.size - 1
-            textCityFrom.text = user.cities.get(0)
-            textCityTo.text = user.cities.get(lastIndexArr)
+            textCityFrom.setText(user.cities.get(0))
+            textCityTo.setText(user.cities.get(lastIndexArr))
             cities.add(user.cities.get(0))
             cities.add(user.cities.get(lastIndexArr))
         }
@@ -106,8 +115,9 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             val lastIndexArr = user.dates.size - 1
             val dayBegin = formatDate.format(Date(user.dates.get(0)))
             val dayArrival = formatDate.format(Date(user.dates.get(lastIndexArr)))
-            textDateFrom.text = dayBegin
-            dateArrived.text = dayArrival
+            textDateFrom.setText(dayBegin)
+            dateArrived.setText(dayArrival)
+
             dates.add(user.dates.get(0))
             dates.add(user.dates.get(lastIndexArr))
         }
@@ -230,7 +240,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(budget)
 
         view.findViewById<LinearLayout>(R.id.headerprofile).setOnClickListener({
-            openSettingDialog()
+            openInformationEditDialog()
         })
 
         view.findViewById<SeekBar>(R.id.choose_price_travel).setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -244,11 +254,9 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
             override fun onStopTrackingTouch(p0: SeekBar?) {
             }
-
         })
 
         view.findViewById<ImageView>(R.id.directions_car).setOnClickListener({
-
             if (checkInMethods(Method.CAR)) {
                 directions_car.setImageResource(R.drawable.ic_directions_car_grey)
                 methods.remove(Method.CAR)
@@ -362,10 +370,11 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         add_new_trip.visibility = View.GONE
     }
 
-    private fun openSettingDialog() {
+    private fun openInformationEditDialog() {
         val simpleAlert = AlertDialog.Builder(activity).create()
         val inflater = this.layoutInflater
         val dialogView = inflater.inflate(R.layout.custom_dialog_profile_inforamtion, null)
+
         simpleAlert.setView(dialogView)
         val nameChoose = dialogView.findViewById<View>(R.id.dialog_name) as EditText
         nameChoose.setText(name)
@@ -391,22 +400,21 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             } else if (woman.isChecked) {
                 sex = 2
             } else sex = 0
+
             age = ageChoose.getText().toString().toLong()
             fillAgeSex(age, sex)
-            Log.e("LOG", "выбранный пол:$sex ")
             name = nameChoose?.getText().toString()
 
             lastName = lastNameChoose?.getText().toString()
             username.text = StringBuilder(name).append(" ").append(lastName)
             city = cityChoose?.getText().toString()
             cityview.text = (city)
-            Log.e("LOG", "выбранное имя:$name ...фамилия $lastName")
-
-
+            sendUserInfoToServer()
         })
         simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, "Отмена", { dialogInterface, i ->
-
+            simpleAlert.hide()
         })
+
         simpleAlert.show()
     }
 
@@ -525,7 +533,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         hashMap.set("sex", sex)
         hashMap.set("age", age)
         hashMap.put("countTrip", 1)
-        Log.e("LOG", hashMap.toString())
         return hashMap
     }
 }

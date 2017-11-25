@@ -39,7 +39,8 @@
                 android:freezesText="true"
                 android:text="@string/city"
                 android:textAlignment="center"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                tools:text="Москва, Россия" />
 
             <TextView
                 android:id="@+id/sex_and_age"
@@ -51,7 +52,6 @@
                 android:textAlignment="center"
                 android:textSize="16sp" />
         </LinearLayout>
-
 
         <LinearLayout
             android:id="@+id/socnetwork"
@@ -140,7 +140,7 @@
         <include
             android:id="@+id/add_new_trip"
             layout="@layout/profile_add_trip"
-            android:visibility="gone"
+            android:visibility="visible"
             tools:visibility="visible" />
 
         <include
@@ -213,7 +213,7 @@
             <View
                 android:layout_width="1dp"
                 android:layout_height="30dp"
-                android:background="@color/colorAccent" />
+                android:background="@color/gray" />
 
             <ImageView
                 android:id="@+id/directions_railway"
@@ -228,7 +228,7 @@
             <View
                 android:layout_width="1dp"
                 android:layout_height="30dp"
-                android:background="@color/colorAccent" />
+                android:background="@color/gray" />
 
             <ImageView
                 android:id="@+id/directions_bus"
@@ -243,7 +243,7 @@
             <View
                 android:layout_width="1dp"
                 android:layout_height="30dp"
-                android:background="@color/colorAccent" />
+                android:background="@color/gray" />
 
             <ImageView
                 android:id="@+id/directions_flight"
@@ -258,7 +258,7 @@
             <View
                 android:layout_width="1dp"
                 android:layout_height="30dp"
-                android:background="@color/colorAccent" />
+                android:background="@color/gray" />
 
             <ImageView
                 android:id="@+id/csIcon1"
@@ -298,8 +298,8 @@
                 android:layout_weight="1"
                 android:max="30"
                 android:progress="50"
-                android:progressTint="@color/colorLine"
-                android:thumbTint="@color/colorLine" />
+                android:progressTint="@color/colorPrimary"
+                android:thumbTint="@color/colorPrimary" />
 
             <TextView
                 android:id="@+id/display_price_travel"
@@ -307,7 +307,9 @@
                 android:layout_height="match_parent"
                 android:layout_marginStart="@dimen/margin_left_profile"
                 android:layout_marginTop="12dp"
-                android:text="@string/budget" />
+                android:drawableStart="@drawable/ic_rubles"
+                android:text="@string/budget"
+                android:textSize="16sp" />
 
         </LinearLayout>
 
@@ -333,7 +335,7 @@
                 android:id="@+id/add_info_user"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:backgroundTint="@color/colorLine"
+                android:backgroundTint="@color/colorPrimary"
                 android:hint="@string/description"
                 android:inputType="textMultiLine"
                 android:textSize="14sp" />
