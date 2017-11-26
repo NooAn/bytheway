@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import kotlinx.android.synthetic.main.fragment_display_similar_user_travels.*
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.adapter.DisplaySimilarTravelsAdapter
@@ -21,10 +22,30 @@ import javax.inject.Inject
 
 class SimilarTravelsFragment : Fragment() {
     private lateinit var currentView: View
+    private lateinit var filter: Filter
     private lateinit var viewModel: ShowUsersViewModel
     private lateinit var showUsersAdapter: DisplaySimilarTravelsAdapter
     private lateinit var recyclerView: RecyclerView
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    //private var countInitialElements = 0
+    private var tempStartAge: Int = -1
+    private var tempEndAge: Int = -1
+    private var tempStartDate: Long = 0L
+    private var tempEndDate: Long = 0L
+    private var tempSex: Int = 0
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        filter = if (savedInstanceState != null) {
+            tempStartAge = savedInstanceState.getInt("tempStartAge")
+            tempSex = savedInstanceState.getInt("tempSex")
+            tempEndAge = savedInstanceState.getInt("tempEndAge")
+            tempStartDate = savedInstanceState.getLong("tempStartDate")
+            tempEndDate = savedInstanceState.getLong("tempEndDate")
+            savedInstanceState.getSerializable("filter") as Filter
+        } else Filter()
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         currentView = inflater.inflate(R.layout.fragment_display_similar_user_travels, container, false)
@@ -44,7 +65,7 @@ class SimilarTravelsFragment : Fragment() {
         showUsersAdapter = DisplaySimilarTravelsAdapter(this.context)
         recyclerView.adapter = showUsersAdapter
 
-        val observer = Observer<List<User>> { list ->
+        viewModel.similarUsersLiveData.observe(this, Observer<List<User>> { list ->
             Log.e("LOG", "onChanged " + list + " - size")
             if (list != null) {
                 val random = Random()
@@ -53,9 +74,11 @@ class SimilarTravelsFragment : Fragment() {
                     Log.e("tag", "11user percents: " + user.percentsSimilarTravel + " \n")
                 }
                 showUsersAdapter.addItems(list)
+                loading_where_load_users.visibility = View.GONE
             }
-        }
-        viewModel.getSimilarUsersTravels(Filter(/* some data for filtering*/), observer).observe(this, observer)
+        })
+        viewModel.getUsersWithSimilarTravel(filter)
+        loading_where_load_users.visibility = View.VISIBLE
     }
 
     companion object {

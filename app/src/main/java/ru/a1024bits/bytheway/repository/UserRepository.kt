@@ -22,8 +22,8 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) : IUsersR
         Log.e("LOG", "init repos2")
     }
 
-    override fun getSimilarUsersTravels(data: Filter, observer: Observer<List<User>>): List<User> {
-        return arrayListOf()
+    override fun getSimilarUsersTravels(data: Filter, observer: Observer<List<User>>): Task<QuerySnapshot> {
+        return store.collection(COLLECTION_USERS).get()
     }
 
     //Rx wrapper
