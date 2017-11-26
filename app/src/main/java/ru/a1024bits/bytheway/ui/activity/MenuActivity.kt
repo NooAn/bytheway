@@ -232,7 +232,16 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                             override fun onResponse(call: Call<AirUser?>?, response: Response<AirUser?>?) {
                                 Log.e("LOGI", response?.message().toString())
-                                viewModel?.updateStaticalInfo(response?.body()!!, FirebaseAuth.getInstance().currentUser?.uid.toString())
+                                viewModel?.updateStaticalInfo(response?.body(), FirebaseAuth.getInstance().currentUser?.uid.toString())
+                            }
+                        })
+                        loginService.getMyTrips().enqueue(object: Callback<AirUser?> {
+                            override fun onResponse(call: Call<AirUser?>?, response: Response<AirUser?>?) {
+                                viewModel?.updateFeatureTrips(response?.body(), FirebaseAuth.getInstance().currentUser?.uid.toString())
+                            }
+
+                            override fun onFailure(call: Call<AirUser?>?, t: Throwable?) {
+                                Log.e("LOGI", "fail", t)
                             }
                         })
                         navigator.applyCommand(Replace(Screens.AIR_SUCCES_SCREEN, 1))

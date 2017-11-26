@@ -102,18 +102,43 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                 }
     }
 
-    fun updateStaticalInfo(airUser: AirUser, id: String) {
+    fun updateStaticalInfo(airUser: AirUser?, id: String) {
         Log.d("LOG", "update statical")
-        val hash = HashMap<String, Any>()
-        hash.put("hours", airUser.data.hours)
+        val map = HashMap<String, Any>()
+        map.put("flightHours", airUser?.data?.hours.toString())
         val set = HashSet<String>()
-        airUser.data.airports.forEachIndexed({ index, airports ->
+        airUser?.data?.airports?.forEachIndexed({ index, airports ->
             set.add(airports.country)
         })
-        hash.put("countries", set.size)
-        hash.put("kilometers", airUser.data.kilometers)
-//        var airInfo = AirInfo(airUser.data.hours, set.size.toString(), airUser.data.kilometers)
+        map.put("countries", set.size)
+        map.put("kilometers", airUser?.data?.kilometers.toString())
+//        var airInfo = AirInfo(airUser.data.flightHours, set.size.toString(), airUser.data.kilometers)
 //        hash.put("airInfo", airInfo)
-        sendUserData(hash, id)
+
+        sendUserData(map, id)
+    }
+
+    fun updateFeatureTrips(body: AirUser?, uid: String) {
+        val map = HashMap<String, Any>()
+        val currentTime = System.currentTimeMillis()
+        body?.data?.trips?.get(0)?.flights?.let { flights ->
+            for (flight in flights) {
+                if (flight.departureLocale.toLong() > currentTime) {
+                    val listCities = arrayListOf<String>()
+                    listCities.add(flight.origin.country_full)
+                    listCities.add(flight.destination.country_full)
+                    val listDates = arrayListOf<Long>()
+                    listDates.add(flight.departureUtc.toLong())
+                    listDates.add(flight.departureLocale)
+                    map.set("cities", listCities)
+                    map.set("countTrip", 1)
+                    map.set("dates", listDates)
+                    break
+                }
+            }
+        }
+        sendUserData(map, uid)
+
+        Log.e("LOG name", "" + body?.data?.trips?.get(0)?.flights?.get(0)?.arrivalUtc)
     }
 }

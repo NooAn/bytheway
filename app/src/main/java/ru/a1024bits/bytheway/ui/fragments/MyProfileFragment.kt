@@ -62,6 +62,12 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
     private var age: Long = 0
 
+    private var countries: Long = 0
+
+    private var hours: Long = 0
+
+    private var kilometers: Long = 0
+
     private var cities: ArrayList<String> = arrayListOf()
 
     private var budget: Long = 0 // default const
@@ -91,6 +97,16 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
         lastName = user.lastName
         name = user.name
+
+        if (user.flightHours == 0L) {
+            travelledStatistics.visibility = View.GONE
+        } else {
+            travelledStatistics.visibility = View.VISIBLE
+        }
+
+        travelledCountries.text = user.countries.toString()
+        flightHours.text = user.flightHours.toString()
+        flightDistance.text = user.kilometers.toString()
 
         if (user.city.length > 0) {
             cityview.text = user.city

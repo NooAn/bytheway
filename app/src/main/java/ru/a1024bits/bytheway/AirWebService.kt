@@ -22,5 +22,7 @@ interface AirWebService {
     @GET("/api/v1/me")
     fun getUserProfile(): Call<AirUser>
 
+    @GET("/api/v1/me/trips")
+    fun getMyTrips(): Call <AirUser>
 
 }
