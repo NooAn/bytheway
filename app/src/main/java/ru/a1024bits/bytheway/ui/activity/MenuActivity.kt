@@ -25,7 +25,6 @@ import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.places.Places
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
-import com.google.gson.reflect.TypeToken
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -35,7 +34,6 @@ import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.AccessToken
 import ru.a1024bits.bytheway.model.AirUser
 import ru.a1024bits.bytheway.model.User
-import ru.a1024bits.bytheway.repository.UserRepository
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.router.Screens.Companion.AIR_SUCCES_SCREEN
@@ -77,7 +75,6 @@ class MenuActivity : AppCompatActivity(),
     private val STATE_SCREEN_NAMES = "state_screen_names"
 
     @Inject lateinit var navigatorHolder: NavigatorHolder
-    @Inject lateinit var userRepository: UserRepository
 
     private var glide: RequestManager? = null
     var mainUser: User? = null
@@ -255,22 +252,15 @@ class MenuActivity : AppCompatActivity(),
         }
     }
 
-    val APP_PREFERENCES = "string_save"
-
-    val ACCESS_TOKEN = "access_t"
-    val REFRESH_TOKEN = "refresh_t"
-    val TYPE_TOKEN = "type_t"
-
     private fun saveToken(accessToken: AccessToken?) {
-        val sharePreferences = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE)
-        sharePreferences.edit().putString(REFRESH_TOKEN, accessToken?.refresToken).apply()
-        sharePreferences.edit().putString(ACCESS_TOKEN, accessToken?.accessToken).apply()
-        sharePreferences.edit().putString(TYPE_TOKEN, accessToken?.getTokenType()).apply()
+        preferences.edit().putString(Constants.REFRESH_TOKEN, accessToken?.refresToken).apply()
+        preferences.edit().putString(Constants.ACCESS_TOKEN, accessToken?.accessToken).apply()
+        preferences.edit().putString(Constants.TYPE_TOKEN, accessToken?.getTokenType()).apply()
     }
 
-    fun getAccessToken(): String = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE).getString(ACCESS_TOKEN, "")
-    fun getTypeToken(): String = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE).getString(TYPE_TOKEN, "")
-    fun getRefreshToken(): String = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE).getString(REFRESH_TOKEN, "")
+    fun getAccessToken(): String = preferences.getString(Constants.ACCESS_TOKEN, "")
+    fun getTypeToken(): String = preferences.getString(Constants.TYPE_TOKEN, "")
+    fun getRefreshToken(): String = preferences.getString(Constants.REFRESH_TOKEN, "")
 
 
     override fun onPause() {
@@ -280,11 +270,6 @@ class MenuActivity : AppCompatActivity(),
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
-        return super.onOptionsItemSelected(item)
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
