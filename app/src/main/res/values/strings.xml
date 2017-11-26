@@ -41,6 +41,7 @@
     <string name="save">Сохранить</string>
     <string name="sex_and_age">Пол, возраст</string>
     <string name="add_new_trip">+ Создать поездку</string>
+    <string name="exit">Выйти</string>
 
     <string-array name="months_array">
         <item>янв.</item>

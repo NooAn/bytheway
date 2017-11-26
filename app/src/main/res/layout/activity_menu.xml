@@ -20,6 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
+        android:background="#EEEEEE"
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/nav_header_main"
         app:menu="@menu/activity_main_drawer">
@@ -27,10 +28,16 @@
         <Button
             android:id="@+id/sing_out"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:background="@color/white"
-            android:text="Выход" />
+            android:background="#EEEEEE"
+            android:drawablePadding="30dp"
+            android:drawableStart="@drawable/ic_exit_to_app"
+            android:gravity="center_vertical|start"
+            android:paddingStart="16dp"
+            android:stateListAnimator="@null"
+            android:textAllCaps="false"
+            android:text="@string/exit" />
 
     </android.support.design.widget.NavigationView>
 
