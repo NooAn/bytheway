@@ -3,7 +3,10 @@ package ru.a1024bits.bytheway.repository
 import android.arch.lifecycle.Observer
 import android.util.Log
 import com.google.android.gms.tasks.Task
-import com.google.firebase.firestore.*
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException
+import com.google.firebase.firestore.QuerySnapshot
 import ru.a1024bits.bytheway.model.User
 import javax.inject.Inject
 
@@ -22,8 +25,8 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) : IUsersR
         Log.e("LOG", "init repos2")
     }
 
-    override fun getSimilarUsersTravels(data: Filter, observer: Observer<List<User>>): List<User> {
-        return arrayListOf()
+    override fun getSimilarUsersTravels(data: Filter, observer: Observer<List<User>>): Task<QuerySnapshot> {
+        return store.collection(COLLECTION_USERS).get()
     }
 
     //Rx wrapper

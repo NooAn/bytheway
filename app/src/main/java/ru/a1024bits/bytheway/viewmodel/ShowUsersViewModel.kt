@@ -1,11 +1,8 @@
 package ru.a1024bits.bytheway.viewmodel
 
-import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModel
 import android.util.Log
-import android.widget.ProgressBar
 import com.google.firebase.firestore.DocumentSnapshot
 import ru.a1024bits.bytheway.model.Method
 import ru.a1024bits.bytheway.model.SocialNetwork
@@ -21,6 +18,7 @@ class ShowUsersViewModel @Inject constructor(var userRepository: UserRepository)
 
     var listUser: MutableLiveData<List<User>> = MutableLiveData<List<User>>()
     var usersLiveData: MutableLiveData<List<User>> = MutableLiveData<List<User>>()
+    var similarUsersLiveData: MutableLiveData<List<User>> = MutableLiveData<List<User>>()
     val TAG = "showUserViewModel"
 
     fun getAllUsers(filter: Filter) {
@@ -58,6 +56,43 @@ class ShowUsersViewModel @Inject constructor(var userRepository: UserRepository)
                 }
     }
 
+    fun getUsersWithSimilarTravel(filter: Filter) {
+        userRepository.getUsers()
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        val result: MutableList<User> = ArrayList()
+                        for (document in task.result) {
+                            try {
+                                val user = User()
+                                Log.d(TAG, document.id + " => " + document.data)
+                                initializeUserFromDocument(user, document)
+
+                                //will this be uncommented ever?
+
+                                /*if ((filter.startBudget > 0) && (filter.endBudget > 0))
+                                    if (user.budget < filter.startBudget || user.budget > filter.endBudget) continue
+                                if ((filter.startDate > 0L) && (filter.endDate > 0L))
+                                    if (user.data < filter.startDate || user.data > filter.endDate) continue
+                                if ((filter.startAge > 0) && (filter.endAge > 0))
+                                    if (user.age < filter.startAge || user.age > filter.endAge) continue
+                                if (filter.sex != 0)
+                                    if (user.sex != filter.sex) continue
+                                if ("" != filter.startCity)
+                                    if (!user.cities.contains(filter.startCity)) continue
+                                if ("" != filter.endCity)
+                                    if (!user.cities.contains(filter.endCity)) continue*/
+
+                                result.add(user)
+                            } catch (e: Exception) {
+                            }
+                        }
+                        similarUsersLiveData.setValue(result)
+                    } else {
+                        Log.w(TAG, "Error getting documents.", task.exception)
+                    }
+                }
+    }
+
     private fun initializeUserFromDocument(user: User, document: DocumentSnapshot) {
         user.lastName = document.data.getValue("lastName") as String
         user.email = document.data.getValue("email") as String
@@ -87,13 +122,5 @@ class ShowUsersViewModel @Inject constructor(var userRepository: UserRepository)
         if (document.data.containsKey("city"))
             user.city = document.data.getValue("city") as String
     }
-
-
-    fun getSimilarUsersTravels(data: Filter, observer: Observer<List<User>>): LiveData<List<User>> {
-        Log.e("LOG", "init repos1 $userRepository")
-        userRepository.getSimilarUsersTravels(data, observer)
-        return listUser as MutableLiveData<List<User>>
-    }
-
 
 }

@@ -67,6 +67,7 @@
             <ImageView
                 tools:ignore="ContentDescription"
                 android:id="@+id/vkIcon"
+                android:scaleType="center"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginEnd="6dp"
@@ -78,11 +79,12 @@
             <View
                 android:layout_width="1dp"
                 android:layout_height="30dp"
-                android:background="@color/colorAccent" />
+                android:background="@color/greyTravelTypeDivider" />
 
             <ImageView
                 tools:ignore="ContentDescription"
                 android:id="@+id/whatsUpIcon"
+                android:scaleType="center"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginEnd="6dp"
@@ -94,11 +96,12 @@
             <View
                 android:layout_width="1dp"
                 android:layout_height="30dp"
-                android:background="@color/colorAccent" />
+                android:background="@color/greyTravelTypeDivider" />
 
             <ImageView
                 tools:ignore="ContentDescription"
                 android:id="@+id/tgIcon"
+                android:scaleType="center"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginEnd="6dp"
@@ -111,11 +114,12 @@
             <View
                 android:layout_width="1dp"
                 android:layout_height="30dp"
-                android:background="@color/colorAccent" />
+                android:background="@color/greyTravelTypeDivider" />
 
             <ImageView
                 tools:ignore="ContentDescription"
                 android:id="@+id/fbcon"
+                android:scaleType="center"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginEnd="6dp"
@@ -127,11 +131,12 @@
             <View
                 android:layout_width="1dp"
                 android:layout_height="30dp"
-                android:background="@color/colorAccent" />
+                android:background="@color/greyTravelTypeDivider" />
 
             <ImageView
                 tools:ignore="ContentDescription"
                 android:id="@+id/csIcon"
+                android:scaleType="center"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginEnd="6dp"
