@@ -164,9 +164,12 @@ class MenuActivity : AppCompatActivity(),
                     USER_PROFILE_SCREEN -> return MyProfileFragment()
                     SEARCH_MAP_SCREEN -> return MapFragment()
                     AIR_SUCCES_SCREEN -> {
-
-                        var name: String = getNameFromFligths(data as List<Fligths>)
-                        var date: String = getDateFromFligths(data as List<Fligths>)
+                        var name: String = ""
+                        var date: String = ""
+                        if (data is List<*>) {
+                            name = getNameFromFligths(data as List<Fligths>)
+                            date = getDateFromFligths(data as List<Fligths>)
+                        }
                         return AirSuccesfullFragment.newInstance(name, date)
                     }
                     USER_SINHRONIZED_SCREEN -> return AppInTheAirSinchronizedFragment()
@@ -266,7 +269,8 @@ class MenuActivity : AppCompatActivity(),
                         loginService.getMyTrips().enqueue(object : Callback<AirUser?> {
                             override fun onResponse(call: Call<AirUser?>?, response: Response<AirUser?>?) {
                                 viewModel?.updateFeatureTrips(response?.body(), FirebaseAuth.getInstance().currentUser?.uid.toString())
-                                navigator.applyCommand(Replace(Screens.AIR_SUCCES_SCREEN, response?.body()?.data?.trips?.get(0)?.flights))
+                                if (response?.body() != null)
+                                    navigator.applyCommand(Replace(Screens.AIR_SUCCES_SCREEN, response?.body()?.data?.trips?.get(0)?.flights))
                             }
 
                             override fun onFailure(call: Call<AirUser?>?, t: Throwable?) {

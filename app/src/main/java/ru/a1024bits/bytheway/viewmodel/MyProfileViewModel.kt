@@ -122,21 +122,22 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
     fun updateFeatureTrips(body: AirUser?, uid: String) {
         val map = HashMap<String, Any>()
         val currentTime = System.currentTimeMillis()
-        for (flight in body?.data?.trips?.get(0)?.flights!!) {
-            Log.d("LOG", (flight.departureUtc.toLong().toString() + " " + currentTime / 1000 + " " + (flight.departureLocale.toLong() > currentTime)))
-            if (flight.departureUtc.toLong() > currentTime / 1000) {
-                val listCities = arrayListOf<String>()
-                listCities.add(flight.origin.name)
-                listCities.add(flight.destination.name)
-                val listDates = arrayListOf<Long>()
-                listDates.add(flight.departureUtc.toLong())
-                listDates.add(flight.arrivalUtc.toLong())
-                map.put("cities", listCities)
-                map.put("countTrip", 1)
-                map.put("dates", listDates)
-                break
+        if (body?.data?.trips?.get(0)?.flights != null)
+            for (flight in body?.data?.trips?.get(0)?.flights) {
+                Log.d("LOG", (flight.departureUtc.toLong().toString() + " " + currentTime / 1000 + " " + (flight.departureLocale.toLong() > currentTime)))
+                if (flight.departureUtc.toLong() > currentTime / 1000) {
+                    val listCities = arrayListOf<String>()
+                    listCities.add(flight.origin.name)
+                    listCities.add(flight.destination.name)
+                    val listDates = arrayListOf<Long>()
+                    listDates.add(flight.departureUtc.toLong())
+                    listDates.add(flight.arrivalUtc.toLong())
+                    map.put("cities", listCities)
+                    map.put("countTrip", 1)
+                    map.put("dates", listDates)
+                    break
+                }
             }
-        }
         sendUserData(map, uid)
 
         Log.e("LOG name", "" + body?.data?.trips?.get(0)?.flights?.get(0)?.arrivalUtc)
