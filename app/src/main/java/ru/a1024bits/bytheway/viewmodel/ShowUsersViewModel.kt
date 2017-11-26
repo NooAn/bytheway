@@ -70,8 +70,8 @@ class ShowUsersViewModel @Inject constructor(var userRepository: UserRepository)
             user.socialNetwork = document.data.getValue("socialNetwork") as ArrayList<SocialNetwork>
         if (document.data.containsKey("method"))
             user.method = document.data.getValue("method") as ArrayList<Method>
-        if (document.data.containsKey("route"))
-            user.route = document.data.getValue("route") as ArrayList<String>
+//        if (document.data.containsKey("route"))
+//            user.route = document.data.getValue("route") as ArrayList<String>
         if (document.data.containsKey("cities"))
             user.cities = document.data.getValue("cities") as ArrayList<String>
         if (document.data.containsKey("urlPhoto"))
