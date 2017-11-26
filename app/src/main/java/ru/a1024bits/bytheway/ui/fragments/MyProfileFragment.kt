@@ -29,9 +29,10 @@ import ru.a1024bits.bytheway.model.SocialNetwork
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
-import javax.inject.Inject
-import java.util.Date
 import java.text.SimpleDateFormat
+import java.util.Date
+import javax.inject.Inject
+import kotlin.collections.HashMap
 
 
 class MyProfileFragment : Fragment(), OnMapReadyCallback {
@@ -173,7 +174,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
     }
 
     fun fillAgeSex(userAge: Long, userSex: Int) {
-        var gender = when (userSex) {
+        val gender = when (userSex) {
             1 -> "М"
             2 -> "Ж"
             else -> {
@@ -401,13 +402,13 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
                 sex = 2
             } else sex = 0
 
-            age = ageChoose.getText().toString().toLong()
+            age = ageChoose.text.toString().toLong()
             fillAgeSex(age, sex)
-            name = nameChoose?.getText().toString()
+            name = nameChoose.text.toString()
 
-            lastName = lastNameChoose?.getText().toString()
+            lastName = lastNameChoose.text.toString()
             username.text = StringBuilder(name).append(" ").append(lastName)
-            city = cityChoose?.getText().toString()
+            city = cityChoose.text.toString()
             cityview.text = (city)
             sendUserInfoToServer()
         })
@@ -436,9 +437,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
 
     fun onButtonPressed() {
-        if (mListener != null) {
-            mListener!!.onFragmentInteraction()
-        }
+        mListener?.onFragmentInteraction()
     }
 
     override fun onAttach(context: Context?) {

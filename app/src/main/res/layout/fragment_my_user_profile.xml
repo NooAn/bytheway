@@ -142,6 +142,81 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/travelledStatistics"
+            android:layout_below="@+id/socnetwork"
+            android:layout_marginBottom="25dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <RelativeLayout
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content">
+                <TextView
+                    tools:text="60"
+                    android:id="@+id/travelledCountries"
+                    android:textSize="20sp"
+                    android:textColor="@color/mdtp_dark_gray"
+                    android:drawablePadding="6dp"
+                    android:drawableStart="@drawable/ic_country"
+                    android:layout_centerHorizontal="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:text="стран"
+                    android:layout_below="@+id/travelledCountries"
+                    android:layout_centerHorizontal="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </RelativeLayout>
+
+            <!-- Flight hours -->
+            <RelativeLayout
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content">
+                <TextView
+                    tools:text="45"
+                    android:id="@+id/flightHours"
+                    android:textSize="20sp"
+                    android:textColor="@color/mdtp_dark_gray"
+                    android:drawablePadding="6dp"
+                    android:drawableStart="@drawable/ic_flight_time"
+                    android:layout_centerHorizontal="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:text="часов в полете"
+                    android:layout_below="@+id/flightHours"
+                    android:layout_centerHorizontal="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </RelativeLayout>
+
+            <!-- Flight hours -->
+            <RelativeLayout
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content">
+                <TextView
+                    tools:text="1480"
+                    android:id="@+id/flightDistance"
+                    android:textSize="20sp"
+                    android:textColor="@color/mdtp_dark_gray"
+                    android:drawablePadding="6dp"
+                    android:drawableStart="@drawable/ic_flight_distance"
+                    android:layout_centerHorizontal="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:text="км над землей"
+                    android:layout_below="@+id/flightDistance"
+                    android:layout_centerHorizontal="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </RelativeLayout>
+        </LinearLayout>
+
         <include
             android:id="@+id/add_new_trip"
             layout="@layout/profile_add_trip"

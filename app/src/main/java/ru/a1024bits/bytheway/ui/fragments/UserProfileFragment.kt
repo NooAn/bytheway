@@ -1,10 +1,10 @@
 package ru.a1024bits.bytheway.ui.fragments
 
-import android.arch.lifecycle.LifecycleFragment
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,7 +16,7 @@ import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.viewmodel.UserProfileViewModel
 
 
-class UserProfileFragment : LifecycleFragment(), OnMapReadyCallback {
+class UserProfileFragment : Fragment(), OnMapReadyCallback {
 
     private var viewModel: UserProfileViewModel? = null
 
@@ -58,7 +58,7 @@ class UserProfileFragment : LifecycleFragment(), OnMapReadyCallback {
     private var googleMap: GoogleMap? = null
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater!!.inflate(R.layout.fragment_user_profile, container, false)
+        val view = inflater?.inflate(R.layout.fragment_user_profile, container, false)
 
         mMapView = view?.findViewById<MapView>(R.id.mapView)
         mMapView?.onCreate(savedInstanceState)
@@ -81,7 +81,7 @@ class UserProfileFragment : LifecycleFragment(), OnMapReadyCallback {
         // create marker
         val marker = MarkerOptions().position(
                 LatLng(latitude, longitude)).title("Hello Maps")
-        return view;
+        return view
     }
 
     private fun settingsSocialNetworkButtons() {

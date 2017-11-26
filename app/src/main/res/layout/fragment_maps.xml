@@ -56,6 +56,7 @@
         android:orientation="horizontal">
 
         <Button
+            android:id="@+id/buttonSaveTravelInfo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="4dp"
@@ -69,6 +70,7 @@
             android:theme="@style/WhiteButton" />
 
         <Button
+            android:id="@+id/buttonSearch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="4dp"
