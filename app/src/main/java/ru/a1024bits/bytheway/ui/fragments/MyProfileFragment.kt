@@ -290,12 +290,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         })
 
         view.findViewById<ImageView>(R.id.directions_car).setOnClickListener({
-
-
-
             if (Method.CAR in methods){
-
-
+                
                 directions_car.setImageResource(R.drawable.ic_directions_car_grey)
                 methods.remove(Method.CAR)
             } else {
@@ -308,6 +304,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
         view.findViewById<ImageView>(R.id.directions_railway).setOnClickListener({
             if (Method.TRAIN in methods){
+
 
                 directions_railway.setImageResource(R.drawable.ic_directions_railway_grey)
                 methods.remove(Method.TRAIN)
