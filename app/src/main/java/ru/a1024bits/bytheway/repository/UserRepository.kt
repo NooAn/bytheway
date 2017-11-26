@@ -3,10 +3,7 @@ package ru.a1024bits.bytheway.repository
 import android.arch.lifecycle.Observer
 import android.util.Log
 import com.google.android.gms.tasks.Task
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FirebaseFirestoreException
-import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.*
 import ru.a1024bits.bytheway.model.User
 import javax.inject.Inject
 
