@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 /**
  * Created by x220 on 26.11.2017.
  */
-data class AirUser(val error: String, val status: String, val data: Data)
+data class AirUser(val error: String = "0", val status: String = "ok", val data: Data)
 
 data class Data(val id: String, @SerializedName("last_year_kilometers") val lastYearKm: String,
                 val flights: List<Fligths>, val hours: String,

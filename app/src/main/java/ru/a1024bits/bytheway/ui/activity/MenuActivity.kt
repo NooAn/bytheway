@@ -1,5 +1,7 @@
 package ru.a1024bits.bytheway.ui.activity
 
+import android.arch.lifecycle.ViewModelProvider
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -45,6 +47,7 @@ import ru.a1024bits.bytheway.router.Screens.Companion.USER_PROFILE_SCREEN
 import ru.a1024bits.bytheway.router.Screens.Companion.USER_SINHRONIZED_SCREEN
 import ru.a1024bits.bytheway.ui.fragments.*
 import ru.a1024bits.bytheway.util.ServiceGenerator
+import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.android.SupportFragmentNavigator
 import ru.terrakok.cicerone.commands.Command
@@ -71,6 +74,9 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     lateinit var navigatorHolder: NavigatorHolder;
     private var glide: RequestManager? = null
     var mainUser: User? = null
+
+    private var viewModel: MyProfileViewModel? = null
+    @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -119,6 +125,8 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 .addApi(Places.PLACE_DETECTION_API)
                 .enableAutoManage(this, this)
                 .build()
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
+
     }
 
     private fun isFirstEnter(): Boolean {
@@ -217,13 +225,14 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         Log.e("LOGI", " ${accessToken?.accessToken} ${accessToken?.getTokenType()}")
                         saveToken(accessToken)
                         val loginService = generator.createService(AirWebService::class.java, accessToken?.getTokenType() + " " + accessToken?.accessToken);
-                        loginService.getUserProfile().enqueue(object: Callback<AirUser?> {
+                        loginService.getUserProfile().enqueue(object : Callback<AirUser?> {
                             override fun onFailure(call: Call<AirUser?>?, t: Throwable?) {
                                 Log.e("LOGI", "fail", t)
                             }
 
                             override fun onResponse(call: Call<AirUser?>?, response: Response<AirUser?>?) {
-                                Log.e("LOGI",response?.message().toString())
+                                Log.e("LOGI", response?.message().toString())
+                                viewModel?.updateStaticalInfo(response?.body()!!, FirebaseAuth.getInstance().currentUser?.uid.toString())
                             }
                         })
                         navigator.applyCommand(Replace(Screens.AIR_SUCCES_SCREEN, 1))

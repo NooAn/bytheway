@@ -9,8 +9,7 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import ru.a1024bits.bytheway.model.SocialNetwork
-import ru.a1024bits.bytheway.model.User
+import ru.a1024bits.bytheway.model.*
 import ru.a1024bits.bytheway.repository.COLLECTION_USERS
 import ru.a1024bits.bytheway.repository.UserRepository
 import javax.inject.Inject
@@ -101,5 +100,20 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                     Log.e("LOG", "ok send user")
                     //fixme
                 }
+    }
+
+    fun updateStaticalInfo(airUser: AirUser, id: String) {
+        Log.d("LOG", "update statical")
+        val hash = HashMap<String, Any>()
+        hash.put("hours", airUser.data.hours)
+        val set = HashSet<String>()
+        airUser.data.airports.forEachIndexed({ index, airports ->
+            set.add(airports.country)
+        })
+        hash.put("countries", set.size)
+        hash.put("kilometers", airUser.data.kilometers)
+//        var airInfo = AirInfo(airUser.data.hours, set.size.toString(), airUser.data.kilometers)
+//        hash.put("airInfo", airInfo)
+        sendUserData(hash, id)
     }
 }
