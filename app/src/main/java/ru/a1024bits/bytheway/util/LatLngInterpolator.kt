@@ -66,7 +66,6 @@ interface LatLngInterpolator {
 
         private fun findArctg(lat1: Double, lat2: Double, lon1: Double, lon2: Double) : Double {
             val arctg = Math.atan( (lat2-lat1) / (lon2-lon1) )
-            println("fraction: lat = ${lat2-lat1} / lon = ${lon2 - lon1}; arctg = $arctg")
             return Math.toDegrees(arctg)
         }
 
