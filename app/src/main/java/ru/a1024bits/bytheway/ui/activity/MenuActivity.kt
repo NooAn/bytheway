@@ -33,6 +33,7 @@ import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.AccessToken
 import ru.a1024bits.bytheway.model.AirUser
+import ru.a1024bits.bytheway.model.Fligths
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.router.Screens
@@ -50,6 +51,8 @@ import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.android.SupportFragmentNavigator
 import ru.terrakok.cicerone.commands.Command
 import ru.terrakok.cicerone.commands.Replace
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.inject.Inject
 
 class MenuActivity : AppCompatActivity(),
@@ -89,7 +92,6 @@ class MenuActivity : AppCompatActivity(),
 
         setContentView(R.layout.activity_menu)
 
-        markFirstEnter()
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -118,8 +120,9 @@ class MenuActivity : AppCompatActivity(),
         // how make name and city!!?
 
         if (savedInstanceState == null) {
-            if (true) {
+            if (preferences.getBoolean(Constants.FIRST_ENTER, true)) {
                 navigator.applyCommand(Replace(Screens.USER_SINHRONIZED_SCREEN, 1))
+                markFirstEnter()
             } else
                 navigator.applyCommand(Replace(Screens.USER_PROFILE_SCREEN, 1))
         } else {
@@ -160,7 +163,12 @@ class MenuActivity : AppCompatActivity(),
                 when (screenKey) {
                     USER_PROFILE_SCREEN -> return MyProfileFragment()
                     SEARCH_MAP_SCREEN -> return MapFragment()
-                    AIR_SUCCES_SCREEN -> return AirSuccesfullFragment()
+                    AIR_SUCCES_SCREEN -> {
+
+                        var name: String = getNameFromFligths(data as List<Fligths>)
+                        var date: String = getDateFromFligths(data as List<Fligths>)
+                        return AirSuccesfullFragment.newInstance(name, date)
+                    }
                     USER_SINHRONIZED_SCREEN -> return AppInTheAirSinchronizedFragment()
                     ALL_USERS_SCREEN -> return AllUsersFragment.newInstance()
                     SIMILAR_TRAVELS_SCREEN -> return SimilarTravelsFragment.newInstance()
@@ -180,6 +188,29 @@ class MenuActivity : AppCompatActivity(),
             super.applyCommand(command)
             Log.e("LOG command", command.toString())
         }
+    }
+
+    private fun getNameFromFligths(list: List<Fligths>): String {
+        val currentTime = System.currentTimeMillis() / 1000
+        for (flight in list) {
+            if (flight.departureUtc.toLong() > currentTime) {
+                return flight.origin.country + ", " + flight.origin.name + " \n" + flight.destination.country + ", " + flight.destination.name
+            }
+        }
+        return "0"
+    }
+
+    private fun getDateFromFligths(list: List<Fligths>): String {
+        val currentTime = System.currentTimeMillis() / 1000
+        for (flight in list) {
+            if (flight.departureUtc.toLong() > currentTime) {
+                val formatter = SimpleDateFormat("dd MMM yyyy")
+                val calendar = Calendar.getInstance()
+                calendar.timeInMillis = flight.departureUtc.toLong() * 1000
+                return formatter.format(calendar.getTime())
+            }
+        }
+        return "0"
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
@@ -232,16 +263,16 @@ class MenuActivity : AppCompatActivity(),
                                 viewModel?.updateStaticalInfo(response?.body(), FirebaseAuth.getInstance().currentUser?.uid.toString())
                             }
                         })
-                        loginService.getMyTrips().enqueue(object: Callback<AirUser?> {
+                        loginService.getMyTrips().enqueue(object : Callback<AirUser?> {
                             override fun onResponse(call: Call<AirUser?>?, response: Response<AirUser?>?) {
                                 viewModel?.updateFeatureTrips(response?.body(), FirebaseAuth.getInstance().currentUser?.uid.toString())
+                                navigator.applyCommand(Replace(Screens.AIR_SUCCES_SCREEN, response?.body()?.data?.trips?.get(0)?.flights))
                             }
 
                             override fun onFailure(call: Call<AirUser?>?, t: Throwable?) {
                                 Log.e("LOGI", "fail", t)
                             }
                         })
-                        navigator.applyCommand(Replace(Screens.AIR_SUCCES_SCREEN, 1))
                     }
                 })
 

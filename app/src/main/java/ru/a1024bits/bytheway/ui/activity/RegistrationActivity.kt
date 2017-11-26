@@ -26,53 +26,49 @@ import javax.inject.Inject
 
 class RegistrationActivity : LifecycleActivity(), GoogleApiClient.OnConnectionFailedListener {
     override fun onConnectionFailed(p0: ConnectionResult) {
-    
+
     }
-    
-    
+
+
     private var viewModel: MyProfileViewModel? = null
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
-    
+
     private val RC_SIGN_IN = 9001
     private val mAuth = FirebaseAuth.getInstance();
     private var mGoogleApiClient: GoogleApiClient? = null
-    
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_registration)
+        setContentView(R.layout.activity_splash)
         App.component.inject(this)
-        
+
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(resources.getString(R.string.default_web_client_id))
                 .requestId()
                 .requestEmail()
                 .build()
-        
+
         mGoogleApiClient = GoogleApiClient.Builder(this)
                 .enableAutoManage(this /* Activity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build()
-        
+
         Log.e("LOG", mAuth?.currentUser.toString())
-        
-        signInButton.setSize(SignInButton.SIZE_STANDARD)
-        signInButton.setOnClickListener({
-            signIn()
-        })
-        
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
+        signIn()
+
     }
-    
+
     private fun signIn() {
         val signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient)
         startActivityForResult(signInIntent, RC_SIGN_IN)
     }
-    
+
     override fun onStart() {
         super.onStart()
     }
-    
-    
+
+
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == RC_SIGN_IN) {
@@ -80,7 +76,7 @@ class RegistrationActivity : LifecycleActivity(), GoogleApiClient.OnConnectionFa
             handleSignInResult(result)
         }
     }
-    
+
     private fun handleSignInResult(result: GoogleSignInResult) {
         if (result.isSuccess) {
             // Signed in successfully, show authenticated UI.
@@ -94,12 +90,12 @@ class RegistrationActivity : LifecycleActivity(), GoogleApiClient.OnConnectionFa
             updateUI(false)
         }
     }
-    
+
     private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount) {
         Log.d("LOG", "firebaseAuthWithGoogle: ${acct.id}  ${acct.idToken}")
-        
+
         val credential = GoogleAuthProvider.getCredential(acct.idToken, null)
-        
+
         mAuth?.signInWithCredential(credential)
                 ?.addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
@@ -114,7 +110,7 @@ class RegistrationActivity : LifecycleActivity(), GoogleApiClient.OnConnectionFa
                     }
                 }
     }
-    
+
     private fun updateUI(signedIn: Boolean) {
         if (signedIn) {
             Log.e("LOG2", mAuth?.currentUser?.photoUrl.toString())
@@ -132,6 +128,6 @@ class RegistrationActivity : LifecycleActivity(), GoogleApiClient.OnConnectionFa
             Toast.makeText(this, "Not allowed Google", Toast.LENGTH_SHORT).show()
         }
     }
-    
-    
+
+
 }
