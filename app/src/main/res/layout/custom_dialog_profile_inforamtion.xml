@@ -31,11 +31,21 @@
 
     <TextView
         android:id="@+id/dialog_year"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:hint="Год рождения"
+        android:text="Год рождения"
         app:layout_constraintBottom_toTopOf="@+id/sex" />
+
+    <Spinner
+        android:id="@+id/years"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="2dp"
+        app:layout_constraintStart_toEndOf="@+id/dialog_year"
+        app:layout_constraintTop_toBottomOf="@+id/dialog_city"/>
 
 
     <RadioGroup
@@ -71,6 +81,8 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_begin="20dp" />
+
+
 
 
 </android.support.constraint.ConstraintLayout>

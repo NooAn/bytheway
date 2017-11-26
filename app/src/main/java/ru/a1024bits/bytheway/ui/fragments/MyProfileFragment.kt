@@ -19,6 +19,8 @@ import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.android.synthetic.main.custom_dialog_profile_inforamtion.*
+import kotlinx.android.synthetic.main.custom_dialog_profile_inforamtion.view.*
 import kotlinx.android.synthetic.main.fragment_my_user_profile.*
 import kotlinx.android.synthetic.main.profile_direction.*
 import kotlinx.android.synthetic.main.profile_main_image.*
@@ -32,10 +34,15 @@ import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import javax.inject.Inject
 import java.util.Date
 import java.text.SimpleDateFormat
+import java.util.Calendar
+
 
 
 class MyProfileFragment : Fragment(), OnMapReadyCallback {
+
     private var viewModel: MyProfileViewModel? = null
+
+
     private var mListener: OnFragmentInteractionListener? = null
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
 
@@ -66,6 +73,10 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
     private var budget: Long = 0 // default const
 
     private var glide: RequestManager? = null
+
+    private var yearNow:Int=0
+
+    private var yearsArr:ArrayList<Int> = arrayListOf()
 
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -113,6 +124,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         }
 
         fillAgeSex(user.age, user.sex)
+        age=user.age
 
         glide?.load(user.urlPhoto)
                 ?.apply(RequestOptions.circleCropTransform())
@@ -384,8 +396,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         lastNameChoose.setText(lastName)
         val cityChoose = dialogView.findViewById<View>(R.id.dialog_city) as EditText
         cityChoose.setText(city)
-        val ageChoose = dialogView.findViewById<View>(R.id.dialog_year) as EditText
-        ageChoose.setText(age.toString())
+       /* val yearChoose = dialogView.findViewById<View>(R.id.years) as Spinner*/
+
         val man = dialogView.findViewById<RadioButton>(R.id.man)
 
         val woman = dialogView.findViewById<RadioButton>(R.id.woman)
@@ -402,7 +414,31 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             } else if (woman.isChecked) {
                 sex = 2
             } else sex = 0
-            age = ageChoose.getText().toString().toLong()
+
+          val calendar=Calendar.getInstance()
+            yearNow=calendar.get(Calendar.YEAR)
+
+            for (i in 1920..yearNow){
+                yearsArr.add(i)
+            }
+
+
+            var yearsAdapter =ArrayAdapter<Int>(dialogView.context,android.R.layout.simple_spinner_item, yearsArr)
+
+            yearsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            years.adapter=yearsAdapter
+            years.setSelection(1920+age.toInt())
+            years.onItemSelectedListener = object: AdapterView.OnItemSelectedListener{
+                override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                    val selectedItem = parent.getItemAtPosition(position).toString().toLong()
+                  age=(yearNow-selectedItem)
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>) {
+
+                }
+            }
+
             fillAgeSex(age, sex)
             Log.e("LOG", "выбранный пол:$sex ")
             name = nameChoose?.getText().toString()
@@ -420,6 +456,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         })
         simpleAlert.show()
     }
+
 
     private fun openDialog(socialNetwork: SocialNetwork) {
         val simpleAlert = AlertDialog.Builder(activity).create()
@@ -534,3 +571,5 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         return hashMap
     }
 }
+
+
