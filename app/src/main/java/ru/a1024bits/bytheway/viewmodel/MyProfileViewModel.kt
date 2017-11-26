@@ -87,6 +87,7 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
     }
 
     fun sendUserData(map: HashMap<String, Any>, id: String) {
+        Log.e("LOG map:", map.toString())
         userRepository.changeUserProfile(map, id)
                 .addOnCompleteListener {
                     //fixme
@@ -121,20 +122,19 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
     fun updateFeatureTrips(body: AirUser?, uid: String) {
         val map = HashMap<String, Any>()
         val currentTime = System.currentTimeMillis()
-        body?.data?.trips?.get(0)?.flights?.let { flights ->
-            for (flight in flights) {
-                if (flight.departureLocale.toLong() > currentTime) {
-                    val listCities = arrayListOf<String>()
-                    listCities.add(flight.origin.country_full)
-                    listCities.add(flight.destination.country_full)
-                    val listDates = arrayListOf<Long>()
-                    listDates.add(flight.departureUtc.toLong())
-                    listDates.add(flight.departureLocale)
-                    map.set("cities", listCities)
-                    map.set("countTrip", 1)
-                    map.set("dates", listDates)
-                    break
-                }
+        for (flight in body?.data?.trips?.get(0)?.flights!!) {
+            Log.d("LOG", (flight.departureUtc.toLong().toString() + " " + currentTime / 1000 + " " + (flight.departureLocale.toLong() > currentTime)))
+            if (flight.departureUtc.toLong() > currentTime / 1000) {
+                val listCities = arrayListOf<String>()
+                listCities.add(flight.origin.name)
+                listCities.add(flight.destination.name)
+                val listDates = arrayListOf<Long>()
+                listDates.add(flight.departureUtc.toLong())
+                listDates.add(flight.arrivalUtc.toLong())
+                map.put("cities", listCities)
+                map.put("countTrip", 1)
+                map.put("dates", listDates)
+                break
             }
         }
         sendUserData(map, uid)

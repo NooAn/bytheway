@@ -63,23 +63,28 @@
         android:layout_marginTop="24dp"
         android:background="@color/colorPrimary" />
 
+
     <TextView
         android:id="@+id/city_from_air"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:layout_marginEnd="24dp"
+        android:layout_marginStart="24dp"
         android:layout_marginTop="24dp"
+        android:textAlignment="center"
         android:textSize="16sp"
         android:textStyle="bold"
         tools:text="@string/exampleCity" />
 
     <TextView
+        android:id="@+id/date_air_go"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="31 мая 2017"
         android:textAlignment="center"
-        android:textSize="13sp" />
+        android:textSize="13sp"
+        tools:text="31 мая 2017" />
 
     <RelativeLayout
         android:layout_width="wrap_content"

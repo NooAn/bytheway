@@ -7,7 +7,7 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import kotlinx.android.synthetic.main.fragment_app_in_the_air_sinchronized.*
+import kotlinx.android.synthetic.main.fragment_air_succesfull.*
 
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
@@ -37,6 +37,11 @@ class AirSuccesfullFragment : Fragment() {
             //return in menu
             (activity as MenuActivity).navigator.applyCommand(Replace(Screens.MY_PROFILE_SCREEN, 1))
         }
+        if (arguments != null) {
+            city_from_air.text = arguments.getString(NAME);
+            date_air_go.text = arguments.getString(DATE);
+        }
+
     }
 
     fun onButtonPressed(uri: Uri) {
@@ -60,14 +65,14 @@ class AirSuccesfullFragment : Fragment() {
 
 
     companion object {
-        private val ARG_PARAM1 = "param1"
-        private val ARG_PARAM2 = "param2"
+        private val NAME = "name_city"
+        private val DATE = "date_trip"
 
-        fun newInstance(): AirSuccesfullFragment {
+        fun newInstance(name: String, date: String): AirSuccesfullFragment {
             val fragment = AirSuccesfullFragment()
             val args = Bundle()
-//            args.putString(ARG_PARAM1, param1)
-//            args.putString(ARG_PARAM2, param2)
+            args.putString(NAME, name)
+            args.putString(DATE, date)
             fragment.arguments = args
             return fragment
         }

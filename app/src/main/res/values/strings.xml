@@ -65,7 +65,7 @@
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="air_next_profile">Перейти в профиль</string>
-    <string name="text_air_succesful_add">Ваши поездки успешно добавлены! </string>
+    <string name="text_air_succesful_add">Ваши поездки успешно добавлены !</string>
     <string name="exampleCity">Берлин - Москва</string>
 
     <string name="travelCar">Машина</string>
