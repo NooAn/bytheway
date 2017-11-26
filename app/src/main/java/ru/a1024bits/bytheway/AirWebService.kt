@@ -6,6 +6,7 @@ import retrofit2.Response
 import retrofit2.http.*
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.model.AccessToken
+import ru.a1024bits.bytheway.model.AirUser
 
 
 interface AirWebService {
@@ -19,7 +20,7 @@ interface AirWebService {
             @Query("redirect_uri") uri: String): Call<AccessToken>
 
     @GET("/api/v1/me")
-    fun getUserProfile(): List<User>
+    fun getUserProfile(): Call<AirUser>
 
 
 }

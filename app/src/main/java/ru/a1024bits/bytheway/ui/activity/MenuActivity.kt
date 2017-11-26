@@ -32,6 +32,7 @@ import ru.a1024bits.bytheway.AirWebService
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.AccessToken
+import ru.a1024bits.bytheway.model.AirUser
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.router.Screens
@@ -215,6 +216,16 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         val accessToken = response?.body()
                         Log.e("LOGI", " ${accessToken?.accessToken} ${accessToken?.getTokenType()}")
                         saveToken(accessToken)
+                        val loginService = generator.createService(AirWebService::class.java, accessToken?.getTokenType() + " " + accessToken?.accessToken);
+                        loginService.getUserProfile().enqueue(object: Callback<AirUser?> {
+                            override fun onFailure(call: Call<AirUser?>?, t: Throwable?) {
+                                Log.e("LOGI", "fail", t)
+                            }
+
+                            override fun onResponse(call: Call<AirUser?>?, response: Response<AirUser?>?) {
+                                Log.e("LOGI",response?.message().toString())
+                            }
+                        })
                         navigator.applyCommand(Replace(Screens.AIR_SUCCES_SCREEN, 1))
                     }
                 })
@@ -222,7 +233,6 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             } else if (uri.getQueryParameter("error") != null) {
                 // show an error message here
                 Log.e("LOGI:", "error: ${uri.getQueryParameter("error")}")
-
             }
         }
     }
