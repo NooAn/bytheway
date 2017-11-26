@@ -60,9 +60,9 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                         // Пользователя нет в системе, добавляем.
                         userRepository.addUser(User().apply {
                             val list = currentUser?.displayName?.split(" ")
-                            name = list?.get(0).toString()
-                            lastName = list?.get(1).toString()
-                            id = currentUser?.uid.toString()
+                            name = list?.get(0).orEmpty()
+                            lastName = list?.get(1).orEmpty()
+                            id = currentUser?.uid.orEmpty()
                             email = currentUser?.email.toString()
                             phone = currentUser?.phoneNumber.toString()
                             urlPhoto = currentUser?.photoUrl.toString()
