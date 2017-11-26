@@ -22,7 +22,7 @@ import ru.a1024bits.bytheway.util.API_BASE_URL
  * Created by x220 on 25.11.2017.
  */
 const val clientId = "38fee1c0-7e1b-4afc-9413-8fe0e1986df8"
-const val clientSecret = "WrqxeV6i-8wRvxxlWXVlYNWy!NZrX3ArWGv*wmftaQ_pkV*8Cn!0.3fou539f)ZwiF8\\$*7IM.UufrNZ-UWgB"
+const val clientSecret = "WrqxeV6i-8wRvxxlWXVlYNWy!NZrX3ArWGv*wmftaQ_pkV*8Cn!0.3fou539f)ZwiF8\$*7IM.UufrNZ-UWgB"
 const val redirectUri = "https://www.appintheair.mobi/blank"
 
 class AppInTheAirSinchronizedFragment : Fragment() {
@@ -56,7 +56,7 @@ class AppInTheAirSinchronizedFragment : Fragment() {
     private fun login() {
         val intent = Intent(
                 Intent.ACTION_VIEW,
-                Uri.parse(API_BASE_URL + "/oauth/authorize" + "?client_id=" + clientId + "&redirect_uri=" + redirectUri +"&response_type=code&scope=user_info" ))
+                Uri.parse(API_BASE_URL + "/oauth/authorize" + "?client_id=" + clientId + "&redirect_uri=" + redirectUri +"&response_type=code&scope=user_info%20user_flights%20user_email" ))
         startActivity(intent)
     }
 }

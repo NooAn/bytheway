@@ -1,5 +1,7 @@
 package ru.a1024bits.bytheway.ui.activity
 
+import android.arch.lifecycle.ViewModelProvider
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
 import android.support.design.widget.NavigationView
@@ -23,6 +25,7 @@ import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.places.Places
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
+import com.google.gson.reflect.TypeToken
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -30,6 +33,7 @@ import ru.a1024bits.bytheway.AirWebService
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.AccessToken
+import ru.a1024bits.bytheway.model.AirUser
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.UserRepository
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
@@ -43,6 +47,7 @@ import ru.a1024bits.bytheway.router.Screens.Companion.USER_SINHRONIZED_SCREEN
 import ru.a1024bits.bytheway.ui.fragments.*
 import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.util.ServiceGenerator
+import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.android.SupportFragmentNavigator
 import ru.terrakok.cicerone.commands.Command
@@ -76,6 +81,9 @@ class MenuActivity : AppCompatActivity(),
 
     private var glide: RequestManager? = null
     var mainUser: User? = null
+
+    private var viewModel: MyProfileViewModel? = null
+    @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -126,6 +134,8 @@ class MenuActivity : AppCompatActivity(),
                 .addApi(Places.PLACE_DETECTION_API)
                 .enableAutoManage(this, this)
                 .build()
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
+
     }
 
     private fun markFirstEnter() = preferences.edit()
@@ -201,9 +211,10 @@ class MenuActivity : AppCompatActivity(),
                 // get access token
                 // we'll do that in a minute
                 val generator = ServiceGenerator()
-                val loginService = generator.createService(AirWebService::class.java, clientId, clientSecret);
-                val call = loginService.getAccessToken(code, clientId, clientSecret, redirectUri,
-                        "authorization_code,refresh_token,client_credentials");
+                val loginService = generator.createService(AirWebService::class.java);
+                val call = loginService.getAccessToken(code, clientId, clientSecret,
+                        "authorization_code",
+                        redirectUri)
                 call.enqueue(object : Callback<AccessToken?> {
                     override fun onFailure(call: Call<AccessToken?>?, t: Throwable?) {
                         Log.e("LOG", "on Fail")
@@ -212,6 +223,27 @@ class MenuActivity : AppCompatActivity(),
                     override fun onResponse(call: Call<AccessToken?>?, response: Response<AccessToken?>?) {
                         val accessToken = response?.body()
                         Log.e("LOGI", " ${accessToken?.accessToken} ${accessToken?.getTokenType()}")
+                        saveToken(accessToken)
+                        val loginService = generator.createService(AirWebService::class.java, accessToken?.getTokenType() + " " + accessToken?.accessToken);
+                        loginService.getUserProfile().enqueue(object : Callback<AirUser?> {
+                            override fun onFailure(call: Call<AirUser?>?, t: Throwable?) {
+                                Log.e("LOGI", "fail", t)
+                            }
+
+                            override fun onResponse(call: Call<AirUser?>?, response: Response<AirUser?>?) {
+                                Log.e("LOGI", response?.message().toString())
+                                viewModel?.updateStaticalInfo(response?.body(), FirebaseAuth.getInstance().currentUser?.uid.toString())
+                            }
+                        })
+                        loginService.getMyTrips().enqueue(object: Callback<AirUser?> {
+                            override fun onResponse(call: Call<AirUser?>?, response: Response<AirUser?>?) {
+                                viewModel?.updateFeatureTrips(response?.body(), FirebaseAuth.getInstance().currentUser?.uid.toString())
+                            }
+
+                            override fun onFailure(call: Call<AirUser?>?, t: Throwable?) {
+                                Log.e("LOGI", "fail", t)
+                            }
+                        })
                         navigator.applyCommand(Replace(Screens.AIR_SUCCES_SCREEN, 1))
                     }
                 })
@@ -219,10 +251,27 @@ class MenuActivity : AppCompatActivity(),
             } else if (uri.getQueryParameter("error") != null) {
                 // show an error message here
                 Log.e("LOGI:", "error: ${uri.getQueryParameter("error")}")
-
             }
         }
     }
+
+    val APP_PREFERENCES = "string_save"
+
+    val ACCESS_TOKEN = "access_t"
+    val REFRESH_TOKEN = "refresh_t"
+    val TYPE_TOKEN = "type_t"
+
+    private fun saveToken(accessToken: AccessToken?) {
+        val sharePreferences = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE)
+        sharePreferences.edit().putString(REFRESH_TOKEN, accessToken?.refresToken).apply()
+        sharePreferences.edit().putString(ACCESS_TOKEN, accessToken?.accessToken).apply()
+        sharePreferences.edit().putString(TYPE_TOKEN, accessToken?.getTokenType()).apply()
+    }
+
+    fun getAccessToken(): String = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE).getString(ACCESS_TOKEN, "")
+    fun getTypeToken(): String = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE).getString(TYPE_TOKEN, "")
+    fun getRefreshToken(): String = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE).getString(REFRESH_TOKEN, "")
+
 
     override fun onPause() {
         super.onPause()

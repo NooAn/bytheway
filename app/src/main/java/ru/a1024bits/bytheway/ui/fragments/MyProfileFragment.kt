@@ -62,6 +62,12 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
     private var age: Long = 0
 
+    private var countries: Long = 0
+
+    private var hours: Long = 0
+
+    private var kilometers: Long = 0
+
     private var cities: ArrayList<String> = arrayListOf()
 
     private var budget: Long = 0 // default const
@@ -91,6 +97,16 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
         lastName = user.lastName
         name = user.name
+
+        if (user.flightHours == 0L) {
+            travelledStatistics.visibility = View.GONE
+        } else {
+            travelledStatistics.visibility = View.VISIBLE
+        }
+
+        travelledCountries.text = user.countries.toString()
+        flightHours.text = user.flightHours.toString()
+        flightDistance.text = user.kilometers.toString()
 
         if (user.city.length > 0) {
             cityview.text = user.city
@@ -130,7 +146,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
                 ?.into(image_avatar)
 
         for (name in user.socialNetwork) {
-
+            socNet.add(name)
             when (name) {
                 SocialNetwork.VK -> vkIcon.setImageResource(R.drawable.ic_vk_color)
                 SocialNetwork.CS -> csIcon.setImageResource(R.drawable.ic_cs_color)
@@ -427,10 +443,12 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         val dialogView = inflater.inflate(R.layout.custom_dialog_profile_soc_network, null)
         simpleAlert.setView(dialogView)
         simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Сохранить", { dialogInterface, i ->
-            viewModel?.saveLinks(dialogView.findViewById<EditText>(R.id.socLinkText).text, socialNetwork, uid)
+            //  socNet.add(socialNetwork.apply { link = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString() })
+            socialNetwork.link = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString()
+            socNet.add(socialNetwork)
+            viewModel?.saveLinks(socNet, uid)
         })
         simpleAlert.show()
-        socNet.add(socialNetwork)
     }
 
 
@@ -525,7 +543,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         hashMap.set("city", city)
         hashMap.set("cities", cities)
         hashMap.set("method", methods)
-        hashMap.set("socNet", socNet)
+        // hashMap.set("socNet", socNet)
         hashMap.set("dates", dates)
         hashMap.set("budget", budget)
         hashMap.set("addInformation", add_info_user.text.toString())

@@ -146,6 +146,8 @@
             android:id="@+id/travelledStatistics"
             android:layout_below="@+id/socnetwork"
             android:layout_marginBottom="25dp"
+            android:visibility="gone"
+            tools:visibility="visible"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <RelativeLayout
@@ -170,7 +172,7 @@
                     android:layout_height="wrap_content" />
             </RelativeLayout>
 
-            <!-- Flight hours -->
+            <!-- FliflightHoursours -->
             <RelativeLayout
                 android:layout_weight="1"
                 android:layout_width="0dp"
@@ -193,7 +195,7 @@
                     android:layout_height="wrap_content" />
             </RelativeLayout>
 
-            <!-- Flight hours -->
+            <!-- FliflightHoursours -->
             <RelativeLayout
                 android:layout_weight="1"
                 android:layout_width="0dp"
