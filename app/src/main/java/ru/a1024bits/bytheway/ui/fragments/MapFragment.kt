@@ -124,6 +124,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             //send data to Firebase
             routeString?.let { route -> viewModel?.sendUserData(getHashMapUser(route), uid) }
         }
+
+        buttonSearch.setOnClickListener {
+            goFlyPlan()
+        }
     }
 
 
@@ -140,8 +144,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     fun goFlyPlan() {
-        val endLocation = LatLng(32.0, 10.0) // Whatever origin coordinates
-        val fromLocation = LatLng(22.00, 10.00)
+        if(points.size < 2) return
+
+        val fromLocation = points.valueAt(0).position
+        val endLocation = points.valueAt(1).position
 
         val markerOptions = MarkerOptions().position(fromLocation).anchor(0.5F, 1.0F).flat(true)
 
@@ -161,7 +167,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val d = (Math.abs(endLocation.latitude) - Math.abs(fromLocation.latitude)) / 2
         val c = (Math.abs(endLocation.longitude) - Math.abs(fromLocation.longitude)) / 2
 
-        val point2: LatLng
+        val lat1 = fromLocation.latitude
+        val lat2 = endLocation.latitude
+
+        val lon1 = fromLocation.longitude
+        val lon2 = endLocation.longitude
+
+        /*val point2: LatLng
         val point3: LatLng
 
         if (Math.abs(c) > Math.abs(d)) {
@@ -170,12 +182,54 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         } else {
             point2 = LatLng(endLocation.latitude - d, endLocation.longitude + d * (3 / d))
             point3 = LatLng(fromLocation.latitude + d, fromLocation.longitude - d * (3 / d))
-        }
+        }*/
+
+        val angle = findArctg(lat1, lat2, lon1, lon2)
+        //val angle = 90.0
+        val module = module(lat1, lat2, lon1, lon2)
+
+        println("module = $module")
+
+        val latCentral = (lat2+lat1)/2
+        val lonCentral = (lon2+lon1)/2
+
+        val latTop = latCentral + module / 8
+        val lonTop = lonCentral
+
+        val latBottom = latCentral - module / 8
+        val lonBottom = lonCentral
+
+        val rotatedTop = rotatePoint(lonTop, latTop, lonCentral, latCentral, -angle)
+        val rotatedBottom = rotatePoint(lonBottom, latBottom, lonCentral, latCentral, -angle)
+
+        val point2 = LatLng(rotatedTop[1], rotatedTop[0])
+        val point3 = LatLng(rotatedBottom[1], rotatedBottom[0])
+
         Log.i("LOG", point3.toString())
         Log.i("LOG", point2.toString())
 
         mMap?.addMarker(MarkerOptions().position(point2).title("point2"))
         mMap?.addMarker(MarkerOptions().position(point3).title("point3"))
+    }
+
+    //lat = y
+    //lon = x
+
+    private fun findArctg(lat1: Double, lat2: Double, lon1: Double, lon2: Double) : Double {
+        val arctg = Math.atan( (lat2-lat1) / (lon2-lon1) )
+        println("fraction: lat = ${lat2-lat1} / lon = ${lon2 - lon1}; arctg = $arctg")
+        return Math.toDegrees(arctg)
+    }
+
+    /* Apply rotation matrix to the point(x,y) */
+    private fun rotatePoint(x: Double, y: Double, x0: Double, y0: Double, angle: Double) : Array<Double> {
+        val x1 = - (y - y0) * Math.sin(Math.toRadians(angle)) + Math.cos(Math.toRadians(angle)) * (x - x0) + x0
+        val y1 = (y - y0) * + Math.cos(Math.toRadians(angle)) + Math.sin(Math.toRadians(angle)) * (x - x0) + y0
+        return arrayOf(x1, y1)
+    }
+
+    private fun module(lat1: Double, lat2: Double, lon1: Double, lon2: Double) : Double {
+        return Math.sqrt((lat2-lat1)*(lat2-lat1) + (lon2-lon1)*(lon2-lon1))
     }
 
     var listPointPath: ArrayList<LatLng> = ArrayList()
