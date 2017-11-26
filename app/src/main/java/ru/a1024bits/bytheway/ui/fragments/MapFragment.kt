@@ -19,20 +19,27 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.fragment_maps.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import ru.a1024bits.aviaanimation.ui.util.LatLngInterpolator
 import ru.a1024bits.aviaanimation.ui.util.MarkerAnimation
 import ru.a1024bits.bytheway.App
+import ru.a1024bits.bytheway.MapWebService
 import ru.a1024bits.bytheway.R
+import ru.a1024bits.bytheway.model.map_directions.RoutesList
 import ru.a1024bits.bytheway.util.createMarker
-import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
+import ru.a1024bits.bytheway.util.toJsonString
+import ru.a1024bits.bytheway.viewmodel.MapViewModel
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 
 
 /**
- * Created by andrey.gusenkov on 30/09/2017.
+ * Created by andrey.gusenkov on 30/09/2017
  */
 class MapFragment : Fragment(), OnMapReadyCallback {
 
@@ -40,15 +47,26 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private var mMapView: MapView? = null
 
     private val points: ArrayMap<Int, MarkerOptions> by lazy { ArrayMap<Int, MarkerOptions>() }
+    private var routeString: String? = null
 
-    private var viewModel: MyProfileViewModel? = null
+    private var viewModel: MapViewModel? = null
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    private val uid: String by lazy { FirebaseAuth.getInstance().currentUser?.uid.orEmpty() }
+
+    /*private val mapService: MapWebService by lazy {
+        //val generator = ServiceGenerator()
+        //generator.createService(MapWebService::class.java)
+    }*/
+
+    @Inject lateinit var mapService: MapWebService
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         App.component.inject(this)
 
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
+        //todo: work with this
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(MapViewModel::class.java)
         viewModel?.load?.observe(this, android.arch.lifecycle.Observer {
             Log.e("LOG", "observer map fragment")
         })
@@ -57,13 +75,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater?.inflate(R.layout.fragment_maps, container, false)
 
-        collapsingToolbar?.setContentScrimColor(getResources().getColor(R.color.colorAccent))
+        collapsingToolbar?.setContentScrimColor(
+                ContextCompat.getColor(activity, R.color.colorAccent))
 
         mMapView = view?.findViewById<MapView>(R.id.map)
 
         mMapView?.onCreate(savedInstanceState)
-
-        mMapView?.onResume()
 
         try {
             MapsInitializer.initialize(activity.applicationContext)
@@ -102,6 +119,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 mapFragmentScrollView.scrollTo(0,0)
             }
         })
+
+        buttonSaveTravelInfo.setOnClickListener {
+            //send data to Firebase
+            routeString?.let { route -> viewModel?.sendUserData(getHashMapUser(route), uid) }
+        }
     }
 
 
@@ -109,11 +131,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         this.mMap = googleMap
-        val constLocation = LatLng(50.0, 50.0);
+        val constLocation = LatLng(50.0, 50.0)
 
-        mMap?.moveCamera(CameraUpdateFactory.newLatLng(constLocation));
+        mMap?.moveCamera(CameraUpdateFactory.newLatLng(constLocation))
 
-        mMap?.animateCamera(CameraUpdateFactory.zoomTo(3F));
+        mMap?.animateCamera(CameraUpdateFactory.zoomTo(3F))
 
     }
 
@@ -121,7 +143,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val endLocation = LatLng(32.0, 10.0) // Whatever origin coordinates
         val fromLocation = LatLng(22.00, 10.00)
 
-        val markerOptions = MarkerOptions().position(fromLocation).anchor(0.5F, 1.0F).flat(true);
+        val markerOptions = MarkerOptions().position(fromLocation).anchor(0.5F, 1.0F).flat(true)
 
 
         var t = 0.0
@@ -133,14 +155,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         // Changing marker icon
         markerOptions.icon(bitmapDescriptorFromVector(activity, R.drawable.plane)).rotation(getBearing(listPointPath.first(), listPointPath[1]))
 
-        marker = mMap?.addMarker(markerOptions);
+        marker = mMap?.addMarker(markerOptions)
         animateMarker()
         // - delete after
         val d = (Math.abs(endLocation.latitude) - Math.abs(fromLocation.latitude)) / 2
         val c = (Math.abs(endLocation.longitude) - Math.abs(fromLocation.longitude)) / 2
 
-        var point2: LatLng
-        var point3: LatLng
+        val point2: LatLng
+        val point3: LatLng
 
         if (Math.abs(c) > Math.abs(d)) {
             point2 = LatLng(endLocation.latitude + c * (3 / d), endLocation.longitude - c)
@@ -243,8 +265,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         //animate camera to show markers
         when (points.size) {
             1 -> mMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(points.valueAt(0).position,7F/* zoom level */))
-            else -> mMap?.animateCamera(CameraUpdateFactory.newLatLngBounds(createLatLngBounds(points),
-                    resources.getDimensionPixelSize(R.dimen.latLngBoundsPadding)))
+            else -> {
+                mMap?.animateCamera(CameraUpdateFactory.newLatLngBounds(createLatLngBounds(points),
+                        resources.getDimensionPixelSize(R.dimen.latLngBoundsPadding)))
+                obtainDirection()
+            }
         }
     }
 
@@ -254,26 +279,30 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         return builder.build()
     }
 
-    private fun getDirectionsUrl(origin: LatLng, dest: LatLng): String {
-
-        // Origin of route
-        val strOrigin = "origin=${origin.latitude},${origin.longitude}"
-
-        // Destination of route
-        val strDest = "destination=${dest.latitude},${dest.longitude}"
-
-        // Sensor enabled
-        val sensor = "sensor=false"
-
-        // Building the parameters to the web service
-        val parameters = "$strOrigin&$strDest&$sensor"
-
-        // Output format
-        val output = "json"
-
-        // Building the url to the web service
-
-        return "https://maps.googleapis.com/maps/api/directions/$output?$parameters"
+    fun getHashMapUser(route: String): HashMap<String, Any> {
+        val hashMap = HashMap<String, Any>()
+        hashMap.put("route", route)
+        return hashMap
     }
 
+    private fun obtainDirection() {
+        mapService.getDirections( hashMapOf(
+                "origin" to points.valueAt(0).position.toJsonString(),
+                "destination" to points.valueAt(1).position.toJsonString(),
+                "sensor" to "false")).enqueue(object: Callback<RoutesList?> {
+            override fun onResponse(call: Call<RoutesList?>?, response: Response<RoutesList?>?) {
+                response?.body()?.routes?.map {
+                    it.overviewPolyline?.encodedData?.let { routeString ->
+                        Log.w("myLogs", "uid: $uid; encoded direction route: $routeString")
+                        this@MapFragment.routeString = routeString
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<RoutesList?>?, t: Throwable?) {
+                t?.printStackTrace()
+                //todo show error
+            }
+        })
+    }
 }
