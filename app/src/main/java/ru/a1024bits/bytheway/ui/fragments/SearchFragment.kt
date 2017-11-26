@@ -81,6 +81,12 @@ class SearchFragment : Fragment() {
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        iconCar.setOnClickListener { with(travelCarText) { isActivated = !isActivated } }
+        iconTrain.setOnClickListener { with(travelTrainText) { isActivated = !isActivated } }
+        iconBus.setOnClickListener { with(travelBusText) { isActivated = !isActivated } }
+        iconPlane.setOnClickListener { with(travelPlaneText) { isActivated = !isActivated } }
+        iconHitchHicking.setOnClickListener { with(travelHitchHikingText) { isActivated = !isActivated } }
+
         text_from_city.setOnClickListener {
             sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM)
         }
