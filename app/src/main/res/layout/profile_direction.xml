@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_below="@+id/socnetwork"
+    android:layout_below="@+id/travelledStatistics"
     android:background="@color/colorPrimary"
     android:paddingBottom="32dp"
     android:paddingTop="32dp">
