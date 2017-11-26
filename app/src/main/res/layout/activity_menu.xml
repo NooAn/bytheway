@@ -5,7 +5,7 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/hint"
     android:fitsSystemWindows="true"
     tools:openDrawer="start">
 
@@ -20,7 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="#EEEEEE"
+        android:background="@color/hint"
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/nav_header_main"
         app:menu="@menu/activity_main_drawer">
@@ -30,14 +30,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:background="#EEEEEE"
+            android:background="@color/hint"
             android:drawablePadding="30dp"
             android:drawableStart="@drawable/ic_exit_to_app"
             android:gravity="center_vertical|start"
             android:paddingStart="16dp"
             android:stateListAnimator="@null"
-            android:textAllCaps="false"
-            android:text="@string/exit" />
+            android:text="@string/exit"
+            android:textAllCaps="false" />
 
     </android.support.design.widget.NavigationView>
 

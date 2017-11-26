@@ -9,8 +9,7 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import ru.a1024bits.bytheway.model.SocialNetwork
-import ru.a1024bits.bytheway.model.User
+import ru.a1024bits.bytheway.model.*
 import ru.a1024bits.bytheway.repository.COLLECTION_USERS
 import ru.a1024bits.bytheway.repository.UserRepository
 import javax.inject.Inject
@@ -36,15 +35,16 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
         Log.e("LOG", "end load user: $userId")
     }
 
-    fun saveLinks(textLinks: Editable, socNetwork: SocialNetwork, id: String) {
+    fun saveLinks(arraySocNetwork: List<SocialNetwork>, id: String) {
         val map: HashMap<String, Any> = hashMapOf()
-        map.put("link", socNetwork)
+        map.put("socialNetwork", arraySocNetwork)
         userRepository.changeUserProfile(map, id)
                 .addOnFailureListener {
                     error.value = 1
+                    Log.e("LOG", "fail link change ${it.message}", it)
                 }
                 .addOnCompleteListener {
-                    Log.e("LOG", "oncomplete")
+                    Log.e("LOG", "oncomplete link change")
                 }
     }
 
@@ -100,5 +100,45 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                     Log.e("LOG", "ok send user")
                     //fixme
                 }
+    }
+
+    fun updateStaticalInfo(airUser: AirUser?, id: String) {
+        Log.d("LOG", "update statical")
+        val map = HashMap<String, Any>()
+        map.put("flightHours", airUser?.data?.hours.toString())
+        val set = HashSet<String>()
+        airUser?.data?.airports?.forEachIndexed({ index, airports ->
+            set.add(airports.country)
+        })
+        map.put("countries", set.size)
+        map.put("kilometers", airUser?.data?.kilometers.toString())
+//        var airInfo = AirInfo(airUser.data.flightHours, set.size.toString(), airUser.data.kilometers)
+//        hash.put("airInfo", airInfo)
+
+        sendUserData(map, id)
+    }
+
+    fun updateFeatureTrips(body: AirUser?, uid: String) {
+        val map = HashMap<String, Any>()
+        val currentTime = System.currentTimeMillis()
+        body?.data?.trips?.get(0)?.flights?.let { flights ->
+            for (flight in flights) {
+                if (flight.departureLocale.toLong() > currentTime) {
+                    val listCities = arrayListOf<String>()
+                    listCities.add(flight.origin.country_full)
+                    listCities.add(flight.destination.country_full)
+                    val listDates = arrayListOf<Long>()
+                    listDates.add(flight.departureUtc.toLong())
+                    listDates.add(flight.departureLocale)
+                    map.set("cities", listCities)
+                    map.set("countTrip", 1)
+                    map.set("dates", listDates)
+                    break
+                }
+            }
+        }
+        sendUserData(map, uid)
+
+        Log.e("LOG name", "" + body?.data?.trips?.get(0)?.flights?.get(0)?.arrivalUtc)
     }
 }

@@ -25,7 +25,7 @@ class SplashActivity : Activity() {
 
         Log.e("LOG spalsh activity", currentUser.toString())
 
-        if (currentUser == null) {
+        if (currentUser != null) {
             startActivity(Intent(this, RegistrationActivity::class.java))
         } else {
             startActivity(Intent(this, MenuActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY))

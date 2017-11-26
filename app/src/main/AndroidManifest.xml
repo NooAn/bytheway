@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="ru.a1024bits.bytheway">
+    package="ru.a1024bits.bytheway">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name=".App"
@@ -12,22 +12,33 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
-        <activity android:name=".ui.activity.RegistrationActivity"/>
-        <activity android:name=".ui.activity.MenuActivity"/>
+        <activity android:name=".ui.activity.RegistrationActivity" />
+        <activity android:name=".ui.activity.MenuActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="www.appintheair.mobi"
+                    android:scheme="https" />
+            </intent-filter>
+        </activity>
 
         <activity
             android:name=".ui.activity.SplashActivity"
             android:label="@string/title_activity_menu">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDBqb2pdkfSx1ii31xwPsFf635j-cQB1tU"/>
+            android:value="AIzaSyDBqb2pdkfSx1ii31xwPsFf635j-cQB1tU" />
     </application>
 
 </manifest>

@@ -39,7 +39,8 @@
                 android:freezesText="true"
                 android:text="@string/city"
                 android:textAlignment="center"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                tools:text="Москва, Россия" />
 
             <TextView
                 android:id="@+id/sex_and_age"
@@ -51,7 +52,6 @@
                 android:textAlignment="center"
                 android:textSize="16sp" />
         </LinearLayout>
-
 
         <LinearLayout
             android:id="@+id/socnetwork"
@@ -65,6 +65,7 @@
             android:orientation="horizontal">
 
             <ImageView
+                tools:ignore="ContentDescription"
                 android:id="@+id/vkIcon"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -80,6 +81,7 @@
                 android:background="@color/colorAccent" />
 
             <ImageView
+                tools:ignore="ContentDescription"
                 android:id="@+id/whatsUpIcon"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -95,6 +97,7 @@
                 android:background="@color/colorAccent" />
 
             <ImageView
+                tools:ignore="ContentDescription"
                 android:id="@+id/tgIcon"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -111,6 +114,7 @@
                 android:background="@color/colorAccent" />
 
             <ImageView
+                tools:ignore="ContentDescription"
                 android:id="@+id/fbcon"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -126,6 +130,7 @@
                 android:background="@color/colorAccent" />
 
             <ImageView
+                tools:ignore="ContentDescription"
                 android:id="@+id/csIcon"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -137,10 +142,87 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/travelledStatistics"
+            android:layout_below="@+id/socnetwork"
+            android:layout_marginBottom="25dp"
+            android:visibility="gone"
+            tools:visibility="visible"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <RelativeLayout
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content">
+                <TextView
+                    tools:text="60"
+                    android:id="@+id/travelledCountries"
+                    android:textSize="20sp"
+                    android:textColor="@color/mdtp_dark_gray"
+                    android:drawablePadding="6dp"
+                    android:drawableStart="@drawable/ic_country"
+                    android:layout_centerHorizontal="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:text="стран"
+                    android:layout_below="@+id/travelledCountries"
+                    android:layout_centerHorizontal="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </RelativeLayout>
+
+            <!-- FliflightHoursours -->
+            <RelativeLayout
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content">
+                <TextView
+                    tools:text="45"
+                    android:id="@+id/flightHours"
+                    android:textSize="20sp"
+                    android:textColor="@color/mdtp_dark_gray"
+                    android:drawablePadding="6dp"
+                    android:drawableStart="@drawable/ic_flight_time"
+                    android:layout_centerHorizontal="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:text="часов в полете"
+                    android:layout_below="@+id/flightHours"
+                    android:layout_centerHorizontal="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </RelativeLayout>
+
+            <!-- FliflightHoursours -->
+            <RelativeLayout
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content">
+                <TextView
+                    tools:text="1480"
+                    android:id="@+id/flightDistance"
+                    android:textSize="20sp"
+                    android:textColor="@color/mdtp_dark_gray"
+                    android:drawablePadding="6dp"
+                    android:drawableStart="@drawable/ic_flight_distance"
+                    android:layout_centerHorizontal="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:text="км над землей"
+                    android:layout_below="@+id/flightDistance"
+                    android:layout_centerHorizontal="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </RelativeLayout>
+        </LinearLayout>
+
         <include
             android:id="@+id/add_new_trip"
             layout="@layout/profile_add_trip"
-            android:visibility="gone"
+            android:visibility="visible"
             tools:visibility="visible" />
 
         <include
@@ -201,6 +283,7 @@
             tools:visibility="visible">
 
             <ImageView
+                tools:ignore="ContentDescription"
                 android:id="@+id/directions_car"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -213,9 +296,10 @@
             <View
                 android:layout_width="1dp"
                 android:layout_height="30dp"
-                android:background="@color/colorAccent" />
+                android:background="@color/gray" />
 
             <ImageView
+                tools:ignore="ContentDescription"
                 android:id="@+id/directions_railway"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -228,9 +312,10 @@
             <View
                 android:layout_width="1dp"
                 android:layout_height="30dp"
-                android:background="@color/colorAccent" />
+                android:background="@color/gray" />
 
             <ImageView
+                tools:ignore="ContentDescription"
                 android:id="@+id/directions_bus"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -243,9 +328,10 @@
             <View
                 android:layout_width="1dp"
                 android:layout_height="30dp"
-                android:background="@color/colorAccent" />
+                android:background="@color/gray" />
 
             <ImageView
+                tools:ignore="ContentDescription"
                 android:id="@+id/directions_flight"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -258,9 +344,10 @@
             <View
                 android:layout_width="1dp"
                 android:layout_height="30dp"
-                android:background="@color/colorAccent" />
+                android:background="@color/gray" />
 
             <ImageView
+                tools:ignore="ContentDescription"
                 android:id="@+id/csIcon1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -298,8 +385,8 @@
                 android:layout_weight="1"
                 android:max="30"
                 android:progress="50"
-                android:progressTint="@color/colorLine"
-                android:thumbTint="@color/colorLine" />
+                android:progressTint="@color/colorPrimary"
+                android:thumbTint="@color/colorPrimary" />
 
             <TextView
                 android:id="@+id/display_price_travel"
@@ -307,7 +394,9 @@
                 android:layout_height="match_parent"
                 android:layout_marginStart="@dimen/margin_left_profile"
                 android:layout_marginTop="12dp"
-                android:text="@string/budget" />
+                android:drawableStart="@drawable/ic_rubles"
+                android:text="@string/budget"
+                android:textSize="16sp" />
 
         </LinearLayout>
 
@@ -333,7 +422,7 @@
                 android:id="@+id/add_info_user"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:backgroundTint="@color/colorLine"
+                android:backgroundTint="@color/colorPrimary"
                 android:hint="@string/description"
                 android:inputType="textMultiLine"
                 android:textSize="14sp" />

@@ -12,4 +12,11 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="margin_left_profile">16dp</dimen>
     <dimen name="size_user_avatar">70dp</dimen>
+
+    <dimen name="latLngBoundsPadding">52dp</dimen>
+
+    <dimen name="travelTypeHintTextSize">10sp</dimen>
+    <dimen name="travelTypeHintTextMarginBottom">10dp</dimen>
+    <dimen name="chooseDestinationLayoutHeight">185dp</dimen>
+    <dimen name="sinch_margin_left">16dp</dimen>
 </resources>
