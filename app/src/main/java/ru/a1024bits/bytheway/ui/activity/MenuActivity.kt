@@ -24,6 +24,7 @@ import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.places.Places
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
+import com.google.gson.reflect.TypeToken
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -201,9 +202,10 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 // get access token
                 // we'll do that in a minute
                 val generator = ServiceGenerator()
-                val loginService = generator.createService(AirWebService::class.java, clientId, clientSecret);
-                val call = loginService.getAccessToken(code, clientId, clientSecret, redirectUri,
-                        "authorization_code,refresh_token,client_credentials");
+                val loginService = generator.createService(AirWebService::class.java);
+                val call = loginService.getAccessToken(code, clientId, clientSecret,
+                        "authorization_code",
+                        redirectUri)
                 call.enqueue(object : Callback<AccessToken?> {
                     override fun onFailure(call: Call<AccessToken?>?, t: Throwable?) {
                         Log.e("LOG", "on Fail")
@@ -212,6 +214,7 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     override fun onResponse(call: Call<AccessToken?>?, response: Response<AccessToken?>?) {
                         val accessToken = response?.body()
                         Log.e("LOGI", " ${accessToken?.accessToken} ${accessToken?.getTokenType()}")
+                        saveToken(accessToken)
                         navigator.applyCommand(Replace(Screens.AIR_SUCCES_SCREEN, 1))
                     }
                 })
@@ -223,6 +226,24 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         }
     }
+
+    val APP_PREFERENCES = "string_save"
+
+    val ACCESS_TOKEN = "access_t"
+    val REFRESH_TOKEN = "refresh_t"
+    val TYPE_TOKEN = "type_t"
+
+    private fun saveToken(accessToken: AccessToken?) {
+        val sharePreferences = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE)
+        sharePreferences.edit().putString(REFRESH_TOKEN, accessToken?.refresToken).apply()
+        sharePreferences.edit().putString(ACCESS_TOKEN, accessToken?.accessToken).apply()
+        sharePreferences.edit().putString(TYPE_TOKEN, accessToken?.getTokenType()).apply()
+    }
+
+    fun getAccessToken(): String = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE).getString(ACCESS_TOKEN, "")
+    fun getTypeToken(): String = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE).getString(TYPE_TOKEN, "")
+    fun getRefreshToken(): String = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE).getString(REFRESH_TOKEN, "")
+
 
     override fun onPause() {
         super.onPause()

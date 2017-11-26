@@ -15,9 +15,9 @@ enum class Method {
     BOAT
 }
 
-enum class SocialNetwork(val link: String) {
-    VK(""),
-    WHATSAAP(""),
+enum class SocialNetwork(var link: String) {
+    VK("vkontakte"),
+    WHATSAAP("wh"),
     CS(""),
     FB(""),
     TG("")

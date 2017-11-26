@@ -34,7 +34,7 @@ class ServiceGenerator {
             return createService(serviceClass, authToken)
         }
 
-        return createService(serviceClass, null, null)
+        return createService(serviceClass, "")
     }
 
     fun <S> createService(
