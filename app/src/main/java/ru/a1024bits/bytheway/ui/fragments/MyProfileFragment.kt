@@ -112,10 +112,14 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             cityview.text = user.city
             city = user.city
         }
+        Log.e("LOGER", "" + user.countTrip)
 
         if (user.countTrip == 0) {
             showBlockAddTrip()
             hideBlockTravelInforamtion()
+        } else {
+            hideBlockNewTrip()
+            showBlockTravelInformation()
         }
 
         if (user.cities.size > 0) {
@@ -542,7 +546,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         hashMap.set("lastName", lastName)
         hashMap.set("city", city)
         hashMap.set("cities", cities)
-        hashMap.set("method", methods)
+      //  hashMap.set("method", methods)
         // hashMap.set("socNet", socNet)
         hashMap.set("dates", dates)
         hashMap.set("budget", budget)

@@ -37,7 +37,7 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
 
     fun saveLinks(arraySocNetwork: List<SocialNetwork>, id: String) {
         val map: HashMap<String, Any> = hashMapOf()
-        map.put("socialNetwork", arraySocNetwork)
+        // map.put("socialNetwork", arraySocNetwork) fixme
         userRepository.changeUserProfile(map, id)
                 .addOnFailureListener {
                     error.value = 1
@@ -106,13 +106,13 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
     fun updateStaticalInfo(airUser: AirUser?, id: String) {
         Log.d("LOG", "update statical")
         val map = HashMap<String, Any>()
-        map.put("flightHours", airUser?.data?.hours.toString())
+        map.put("flightHours", airUser?.data?.hours?.toLong() ?: 0)
         val set = HashSet<String>()
         airUser?.data?.airports?.forEachIndexed({ index, airports ->
             set.add(airports.country)
         })
         map.put("countries", set.size)
-        map.put("kilometers", airUser?.data?.kilometers.toString())
+        map.put("kilometers", airUser?.data?.kilometers?.toLong() ?: 0)
 //        var airInfo = AirInfo(airUser.data.flightHours, set.size.toString(), airUser.data.kilometers)
 //        hash.put("airInfo", airInfo)
 
