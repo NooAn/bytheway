@@ -6,16 +6,16 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="fullname">Andrey Petrov</string>
     <string name="datetrip">Дата</string>
-    <string name="type_money">Рублей: </string>
+    <string name="type_money"> </string>
     <string name="money">Бюджет поездки</string>
     <string name="description">Описание поездки</string>
-    <string name="city">Москва, Россия</string>
+    <string name="city">Родной город</string>
     <string name="drawer_item_map_search">Поиск попутчиков</string>
     <string name="drawer_item_profile">Профиль</string>
     <string name="title_activity_menu">bytheway</string>
 
     <string name="city_end">Пункт назначения</string>
-    <string name="name_button_search">Нажми нежно!</string>
+    <string name="name_button_search">Поиск попутчиков</string>
     <string name="city_start">Пункт отправления</string>
     <string name="title_section1">Section 1</string>
     <string name="title_section2">Section 2</string>
@@ -24,10 +24,10 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_example">Example action</string>
     <string name="action_settings">Settings</string>
-    <string name="city_from">Москва</string>
-    <string name="date_from">24 сентября</string>
-    <string name="city_to">Красноярск</string>
-    <string name="date_to">2 декабря</string>
+    <string name="city_from">Откуда</string>
+    <string name="date_from">Дата</string>
+    <string name="city_to">Куда</string>
+    <string name="date_to">Дата</string>
     <string name="date_trip">Дата путешествия</string>
     <string name="method_move">Способ передвижения</string>
     <string name="budget">1000 руб.</string>
@@ -41,6 +41,12 @@
     <string name="save">Сохранить</string>
     <string name="sex_and_age">Пол, возраст</string>
     <string name="add_new_trip">+ Создать поездку</string>
+    <string name="app_in_the_air">App in the Air</string>
+    <string name="personal_flight_assistant">Personal flight assistant</string>
+    <string name="app_sinchronized">Синхронизация с App in the Air</string>
+    <string name="text_sinch_app_air">Для автоматического создания поездок и быстрого поиска попутчиков мы можем добавить ваши рейсы  из приложения App in the Air.</string>
+    <string name="sinch_button">СИНХРОНИЗИРОВАТЬ</string>
+    <string name="miss">пропустить</string>
 
     <string-array name="months_array">
         <item>янв.</item>
@@ -56,4 +62,15 @@
         <item>ноя.</item>
         <item>дек.</item>
     </string-array>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="air_next_profile">Перейти в профиль</string>
+    <string name="text_air_succesful_add">Ваши поездки успешно добавлены !</string>
+    <string name="exampleCity">Берлин - Москва</string>
+
+    <string name="travelCar">Машина</string>
+    <string name="travelTrain">Поезд</string>
+    <string name="travelBus">Автобус</string>
+    <string name="travelPlane">Самолет</string>
+    <string name="travelHitchHicking">Автостоп</string>
 </resources>

@@ -7,7 +7,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="@color/hint"
         android:paddingEnd="6dp"
         android:paddingStart="6dp"
         tools:context="ru.a1024bits.bytheway.ui.fragments.UserProfileFragment">
@@ -60,44 +60,53 @@
             android:orientation="horizontal">
 
             <ImageView
+                tools:ignore="ContentDescription"
                 android:id="@+id/vkIcon"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:scaleType="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
                 android:src="@drawable/ic_vk_gray"/>
 
             <ImageView
+                tools:ignore="ContentDescription"
                 android:id="@+id/whatsUpIcon"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:scaleType="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
                 android:src="@drawable/ic_whats_icon_color"/>
 
             <ImageView
+                tools:ignore="ContentDescription"
                 android:id="@+id/tgIcon"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:scaleType="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
                 android:src="@drawable/ic_tg_color"/>
 
             <ImageView
+                tools:ignore="ContentDescription"
                 android:id="@+id/fbcon"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
                 android:src="@drawable/ic_fb_color"/>
 
             <ImageView
+                tools:ignore="ContentDescription"
                 android:id="@+id/csIcon"
-                android:layout_width="match_parent"
+                android:scaleType="center"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
@@ -129,6 +138,7 @@
             android:orientation="horizontal">
 
             <ImageView
+                tools:ignore="ContentDescription"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/common_google_signin_btn_icon_dark"/>
@@ -170,6 +180,7 @@
             android:orientation="horizontal">
 
             <ImageView
+                tools:ignore="ContentDescription"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/common_google_signin_btn_icon_dark"/>

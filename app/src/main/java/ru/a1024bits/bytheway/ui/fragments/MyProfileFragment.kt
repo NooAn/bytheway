@@ -31,10 +31,11 @@ import ru.a1024bits.bytheway.model.SocialNetwork
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
-import javax.inject.Inject
-import java.util.Date
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
+import javax.inject.Inject
+import kotlin.collections.HashMap
 
 
 
@@ -68,6 +69,12 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
     private var age: Long = 0
 
+    private var countries: Long = 0
+
+    private var hours: Long = 0
+
+    private var kilometers: Long = 0
+
     private var cities: ArrayList<String> = arrayListOf()
 
     private var budget: Long = 0 // default const
@@ -98,15 +105,38 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
     private fun fillProfile(user: User) {
         username.text = StringBuilder(user.name).append(" ").append(user.lastName)
-        if (user.city.length > 0) cityview.text = user.city
+
+        lastName = user.lastName
+        name = user.name
+
+        if (user.flightHours == 0L) {
+            travelledStatistics.visibility = View.GONE
+        } else {
+            travelledStatistics.visibility = View.VISIBLE
+        }
+
+        travelledCountries.text = user.countries.toString()
+        flightHours.text = user.flightHours.toString()
+        flightDistance.text = user.kilometers.toString()
+
+        if (user.city.length > 0) {
+            cityview.text = user.city
+            city = user.city
+        }
+        Log.e("LOGER", "" + user.countTrip)
+
         if (user.countTrip == 0) {
             showBlockAddTrip()
             hideBlockTravelInforamtion()
+        } else {
+            hideBlockNewTrip()
+            showBlockTravelInformation()
         }
+
         if (user.cities.size > 0) {
             val lastIndexArr = user.cities.size - 1
-            textCityFrom.text = user.cities.get(0)
-            textCityTo.text = user.cities.get(lastIndexArr)
+            textCityFrom.setText(user.cities.get(0))
+            textCityTo.setText(user.cities.get(lastIndexArr))
             cities.add(user.cities.get(0))
             cities.add(user.cities.get(lastIndexArr))
         }
@@ -117,8 +147,9 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             val lastIndexArr = user.dates.size - 1
             val dayBegin = formatDate.format(Date(user.dates.get(0)))
             val dayArrival = formatDate.format(Date(user.dates.get(lastIndexArr)))
-            textDateFrom.text = dayBegin
-            dateArrived.text = dayArrival
+            textDateFrom.setText(dayBegin)
+            dateArrived.setText(dayArrival)
+
             dates.add(user.dates.get(0))
             dates.add(user.dates.get(lastIndexArr))
         }
@@ -131,7 +162,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
                 ?.into(image_avatar)
 
         for (name in user.socialNetwork) {
-
+            socNet.add(name)
             when (name) {
                 SocialNetwork.VK -> vkIcon.setImageResource(R.drawable.ic_vk_color)
                 SocialNetwork.CS -> csIcon.setImageResource(R.drawable.ic_cs_color)
@@ -175,7 +206,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
     }
 
     fun fillAgeSex(userAge: Long, userSex: Int) {
-        var gender = when (userSex) {
+        val gender = when (userSex) {
             1 -> "М"
             2 -> "Ж"
             else -> {
@@ -242,7 +273,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(budget)
 
         view.findViewById<LinearLayout>(R.id.headerprofile).setOnClickListener({
-            openSettingDialog()
+            openInformationEditDialog()
         })
 
         view.findViewById<SeekBar>(R.id.choose_price_travel).setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -256,13 +287,14 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
             override fun onStopTrackingTouch(p0: SeekBar?) {
             }
-
         })
 
         view.findViewById<ImageView>(R.id.directions_car).setOnClickListener({
 
 
+
             if (Method.CAR in methods){
+
 
                 directions_car.setImageResource(R.drawable.ic_directions_car_grey)
                 methods.remove(Method.CAR)
@@ -385,10 +417,11 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         add_new_trip.visibility = View.GONE
     }
 
-    private fun openSettingDialog() {
+    private fun openInformationEditDialog() {
         val simpleAlert = AlertDialog.Builder(activity).create()
         val inflater = this.layoutInflater
         val dialogView = inflater.inflate(R.layout.custom_dialog_profile_inforamtion, null)
+
         simpleAlert.setView(dialogView)
         val nameChoose = dialogView.findViewById<View>(R.id.dialog_name) as EditText
         nameChoose.setText(name)
@@ -415,6 +448,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
                 sex = 2
             } else sex = 0
 
+
           val calendar=Calendar.getInstance()
             yearNow=calendar.get(Calendar.YEAR)
 
@@ -439,21 +473,22 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
                 }
             }
 
+
+
+
             fillAgeSex(age, sex)
-            Log.e("LOG", "выбранный пол:$sex ")
-            name = nameChoose?.getText().toString()
+            name = nameChoose.text.toString()
 
-            lastName = lastNameChoose?.getText().toString()
+            lastName = lastNameChoose.text.toString()
             username.text = StringBuilder(name).append(" ").append(lastName)
-            city = cityChoose?.getText().toString()
+            city = cityChoose.text.toString()
             cityview.text = (city)
-            Log.e("LOG", "выбранное имя:$name ...фамилия $lastName")
-
-
+            sendUserInfoToServer()
         })
         simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, "Отмена", { dialogInterface, i ->
-
+            simpleAlert.hide()
         })
+
         simpleAlert.show()
     }
 
@@ -466,17 +501,17 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         val dialogView = inflater.inflate(R.layout.custom_dialog_profile_soc_network, null)
         simpleAlert.setView(dialogView)
         simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Сохранить", { dialogInterface, i ->
-            viewModel?.saveLinks(dialogView.findViewById<EditText>(R.id.socLinkText).text, socialNetwork, uid)
+            //  socNet.add(socialNetwork.apply { link = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString() })
+            socialNetwork.link = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString()
+            socNet.add(socialNetwork)
+            viewModel?.saveLinks(socNet, uid)
         })
         simpleAlert.show()
-        socNet.add(socialNetwork)
     }
 
 
     fun onButtonPressed() {
-        if (mListener != null) {
-            mListener!!.onFragmentInteraction()
-        }
+        mListener?.onFragmentInteraction()
     }
 
     override fun onAttach(context: Context?) {
@@ -559,15 +594,14 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         hashMap.set("lastName", lastName)
         hashMap.set("city", city)
         hashMap.set("cities", cities)
-        hashMap.set("method", methods)
-        hashMap.set("socNet", socNet)
+      //  hashMap.set("method", methods)
+        // hashMap.set("socNet", socNet)
         hashMap.set("dates", dates)
         hashMap.set("budget", budget)
         hashMap.set("addInformation", add_info_user.text.toString())
         hashMap.set("sex", sex)
         hashMap.set("age", age)
         hashMap.put("countTrip", 1)
-        Log.e("LOG", hashMap.toString())
         return hashMap
     }
 }

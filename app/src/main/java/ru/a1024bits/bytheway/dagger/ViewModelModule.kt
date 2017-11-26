@@ -5,12 +5,13 @@ import android.arch.lifecycle.ViewModelProvider
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
+import ru.a1024bits.bytheway.viewmodel.MapViewModel
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import ru.a1024bits.bytheway.viewmodel.ShowUsersViewModel
 import ru.a1024bits.bytheway.viewmodel.ViewModelFactory
 
 /**
- * Created by andrey.gusenkov on 03/11/2017.
+ * Created by andrey.gusenkov on 03/11/2017
  */
 @Module
 abstract class ViewModelModule {
@@ -26,6 +27,12 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(MyProfileViewModel::class)
     abstract fun bindMyProfileViewModel(mainViewModel: MyProfileViewModel): ViewModel
+
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(MapViewModel::class)
+    abstract fun bindMapViewModel(mainViewModel: MapViewModel): ViewModel
     
     
     @Binds

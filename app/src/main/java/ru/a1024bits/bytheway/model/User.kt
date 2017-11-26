@@ -1,11 +1,5 @@
 package ru.a1024bits.bytheway.model
 
-
-/**
- * Created by andrey.gusenkov on 18/09/2017.
- *
- */
-
 enum class Method {
     TRAIN,
     BUS,
@@ -15,13 +9,15 @@ enum class Method {
     BOAT
 }
 
-enum class SocialNetwork(val link: String) {
-    VK(""),
-    WHATSAAP(""),
+enum class SocialNetwork(var link: String) {
+    VK("vkontakte"),
+    WHATSAAP("wh"),
     CS(""),
     FB(""),
     TG("")
 }
+
+data class AirInfo(var hours: String = "0", var countries: String = "0", var kilometers: String = "0")
 
 data class User(var name: String = "",
                 var lastName: String = "",
@@ -30,7 +26,11 @@ data class User(var name: String = "",
                 var email: String = "",
                 var phone: String = "",
                 var countTrip: Int = 0,
-                var route: ArrayList<String> = arrayListOf(),
+                var airInfo: AirInfo = AirInfo(),
+                var flightHours: Long = 0,
+                var countries: Long = 0,
+                var kilometers: Long = 0,
+                var route: String = "",//ArrayList<String> = arrayListOf(),
                 var cities: ArrayList<String> = arrayListOf(),
                 var method: ArrayList<Method> = arrayListOf(),
                 var dates: ArrayList<Long> = arrayListOf(),

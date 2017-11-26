@@ -29,13 +29,14 @@
         android:hint="Город"
         app:layout_constraintBottom_toTopOf="@+id/dialog_year" />
 
-    <TextView
+    <EditText
         android:id="@+id/dialog_year"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:text="Год рождения"
         app:layout_constraintBottom_toTopOf="@+id/sex" />
+
 
     <Spinner
         android:id="@+id/years"
@@ -54,7 +55,6 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.03"
@@ -81,8 +81,6 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_begin="20dp" />
-
-
 
 
 </android.support.constraint.ConstraintLayout>

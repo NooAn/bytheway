@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:focusableInTouchMode="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
@@ -8,50 +10,268 @@
 
     <TextView
         android:id="@+id/text_from_city"
+        android:textColor="@color/mdtp_dark_gray"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toStartOf="@+id/swap_cities"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="6dp"
         android:layout_toEndOf="@+id/startMarkerView"
+        android:layout_toStartOf="@+id/swap_cities"
+        android:layout_marginStart="34dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="8dp"
         android:background="@drawable/textlines"
-        android:drawableEnd="@drawable/ic_shape"
         android:hint="@string/city_start"
-        android:inputType="text|textAutoComplete|textCapSentences"
         android:textSize="16sp" />
 
 
     <ImageView
         android:id="@+id/startMarkerView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="18dp"
+        android:layout_height="76dp"
         android:layout_alignBottom="@+id/text_to_city"
         android:layout_alignParentStart="true"
         android:layout_alignTop="@+id/text_from_city"
-        android:padding="10dp"
-        android:src="@drawable/ic_point_one_2" />
-
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="22dp"
+        android:src="@drawable/ic_search_route_gps"
+        tools:ignore="ContentDescription" />
 
     <TextView
         android:id="@+id/text_to_city"
+        android:textColor="@color/mdtp_dark_gray"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/text_from_city"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="12dp"
         android:layout_toEndOf="@+id/startMarkerView"
         android:layout_toStartOf="@+id/swap_cities"
+        android:layout_marginStart="34dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="8dp"
         android:background="@drawable/textlines"
-        android:drawableEnd="@drawable/ic_shape"
         android:hint="@string/city_end"
         android:textSize="16sp" />
 
     <ImageButton
         android:id="@+id/swap_cities"
-        android:layout_width="16dp"
-        android:layout_height="16dp"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:layout_alignParentEnd="true"
         android:layout_below="@+id/text_from_city"
-        android:layout_marginStart="16dp"
-        android:background="@drawable/swap_cities"/>
+        android:layout_marginStart="28dp"
+        android:background="@drawable/swap_cities"
+        android:padding="12dp"
+        tools:ignore="ContentDescription" />
+
+    <LinearLayout
+        android:layout_below="@+id/text_to_city"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Budget -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/dateTitle"
+                android:text="Дата"
+                android:textSize="16sp"
+                android:layout_marginTop="22dp"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/midGrey"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/dateFromValue"
+                android:text="12 янв"
+                android:gravity="center_vertical"
+                android:drawableStart="@android:drawable/ic_menu_my_calendar"
+                android:layout_alignStart="@+id/budgetFromLayout"
+                android:layout_marginTop="18dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/dateToValue"
+                android:text="20 янв"
+                android:gravity="center_vertical"
+                android:drawableStart="@android:drawable/ic_menu_my_calendar"
+                android:layout_alignStart="@+id/budgetToLayout"
+                android:layout_marginTop="18dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/budgetTitle"
+                android:layout_below="@+id/dateTitle"
+                android:text="Бюджет"
+                android:textSize="16sp"
+                android:layout_marginTop="30dp"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/midGrey"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/budgetFromLayout"
+                android:layout_below="@+id/dateFromValue"
+                android:layout_toStartOf="@+id/budgetToLayout"
+                android:layout_marginEnd="35dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/budgetFromValue"
+                    android:hint="от"
+                    android:inputType="number"
+                    android:imeOptions="actionNext"
+                    android:minEms="4"
+                    android:maxEms="4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/budgetToLayout"
+                android:layout_below="@+id/dateToValue"
+                android:layout_alignParentEnd="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/budgetToValue"
+                    android:hint="до"
+                    android:inputType="number"
+                    android:imeOptions="actionDone"
+                    android:minEms="4"
+                    android:maxEms="4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </android.support.design.widget.TextInputLayout>
+
+        </RelativeLayout>
+        <!-- Travel types -->
+        <LinearLayout
+            android:layout_marginTop="26dp"
+            android:orientation="horizontal"
+            android:gravity="bottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <!-- Car -->
+            <RelativeLayout
+                android:id="@+id/iconCar"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/travelCarText"
+                    android:text="@string/travelCar"
+                    android:textSize="@dimen/travelTypeHintTextSize"
+                    android:gravity="center_horizontal"
+                    android:drawableTop="@drawable/ic_search_car_selector"
+                    android:drawablePadding="10dp"
+                    android:layout_marginTop="25dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+                <View
+                    android:background="@color/greyTravelTypeDivider"
+                    android:layout_width="2dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignBottom="@+id/travelCarText"
+                    android:layout_marginBottom="@dimen/travelTypeHintTextMarginBottom"
+                    android:layout_height="match_parent" />
+            </RelativeLayout>
+            <!-- Train -->
+            <RelativeLayout
+                android:id="@+id/iconTrain"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/travelTrainText"
+                    android:text="@string/travelTrain"
+                    android:textSize="@dimen/travelTypeHintTextSize"
+                    android:gravity="center_horizontal"
+                    android:drawableTop="@drawable/ic_search_train_selector"
+                    android:drawablePadding="10dp"
+                    android:layout_marginTop="25dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+                <View
+                    android:background="@color/greyTravelTypeDivider"
+                    android:layout_width="2dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignBottom="@+id/travelTrainText"
+                    android:layout_marginBottom="@dimen/travelTypeHintTextMarginBottom"
+                    android:layout_height="match_parent" />
+            </RelativeLayout>
+            <!-- Bus -->
+            <RelativeLayout
+                android:id="@+id/iconBus"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/travelBusText"
+                    android:text="@string/travelBus"
+                    android:textSize="@dimen/travelTypeHintTextSize"
+                    android:gravity="center_horizontal"
+                    android:drawableTop="@drawable/ic_search_bus_selector"
+                    android:drawablePadding="10dp"
+                    android:layout_marginTop="25dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+                <View
+                    android:background="@color/greyTravelTypeDivider"
+                    android:layout_width="2dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignBottom="@+id/travelBusText"
+                    android:layout_marginBottom="@dimen/travelTypeHintTextMarginBottom"
+                    android:layout_height="match_parent" />
+            </RelativeLayout>
+            <!-- Plane -->
+            <RelativeLayout
+                android:id="@+id/iconPlane"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/travelPlaneText"
+                    android:text="@string/travelPlane"
+                    android:textSize="@dimen/travelTypeHintTextSize"
+                    android:gravity="center_horizontal"
+                    android:drawableTop="@drawable/ic_search_plane_selector"
+                    android:drawablePadding="10dp"
+                    android:layout_marginTop="25dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+                <View
+                    android:background="@color/greyTravelTypeDivider"
+                    android:layout_width="2dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignBottom="@+id/travelPlaneText"
+                    android:layout_marginBottom="@dimen/travelTypeHintTextMarginBottom"
+                    android:layout_height="match_parent" />
+            </RelativeLayout>
+            <!-- Hitch hicking -->
+            <RelativeLayout
+                android:id="@+id/iconHitchHicking"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/travelHitchHikingText"
+                    android:text="@string/travelHitchHicking"
+                    android:textSize="@dimen/travelTypeHintTextSize"
+                    android:gravity="center_horizontal"
+                    android:drawableTop="@drawable/ic_search_hitch_hiking_selector"
+                    android:drawablePadding="10dp"
+                    android:layout_marginTop="25dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </RelativeLayout>
+        </LinearLayout>
+    </LinearLayout>
 
 </RelativeLayout>
