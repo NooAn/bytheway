@@ -74,4 +74,5 @@
     <string name="travelBus">Автобус</string>
     <string name="travelPlane">Самолет</string>
     <string name="travelHitchHicking">Автостоп</string>
+    <string name="feedback">Обратная связь</string>
 </resources>

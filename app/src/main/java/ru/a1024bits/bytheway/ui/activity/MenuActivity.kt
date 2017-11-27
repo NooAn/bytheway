@@ -302,7 +302,7 @@ class MenuActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.profile_item -> navigator.applyCommand(Replace(Screens.USER_PROFILE_SCREEN, 1))
             R.id.search_item -> navigator.applyCommand(Replace(Screens.SEARCH_MAP_SCREEN, 1))
             R.id.all_users_item -> navigator.applyCommand(Replace(Screens.ALL_USERS_SCREEN, 1))
-            R.id.similar_travel_item -> navigator.applyCommand(Replace(Screens.SIMILAR_TRAVELS_SCREEN, 1))
+//            R.id.similar_travel_item -> navigator.applyCommand(Replace(Screens.SIMILAR_TRAVELS_SCREEN, 1))
         }
 
         val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)

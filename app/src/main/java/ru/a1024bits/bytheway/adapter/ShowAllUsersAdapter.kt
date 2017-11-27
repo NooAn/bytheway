@@ -40,9 +40,7 @@ class ShowAllUsersAdapter(val context: Context) : RecyclerView.Adapter<ShowAllUs
         }
     }
 
-    override fun getItemCount(): Int {
-        return users.size
-    }
+    override fun getItemCount(): Int = users.size
 
     inner class UserViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         var name = view.findViewById<TextView>(R.id.name_content_user)

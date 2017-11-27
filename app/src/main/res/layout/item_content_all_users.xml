@@ -31,7 +31,7 @@
 
     <TextView
         android:id="@+id/text_city"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
@@ -40,8 +40,6 @@
         android:text="Киев, Украина"
         android:textColor="@android:color/black"
         android:textSize="12sp"
-        app:layout_constraintBottom_toBottomOf="@+id/user_avatar"
-        app:layout_constraintEnd_toEndOf="@+id/name_content_user"
         app:layout_constraintStart_toStartOf="@+id/name_content_user"
         app:layout_constraintTop_toBottomOf="@+id/name_content_user" />
 
