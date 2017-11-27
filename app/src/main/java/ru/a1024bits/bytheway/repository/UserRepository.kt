@@ -11,7 +11,7 @@ import javax.inject.Inject
 const val COLLECTION_USERS = "users"
 
 /**
- * Created by andrey.gusenkov on 19/09/2017.
+ * Created by andrey.gusenkov on 19/09/2017
  */
 class UserRepository @Inject constructor(val store: FirebaseFirestore) : IUsersRepository {
 
@@ -22,8 +22,8 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) : IUsersR
         Log.e("LOG", "init repos2")
     }
 
-    override fun getSimilarUsersTravels(data: Filter, observer: Observer<List<User>>): List<User> {
-        return arrayListOf()
+    override fun getSimilarUsersTravels(data: Filter, observer: Observer<List<User>>): Task<QuerySnapshot> {
+        return store.collection(COLLECTION_USERS).get()
     }
 
     //Rx wrapper
@@ -61,13 +61,13 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) : IUsersR
 
     override fun changeUserProfile(map: HashMap<String, Any>, id: String): Task<Void> {
         val documentRef = store.collection(COLLECTION_USERS).document(id);
-        return documentRef.update(map)
-//        return store.runTransaction(object : Transaction.Function<Void> {
-//            override fun apply(transaction: Transaction): Void? {
-//              //  map.put("timestamp", FieldValue.serverTimestamp());
-//                return null
-//            }
-//        })
+        return store.runTransaction(object : Transaction.Function<Void> {
+            override fun apply(transaction: Transaction): Void? {
+                map.put("timestamp", FieldValue.serverTimestamp());
+                documentRef.update(map)
+                return null
+            }
+        })
     }
 
 }

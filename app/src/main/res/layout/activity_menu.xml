@@ -5,7 +5,7 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/hint"
+    android:background="@color/white"
     android:fitsSystemWindows="true"
     tools:openDrawer="start">
 
@@ -27,8 +27,8 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_gravity="bottom"
             android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
             android:orientation="vertical">
 
             <Button
@@ -58,34 +58,6 @@
                 android:textAllCaps="false" />
 
         </LinearLayout>
-
-        <!--<Button-->
-            <!--android:id="@+id/feedback"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:background="@color/hint"-->
-            <!--android:drawablePadding="30dp"-->
-            <!--android:drawableStart="@drawable/ic_feedback"-->
-            <!--android:gravity="center_vertical|start"-->
-            <!--android:layout_gravity="bottom|clip_vertical"-->
-            <!--android:paddingStart="16dp"-->
-            <!--android:stateListAnimator="@null"-->
-            <!--android:text="@string/feedback"-->
-            <!--android:textAllCaps="false" />-->
-
-        <!--<Button-->
-            <!--android:id="@+id/sing_out"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_gravity="bottom"-->
-            <!--android:background="@color/hint"-->
-            <!--android:drawablePadding="30dp"-->
-            <!--android:drawableStart="@drawable/ic_exit_to_app"-->
-            <!--android:gravity="center_vertical|start"-->
-            <!--android:paddingStart="16dp"-->
-            <!--android:stateListAnimator="@null"-->
-            <!--android:text="@string/exit"-->
-            <!--android:textAllCaps="false" />-->
 
     </android.support.design.widget.NavigationView>
 

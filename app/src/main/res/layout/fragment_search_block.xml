@@ -155,6 +155,7 @@
         <LinearLayout
             android:layout_marginTop="26dp"
             android:orientation="horizontal"
+            android:gravity="bottom"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <!-- Car -->
@@ -168,7 +169,7 @@
                     android:text="@string/travelCar"
                     android:textSize="@dimen/travelTypeHintTextSize"
                     android:gravity="center_horizontal"
-                    android:drawableTop="@drawable/ic_car_grey"
+                    android:drawableTop="@drawable/ic_search_car_selector"
                     android:drawablePadding="10dp"
                     android:layout_marginTop="25dp"
                     android:layout_width="match_parent"
@@ -192,7 +193,7 @@
                     android:text="@string/travelTrain"
                     android:textSize="@dimen/travelTypeHintTextSize"
                     android:gravity="center_horizontal"
-                    android:drawableTop="@drawable/ic_train_grey"
+                    android:drawableTop="@drawable/ic_search_train_selector"
                     android:drawablePadding="10dp"
                     android:layout_marginTop="25dp"
                     android:layout_width="match_parent"
@@ -216,7 +217,7 @@
                     android:text="@string/travelBus"
                     android:textSize="@dimen/travelTypeHintTextSize"
                     android:gravity="center_horizontal"
-                    android:drawableTop="@drawable/ic_bus_grey"
+                    android:drawableTop="@drawable/ic_search_bus_selector"
                     android:drawablePadding="10dp"
                     android:layout_marginTop="25dp"
                     android:layout_width="match_parent"
@@ -240,7 +241,7 @@
                     android:text="@string/travelPlane"
                     android:textSize="@dimen/travelTypeHintTextSize"
                     android:gravity="center_horizontal"
-                    android:drawableTop="@drawable/ic_plane_grey"
+                    android:drawableTop="@drawable/ic_search_plane_selector"
                     android:drawablePadding="10dp"
                     android:layout_marginTop="25dp"
                     android:layout_width="match_parent"
@@ -260,11 +261,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content">
                 <TextView
-                    android:id="@+id/travelHitchHickingText"
+                    android:id="@+id/travelHitchHikingText"
                     android:text="@string/travelHitchHicking"
                     android:textSize="@dimen/travelTypeHintTextSize"
                     android:gravity="center_horizontal"
-                    android:drawableTop="@drawable/ic_hitch_hicking_grey"
+                    android:drawableTop="@drawable/ic_search_hitch_hiking_selector"
                     android:drawablePadding="10dp"
                     android:layout_marginTop="25dp"
                     android:layout_width="match_parent"

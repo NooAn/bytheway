@@ -30,9 +30,12 @@ import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.MapWebService
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.map_directions.RoutesList
+import ru.a1024bits.bytheway.router.Screens
+import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.a1024bits.bytheway.util.createMarker
 import ru.a1024bits.bytheway.util.toJsonString
 import ru.a1024bits.bytheway.viewmodel.MapViewModel
+import ru.terrakok.cicerone.commands.Replace
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
@@ -101,7 +104,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         appBarLayout.layoutParams = params
 
 
-        mapFragmentRoot.viewTreeObserver.addOnGlobalLayoutListener(object: ViewTreeObserver.OnGlobalLayoutListener {
+        mapFragmentRoot.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 mapFragmentRoot.viewTreeObserver.removeOnGlobalLayoutListener(this)
 
@@ -111,7 +114,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 mapParams.height = targetMapHeight
                 map.layoutParams = mapParams
 
-                mapFragmentScrollView.scrollTo(0,0)
+                mapFragmentScrollView.scrollTo(0, 0)
             }
         })
 
@@ -139,7 +142,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     fun goFlyPlan() {
-        if(points.size < 2) return
+        if (points.size < 2) return
 
         val fromLocation = points.valueAt(0).position
         val endLocation = points.valueAt(1).position
@@ -169,11 +172,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val angle = findArctg(lat1, lat2, lon1, lon2)
         val module = module(lat1, lat2, lon1, lon2)
 
-        println("angle = $angle")
-        println("module = $module")
-
-        val latCentral = (lat2+lat1)/2
-        val lonCentral = (lon2+lon1)/2
+        val latCentral = (lat2 + lat1) / 2
+        val lonCentral = (lon2 + lon1) / 2
 
         val latTop = latCentral + module / 4
         val lonTop = lonCentral
@@ -197,21 +197,20 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     //lat = y
     //lon = x
 
-    private fun findArctg(lat1: Double, lat2: Double, lon1: Double, lon2: Double) : Double {
-        val arctg = Math.atan( (lat2-lat1) / (lon2-lon1) )
-        println("fraction: lat = ${lat2-lat1} / lon = ${lon2 - lon1}; arctg = $arctg")
+    private fun findArctg(lat1: Double, lat2: Double, lon1: Double, lon2: Double): Double {
+        val arctg = Math.atan((lat2 - lat1) / (lon2 - lon1))
         return Math.toDegrees(arctg)
     }
 
     /* Apply rotation matrix to the point(x,y) */
-    private fun rotatePoint(x: Double, y: Double, x0: Double, y0: Double, angle: Double) : Array<Double> {
-        val x1 = - (y - y0) * Math.sin(angle) + Math.cos(angle) * (x - x0) + x0
-        val y1 = (y - y0) * + Math.cos(angle) + Math.sin(angle) * (x - x0) + y0
+    private fun rotatePoint(x: Double, y: Double, x0: Double, y0: Double, angle: Double): Array<Double> {
+        val x1 = -(y - y0) * Math.sin(angle) + Math.cos(angle) * (x - x0) + x0
+        val y1 = (y - y0) * +Math.cos(angle) + Math.sin(angle) * (x - x0) + y0
         return arrayOf(x1, y1)
     }
 
-    private fun module(lat1: Double, lat2: Double, lon1: Double, lon2: Double) : Double {
-        return Math.sqrt((lat2-lat1)*(lat2-lat1) + (lon2-lon1)*(lon2-lon1))
+    private fun module(lat1: Double, lat2: Double, lon1: Double, lon2: Double): Double {
+        return Math.sqrt((lat2 - lat1) * (lat2 - lat1) + (lon2 - lon1) * (lon2 - lon1))
     }
 
     var listPointPath: ArrayList<LatLng> = ArrayList()
@@ -247,7 +246,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         Log.e("LOG", "animate marker last and size: ${listPointPath.last()} ${listPointPath.size}")
         // Whatever destination coordinates
         if (markerAnimation.flag == false)
-            markerAnimation.animateMarker(marker, listPointPath.first(), listPointPath.last(), LatLngInterpolator.CurveBezie(), listPointPath)
+            markerAnimation.animateMarker(marker, listPointPath.first(), listPointPath.last(),
+                    LatLngInterpolator.CurveBezie(), listPointPath,
+
+                    onAnimationEnd = {
+                        (activity as MenuActivity).navigator
+                                .applyCommand(Replace(
+                                        Screens.SIMILAR_TRAVELS_SCREEN, 1))
+                    })
     }
 
     private fun initBoxInputFragment() {
@@ -300,7 +306,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         //animate camera to show markers
         when (points.size) {
-            1 -> mMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(points.valueAt(0).position,7F/* zoom level */))
+            1 -> mMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(points.valueAt(0).position, 7F/* zoom level */))
             else -> {
                 mMap?.animateCamera(CameraUpdateFactory.newLatLngBounds(createLatLngBounds(points),
                         resources.getDimensionPixelSize(R.dimen.latLngBoundsPadding)))
@@ -322,10 +328,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun obtainDirection() {
-        mapService.getDirections( hashMapOf(
+        mapService.getDirections(hashMapOf(
                 "origin" to points.valueAt(0).position.toJsonString(),
                 "destination" to points.valueAt(1).position.toJsonString(),
-                "sensor" to "false")).enqueue(object: Callback<RoutesList?> {
+                "sensor" to "false")).enqueue(object : Callback<RoutesList?> {
             override fun onResponse(call: Call<RoutesList?>?, response: Response<RoutesList?>?) {
                 response?.body()?.routes?.map {
                     it.overviewPolyline?.encodedData?.let { routeString ->
