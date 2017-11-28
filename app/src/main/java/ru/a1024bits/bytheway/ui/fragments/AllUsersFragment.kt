@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment
 import android.support.v7.widget.SearchView
 import android.util.Log
 import android.view.*
+import android.view.animation.AnimationUtils
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import kotlinx.android.synthetic.main.fragment_display_all_users.*
@@ -52,6 +53,8 @@ class AllUsersFragment : Fragment() {
             tempEndDate = savedInstanceState.getLong("tempEndDate")
             savedInstanceState.getSerializable("filter") as Filter
         } else Filter()
+
+
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
@@ -176,10 +179,18 @@ class AllUsersFragment : Fragment() {
         }
 
         searchParametersText.setOnClickListener {
+
+            val transOn= AnimationUtils.loadAnimation(context, R.anim.transition_on)
+
+            val transOut= AnimationUtils.loadAnimation(context, R.anim.transition_out)
             if (block_search_parameters.visibility == View.GONE) {
+                block_search_parameters.startAnimation(transOn)
                 block_search_parameters.visibility = View.VISIBLE
+
             } else {
+                block_search_parameters.startAnimation(transOut)
                 block_search_parameters.visibility = View.GONE
+
             }
         }
     }
@@ -187,6 +198,9 @@ class AllUsersFragment : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.all_users_menu, menu)
+        
+
+
 
         val searchView = menu.findItem(R.id.search_all_users_item).actionView as SearchView
         searchView.setSearchableInfo(
