@@ -141,6 +141,9 @@ class MenuActivity : AppCompatActivity(),
             FirebaseAuth.getInstance().signOut()
             finishAffinity()
         }
+
+
+
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
 
     }
