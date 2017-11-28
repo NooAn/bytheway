@@ -242,8 +242,6 @@ class MenuActivity : AppCompatActivity(),
             // use the parameter your API exposes for the code (mostly it's "code")
             val code = uri.getQueryParameter("code")
             if (code != null) {
-
-                Log.e("LOGI:", "code $code")
                 // get access token
                 // we'll do that in a minute
                 val generator = ServiceGenerator()

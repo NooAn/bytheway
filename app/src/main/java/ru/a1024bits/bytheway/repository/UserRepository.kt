@@ -60,6 +60,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) : IUsersR
     }
 
     override fun changeUserProfile(map: HashMap<String, Any>, id: String): Task<Void> {
+        Log.d("LOG", "change user profile send....");
         val documentRef = store.collection(COLLECTION_USERS).document(id);
         return store.runTransaction(object : Transaction.Function<Void> {
             override fun apply(transaction: Transaction): Void? {

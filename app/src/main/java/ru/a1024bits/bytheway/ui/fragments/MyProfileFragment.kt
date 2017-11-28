@@ -4,6 +4,8 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
@@ -334,26 +336,71 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             showBlockTravelInformation()
         }
         view.findViewById<ImageView>(R.id.vkIcon).setOnClickListener {
-            openDialog(SocialNetwork.VK)
-            vkIcon.setImageResource(R.drawable.ic_vk_color)
-
+            if (checkInSocialMethods(SocialNetwork.VK)) {
+                openDialog(SocialNetwork.VK)
+                vkIcon.setImageResource(R.drawable.ic_vk_gray)
+                socNet.remove(SocialNetwork.VK)
+            } else {
+                vkIcon.setImageResource(R.drawable.ic_vk_color)
+                socNet.add(SocialNetwork.VK)
+            }
+            saveSocialData()
+//            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://vk.com/"+linkUsers))
+//            startActivity(browserIntent) //for UserProfileFragment
         }
         view.findViewById<ImageView>(R.id.csIcon).setOnClickListener {
-            openDialog(SocialNetwork.CS)
-            csIcon.setImageResource(R.drawable.ic_cs_color)
+            if (checkInSocialMethods(SocialNetwork.CS)) {
+                openDialog(SocialNetwork.CS)
+                csIcon.setImageResource(R.drawable.ic_cs_grey)
+                socNet.remove(SocialNetwork.CS)
+            } else {
+                csIcon.setImageResource(R.drawable.ic_cs_color)
+                socNet.add(SocialNetwork.CS)
+            }
+            saveSocialData()
+
+//            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.couchsurfing.com/people/selcukatesoglu"))
+//            startActivity(browserIntent)// for UserProfileFragment
         }
         view.findViewById<ImageView>(R.id.whatsUpIcon).setOnClickListener({
-            openDialog(SocialNetwork.WHATSAAP)
-            whatsUpIcon.setImageResource(R.drawable.ic_whats_icon_color)
+            //            val browserIntent = Intent(Intent.ACTION_VIEW,
+//                    Uri.parse("whatsapp://send?text=Привет, я нашел тебя в ByTheWay.&phone=+number&abid=+number"))
+//            startActivity(browserIntent)// for UserProfileFragment
+
+            if (checkInSocialMethods(SocialNetwork.WHATSAAP)) {
+                openDialog(SocialNetwork.WHATSAAP)
+                whatsUpIcon.setImageResource(R.drawable.ic_whats_icon_grey)
+                socNet.remove(SocialNetwork.WHATSAAP)
+            } else {
+                whatsUpIcon.setImageResource(R.drawable.ic_whats_icon_color)
+                socNet.add(SocialNetwork.WHATSAAP)
+            }
+            saveSocialData()
+
         })
         view.findViewById<ImageView>(R.id.fbcon).setOnClickListener({
-            openDialog(SocialNetwork.FB)
-            fbcon.setImageResource(R.drawable.ic_fb_color)
+            if (checkInSocialMethods(SocialNetwork.FB)) {
+                openDialog(SocialNetwork.FB)
+                fbcon.setImageResource(R.drawable.ic_fb_grey)
+                socNet.remove(SocialNetwork.FB)
+            } else {
+                fbcon.setImageResource(R.drawable.ic_fb_color)
+                socNet.add(SocialNetwork.FB)
+            }
+            saveSocialData()
         })
         view.findViewById<ImageView>(R.id.tgIcon).setOnClickListener({
-            openDialog(SocialNetwork.TG)
-            tgIcon.setImageResource(R.drawable.ic_tg_color)
+            if (checkInSocialMethods(SocialNetwork.TG)) {
+                openDialog(SocialNetwork.TG)
+                tgIcon.setImageResource(R.drawable.tg_grey)
+                socNet.remove(SocialNetwork.TG)
+            } else {
+                tgIcon.setImageResource(R.drawable.ic_tg_color)
+                socNet.add(SocialNetwork.TG)
+            }
+            saveSocialData()
         })
+
         view.findViewById<Button>(R.id.button_save_travel_info).setOnClickListener({
             Log.e("LOG", "save travel")
             sendUserInfoToServer()
@@ -371,6 +418,14 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         mMapView?.getMapAsync(this)
         return view
     }
+
+    private fun saveSocialData() {
+        val map = HashMap<String, Any>()
+        map.put("socialNetwork", socNet)
+        //viewModel?.sendUserData(map, uid)
+    }
+
+    private fun checkInSocialMethods(value: SocialNetwork) = !(value in socNet)
 
     private fun sendUserInfoToServer() {
         viewModel?.sendUserData(getHashMapUser(), uid)
@@ -545,7 +600,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         hashMap.set("lastName", lastName)
         hashMap.set("city", city)
         hashMap.set("cities", cities)
-      //  hashMap.set("method", methods)
+        //  hashMap.set("method", methods)
         // hashMap.set("socNet", socNet)
         hashMap.set("dates", dates)
         hashMap.set("budget", budget)
