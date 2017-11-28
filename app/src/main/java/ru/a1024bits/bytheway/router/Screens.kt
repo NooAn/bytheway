@@ -9,10 +9,9 @@ class Screens {
         val USER_SINHRONIZED_SCREEN = "app_sich_screen"
         val MY_PROFILE_SCREEN = "user_profile_screen"
         val SEARCH_MAP_SCREEN = "start fragment screen"
-        val MAIN_ACTIVITY_SCREEN = "main fragment screen"
         val ALL_USERS_SCREEN = "all_users_screen"
         val SIMILAR_TRAVELS_SCREEN = "similar_travel_screen"
-        val LOGIN_APP_IN_THE_AIR = "login_app_in_the_air"
         val AIR_SUCCES_SCREEN = "air_succes_screen"
+        val FEEDBACK_SCREEN = "feedback_screen"
     }
 }

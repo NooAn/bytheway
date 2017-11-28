@@ -455,7 +455,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         simpleAlert.show()
     }
 
-
     fun onButtonPressed() {
         mListener?.onFragmentInteraction()
     }
