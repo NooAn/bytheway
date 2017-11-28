@@ -19,8 +19,6 @@ import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.android.synthetic.main.custom_dialog_profile_inforamtion.*
-import kotlinx.android.synthetic.main.custom_dialog_profile_inforamtion.view.*
 import kotlinx.android.synthetic.main.fragment_my_user_profile.*
 import kotlinx.android.synthetic.main.profile_direction.*
 import kotlinx.android.synthetic.main.profile_main_image.*
@@ -36,7 +34,6 @@ import java.util.Calendar
 import java.util.Date
 import javax.inject.Inject
 import kotlin.collections.HashMap
-
 
 
 class MyProfileFragment : Fragment(), OnMapReadyCallback {
@@ -81,9 +78,9 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
     private var glide: RequestManager? = null
 
-    private var yearNow:Int=0
+    private var yearNow: Int = 0
 
-    private var yearsArr:ArrayList<Int> = arrayListOf()
+    private var yearsArr: ArrayList<Int> = arrayListOf()
 
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -155,7 +152,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         }
 
         fillAgeSex(user.age, user.sex)
-        age=user.age
+        age = user.age
 
         glide?.load(user.urlPhoto)
                 ?.apply(RequestOptions.circleCropTransform())
@@ -290,7 +287,9 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         })
 
         view.findViewById<ImageView>(R.id.directions_car).setOnClickListener({
+
             if (Method.CAR in methods){
+
 
                 directions_car.setImageResource(R.drawable.ic_directions_car_grey)
                 methods.remove(Method.CAR)
@@ -303,7 +302,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         })
 
         view.findViewById<ImageView>(R.id.directions_railway).setOnClickListener({
-            if (Method.TRAIN in methods){
+            if (Method.TRAIN in methods) {
 
 
                 directions_railway.setImageResource(R.drawable.ic_directions_railway_grey)
@@ -316,7 +315,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
         view.findViewById<ImageView>(R.id.directions_bus).setOnClickListener({
 
-            if (Method.BUS in methods){
+            if (Method.BUS in methods) {
 
                 directions_bus.setImageResource(R.drawable.ic_directions_bus_grey)
                 methods.remove(Method.BUS)
@@ -328,7 +327,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
         view.findViewById<ImageView>(R.id.directions_flight).setOnClickListener({
 
-            if (Method.PLANE in methods){
+            if (Method.PLANE in methods) {
 
                 directions_flight.setImageResource(R.drawable.ic_flight_grey)
                 methods.remove(Method.PLANE)
@@ -340,7 +339,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
         view.findViewById<ImageView>(R.id.csIcon1).setOnClickListener({
 
-            if (Method.HITCHHIKING in methods){
+            if (Method.HITCHHIKING in methods) {
 
                 csIcon1.setImageResource(R.drawable.ic_directions_hitchhiking)
                 methods.remove(Method.HITCHHIKING)
@@ -426,7 +425,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         lastNameChoose.setText(lastName)
         val cityChoose = dialogView.findViewById<View>(R.id.dialog_city) as EditText
         cityChoose.setText(city)
-       /* val yearChoose = dialogView.findViewById<View>(R.id.years) as Spinner*/
+
+        val spinnerYearsView = dialogView.findViewById<View>(R.id.spinnerYearsView) as Spinner
 
         val man = dialogView.findViewById<RadioButton>(R.id.man)
 
@@ -438,40 +438,41 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         } else if (sex == 2) {
             sexChoose.check(woman.id)
         }
+
+        val calendar = Calendar.getInstance()
+        yearNow = calendar.get(Calendar.YEAR)
+
+        for (i in 1920..yearNow) {
+            yearsArr.add(i)
+        }
+
+        Log.e("LOG", "array check! : ${yearsArr.size}")
+
+        val yearsAdapter = ArrayAdapter<Int>(this.context, android.R.layout.simple_spinner_item, yearsArr);
+
+        yearsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerYearsView.adapter = yearsAdapter
+        spinnerYearsView.prompt = "Дата"
+
+        spinnerYearsView.setSelection(1)
+        spinnerYearsView.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                val selectedItem = parent.getItemAtPosition(position).toString().toLong()
+                age = (yearNow - selectedItem)
+                Log.e("LOG", "Click 2")
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                Log.e("LOG", "Nothing 2")
+            }
+        }
+
         simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Сохранить", { dialogInterface, i ->
             if (man.isChecked) {
                 sex = 1
             } else if (woman.isChecked) {
                 sex = 2
             } else sex = 0
-
-
-          val calendar=Calendar.getInstance()
-            yearNow=calendar.get(Calendar.YEAR)
-
-            for (i in 1920..yearNow){
-                yearsArr.add(i)
-            }
-
-
-            var yearsAdapter =ArrayAdapter<Int>(dialogView.context,android.R.layout.simple_spinner_item, yearsArr)
-
-            yearsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            years.adapter=yearsAdapter
-            years.setSelection(1920+age.toInt())
-            years.onItemSelectedListener = object: AdapterView.OnItemSelectedListener{
-                override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                    val selectedItem = parent.getItemAtPosition(position).toString().toLong()
-                  age=(yearNow-selectedItem)
-                }
-
-                override fun onNothingSelected(parent: AdapterView<*>) {
-
-                }
-            }
-
-
-
 
             fillAgeSex(age, sex)
             name = nameChoose.text.toString()
@@ -583,15 +584,13 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
     }
 
 
-
-
     fun getHashMapUser(): HashMap<String, Any> {
         val hashMap = HashMap<String, Any>()
         hashMap.set("name", name)
         hashMap.set("lastName", lastName)
         hashMap.set("city", city)
         hashMap.set("cities", cities)
-      //  hashMap.set("method", methods)
+        //  hashMap.set("method", methods)
         // hashMap.set("socNet", socNet)
         hashMap.set("dates", dates)
         hashMap.set("budget", budget)
