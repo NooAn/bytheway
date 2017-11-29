@@ -4,8 +4,6 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
@@ -30,6 +28,7 @@ import ru.a1024bits.bytheway.model.Method
 import ru.a1024bits.bytheway.model.SocialNetwork
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
+import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -54,9 +53,15 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
     private var city = ""
 
+    private var numberPhone: String = "+7"
+    private var vkLink: String = "https://www.vk.com/"
+    private var tgNick = "@"
+    private var csLink = "https://www.couchsurfing.com/people/"
+    private var fbLink = "https://www.facebook.com/"
+
     private var methods: ArrayList<Method> = arrayListOf()
 
-    private var socNet: ArrayList<SocialNetwork> = arrayListOf()
+    private var socNet: HashMap<String, String> = hashMapOf()
 
     private var dates: ArrayList<Long> = arrayListOf()
 
@@ -99,6 +104,9 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
         lastName = user.lastName
         name = user.name
+
+        numberPhone = user.phone
+
 
         if (user.flightHours == 0L) {
             travelledStatistics.visibility = View.GONE
@@ -152,13 +160,13 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
                 ?.into(image_avatar)
 
         for (name in user.socialNetwork) {
-            socNet.add(name)
-            when (name) {
-                SocialNetwork.VK -> vkIcon.setImageResource(R.drawable.ic_vk_color)
-                SocialNetwork.CS -> csIcon.setImageResource(R.drawable.ic_cs_color)
-                SocialNetwork.FB -> fbcon.setImageResource(R.drawable.ic_fb_color)
-                SocialNetwork.WHATSAAP -> whatsUpIcon.setImageResource(R.drawable.ic_whats_icon_color)
-                SocialNetwork.TG -> tgIcon.setImageResource(R.drawable.ic_tg_color)
+            socNet.put(name.key, name.value)
+            when (name.key) {
+                SocialNetwork.VK.link -> vkIcon.setImageResource(R.drawable.ic_vk_color)
+                SocialNetwork.CS.link -> csIcon.setImageResource(R.drawable.ic_cs_color)
+                SocialNetwork.FB.link -> fbcon.setImageResource(R.drawable.ic_fb_color)
+                SocialNetwork.WHATSAAP.link -> whatsUpIcon.setImageResource(R.drawable.ic_whats_icon_color)
+                SocialNetwork.TG.link -> tgIcon.setImageResource(R.drawable.ic_tg_color)
 
             }
         }
@@ -336,69 +344,23 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             showBlockTravelInformation()
         }
         view.findViewById<ImageView>(R.id.vkIcon).setOnClickListener {
-            if (checkInSocialMethods(SocialNetwork.VK)) {
-                openDialog(SocialNetwork.VK)
-                vkIcon.setImageResource(R.drawable.ic_vk_gray)
-                socNet.remove(SocialNetwork.VK)
-            } else {
-                vkIcon.setImageResource(R.drawable.ic_vk_color)
-                socNet.add(SocialNetwork.VK)
-            }
-            saveSocialData()
-//            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://vk.com/"+linkUsers))
-//            startActivity(browserIntent) //for UserProfileFragment
+            /*
+             Если контакты еще не добавлены, тогда открываем диалоговое окно.
+             Если были какие-то изменения в линках то сохраняем в бд. И меняем цвет иконки соответсвенно значениям.
+             */
+            openDialog(SocialNetwork.VK)
         }
-        view.findViewById<ImageView>(R.id.csIcon).setOnClickListener {
-            if (checkInSocialMethods(SocialNetwork.CS)) {
-                openDialog(SocialNetwork.CS)
-                csIcon.setImageResource(R.drawable.ic_cs_grey)
-                socNet.remove(SocialNetwork.CS)
-            } else {
-                csIcon.setImageResource(R.drawable.ic_cs_color)
-                socNet.add(SocialNetwork.CS)
-            }
-            saveSocialData()
-
-//            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.couchsurfing.com/people/selcukatesoglu"))
-//            startActivity(browserIntent)// for UserProfileFragment
+        view.findViewById<ImageView>(R.id.csIcon).setOnClickListener() {
+            openDialog(SocialNetwork.CS)
         }
         view.findViewById<ImageView>(R.id.whatsUpIcon).setOnClickListener({
-            //            val browserIntent = Intent(Intent.ACTION_VIEW,
-//                    Uri.parse("whatsapp://send?text=Привет, я нашел тебя в ByTheWay.&phone=+number&abid=+number"))
-//            startActivity(browserIntent)// for UserProfileFragment
-
-            if (checkInSocialMethods(SocialNetwork.WHATSAAP)) {
-                openDialog(SocialNetwork.WHATSAAP)
-                whatsUpIcon.setImageResource(R.drawable.ic_whats_icon_grey)
-                socNet.remove(SocialNetwork.WHATSAAP)
-            } else {
-                whatsUpIcon.setImageResource(R.drawable.ic_whats_icon_color)
-                socNet.add(SocialNetwork.WHATSAAP)
-            }
-            saveSocialData()
-
+            openDialog(SocialNetwork.WHATSAAP)
         })
         view.findViewById<ImageView>(R.id.fbcon).setOnClickListener({
-            if (checkInSocialMethods(SocialNetwork.FB)) {
-                openDialog(SocialNetwork.FB)
-                fbcon.setImageResource(R.drawable.ic_fb_grey)
-                socNet.remove(SocialNetwork.FB)
-            } else {
-                fbcon.setImageResource(R.drawable.ic_fb_color)
-                socNet.add(SocialNetwork.FB)
-            }
-            saveSocialData()
+            openDialog(SocialNetwork.FB)
         })
         view.findViewById<ImageView>(R.id.tgIcon).setOnClickListener({
-            if (checkInSocialMethods(SocialNetwork.TG)) {
-                openDialog(SocialNetwork.TG)
-                tgIcon.setImageResource(R.drawable.tg_grey)
-                socNet.remove(SocialNetwork.TG)
-            } else {
-                tgIcon.setImageResource(R.drawable.ic_tg_color)
-                socNet.add(SocialNetwork.TG)
-            }
-            saveSocialData()
+            openDialog(SocialNetwork.TG)
         })
 
         view.findViewById<Button>(R.id.button_save_travel_info).setOnClickListener({
@@ -419,13 +381,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         return view
     }
 
-    private fun saveSocialData() {
-        val map = HashMap<String, Any>()
-        map.put("socialNetwork", socNet)
-        //viewModel?.sendUserData(map, uid)
-    }
-
-    private fun checkInSocialMethods(value: SocialNetwork) = !(value in socNet)
+//    private fun checkInSocialMethods(value: SocialNetwork) = (value in socNet.keys)
 
     private fun sendUserInfoToServer() {
         viewModel?.sendUserData(getHashMapUser(), uid)
@@ -501,13 +457,56 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         val inflater = this.layoutInflater
         val dialogView = inflater.inflate(R.layout.custom_dialog_profile_soc_network, null)
         simpleAlert.setView(dialogView)
+        dialogView.findViewById<EditText>(R.id.socLinkText).setText(
+                when (socialNetwork) {
+                    SocialNetwork.VK -> vkLink
+                    SocialNetwork.WHATSAAP -> numberPhone
+                    SocialNetwork.CS -> csLink
+                    SocialNetwork.FB -> fbLink
+                    SocialNetwork.TG -> (if (tgNick.length > 1) tgNick else numberPhone)
+                })
+        simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, "Удалить", { dialog, i ->
+            changeSocIconsDisActive(socialNetwork)
+            socNet.remove(socialNetwork.link)
+        })
         simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Сохранить", { dialogInterface, i ->
-            //  socNet.add(socialNetwork.apply { link = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString() })
-            socialNetwork.link = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString()
-            socNet.add(socialNetwork)
+            val value = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString()
+            viewModel?.error?.observe(this@MyProfileFragment, Observer<Int> { error ->
+                when (error) {
+                    Constants.ERROR -> {
+                        Toast.makeText(this@MyProfileFragment.context, " Ошибка сохранения", Toast.LENGTH_SHORT).show()
+                    }
+                    Constants.SUCCESS -> {
+                        changeSocIconsActive(socialNetwork)
+                        socNet.put(socialNetwork.link, value)
+                    }
+                }
+            })
             viewModel?.saveLinks(socNet, uid)
         })
         simpleAlert.show()
+    }
+
+    private fun changeSocIconsActive(socialNetwork: SocialNetwork) {
+        when (socialNetwork) {
+            SocialNetwork.VK -> vkIcon.setImageResource(R.drawable.ic_vk_color)
+            SocialNetwork.CS -> csIcon.setImageResource(R.drawable.ic_cs_color)
+            SocialNetwork.FB -> fbcon.setImageResource(R.drawable.ic_fb_color)
+            SocialNetwork.WHATSAAP -> whatsUpIcon.setImageResource(R.drawable.ic_whats_icon_color)
+            SocialNetwork.TG -> tgIcon.setImageResource(R.drawable.ic_tg_color)
+
+        }
+    }
+
+    private fun changeSocIconsDisActive(socialNetwork: SocialNetwork) {
+        when (socialNetwork) {
+            SocialNetwork.VK -> vkIcon.setImageResource(R.drawable.ic_vk_gray)
+            SocialNetwork.CS -> csIcon.setImageResource(R.drawable.ic_cs_grey)
+            SocialNetwork.FB -> fbcon.setImageResource(R.drawable.ic_fb_grey)
+            SocialNetwork.WHATSAAP -> whatsUpIcon.setImageResource(R.drawable.ic_whats_icon_grey)
+            SocialNetwork.TG -> tgIcon.setImageResource(R.drawable.tg_grey)
+
+        }
     }
 
     fun onButtonPressed() {
@@ -601,7 +600,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         hashMap.set("city", city)
         hashMap.set("cities", cities)
         //  hashMap.set("method", methods)
-        // hashMap.set("socNet", socNet)
         hashMap.set("dates", dates)
         hashMap.set("budget", budget)
         hashMap.set("addInformation", add_info_user.text.toString())

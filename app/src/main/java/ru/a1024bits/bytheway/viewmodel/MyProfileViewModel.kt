@@ -12,6 +12,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import ru.a1024bits.bytheway.model.*
 import ru.a1024bits.bytheway.repository.COLLECTION_USERS
 import ru.a1024bits.bytheway.repository.UserRepository
+import ru.a1024bits.bytheway.util.Constants.ERROR
+import ru.a1024bits.bytheway.util.Constants.SUCCESS
 import javax.inject.Inject
 
 /**
@@ -35,13 +37,17 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
         Log.e("LOG", "end load user: $userId")
     }
 
-    fun saveLinks(arraySocNetwork: List<SocialNetwork>, id: String) {
+
+    fun saveLinks(arraySocNetwork: HashMap<String, String>, id: String) {
         val map: HashMap<String, Any> = hashMapOf()
-        // map.put("socialNetwork", arraySocNetwork) fixme
+        map.put("socialNetwork", arraySocNetwork) // fixme
         userRepository.changeUserProfile(map, id)
                 .addOnFailureListener {
-                    error.value = 1
+                    error.value = ERROR
                     Log.e("LOG", "fail link change ${it.message}", it)
+                }
+                .addOnSuccessListener {
+                    error.value = SUCCESS
                 }
                 .addOnCompleteListener {
                     Log.e("LOG", "oncomplete link change")
@@ -55,7 +61,7 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
         docRef.get().addOnCompleteListener(object : OnCompleteListener<DocumentSnapshot> {
             override fun onComplete(task: Task<DocumentSnapshot>) {
                 if (task.isSuccessful()) {
-                    val document = task.getResult();
+                    val document = task.getResult()
                     if (!document.exists()) {
                         // Пользователя нет в системе, добавляем.
                         userRepository.addUser(User().apply {
@@ -64,7 +70,7 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                             lastName = list?.get(1).orEmpty()
                             id = currentUser?.uid.orEmpty()
                             email = currentUser?.email.toString()
-                            phone = currentUser?.phoneNumber.toString()
+                            phone = currentUser?.phoneNumber ?: "+7"
                             urlPhoto = currentUser?.photoUrl.toString()
                             currentUser?.getUid()
                         }).addOnCompleteListener {
@@ -91,10 +97,10 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
         userRepository.changeUserProfile(map, id)
                 .addOnCompleteListener {
                     //fixme
-                    Log.e("LOG", "complete user")
+                    Log.e("LOG", "complete сhange profile user")
                 }
                 .addOnFailureListener {
-                    Log.e("LOG", "fail user")
+                    Log.e("LOG", "fail change user")
                     //fixme Здесь обработка лоадера и показь пользователю ошибку загрузки ну не здеь а во вью. пример как эт осделать смотри в вью моделаър
                 }
                 .addOnSuccessListener {
