@@ -12,7 +12,6 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:hint="откудa" />
-    <!--android:layout_alignEnd="@id/cancel_parameters"-->
 
     <EditText
         android:id="@+id/endCity"
@@ -21,53 +20,23 @@
         android:layout_below="@id/startCity"
         android:layout_marginBottom="16dp"
         android:hint="Куда" />
-    <!--android:layout_alignEnd="@id/cancel_parameters"-->
 
     <TextView
         android:id="@+id/date_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/endCity"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="26dp"
         android:layout_marginEnd="70dp"
         android:text="дата"
         android:textSize="18sp" />
 
-    <TextView
-        android:id="@+id/from_date_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/endCity"
-        android:layout_marginEnd="20dp"
-        android:layout_toEndOf="@+id/date_text"
-        android:text="c"
-        android:textSize="18sp" />
-
-    <Spinner
+    <Button
         android:id="@+id/startDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/endCity"
-        android:layout_toEndOf="@id/from_date_text" />
-
-    <TextView
-        android:id="@+id/by_date_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/endCity"
-        android:layout_marginEnd="16dp"
-        android:layout_marginStart="40dp"
-        android:layout_toEndOf="@+id/startDate"
-        android:text="по"
-        android:textSize="18sp" />
-
-    <Spinner
-        android:id="@+id/endDate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/endCity"
-        android:layout_toEndOf="@id/by_date_text" />
-
+        android:layout_toEndOf="@id/date_text"/>
 
     <TextView
         android:id="@+id/sex_text"
@@ -82,9 +51,10 @@
         android:id="@+id/sexButtons"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/from_date_text"
+        android:layout_alignStart="@id/startDate"
         android:layout_below="@id/date_text"
         android:orientation="horizontal">
+        <!--android:layout_toEndOf="@+id/sex_text"-->
 
         <RadioButton
             android:id="@+id/sex_M"
@@ -123,7 +93,7 @@
         android:id="@+id/from_age_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/from_date_text"
+        android:layout_alignStart="@id/sexButtons"
         android:layout_below="@id/sex_text"
         android:text="от"
         android:textSize="18sp" />
@@ -132,16 +102,17 @@
         android:id="@+id/startAge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@id/startDate"
         android:layout_below="@id/sex_text"
-        android:layout_toEndOf="@id/from_age_text" />
+        android:layout_marginStart="20dp"
+        android:layout_alignStart="@id/from_age_text" />
 
     <TextView
         android:id="@+id/by_age_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/by_date_text"
+        android:layout_toEndOf="@+id/startAge"
         android:layout_below="@id/sex_text"
+        android:layout_marginStart="20dp"
         android:text="до"
         android:textSize="18sp" />
 
@@ -149,7 +120,8 @@
         android:id="@+id/endAge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/endDate"
+        android:layout_marginStart="20dp"
+        android:layout_toEndOf="@+id/by_age_text"
         android:layout_below="@id/sex_text" />
 
 
@@ -166,7 +138,7 @@
         android:id="@+id/from_budget_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/from_date_text"
+        android:layout_alignStart="@+id/from_age_text"
         android:layout_below="@id/age_text"
         android:text="от"
         android:textSize="18sp" />
@@ -175,8 +147,8 @@
         android:id="@+id/startBudget"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/startDate"
-        android:layout_alignStart="@+id/startDate"
+        android:layout_alignEnd="@+id/startAge"
+        android:layout_alignStart="@+id/startAge"
         android:layout_below="@id/age_text"
         android:layout_toEndOf="@id/from_budget_text" />
 
@@ -185,7 +157,7 @@
         android:id="@+id/by_budget_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/by_date_text"
+        android:layout_alignStart="@+id/by_age_text"
         android:layout_below="@id/age_text"
         android:text="до"
         android:textSize="18sp" />
@@ -194,8 +166,8 @@
         android:id="@+id/endBudget"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/endDate"
-        android:layout_alignStart="@+id/endDate"
+        android:layout_alignEnd="@+id/endAge"
+        android:layout_alignStart="@+id/endAge"
         android:layout_below="@id/age_text" />
 
     <Button
