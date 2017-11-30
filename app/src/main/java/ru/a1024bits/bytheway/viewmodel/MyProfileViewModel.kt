@@ -47,6 +47,7 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                     Log.e("LOG", "fail link change ${it.message}", it)
                 }
                 .addOnSuccessListener {
+                    Log.e("LOG", "success link change")
                     error.value = SUCCESS
                 }
                 .addOnCompleteListener {
@@ -148,4 +149,5 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
 
         Log.e("LOG name", "" + body?.data?.trips?.get(0)?.flights?.get(0)?.arrivalUtc)
     }
+
 }

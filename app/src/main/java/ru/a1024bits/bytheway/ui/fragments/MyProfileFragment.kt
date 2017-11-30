@@ -106,7 +106,9 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         name = user.name
 
         numberPhone = user.phone
-
+        vkLink = user.socialNetwork.get(SocialNetwork.VK.link) ?: vkLink
+        fbLink = user.socialNetwork.get(SocialNetwork.FB.link) ?: fbLink
+        csLink = user.socialNetwork.get(SocialNetwork.CS.link) ?: csLink
 
         if (user.flightHours == 0L) {
             travelledStatistics.visibility = View.GONE
@@ -148,7 +150,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             val dayArrival = formatDate.format(Date(user.dates.get(lastIndexArr)))
             textDateFrom.setText(dayBegin)
             dateArrived.setText(dayArrival)
-
             dates.add(user.dates.get(0))
             dates.add(user.dates.get(lastIndexArr))
         }
@@ -217,7 +218,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             if (userAge > 0) {
                 sex_and_age.text = StringBuilder(gender).append(", ").append(userAge)
             } else {
-                sex_and_age.text = gender
+                sex_and_age.text = StringBuilder(gender).append(", Возраст ").append(userAge)
             }
         }
 
@@ -226,7 +227,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             if (userSex != 0) {
                 sex_and_age.text = StringBuilder(gender).append(", ").append(userAge)
             } else {
-                sex_and_age.text = userAge.toString()
+                sex_and_age.text = StringBuilder("Пол, ").append(userAge)
             }
         }
     }
@@ -433,14 +434,14 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
                 sex = 2
             } else sex = 0
 
-            age = ageChoose.text.toString().toLong()
+            age = ageChoose.text.toString().toLongOrNull() ?: 0
             fillAgeSex(age, sex)
             name = nameChoose.text.toString()
 
             lastName = lastNameChoose.text.toString()
             username.text = StringBuilder(name).append(" ").append(lastName)
             city = cityChoose.text.toString()
-            cityview.text = (city)
+            cityview.text = if (city.isNotEmpty()) city else "Родной город"
             sendUserInfoToServer()
         })
         simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, "Отмена", { dialogInterface, i ->
@@ -466,11 +467,22 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
                     SocialNetwork.TG -> (if (tgNick.length > 1) tgNick else numberPhone)
                 })
         simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, "Удалить", { dialog, i ->
-            changeSocIconsDisActive(socialNetwork)
-            socNet.remove(socialNetwork.link)
+            viewModel?.error?.observe(this@MyProfileFragment, Observer<Int> { error ->
+                when (error) {
+                    Constants.ERROR -> {
+                        Toast.makeText(this@MyProfileFragment.context, " Ошибка сохранения", Toast.LENGTH_SHORT).show()
+                    }
+                    Constants.SUCCESS -> {
+                        changeSocIconsDisActive(socialNetwork)
+                        socNet.remove(socialNetwork.link)
+                    }
+                }
+            })
+            viewModel?.saveLinks(socNet, uid)
+
         })
         simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Сохранить", { dialogInterface, i ->
-            val value = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString()
+            val newLink = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString()
             viewModel?.error?.observe(this@MyProfileFragment, Observer<Int> { error ->
                 when (error) {
                     Constants.ERROR -> {
@@ -478,7 +490,14 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
                     }
                     Constants.SUCCESS -> {
                         changeSocIconsActive(socialNetwork)
-                        socNet.put(socialNetwork.link, value)
+                        socNet.put(socialNetwork.link, newLink)
+                        when (socialNetwork) {
+                            SocialNetwork.VK -> vkLink = newLink
+                            SocialNetwork.WHATSAAP -> numberPhone = newLink
+                            SocialNetwork.CS -> csLink = newLink
+                            SocialNetwork.FB -> fbLink = newLink
+                            SocialNetwork.TG -> tgNick = newLink
+                        }
                     }
                 }
             })
