@@ -88,7 +88,6 @@ class AllUsersFragment : Fragment() {
                 tempEndDate.get(Calendar.YEAR),
                 tempEndDate.get(Calendar.MONTH),
                 tempEndDate.get(Calendar.DAY_OF_MONTH))
-        dateDialog.selectableDays = arrayOf(extension.currentDate, extension.currentDate)//todo
     }
 
     private fun updateChoseDateButtons(calendarStartDate: Calendar, calendarEndDate: Calendar) {
@@ -192,7 +191,6 @@ class AllUsersFragment : Fragment() {
             if (filter.endDate > 0)
                 tempEndDate.timeInMillis = filter.endDate
 
-            dateDialog.selectableDays = arrayOf(tempStartDate, tempEndDate)//todo
             updateChoseDateButtons(tempStartDate, tempEndDate)
 
         }
