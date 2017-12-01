@@ -12,10 +12,11 @@
             android:id="@+id/searchParametersText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="19dp"
-            android:layout_marginStart="17dp"
+            android:paddingBottom="19dp"
+            android:paddingStart="17dp"
+            android:paddingTop="19dp"
+            android:gravity="center_vertical|start"
             android:background="@color/hint"
-            android:layout_marginTop="19dp"
             android:text="+Параметры поиска"
             android:textColor="#006889" />
 
