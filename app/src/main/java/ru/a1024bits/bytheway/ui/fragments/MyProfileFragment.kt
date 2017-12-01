@@ -32,13 +32,17 @@ import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import javax.inject.Inject
 import kotlin.collections.HashMap
 
 
 class MyProfileFragment : Fragment(), OnMapReadyCallback {
+
     private var viewModel: MyProfileViewModel? = null
+
+
     private var mListener: OnFragmentInteractionListener? = null
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
 
@@ -81,6 +85,10 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
     private var budget: Long = 0 // default const
 
     private var glide: RequestManager? = null
+
+    private var yearNow: Int = 0
+
+    private var yearsArr: ArrayList<Int> = arrayListOf()
 
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -156,6 +164,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         }
 
         fillAgeSex(user.age, user.sex)
+        age = user.age
 
         glide?.load(user.urlPhoto)
                 ?.apply(RequestOptions.circleCropTransform())
@@ -293,6 +302,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             } else {
                 methods.add(Method.CAR)
             }
+
+
         })
 
         view.findViewById<View>(R.id.iconTrain).setOnClickListener({
@@ -307,6 +318,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         view.findViewById<View>(R.id.iconBus).setOnClickListener({
             with(travelBusText) { isActivated = !isActivated }
             if (checkInMethods(Method.BUS)) {
+
                 methods.remove(Method.BUS)
             } else {
                 methods.add(Method.BUS)
@@ -407,8 +419,9 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         lastNameChoose.setText(lastName)
         val cityChoose = dialogView.findViewById<View>(R.id.dialog_city) as EditText
         cityChoose.setText(city)
-        val ageChoose = dialogView.findViewById<View>(R.id.dialog_year) as EditText
-        ageChoose.setText(age.toString())
+
+        val spinnerYearsView = dialogView.findViewById<View>(R.id.spinnerYearsView) as Spinner
+
         val man = dialogView.findViewById<RadioButton>(R.id.man)
 
         val woman = dialogView.findViewById<RadioButton>(R.id.woman)
@@ -419,14 +432,39 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         } else if (sex == 2) {
             sexChoose.check(woman.id)
         }
-        simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Сохранить", { dialogInterface, i ->
-            if (man.isChecked) {
-                sex = 1
-            } else if (woman.isChecked) {
-                sex = 2
-            } else sex = 0
 
-            age = ageChoose.text.toString().toLongOrNull() ?: 0
+        val calendar = Calendar.getInstance()
+        yearNow = calendar.get(Calendar.YEAR)
+
+        for (i in 1920..yearNow) {
+            yearsArr.add(i)
+        }
+
+        Log.e("LOG", "array check! : ${yearsArr.size}")
+
+        val yearsAdapter = ArrayAdapter<Int>(this.context, android.R.layout.simple_spinner_item, yearsArr);
+
+        yearsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerYearsView.adapter = yearsAdapter
+        spinnerYearsView.prompt = "Дата"
+
+        spinnerYearsView.setSelection(1)
+        spinnerYearsView.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                val selectedItem = parent.getItemAtPosition(position).toString().toLong()
+                age = (yearNow - selectedItem)
+                Log.e("LOG", "Click 2")
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                Log.e("LOG", "Nothing 2")
+            }
+        }
+
+        simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Сохранить", { dialogInterface, i ->
+            sex = if (man.isChecked) 1 else if (woman.isChecked) 2 else 0
+
+            //  age = ageChoose.text.toString().toLongOrNull() ?: 0
             fillAgeSex(age, sex)
             name = nameChoose.text.toString()
 
@@ -442,6 +480,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
         simpleAlert.show()
     }
+
 
     private fun openDialog(socialNetwork: SocialNetwork) {
         val simpleAlert = AlertDialog.Builder(activity).create()
@@ -620,3 +659,5 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         return hashMap
     }
 }
+
+
