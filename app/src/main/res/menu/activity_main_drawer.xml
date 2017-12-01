@@ -6,28 +6,16 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/profile_item"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@drawable/ic_profile"
             android:title="Профиль" />
         <item
             android:id="@+id/search_item"
-            android:icon="@drawable/ic_flight"
+            android:icon="@drawable/ic_search_companions"
             android:title="Поиск попутчиков" />
         <item
             android:id="@+id/all_users_item"
-            android:icon="@drawable/ic_directions_bus"
+            android:icon="@drawable/ic_all_users"
             android:title="Все пользователи" />
-        <item
-            android:id="@+id/similar_travel_item"
-            android:icon="@drawable/ic_directions_hitchhiking"
-            android:title="Пользователи" />
-        <item
-            android:id="@+id/feedback"
-            android:icon="@drawable/plane"
-            android:title="Обратная связь" />
-        <item
-            android:id="@+id/exit_item"
-            android:icon="@drawable/ic_directions_car"
-            android:title="Выход" />
 
     </group>
 
