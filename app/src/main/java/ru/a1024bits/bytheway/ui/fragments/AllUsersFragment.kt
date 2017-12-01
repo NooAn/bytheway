@@ -22,12 +22,18 @@ import kotlinx.android.synthetic.main.searching_parameters_block.*
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.ExtensionsAllUsers
 import ru.a1024bits.bytheway.R
+import ru.a1024bits.bytheway.R.layout.fragment_display_all_users
+import ru.a1024bits.bytheway.R.layout.searching_parameters_block
 import ru.a1024bits.bytheway.adapter.ShowAllUsersAdapter
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.viewmodel.ShowUsersViewModel
 import java.util.*
 import javax.inject.Inject
+import android.view.animation.Animation
+import android.view.animation.ScaleAnimation
+
+
 
 
 class AllUsersFragment : Fragment() {
@@ -168,6 +174,7 @@ class AllUsersFragment : Fragment() {
 
         }
 
+        view_contain_block_parameters.layoutTransition.setDuration(700L)
         searchParametersText.setOnClickListener {
             if (block_search_parameters.visibility == View.GONE) {
                 block_search_parameters.visibility = View.VISIBLE
