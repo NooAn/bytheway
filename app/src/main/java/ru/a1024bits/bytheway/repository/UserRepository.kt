@@ -26,7 +26,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) : IUsersR
         return store.collection(COLLECTION_USERS).get()
     }
 
-    //Rx wrapper
+
     override fun getUsers(): Task<QuerySnapshot> {
 //        val query = store.collection(COLLECTION_USERS)
 //        if ((filter.startBudget != 0) && (filter.endBudget != 0)) {
@@ -51,7 +51,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) : IUsersR
     }
 
     override fun getUserById(userID: String): Task<DocumentSnapshot> {
-        return store.collection(COLLECTION_USERS).document(userID).get();
+        return store.collection(COLLECTION_USERS).document(userID).get()
     }
 
     override fun addUser(user: User): Task<Void> {
@@ -60,8 +60,8 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) : IUsersR
     }
 
     override fun changeUserProfile(map: HashMap<String, Any>, id: String): Task<Void> {
-        Log.d("LOG", "change user profile send....");
-        val documentRef = store.collection(COLLECTION_USERS).document(id);
+        Log.d("LOG", "change user profile send....")
+        val documentRef = store.collection(COLLECTION_USERS).document(id)
         return store.runTransaction(object : Transaction.Function<Void> {
             override fun apply(transaction: Transaction): Void? {
                 map.put("timestamp", FieldValue.serverTimestamp());

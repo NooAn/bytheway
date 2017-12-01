@@ -6,12 +6,14 @@ import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v7.widget.SearchView
 import android.util.Log
 import android.view.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import com.borax12.materialdaterangepicker.date.DatePickerDialog
 import kotlinx.android.synthetic.main.fragment_display_all_users.*
 import kotlinx.android.synthetic.main.searching_parameters_block.*
 import ru.a1024bits.bytheway.App
@@ -21,22 +23,23 @@ import ru.a1024bits.bytheway.adapter.ShowAllUsersAdapter
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.viewmodel.ShowUsersViewModel
+import java.util.*
 import javax.inject.Inject
-import kotlin.collections.ArrayList
 
 
 class AllUsersFragment : Fragment() {
-    private val SIZE_INITIAL_ELEMENTS = 4
+    private val SIZE_INITIAL_ELEMENTS = 2
     private lateinit var filter: Filter
     private lateinit var viewModel: ShowUsersViewModel
     private lateinit var extension: ExtensionsAllUsers
+    private lateinit var dateDialog: DatePickerDialog
     private lateinit var showUsersAdapter: ShowAllUsersAdapter
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
     private var countInitialElements = 0
     private var tempStartAge: Int = -1
     private var tempEndAge: Int = -1
-    private var tempStartDate: Long = 0L
-    private var tempEndDate: Long = 0L
+    private lateinit var tempStartDate: Calendar
+    private lateinit var tempEndDate: Calendar
     private var tempSex: Int = 0
 
 
@@ -44,14 +47,21 @@ class AllUsersFragment : Fragment() {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
         extension = ExtensionsAllUsers(context)
+
         filter = if (savedInstanceState != null) {
             tempStartAge = savedInstanceState.getInt("tempStartAge")
             tempSex = savedInstanceState.getInt("tempSex")
             tempEndAge = savedInstanceState.getInt("tempEndAge")
-            tempStartDate = savedInstanceState.getLong("tempStartDate")
-            tempEndDate = savedInstanceState.getLong("tempEndDate")
+            tempStartDate = savedInstanceState.getSerializable("tempStartDate") as Calendar
+            tempEndDate = savedInstanceState.getSerializable("tempEndDate") as Calendar
             savedInstanceState.getSerializable("filter") as Filter
-        } else Filter()
+        } else {
+            tempStartDate = Calendar.getInstance()
+            tempEndDate = Calendar.getInstance()
+            tempEndDate.timeInMillis = tempEndDate.timeInMillis + 1000L * 60 * 60 * 24 * 182
+            Filter()
+        }
+        updateDateDialog()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
@@ -91,33 +101,8 @@ class AllUsersFragment : Fragment() {
             }
         }
 
-        startDate.adapter = ArrayAdapter<String>(context, android.R.layout.simple_spinner_item,
-                extension.getDaysInEndDataStr())
-        startDate.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(p0: AdapterView<*>?) {}
-            override fun onItemSelected(p0: AdapterView<*>?, view: View?, position: Int, p3: Long) {
-                if (countInitialElements++ < SIZE_INITIAL_ELEMENTS) {
-                    val settingDate = extension.getPositionFromDate(tempStartDate, false)
-                    tempStartDate = extension.daysInMonths[settingDate]
-                    startDate.setSelection(settingDate)
-                    return
-                }
-                tempStartDate = extension.daysInMonths[position]
-            }
-        }
-        endDate.adapter = ArrayAdapter<String>(context, android.R.layout.simple_spinner_item,
-                extension.getDaysInEndDataStr())
-        endDate.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(p0: AdapterView<*>?) {}
-            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, p3: Long) {
-                if (countInitialElements++ < SIZE_INITIAL_ELEMENTS) {
-                    val settingDate = extension.getPositionFromDate(tempEndDate, true)
-                    tempEndDate = extension.daysInMonths[settingDate]
-                    endDate.setSelection(settingDate)
-                    return
-                }
-                tempEndDate = extension.daysInMonths[position]
-            }
+        startDate.setOnClickListener {
+            dateDialog.show(activity.fragmentManager, "")
         }
 
         if (filter.startBudget > 0)
@@ -137,12 +122,13 @@ class AllUsersFragment : Fragment() {
             2 -> sex_W.id
             else -> sex_Any.id
         })
+        updateChoseDateButtons(tempStartDate, tempEndDate)
 
         saveParameters.setOnClickListener {
             filter.startAge = tempStartAge
             filter.endAge = tempEndAge
-            filter.startDate = tempStartDate
-            filter.endDate = tempEndDate
+            filter.startDate = tempStartDate.timeInMillis
+            filter.endDate = tempEndDate.timeInMillis
             if (startBudget.text.toString().isNotEmpty())
                 filter.startBudget = Integer.parseInt(startBudget.text.toString())
             else filter.startBudget = 0
@@ -158,20 +144,24 @@ class AllUsersFragment : Fragment() {
         }
 
         cancelParameters.setOnClickListener {
-            sexButtons.check(when (tempSex) {
+            sexButtons.check(when (filter.sex) {
                 1 -> sex_M.id
                 2 -> sex_W.id
                 else -> sex_Any.id
             })
             startAge.setSelection(filter.startAge)
             endAge.setSelection(filter.endAge)
-            startDate.setSelection(extension.getPositionFromDate(filter.startDate, false))
-            endDate.setSelection(extension.getPositionFromDate(filter.endDate, true))
-
             if (filter.startBudget > 0)
                 startBudget.setText(filter.startBudget.toString())
             if (filter.endBudget > 0)
                 endBudget.setText(filter.endBudget.toString())
+            if (filter.startDate > 0)
+                tempStartDate.timeInMillis = filter.startDate
+            if (filter.endDate > 0)
+                tempEndDate.timeInMillis = filter.endDate
+
+            updateDateDialog()
+            updateChoseDateButtons(tempStartDate, tempEndDate)
 
         }
 
@@ -248,9 +238,44 @@ class AllUsersFragment : Fragment() {
         outState.putSerializable("filter", filter)
         outState.putInt("tempStartAge", tempStartAge)
         outState.putInt("tempEndAge", tempEndAge)
-        outState.putLong("tempStartDate", tempStartDate)
-        outState.putLong("tempEndDate", tempEndDate)
+        outState.putSerializable("tempStartDate", tempStartDate)
+        outState.putSerializable("tempEndDate", tempEndDate)
         outState.putInt("tempSex", tempSex)
+    }
+
+    private fun updateDateDialog() {
+        dateDialog = DatePickerDialog.newInstance(
+                { _, year, monthOfYear, dayOfMonth, yearEnd, monthOfYearEnd, dayOfMonthEnd ->
+                    Log.d("tag", " year + $year ; monthOfYear + $monthOfYear ; dayOfMonth + $dayOfMonth ; yearEnd + $yearEnd ; monthOfYearEnd + $monthOfYearEnd ; dayOfMonthEnd + $dayOfMonthEnd ")
+                    val calendarStartDate = Calendar.getInstance()
+                    calendarStartDate.set(Calendar.YEAR, year)
+                    calendarStartDate.set(Calendar.MONTH, monthOfYear)
+                    calendarStartDate.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+
+                    val calendarEndDate = Calendar.getInstance()
+                    calendarEndDate.set(Calendar.YEAR, yearEnd)
+                    calendarEndDate.set(Calendar.MONTH, monthOfYearEnd)
+                    calendarEndDate.set(Calendar.DAY_OF_MONTH, dayOfMonthEnd)
+
+                    if (calendarStartDate.timeInMillis >= calendarEndDate.timeInMillis) {
+                        Snackbar.make(activity.findViewById(android.R.id.content), "даты оказались некорректными, попробуйте ввести их снова", Snackbar.LENGTH_LONG).show()
+                        return@newInstance
+                    }
+                    tempStartDate = calendarStartDate
+                    tempEndDate = calendarEndDate
+                    updateChoseDateButtons(calendarStartDate, calendarEndDate)
+                },
+                tempStartDate.get(Calendar.YEAR),
+                tempStartDate.get(Calendar.MONTH),
+                tempStartDate.get(Calendar.DAY_OF_MONTH),
+                tempEndDate.get(Calendar.YEAR),
+                tempEndDate.get(Calendar.MONTH),
+                tempEndDate.get(Calendar.DAY_OF_MONTH))
+    }
+
+    private fun updateChoseDateButtons(calendarStartDate: Calendar, calendarEndDate: Calendar) {
+        startDate.text = ("c: " + calendarStartDate.get(Calendar.DAY_OF_MONTH) + " " + context.resources.getStringArray(R.array.months_array)[calendarStartDate.get(Calendar.MONTH)]
+                + " по: " + calendarEndDate.get(Calendar.DAY_OF_MONTH) + " " + context.resources.getStringArray(R.array.months_array)[calendarEndDate.get(Calendar.MONTH)])
     }
 
     companion object {

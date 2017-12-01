@@ -4,11 +4,10 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
+import android.text.Layout
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -30,6 +29,7 @@ import ru.a1024bits.bytheway.model.Method
 import ru.a1024bits.bytheway.model.SocialNetwork
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
+import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -54,9 +54,15 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
     private var city = ""
 
+    private var numberPhone: String = "+7"
+    private var vkLink: String = "https://www.vk.com/"
+    private var tgNick = "@"
+    private var csLink = "https://www.couchsurfing.com/people/"
+    private var fbLink = "https://www.facebook.com/"
+
     private var methods: ArrayList<Method> = arrayListOf()
 
-    private var socNet: ArrayList<SocialNetwork> = arrayListOf()
+    private var socNet: HashMap<String, String> = hashMapOf()
 
     private var dates: ArrayList<Long> = arrayListOf()
 
@@ -100,6 +106,11 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         lastName = user.lastName
         name = user.name
 
+        numberPhone = user.phone
+        vkLink = user.socialNetwork.get(SocialNetwork.VK.link) ?: vkLink
+        fbLink = user.socialNetwork.get(SocialNetwork.FB.link) ?: fbLink
+        csLink = user.socialNetwork.get(SocialNetwork.CS.link) ?: csLink
+
         if (user.flightHours == 0L) {
             travelledStatistics.visibility = View.GONE
         } else {
@@ -140,7 +151,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             val dayArrival = formatDate.format(Date(user.dates.get(lastIndexArr)))
             textDateFrom.setText(dayBegin)
             dateArrived.setText(dayArrival)
-
             dates.add(user.dates.get(0))
             dates.add(user.dates.get(lastIndexArr))
         }
@@ -152,39 +162,37 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
                 ?.into(image_avatar)
 
         for (name in user.socialNetwork) {
-            socNet.add(name)
-            when (name) {
-                SocialNetwork.VK -> vkIcon.setImageResource(R.drawable.ic_vk_color)
-                SocialNetwork.CS -> csIcon.setImageResource(R.drawable.ic_cs_color)
-                SocialNetwork.FB -> fbcon.setImageResource(R.drawable.ic_fb_color)
-                SocialNetwork.WHATSAAP -> whatsUpIcon.setImageResource(R.drawable.ic_whats_icon_color)
-                SocialNetwork.TG -> tgIcon.setImageResource(R.drawable.ic_tg_color)
+            socNet.put(name.key, name.value)
+            when (name.key) {
+                SocialNetwork.VK.link -> vkIcon.setImageResource(R.drawable.ic_vk_color)
+                SocialNetwork.CS.link -> csIcon.setImageResource(R.drawable.ic_cs_color)
+                SocialNetwork.FB.link -> fbcon.setImageResource(R.drawable.ic_fb_color)
+                SocialNetwork.WHATSAAP.link -> whatsUpIcon.setImageResource(R.drawable.ic_whats_icon_color)
+                SocialNetwork.TG.link -> tgIcon.setImageResource(R.drawable.ic_tg_color)
 
             }
         }
         for (method in user.method) {
             when (method) {
                 Method.TRAIN -> {
-                    directions_railway.setImageResource(R.drawable.ic_directions_railway)
+                    with(iconTrain) { isActivated = true }
                     methods.add(Method.TRAIN)
                 }
                 Method.BUS -> {
-                    directions_bus.setImageResource(R.drawable.ic_directions_bus)
+                    with(iconBus) { isActivated = true }
                     methods.add(Method.BUS)
                 }
                 Method.CAR -> {
-                    directions_car.setImageResource(R.drawable.ic_directions_car)
+                    with(iconCar) { isActivated = true }
                     methods.add(Method.CAR)
                 }
                 Method.PLANE -> {
-                    directions_flight.setImageResource(R.drawable.ic_flight)
+                    with(iconPlane) { isActivated = true }
                     methods.add(Method.PLANE)
                 }
                 Method.HITCHHIKING -> {
-                    csIcon1.setImageResource(R.drawable.ic_directions_hitchhiking)
+                    with(iconHitchHicking) { isActivated = true }
                     methods.add(Method.HITCHHIKING)
-                }
-                else -> {
                 }
             }
         }
@@ -209,7 +217,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             if (userAge > 0) {
                 sex_and_age.text = StringBuilder(gender).append(", ").append(userAge)
             } else {
-                sex_and_age.text = gender
+                sex_and_age.text = StringBuilder(gender).append(", Возраст ").append(userAge)
             }
         }
 
@@ -218,7 +226,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             if (userSex != 0) {
                 sex_and_age.text = StringBuilder(gender).append(", ").append(userAge)
             } else {
-                sex_and_age.text = userAge.toString()
+                sex_and_age.text = StringBuilder("Пол, ").append(userAge)
             }
         }
     }
@@ -227,7 +235,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         direction.visibility = View.GONE
         maplayout.visibility = View.GONE
         method_moving.visibility = View.GONE
-        layout_method_moving.visibility = View.GONE
         moneyfortrip.visibility = View.GONE
         descriptionprofile.visibility = View.GONE
         button_remove_travel_info.visibility = View.GONE
@@ -279,52 +286,47 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             }
         })
 
-        view.findViewById<ImageView>(R.id.directions_car).setOnClickListener({
+        view.findViewById<View>(R.id.iconCar).setOnClickListener({
+            with(travelCarText) { isActivated = !isActivated }
             if (checkInMethods(Method.CAR)) {
-                directions_car.setImageResource(R.drawable.ic_directions_car_grey)
                 methods.remove(Method.CAR)
             } else {
-                directions_car.setImageResource(R.drawable.ic_directions_car)
                 methods.add(Method.CAR)
             }
         })
 
-        view.findViewById<ImageView>(R.id.directions_railway).setOnClickListener({
+        view.findViewById<View>(R.id.iconTrain).setOnClickListener({
+            with(travelTrainText) { isActivated = !isActivated }
             if (checkInMethods(Method.TRAIN)) {
-                directions_railway.setImageResource(R.drawable.ic_directions_railway_grey)
                 methods.remove(Method.TRAIN)
             } else {
-                directions_railway.setImageResource(R.drawable.ic_directions_railway)
                 methods.add(Method.TRAIN)
             }
         })
 
-        view.findViewById<ImageView>(R.id.directions_bus).setOnClickListener({
+        view.findViewById<View>(R.id.iconBus).setOnClickListener({
+            with(travelBusText) { isActivated = !isActivated }
             if (checkInMethods(Method.BUS)) {
-                directions_bus.setImageResource(R.drawable.ic_directions_bus_grey)
                 methods.remove(Method.BUS)
             } else {
-                directions_bus.setImageResource(R.drawable.ic_directions_bus)
                 methods.add(Method.BUS)
             }
         })
 
-        view.findViewById<ImageView>(R.id.directions_flight).setOnClickListener({
+        view.findViewById<View>(R.id.iconPlane).setOnClickListener({
+            with(travelPlaneText) { isActivated = !isActivated }
             if (checkInMethods(Method.PLANE)) {
-                directions_flight.setImageResource(R.drawable.ic_flight_grey)
                 methods.remove(Method.PLANE)
             } else {
-                directions_flight.setImageResource(R.drawable.ic_flight)
                 methods.add(Method.PLANE)
             }
         })
 
-        view.findViewById<ImageView>(R.id.csIcon1).setOnClickListener({
+        view.findViewById<View>(R.id.iconHitchHicking).setOnClickListener({
+            with(travelHitchHikingText) { isActivated = !isActivated }
             if (checkInMethods(Method.HITCHHIKING)) {
-                csIcon1.setImageResource(R.drawable.ic_directions_hitchhiking)
                 methods.remove(Method.HITCHHIKING)
             } else {
-                csIcon1.setImageResource(R.drawable.ic_directions_hitchhiking_grey)
                 methods.add(Method.HITCHHIKING)
             }
         })
@@ -336,69 +338,23 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             showBlockTravelInformation()
         }
         view.findViewById<ImageView>(R.id.vkIcon).setOnClickListener {
-            if (checkInSocialMethods(SocialNetwork.VK)) {
-                openDialog(SocialNetwork.VK)
-                vkIcon.setImageResource(R.drawable.ic_vk_gray)
-                socNet.remove(SocialNetwork.VK)
-            } else {
-                vkIcon.setImageResource(R.drawable.ic_vk_color)
-                socNet.add(SocialNetwork.VK)
-            }
-            saveSocialData()
-//            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://vk.com/"+linkUsers))
-//            startActivity(browserIntent) //for UserProfileFragment
+            /*
+             Если контакты еще не добавлены, тогда открываем диалоговое окно.
+             Если были какие-то изменения в линках то сохраняем в бд. И меняем цвет иконки соответсвенно значениям.
+             */
+            openDialog(SocialNetwork.VK)
         }
-        view.findViewById<ImageView>(R.id.csIcon).setOnClickListener {
-            if (checkInSocialMethods(SocialNetwork.CS)) {
-                openDialog(SocialNetwork.CS)
-                csIcon.setImageResource(R.drawable.ic_cs_grey)
-                socNet.remove(SocialNetwork.CS)
-            } else {
-                csIcon.setImageResource(R.drawable.ic_cs_color)
-                socNet.add(SocialNetwork.CS)
-            }
-            saveSocialData()
-
-//            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.couchsurfing.com/people/selcukatesoglu"))
-//            startActivity(browserIntent)// for UserProfileFragment
+        view.findViewById<ImageView>(R.id.csIcon).setOnClickListener() {
+            openDialog(SocialNetwork.CS)
         }
         view.findViewById<ImageView>(R.id.whatsUpIcon).setOnClickListener({
-            //            val browserIntent = Intent(Intent.ACTION_VIEW,
-//                    Uri.parse("whatsapp://send?text=Привет, я нашел тебя в ByTheWay.&phone=+number&abid=+number"))
-//            startActivity(browserIntent)// for UserProfileFragment
-
-            if (checkInSocialMethods(SocialNetwork.WHATSAAP)) {
-                openDialog(SocialNetwork.WHATSAAP)
-                whatsUpIcon.setImageResource(R.drawable.ic_whats_icon_grey)
-                socNet.remove(SocialNetwork.WHATSAAP)
-            } else {
-                whatsUpIcon.setImageResource(R.drawable.ic_whats_icon_color)
-                socNet.add(SocialNetwork.WHATSAAP)
-            }
-            saveSocialData()
-
+            openDialog(SocialNetwork.WHATSAAP)
         })
         view.findViewById<ImageView>(R.id.fbcon).setOnClickListener({
-            if (checkInSocialMethods(SocialNetwork.FB)) {
-                openDialog(SocialNetwork.FB)
-                fbcon.setImageResource(R.drawable.ic_fb_grey)
-                socNet.remove(SocialNetwork.FB)
-            } else {
-                fbcon.setImageResource(R.drawable.ic_fb_color)
-                socNet.add(SocialNetwork.FB)
-            }
-            saveSocialData()
+            openDialog(SocialNetwork.FB)
         })
         view.findViewById<ImageView>(R.id.tgIcon).setOnClickListener({
-            if (checkInSocialMethods(SocialNetwork.TG)) {
-                openDialog(SocialNetwork.TG)
-                tgIcon.setImageResource(R.drawable.tg_grey)
-                socNet.remove(SocialNetwork.TG)
-            } else {
-                tgIcon.setImageResource(R.drawable.ic_tg_color)
-                socNet.add(SocialNetwork.TG)
-            }
-            saveSocialData()
+            openDialog(SocialNetwork.TG)
         })
 
         view.findViewById<Button>(R.id.button_save_travel_info).setOnClickListener({
@@ -419,13 +375,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         return view
     }
 
-    private fun saveSocialData() {
-        val map = HashMap<String, Any>()
-        map.put("socialNetwork", socNet)
-        //viewModel?.sendUserData(map, uid)
-    }
-
-    private fun checkInSocialMethods(value: SocialNetwork) = !(value in socNet)
+//    private fun checkInSocialMethods(value: SocialNetwork) = (value in socNet.keys)
 
     private fun sendUserInfoToServer() {
         viewModel?.sendUserData(getHashMapUser(), uid)
@@ -435,7 +385,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         direction.visibility = View.VISIBLE
         maplayout.visibility = View.VISIBLE
         method_moving.visibility = View.VISIBLE
-        layout_method_moving.visibility = View.VISIBLE
         moneyfortrip.visibility = View.VISIBLE
         descriptionprofile.visibility = View.VISIBLE
         button_remove_travel_info.visibility = View.VISIBLE
@@ -477,14 +426,14 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
                 sex = 2
             } else sex = 0
 
-            age = ageChoose.text.toString().toLong()
+            age = ageChoose.text.toString().toLongOrNull() ?: 0
             fillAgeSex(age, sex)
             name = nameChoose.text.toString()
 
             lastName = lastNameChoose.text.toString()
             username.text = StringBuilder(name).append(" ").append(lastName)
             city = cityChoose.text.toString()
-            cityview.text = (city)
+            cityview.text = if (city.isNotEmpty()) city else "Родной город"
             sendUserInfoToServer()
         })
         simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, "Отмена", { dialogInterface, i ->
@@ -501,13 +450,74 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         val inflater = this.layoutInflater
         val dialogView = inflater.inflate(R.layout.custom_dialog_profile_soc_network, null)
         simpleAlert.setView(dialogView)
+        dialogView.findViewById<EditText>(R.id.socLinkText).setText(
+                when (socialNetwork) {
+                    SocialNetwork.VK -> vkLink
+                    SocialNetwork.WHATSAAP -> numberPhone
+                    SocialNetwork.CS -> csLink
+                    SocialNetwork.FB -> fbLink
+                    SocialNetwork.TG -> (if (tgNick.length > 1) tgNick else numberPhone)
+                })
+        simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, "Удалить", { dialog, i ->
+            viewModel?.error?.observe(this@MyProfileFragment, Observer<Int> { error ->
+                when (error) {
+                    Constants.ERROR -> {
+                        Toast.makeText(this@MyProfileFragment.context, " Ошибка сохранения", Toast.LENGTH_SHORT).show()
+                    }
+                    Constants.SUCCESS -> {
+                        changeSocIconsDisActive(socialNetwork)
+                        socNet.remove(socialNetwork.link)
+                    }
+                }
+            })
+            viewModel?.saveLinks(socNet, uid)
+
+        })
         simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Сохранить", { dialogInterface, i ->
-            //  socNet.add(socialNetwork.apply { link = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString() })
-            socialNetwork.link = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString()
-            socNet.add(socialNetwork)
+            val newLink = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString()
+            viewModel?.error?.observe(this@MyProfileFragment, Observer<Int> { error ->
+                when (error) {
+                    Constants.ERROR -> {
+                        Toast.makeText(this@MyProfileFragment.context, " Ошибка сохранения", Toast.LENGTH_SHORT).show()
+                    }
+                    Constants.SUCCESS -> {
+                        changeSocIconsActive(socialNetwork)
+                        socNet.put(socialNetwork.link, newLink)
+                        when (socialNetwork) {
+                            SocialNetwork.VK -> vkLink = newLink
+                            SocialNetwork.WHATSAAP -> numberPhone = newLink
+                            SocialNetwork.CS -> csLink = newLink
+                            SocialNetwork.FB -> fbLink = newLink
+                            SocialNetwork.TG -> tgNick = newLink
+                        }
+                    }
+                }
+            })
             viewModel?.saveLinks(socNet, uid)
         })
         simpleAlert.show()
+    }
+
+    private fun changeSocIconsActive(socialNetwork: SocialNetwork) {
+        when (socialNetwork) {
+            SocialNetwork.VK -> vkIcon.setImageResource(R.drawable.ic_vk_color)
+            SocialNetwork.CS -> csIcon.setImageResource(R.drawable.ic_cs_color)
+            SocialNetwork.FB -> fbcon.setImageResource(R.drawable.ic_fb_color)
+            SocialNetwork.WHATSAAP -> whatsUpIcon.setImageResource(R.drawable.ic_whats_icon_color)
+            SocialNetwork.TG -> tgIcon.setImageResource(R.drawable.ic_tg_color)
+
+        }
+    }
+
+    private fun changeSocIconsDisActive(socialNetwork: SocialNetwork) {
+        when (socialNetwork) {
+            SocialNetwork.VK -> vkIcon.setImageResource(R.drawable.ic_vk_gray)
+            SocialNetwork.CS -> csIcon.setImageResource(R.drawable.ic_cs_grey)
+            SocialNetwork.FB -> fbcon.setImageResource(R.drawable.ic_fb_grey)
+            SocialNetwork.WHATSAAP -> whatsUpIcon.setImageResource(R.drawable.ic_whats_icon_grey)
+            SocialNetwork.TG -> tgIcon.setImageResource(R.drawable.tg_grey)
+
+        }
     }
 
     fun onButtonPressed() {
@@ -601,7 +611,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         hashMap.set("city", city)
         hashMap.set("cities", cities)
         //  hashMap.set("method", methods)
-        // hashMap.set("socNet", socNet)
         hashMap.set("dates", dates)
         hashMap.set("budget", budget)
         hashMap.set("addInformation", add_info_user.text.toString())

@@ -18,8 +18,9 @@
             android:id="@+id/searchParametersText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="#006889"
             android:layout_marginBottom="19dp"
-            android:layout_marginLeft="17dp"
+            android:layout_marginStart="17dp"
             android:layout_marginTop="19dp"
             android:text="+Параметры поиска" />
 

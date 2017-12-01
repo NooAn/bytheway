@@ -10,15 +10,17 @@ enum class Method {
 }
 
 enum class SocialNetwork(var link: String) {
-    VK("vkontakte"),
-    WHATSAAP("wh"),
-    CS(""),
-    FB(""),
-    TG("")
+    VK("VK"),
+    WHATSAAP("WHATSAAP"),
+    CS("CS"),
+    FB("FB"),
+    TG("TG")
 }
 
 data class AirInfo(var hours: String = "0", var countries: String = "0", var kilometers: String = "0")
-
+/**
+ *
+ */
 data class User(var name: String = "",
                 var lastName: String = "",
                 var age: Long = 0,
@@ -39,7 +41,7 @@ data class User(var name: String = "",
                 var percentsSimilarTravel: Int = 0,
                 var addInformation: String = "",
                 var sex: Int = 0,
-                var socialNetwork: ArrayList<SocialNetwork> = arrayListOf(),
+                var socialNetwork: HashMap<String, String> = hashMapOf<String, String>(),
                 var data: Long = 0,
                 var urlPhoto: String = "https://www.ischool.berkeley.edu/sites/default/files/default_images/avatar.jpeg") {
 }

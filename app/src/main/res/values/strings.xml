@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ByTheWay</string>
+    <string name="app_name">bytheway</string>
     <string name="password">Пароль</string>
     <string name="button_send">Отправить</string>
 
@@ -39,6 +39,7 @@
     <string name="woman">woman</string>
     <string name="name">Имя</string>
     <string name="save">Сохранить</string>
+    <string name="exit">Выйти</string>
     <string name="sex_and_age">Пол, возраст</string>
     <string name="add_new_trip">+ Создать поездку</string>
     <string name="app_in_the_air">App in the Air</string>
@@ -75,4 +76,6 @@
     <string name="travelHitchHicking">Автостоп</string>
     <string name="mail">Электронный адрес</string>
     <string name="feedback_writte">Напишите отзыв или предложение</string>
+    <string name="add_new_trip_from_app_in_the_air">+ Добавить поездку  App in the Air</string>
+    <string name="feedback">Обратная связь</string>
 </resources>

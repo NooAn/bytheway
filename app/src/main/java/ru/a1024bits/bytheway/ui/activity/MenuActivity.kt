@@ -319,8 +319,7 @@ class MenuActivity : AppCompatActivity(),
             R.id.search_item -> navigator.applyCommand(Replace(Screens.SEARCH_MAP_SCREEN, 1))
             R.id.all_users_item -> navigator.applyCommand(Replace(Screens.ALL_USERS_SCREEN, 1))
             R.id.feedback -> openDialogFeedback()//navigator.applyCommand(Replace(Screens.FEEDBACK_SCREEN, 1))
-            R.id.similar_travel_item -> navigator.applyCommand(Replace(Screens.SIMILAR_TRAVELS_SCREEN, 1))
-            R.id.exit_item -> {
+            R.id.sing_out -> {
                 preferences.edit().putBoolean(Constants.FIRST_ENTER, true).apply() //prepare for next first start
                 finishAffinity()
             }
