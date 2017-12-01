@@ -11,6 +11,9 @@ import android.support.v4.app.Fragment
 import android.support.v7.widget.SearchView
 import android.util.Log
 import android.view.*
+import android.view.animation.AlphaAnimation
+import android.view.animation.AnimationUtils
+import android.view.animation.TranslateAnimation
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import com.borax12.materialdaterangepicker.date.DatePickerDialog
@@ -58,7 +61,7 @@ class AllUsersFragment : Fragment() {
         } else {
             tempStartDate = Calendar.getInstance()
             tempEndDate = Calendar.getInstance()
-            tempEndDate.timeInMillis = tempEndDate.timeInMillis + 1000L * 60 * 60 * 24 * 182
+            tempEndDate.timeInMillis = tempEndDate.timeInMillis + 1000L * 60 * 60 * 24
             Filter()
         }
         updateDateDialog()
