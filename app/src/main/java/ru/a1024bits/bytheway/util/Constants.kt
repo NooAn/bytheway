@@ -11,4 +11,8 @@ object Constants {
     val ACCESS_TOKEN = "access_t"
     val REFRESH_TOKEN = "refresh_t"
     val TYPE_TOKEN = "type_t"
+
+
+    val ERROR: Int = -1
+    val SUCCESS: Int = 1
 }

@@ -9,7 +9,6 @@
     android:fitsSystemWindows="true"
     tools:openDrawer="start">
 
-
     <include
         layout="@layout/app_bar_main"
         android:layout_width="match_parent"
@@ -20,7 +19,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="@color/hint"
+        android:background="@color/white"
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/nav_header_main"
         app:menu="@menu/activity_main_drawer">
@@ -29,13 +28,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
+            android:background="@color/white"
             android:orientation="vertical">
 
             <Button
                 android:id="@+id/feedback"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/hint"
+                android:background="@color/white"
                 android:drawablePadding="30dp"
                 android:drawableStart="@drawable/ic_feedback"
                 android:gravity="center_vertical|start"
@@ -48,7 +48,7 @@
                 android:id="@+id/sing_out"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/hint"
+                android:background="@color/white"
                 android:drawablePadding="30dp"
                 android:drawableStart="@drawable/ic_exit_to_app"
                 android:gravity="center_vertical|start"
@@ -58,8 +58,5 @@
                 android:textAllCaps="false" />
 
         </LinearLayout>
-
     </android.support.design.widget.NavigationView>
-
-
 </android.support.v4.widget.DrawerLayout>

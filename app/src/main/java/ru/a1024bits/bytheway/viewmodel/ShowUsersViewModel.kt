@@ -101,8 +101,6 @@ class ShowUsersViewModel @Inject constructor(var userRepository: UserRepository)
             user.age = document.data.getValue("age") as Long
         if (document.data.containsKey("budget"))
             user.budget = document.data.getValue("budget") as Long
-        if (document.data.containsKey("socialNetwork"))
-            user.socialNetwork = document.data.getValue("socialNetwork") as ArrayList<SocialNetwork>
         if (document.data.containsKey("method"))
             user.method = document.data.getValue("method") as ArrayList<Method>
 //        if (document.data.containsKey("route"))
