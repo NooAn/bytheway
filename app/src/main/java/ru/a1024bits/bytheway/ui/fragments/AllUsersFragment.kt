@@ -61,38 +61,7 @@ class AllUsersFragment : Fragment() {
             tempEndDate.timeInMillis = tempEndDate.timeInMillis + 1000L * 60 * 60 * 24 * 182
             Filter()
         }
-        dateDialog = DatePickerDialog.newInstance(
-                { _, year, monthOfYear, dayOfMonth, yearEnd, monthOfYearEnd, dayOfMonthEnd ->
-                    Log.d("tag", " year + $year ; monthOfYear + $monthOfYear ; dayOfMonth + $dayOfMonth ; yearEnd + $yearEnd ; monthOfYearEnd + $monthOfYearEnd ; dayOfMonthEnd + $dayOfMonthEnd ")
-                    val calendarStartDate = Calendar.getInstance()
-                    calendarStartDate.set(Calendar.YEAR, year)
-                    calendarStartDate.set(Calendar.MONTH, monthOfYear)
-                    calendarStartDate.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-
-                    val calendarEndDate = Calendar.getInstance()
-                    calendarEndDate.set(Calendar.YEAR, yearEnd)
-                    calendarEndDate.set(Calendar.MONTH, monthOfYearEnd)
-                    calendarEndDate.set(Calendar.DAY_OF_MONTH, dayOfMonthEnd)
-
-                    if (calendarStartDate.timeInMillis >= calendarEndDate.timeInMillis) {
-                        Snackbar.make(activity.findViewById(android.R.id.content), "даты оказались некорректными, попробуйте ввести их снова", Snackbar.LENGTH_LONG).show()
-                        return@newInstance
-                    }
-                    tempStartDate = calendarStartDate
-                    tempEndDate = calendarEndDate
-                    updateChoseDateButtons(calendarStartDate, calendarEndDate)
-                },
-                tempStartDate.get(Calendar.YEAR),
-                tempStartDate.get(Calendar.MONTH),
-                tempStartDate.get(Calendar.DAY_OF_MONTH),
-                tempEndDate.get(Calendar.YEAR),
-                tempEndDate.get(Calendar.MONTH),
-                tempEndDate.get(Calendar.DAY_OF_MONTH))
-    }
-
-    private fun updateChoseDateButtons(calendarStartDate: Calendar, calendarEndDate: Calendar) {
-        startDate.text = ("c: " + calendarStartDate.get(Calendar.DAY_OF_MONTH) + " " + context.resources.getStringArray(R.array.months_array)[calendarStartDate.get(Calendar.MONTH)]
-                + " по: " + calendarEndDate.get(Calendar.DAY_OF_MONTH) + " " + context.resources.getStringArray(R.array.months_array)[calendarEndDate.get(Calendar.MONTH)])
+        updateDateDialog()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
@@ -175,7 +144,7 @@ class AllUsersFragment : Fragment() {
         }
 
         cancelParameters.setOnClickListener {
-            sexButtons.check(when (tempSex) {
+            sexButtons.check(when (filter.sex) {
                 1 -> sex_M.id
                 2 -> sex_W.id
                 else -> sex_Any.id
@@ -191,6 +160,7 @@ class AllUsersFragment : Fragment() {
             if (filter.endDate > 0)
                 tempEndDate.timeInMillis = filter.endDate
 
+            updateDateDialog()
             updateChoseDateButtons(tempStartDate, tempEndDate)
 
         }
@@ -271,6 +241,41 @@ class AllUsersFragment : Fragment() {
         outState.putSerializable("tempStartDate", tempStartDate)
         outState.putSerializable("tempEndDate", tempEndDate)
         outState.putInt("tempSex", tempSex)
+    }
+
+    private fun updateDateDialog() {
+        dateDialog = DatePickerDialog.newInstance(
+                { _, year, monthOfYear, dayOfMonth, yearEnd, monthOfYearEnd, dayOfMonthEnd ->
+                    Log.d("tag", " year + $year ; monthOfYear + $monthOfYear ; dayOfMonth + $dayOfMonth ; yearEnd + $yearEnd ; monthOfYearEnd + $monthOfYearEnd ; dayOfMonthEnd + $dayOfMonthEnd ")
+                    val calendarStartDate = Calendar.getInstance()
+                    calendarStartDate.set(Calendar.YEAR, year)
+                    calendarStartDate.set(Calendar.MONTH, monthOfYear)
+                    calendarStartDate.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+
+                    val calendarEndDate = Calendar.getInstance()
+                    calendarEndDate.set(Calendar.YEAR, yearEnd)
+                    calendarEndDate.set(Calendar.MONTH, monthOfYearEnd)
+                    calendarEndDate.set(Calendar.DAY_OF_MONTH, dayOfMonthEnd)
+
+                    if (calendarStartDate.timeInMillis >= calendarEndDate.timeInMillis) {
+                        Snackbar.make(activity.findViewById(android.R.id.content), "даты оказались некорректными, попробуйте ввести их снова", Snackbar.LENGTH_LONG).show()
+                        return@newInstance
+                    }
+                    tempStartDate = calendarStartDate
+                    tempEndDate = calendarEndDate
+                    updateChoseDateButtons(calendarStartDate, calendarEndDate)
+                },
+                tempStartDate.get(Calendar.YEAR),
+                tempStartDate.get(Calendar.MONTH),
+                tempStartDate.get(Calendar.DAY_OF_MONTH),
+                tempEndDate.get(Calendar.YEAR),
+                tempEndDate.get(Calendar.MONTH),
+                tempEndDate.get(Calendar.DAY_OF_MONTH))
+    }
+
+    private fun updateChoseDateButtons(calendarStartDate: Calendar, calendarEndDate: Calendar) {
+        startDate.text = ("c: " + calendarStartDate.get(Calendar.DAY_OF_MONTH) + " " + context.resources.getStringArray(R.array.months_array)[calendarStartDate.get(Calendar.MONTH)]
+                + " по: " + calendarEndDate.get(Calendar.DAY_OF_MONTH) + " " + context.resources.getStringArray(R.array.months_array)[calendarEndDate.get(Calendar.MONTH)])
     }
 
     companion object {
