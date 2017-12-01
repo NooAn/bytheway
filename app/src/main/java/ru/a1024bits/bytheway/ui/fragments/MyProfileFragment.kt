@@ -7,6 +7,7 @@ import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
+import android.text.Layout
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -174,26 +175,24 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         for (method in user.method) {
             when (method) {
                 Method.TRAIN -> {
-                    directions_railway.setImageResource(R.drawable.ic_directions_railway)
+                    with(iconTrain) { isActivated = true }
                     methods.add(Method.TRAIN)
                 }
                 Method.BUS -> {
-                    directions_bus.setImageResource(R.drawable.ic_directions_bus)
+                    with(iconBus) { isActivated = true }
                     methods.add(Method.BUS)
                 }
                 Method.CAR -> {
-                    directions_car.setImageResource(R.drawable.ic_directions_car)
+                    with(iconCar) { isActivated = true }
                     methods.add(Method.CAR)
                 }
                 Method.PLANE -> {
-                    directions_flight.setImageResource(R.drawable.ic_flight)
+                    with(iconPlane) { isActivated = true }
                     methods.add(Method.PLANE)
                 }
                 Method.HITCHHIKING -> {
-                    csIcon1.setImageResource(R.drawable.ic_directions_hitchhiking)
+                    with(iconHitchHicking) { isActivated = true }
                     methods.add(Method.HITCHHIKING)
-                }
-                else -> {
                 }
             }
         }
@@ -236,7 +235,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         direction.visibility = View.GONE
         maplayout.visibility = View.GONE
         method_moving.visibility = View.GONE
-        layout_method_moving.visibility = View.GONE
         moneyfortrip.visibility = View.GONE
         descriptionprofile.visibility = View.GONE
         button_remove_travel_info.visibility = View.GONE
@@ -288,52 +286,47 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             }
         })
 
-        view.findViewById<ImageView>(R.id.directions_car).setOnClickListener({
+        view.findViewById<View>(R.id.iconCar).setOnClickListener({
+            with(travelCarText) { isActivated = !isActivated }
             if (checkInMethods(Method.CAR)) {
-                directions_car.setImageResource(R.drawable.ic_directions_car_grey)
                 methods.remove(Method.CAR)
             } else {
-                directions_car.setImageResource(R.drawable.ic_directions_car)
                 methods.add(Method.CAR)
             }
         })
 
-        view.findViewById<ImageView>(R.id.directions_railway).setOnClickListener({
+        view.findViewById<View>(R.id.iconTrain).setOnClickListener({
+            with(travelTrainText) { isActivated = !isActivated }
             if (checkInMethods(Method.TRAIN)) {
-                directions_railway.setImageResource(R.drawable.ic_directions_railway_grey)
                 methods.remove(Method.TRAIN)
             } else {
-                directions_railway.setImageResource(R.drawable.ic_directions_railway)
                 methods.add(Method.TRAIN)
             }
         })
 
-        view.findViewById<ImageView>(R.id.directions_bus).setOnClickListener({
+        view.findViewById<View>(R.id.iconBus).setOnClickListener({
+            with(travelBusText) { isActivated = !isActivated }
             if (checkInMethods(Method.BUS)) {
-                directions_bus.setImageResource(R.drawable.ic_directions_bus_grey)
                 methods.remove(Method.BUS)
             } else {
-                directions_bus.setImageResource(R.drawable.ic_directions_bus)
                 methods.add(Method.BUS)
             }
         })
 
-        view.findViewById<ImageView>(R.id.directions_flight).setOnClickListener({
+        view.findViewById<View>(R.id.iconPlane).setOnClickListener({
+            with(travelPlaneText) { isActivated = !isActivated }
             if (checkInMethods(Method.PLANE)) {
-                directions_flight.setImageResource(R.drawable.ic_flight_grey)
                 methods.remove(Method.PLANE)
             } else {
-                directions_flight.setImageResource(R.drawable.ic_flight)
                 methods.add(Method.PLANE)
             }
         })
 
-        view.findViewById<ImageView>(R.id.csIcon1).setOnClickListener({
+        view.findViewById<View>(R.id.iconHitchHicking).setOnClickListener({
+            with(travelHitchHikingText) { isActivated = !isActivated }
             if (checkInMethods(Method.HITCHHIKING)) {
-                csIcon1.setImageResource(R.drawable.ic_directions_hitchhiking)
                 methods.remove(Method.HITCHHIKING)
             } else {
-                csIcon1.setImageResource(R.drawable.ic_directions_hitchhiking_grey)
                 methods.add(Method.HITCHHIKING)
             }
         })
@@ -392,7 +385,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         direction.visibility = View.VISIBLE
         maplayout.visibility = View.VISIBLE
         method_moving.visibility = View.VISIBLE
-        layout_method_moving.visibility = View.VISIBLE
         moneyfortrip.visibility = View.VISIBLE
         descriptionprofile.visibility = View.VISIBLE
         button_remove_travel_info.visibility = View.VISIBLE
