@@ -15,4 +15,6 @@ object Constants {
     val SUCCESS: Int = 1
     val LAST_INDEX_CITY = "first_city"
     val FIRST_INDEX_CITY = "last_city"
+    val START_DATE = "start_date"
+    val END_DATE = "end_date"
 }

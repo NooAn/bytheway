@@ -40,10 +40,12 @@ import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.a1024bits.bytheway.util.Constants
+import ru.a1024bits.bytheway.util.Constants.END_DATE
 import ru.a1024bits.bytheway.util.Constants.FIRST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM
 import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO
+import ru.a1024bits.bytheway.util.Constants.START_DATE
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import ru.terrakok.cicerone.commands.Replace
 import java.text.SimpleDateFormat
@@ -70,8 +72,17 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                 .append(" ")
                 .append(yearEnd).toString())
 
-        dates.add(1232)
-        dates.add(123)
+        dates.put(START_DATE, getLongFromDate(dayOfMonth, monthOfYear, year))
+        dates.put(END_DATE, getLongFromDate(dayOfMonthEnd, monthOfYearEnd, yearEnd))
+    }
+
+    private fun getLongFromDate(day: Int, month: Int, year: Int): Long {
+        val dateString = "09 9 2012"
+        val dateFormat = SimpleDateFormat("dd MM yyyy")
+        val date = dateFormat.parse(dateString)
+        val unixTime = date.time.toLong() / 1000
+        Log.e("LOG time", unixTime.toString())
+        return unixTime
     }
 
     private var viewModel: MyProfileViewModel? = null
@@ -106,7 +117,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     private var socNet: HashMap<String, String> = hashMapOf()
 
-    private var dates: ArrayList<Long> = arrayListOf()
+    private var dates: HashMap<String, Long> = hashMapOf()
 
     private var sex: Int = 0
 
@@ -186,13 +197,11 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         val formatDate = SimpleDateFormat("dd.MM.yyyy")
 
         if (user.dates.size > 0) {
-            val lastIndexArr = user.dates.size - 1
-            val dayBegin = formatDate.format(Date(user.dates.get(0)))
-            val dayArrival = formatDate.format(Date(user.dates.get(lastIndexArr)))
+            val dayBegin = formatDate.format(Date(user.dates.get(START_DATE) ?: 0))
+            val dayArrival = formatDate.format(Date(user.dates.get(END_DATE) ?: 0))
             textDateFrom.setText(dayBegin)
             dateArrived.setText(dayArrival)
-            dates.add(user.dates.get(0))
-            dates.add(user.dates.get(lastIndexArr))
+            dates = user.dates
         }
 
         fillAgeSex(user.age, user.sex)
@@ -766,9 +775,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         hashMap.set("name", name)
         hashMap.set("lastName", lastName)
         hashMap.set("city", city)
-
         hashMap.set("cities", cities)
-        //  hashMap.set("method", methods)
+        hashMap.set("method", methods)
         hashMap.set("dates", dates)
         hashMap.set("budget", budget)
         hashMap.set("cityFromLatLng", cityFromLatLng)
