@@ -31,6 +31,7 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                     Log.e("LOG", "error ${it.message}")
                 }
                 .addOnSuccessListener { document ->
+                //    Log.e("LOG", document.metadata.)
                     val profile = document.toObject(User::class.java)
                     user.setValue(profile)
                 }

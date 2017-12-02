@@ -1,12 +1,14 @@
 package ru.a1024bits.bytheway.model
 
-enum class Method {
-    TRAIN,
-    BUS,
-    CAR,
-    PLANE,
-    HITCHHIKING,
-    BOAT
+import com.google.firebase.firestore.GeoPoint
+
+enum class Method(var link: String) {
+    TRAIN("train"),
+    BUS("bus"),
+    CAR("car"),
+    PLANE("plane"),
+    HITCHHIKING("hitchhiking"),
+    BOAT("boat")
 }
 
 enum class SocialNetwork(var link: String) {
@@ -28,10 +30,12 @@ data class User(var name: String = "",
                 var phone: String = "",
                 var countTrip: Int = 0,
                 var flightHours: Long = 0,
+                var cityFromLatLng: GeoPoint = GeoPoint(0.0, 0.0),
+                var cityToLatLng: GeoPoint = GeoPoint(0.0, 0.0),
                 var countries: Long = 0,
                 var kilometers: Long = 0,
                 var route: String = "",//ArrayList<String> = arrayListOf(),
-                var cities: ArrayList<String> = arrayListOf(),
+                var cities: HashMap<String, String> = hashMapOf<String, String>(),
                 var method: ArrayList<Method> = arrayListOf(),
                 var dates: ArrayList<Long> = arrayListOf(),
                 var budget: Long = 0,
