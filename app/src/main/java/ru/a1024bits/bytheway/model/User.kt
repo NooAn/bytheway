@@ -11,24 +11,22 @@ enum class Method {
 
 enum class SocialNetwork(var link: String) {
     VK("VK"),
-    WHATSAAP("WHATSAAP"),
+    WHATSAPP("WHATSAPP"),
     CS("CS"),
     FB("FB"),
     TG("TG")
 }
 
-data class AirInfo(var hours: String = "0", var countries: String = "0", var kilometers: String = "0")
 /**
  *
  */
 data class User(var name: String = "",
                 var lastName: String = "",
-                var age: Long = 0,
+                var age: Int = 0,
                 var id: String = "0",
                 var email: String = "",
                 var phone: String = "",
                 var countTrip: Int = 0,
-                var airInfo: AirInfo = AirInfo(),
                 var flightHours: Long = 0,
                 var countries: Long = 0,
                 var kilometers: Long = 0,

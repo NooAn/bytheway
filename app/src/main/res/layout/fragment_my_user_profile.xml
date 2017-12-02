@@ -82,7 +82,7 @@
                 android:background="@color/greyTravelTypeDivider" />
 
             <ImageView
-                android:id="@+id/whatsUpIcon"
+                android:id="@+id/whatsAppIcon"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginEnd="6dp"

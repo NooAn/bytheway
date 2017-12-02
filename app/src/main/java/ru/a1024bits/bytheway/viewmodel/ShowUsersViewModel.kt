@@ -28,9 +28,8 @@ class ShowUsersViewModel @Inject constructor(var userRepository: UserRepository)
                         val result: MutableList<User> = ArrayList()
                         for (document in task.result) {
                             try {
-                                val user = User()
+                                val user = document.toObject(User::class.java)
                                 Log.d(TAG, document.id + " => " + document.data)
-                                initializeUserFromDocument(user, document)
 
                                 if ((filter.startBudget > 0) && (filter.endBudget > 0))
                                     if (user.budget < filter.startBudget || user.budget > filter.endBudget) continue
@@ -63,9 +62,8 @@ class ShowUsersViewModel @Inject constructor(var userRepository: UserRepository)
                         val result: MutableList<User> = ArrayList()
                         for (document in task.result) {
                             try {
-                                val user = User()
                                 Log.d(TAG, document.id + " => " + document.data)
-                                initializeUserFromDocument(user, document)
+                                val user = document.toObject(User::class.java)
 
                                 //will this be uncommented ever?
 
@@ -92,33 +90,4 @@ class ShowUsersViewModel @Inject constructor(var userRepository: UserRepository)
                     }
                 }
     }
-
-    private fun initializeUserFromDocument(user: User, document: DocumentSnapshot) {
-        user.lastName = document.data.getValue("lastName") as String
-        user.email = document.data.getValue("email") as String
-        user.name = document.data.getValue("name") as String
-        if (document.data.containsKey("age"))
-            user.age = document.data.getValue("age") as Long
-        if (document.data.containsKey("budget"))
-            user.budget = document.data.getValue("budget") as Long
-        if (document.data.containsKey("method"))
-            user.method = document.data.getValue("method") as ArrayList<Method>
-//        if (document.data.containsKey("route"))
-//            user.route = document.data.getValue("route") as ArrayList<String>
-        if (document.data.containsKey("cities"))
-            user.cities = document.data.getValue("cities") as ArrayList<String>
-        if (document.data.containsKey("urlPhoto"))
-            user.urlPhoto = document.data.getValue("urlPhoto") as String
-        if (document.data.containsKey("phone"))
-            user.phone = document.data.getValue("phone") as String
-        if (document.data.containsKey("sex"))
-            user.sex = (document.data.getValue("sex") as Long).toInt()
-        if (document.data.containsKey("id"))
-            user.id = document.data.getValue("id") as String
-        if (document.data.containsKey("data"))
-            user.data = document.data.getValue("data") as Long
-        if (document.data.containsKey("city"))
-            user.city = document.data.getValue("city") as String
-    }
-
 }
