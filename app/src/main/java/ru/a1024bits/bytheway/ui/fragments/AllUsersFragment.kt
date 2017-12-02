@@ -11,9 +11,6 @@ import android.support.v4.app.Fragment
 import android.support.v7.widget.SearchView
 import android.util.Log
 import android.view.*
-import android.view.animation.AlphaAnimation
-import android.view.animation.AnimationUtils
-import android.view.animation.TranslateAnimation
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import com.borax12.materialdaterangepicker.date.DatePickerDialog
@@ -22,18 +19,12 @@ import kotlinx.android.synthetic.main.searching_parameters_block.*
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.ExtensionsAllUsers
 import ru.a1024bits.bytheway.R
-import ru.a1024bits.bytheway.R.layout.fragment_display_all_users
-import ru.a1024bits.bytheway.R.layout.searching_parameters_block
 import ru.a1024bits.bytheway.adapter.ShowAllUsersAdapter
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.viewmodel.ShowUsersViewModel
 import java.util.*
 import javax.inject.Inject
-import android.view.animation.Animation
-import android.view.animation.ScaleAnimation
-
-
 
 
 class AllUsersFragment : Fragment() {
@@ -110,7 +101,7 @@ class AllUsersFragment : Fragment() {
             }
         }
 
-        startDate.setOnClickListener {
+        choseDate.setOnClickListener {
             dateDialog.show(activity.fragmentManager, "")
         }
 
@@ -284,7 +275,7 @@ class AllUsersFragment : Fragment() {
     }
 
     private fun updateChoseDateButtons(calendarStartDate: Calendar, calendarEndDate: Calendar) {
-        startDate.text = ("c: " + calendarStartDate.get(Calendar.DAY_OF_MONTH) + " " + context.resources.getStringArray(R.array.months_array)[calendarStartDate.get(Calendar.MONTH)]
+        choseDate.text = ("c: " + calendarStartDate.get(Calendar.DAY_OF_MONTH) + " " + context.resources.getStringArray(R.array.months_array)[calendarStartDate.get(Calendar.MONTH)]
                 + " по: " + calendarEndDate.get(Calendar.DAY_OF_MONTH) + " " + context.resources.getStringArray(R.array.months_array)[calendarEndDate.get(Calendar.MONTH)])
     }
 

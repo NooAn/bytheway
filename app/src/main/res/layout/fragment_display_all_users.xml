@@ -16,7 +16,7 @@
             android:paddingStart="17dp"
             android:paddingTop="19dp"
             android:gravity="center_vertical|start"
-            android:background="@color/hint"
+            android:background="#EFEFEF"
             android:text="+Параметры поиска"
             android:textColor="#006889" />
 
