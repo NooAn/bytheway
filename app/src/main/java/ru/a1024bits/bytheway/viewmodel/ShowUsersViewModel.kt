@@ -25,8 +25,6 @@ class ShowUsersViewModel @Inject constructor(var userRepository: UserRepository)
         userRepository.getUsers()
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-//                        Log.d("tag", "filter: " + "filter.endAge: " + filter.endAge + " filter.startAge: " + filter.startAge + " filter.startDate: " + filter.startDate + " filter.endDate: " + filter.endDate + " filter.startBudget: " + filter.startBudget + " filter.endBudget: " + filter.endBudget + " filter.sex: " + filter.sex)
-                        Log.d("tag", "filter: " + filter)
                         val result: MutableList<User> = ArrayList()
                         for (document in task.result) {
                             try {

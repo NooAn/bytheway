@@ -36,13 +36,6 @@ class AllUsersFragment : Fragment() {
     private lateinit var showUsersAdapter: ShowAllUsersAdapter
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
     private var countInitialElements = 0
-//    private var tempStartAge: Int = 0
-//    private var tempEndAge: Int = -1
-//    private var tempStartBudget: Int = -1
-//    private var tempEndBudget: Int = -1
-//    private lateinit var tempStartDate: Calendar
-//    private lateinit var tempEndDate: Calendar
-//    private var tempSex: Int = 0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,25 +44,12 @@ class AllUsersFragment : Fragment() {
         extension = ExtensionsAllUsers(context)
 
         filter = if (savedInstanceState != null) {
-//            tempStartAge = savedInstanceState.getInt("tempStartAge")
-//            tempSex = savedInstanceState.getInt("tempSex")
-//            tempEndAge = savedInstanceState.getInt("tempEndAge")
-//            tempStartBudget = savedInstanceState.getInt("tempStartBudget")
-//            tempEndBudget = savedInstanceState.getInt("tempEndBudget")
-//            tempStartDate = savedInstanceState.getSerializable("tempStartDate") as Calendar
-//            tempEndDate = savedInstanceState.getSerializable("tempEndDate") as Calendar
             savedInstanceState.getSerializable("filter") as Filter
         } else {
             val result = Filter()
-//            tempStartDate = Calendar.getInstance()
-//            tempStartDate.timeInMillis = 0L
-//            tempEndDate = Calendar.getInstance()
-//            tempEndDate.timeInMillis = 0L
             result.endAge = extension.yearsOldUsers.size - 1
-//            result.endAge = tempEndAge
             result
         }
-        Log.d("tag", "user: " + "filter.endAge: " + filter.endAge + " filter.startAge: " + filter.startAge + " filter.startDate: " + filter.startDate + " filter.endDate: " + filter.endDate + " filter.startBudget: " + filter.startBudget + " filter.endBudget: " + filter.endBudget + " filter.sex: " + filter.sex)
         updateDateDialog()
     }
 
@@ -127,17 +107,8 @@ class AllUsersFragment : Fragment() {
                 filter.startBudget = Integer.parseInt(startBudget.text.toString())
             if (endBudget.text.isNotEmpty())
                 filter.endBudget = Integer.parseInt(endBudget.text.toString())
-//            filter.startAge = tempStartAge
-//            filter.endAge = tempEndAge
-//            filter.startBudget = tempStartBudget
-//            filter.endBudget = tempEndBudget
-//            filter.startDate = tempStartDate.timeInMillis
-//            filter.endDate = tempEndDate.timeInMillis
-//            filter.sex = tempSex
             filter.startCity = startCity.text.toString()
             filter.endCity = endCity.text.toString()
-
-            Log.d("tag", "user: " + "filter.endAge: " + filter.endAge + " filter.startAge: " + filter.startAge + " filter.startDate: " + filter.startDate + " filter.endDate: " + filter.endDate + " filter.startBudget: " + filter.startBudget + " filter.endBudget: " + filter.endBudget + " filter.sex: " + filter.sex)
 
             loading_where_load_users.visibility = View.VISIBLE
             viewModel.getAllUsers(filter)
@@ -247,16 +218,6 @@ class AllUsersFragment : Fragment() {
         if (endBudget.text.isNotEmpty())
             filter.endBudget = Integer.parseInt(endBudget.text.toString())
         outState.putSerializable("filter", filter)
-//        outState.putInt("tempStartAge", tempStartAge)
-//        outState.putInt("tempEndAge", tempEndAge)
-//        outState.putInt("tempStartBudget", tempStartBudget)
-//        outState.putInt("tempEndBudget", tempEndBudget)
-//        outState.putSerializable("tempStartDate", tempStartDate)
-//        outState.putSerializable("tempEndDate", tempEndDate)
-//        outState.putInt("tempSex", tempSex)
-
-        Log.d("tag", "user: " + "filter.endAge: " + filter.endAge + " filter.startAge: " + filter.startAge + " filter.startDate: " + filter.startDate + " filter.endDate: " + filter.endDate + " filter.startBudget: " + filter.startBudget + " filter.endBudget: " + filter.endBudget + " filter.sex: " + filter.sex)
-
     }
 
     private fun updateDateDialog() {
@@ -268,7 +229,6 @@ class AllUsersFragment : Fragment() {
 
         dateDialog = DatePickerDialog.newInstance(
                 { _, year, monthOfYear, dayOfMonth, yearEnd, monthOfYearEnd, dayOfMonthEnd ->
-                    Log.d("tag", " year + $year ; monthOfYear + $monthOfYear ; dayOfMonth + $dayOfMonth ; yearEnd + $yearEnd ; monthOfYearEnd + $monthOfYearEnd ; dayOfMonthEnd + $dayOfMonthEnd ")
                     val calendarStartDate = Calendar.getInstance()
                     calendarStartDate.set(Calendar.YEAR, year)
                     calendarStartDate.set(Calendar.MONTH, monthOfYear)
