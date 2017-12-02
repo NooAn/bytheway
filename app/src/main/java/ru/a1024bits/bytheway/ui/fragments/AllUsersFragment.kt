@@ -36,11 +36,13 @@ class AllUsersFragment : Fragment() {
     private lateinit var showUsersAdapter: ShowAllUsersAdapter
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
     private var countInitialElements = 0
-    private var tempStartAge: Int = -1
-    private var tempEndAge: Int = -1
-    private lateinit var tempStartDate: Calendar
-    private lateinit var tempEndDate: Calendar
-    private var tempSex: Int = 0
+//    private var tempStartAge: Int = 0
+//    private var tempEndAge: Int = -1
+//    private var tempStartBudget: Int = -1
+//    private var tempEndBudget: Int = -1
+//    private lateinit var tempStartDate: Calendar
+//    private lateinit var tempEndDate: Calendar
+//    private var tempSex: Int = 0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,18 +51,25 @@ class AllUsersFragment : Fragment() {
         extension = ExtensionsAllUsers(context)
 
         filter = if (savedInstanceState != null) {
-            tempStartAge = savedInstanceState.getInt("tempStartAge")
-            tempSex = savedInstanceState.getInt("tempSex")
-            tempEndAge = savedInstanceState.getInt("tempEndAge")
-            tempStartDate = savedInstanceState.getSerializable("tempStartDate") as Calendar
-            tempEndDate = savedInstanceState.getSerializable("tempEndDate") as Calendar
+//            tempStartAge = savedInstanceState.getInt("tempStartAge")
+//            tempSex = savedInstanceState.getInt("tempSex")
+//            tempEndAge = savedInstanceState.getInt("tempEndAge")
+//            tempStartBudget = savedInstanceState.getInt("tempStartBudget")
+//            tempEndBudget = savedInstanceState.getInt("tempEndBudget")
+//            tempStartDate = savedInstanceState.getSerializable("tempStartDate") as Calendar
+//            tempEndDate = savedInstanceState.getSerializable("tempEndDate") as Calendar
             savedInstanceState.getSerializable("filter") as Filter
         } else {
-            tempStartDate = Calendar.getInstance()
-            tempEndDate = Calendar.getInstance()
-            tempEndDate.timeInMillis = tempEndDate.timeInMillis + 1000L * 60 * 60 * 24
-            Filter()
+            val result = Filter()
+//            tempStartDate = Calendar.getInstance()
+//            tempStartDate.timeInMillis = 0L
+//            tempEndDate = Calendar.getInstance()
+//            tempEndDate.timeInMillis = 0L
+            result.endAge = extension.yearsOldUsers.size - 1
+//            result.endAge = tempEndAge
+            result
         }
+        Log.d("tag", "user: " + "filter.endAge: " + filter.endAge + " filter.startAge: " + filter.startAge + " filter.startDate: " + filter.startDate + " filter.endDate: " + filter.endDate + " filter.startBudget: " + filter.startBudget + " filter.endBudget: " + filter.endBudget + " filter.sex: " + filter.sex)
         updateDateDialog()
     }
 
@@ -78,11 +87,10 @@ class AllUsersFragment : Fragment() {
         startAge.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(p0: AdapterView<*>?) {}
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, p3: Long) {
-                if (countInitialElements++ < SIZE_INITIAL_ELEMENTS && tempStartAge >= 0) {
-                    startAge.setSelection(tempStartAge)
-                    return
-                }
-                tempStartAge = position
+                if (countInitialElements++ < SIZE_INITIAL_ELEMENTS)
+                    startAge.setSelection(filter.startAge)
+                else
+                    filter.startAge = position
             }
         }
 
@@ -91,78 +99,76 @@ class AllUsersFragment : Fragment() {
         endAge.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(p0: AdapterView<*>?) {}
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, p3: Long) {
-                if (countInitialElements++ < SIZE_INITIAL_ELEMENTS) {
-                    val settingAge = if (tempEndAge >= 0) tempEndAge else extension.yearsOldUsers.size - 1
-                    endAge.setSelection(settingAge)
-                    tempEndAge = settingAge
-                    return
-                }
-                tempEndAge = position
+                if (countInitialElements++ < SIZE_INITIAL_ELEMENTS)
+                    endAge.setSelection(filter.endAge)
+                else
+                    filter.endAge = position
             }
         }
-
         choseDate.setOnClickListener {
             dateDialog.show(activity.fragmentManager, "")
         }
-
-        if (filter.startBudget > 0)
-            startBudget.setText(filter.startBudget.toString())
-        if (filter.endBudget > 0)
-            endBudget.setText(filter.endBudget.toString())
-
         sexButtons.setOnCheckedChangeListener { _, id ->
-            tempSex = when (id) {
+            filter.sex = when (id) {
                 sex_M.id -> 1
                 sex_W.id -> 2
                 else -> 0
             }
         }
-        sexButtons.check(when (tempSex) {
+        sexButtons.check(when (filter.sex) {
             1 -> sex_M.id
             2 -> sex_W.id
             else -> sex_Any.id
         })
-        updateChoseDateButtons(tempStartDate, tempEndDate)
+        updateChoseDateButtons()
 
         saveParameters.setOnClickListener {
-            filter.startAge = tempStartAge
-            filter.endAge = tempEndAge
-            filter.startDate = tempStartDate.timeInMillis
-            filter.endDate = tempEndDate.timeInMillis
-            if (startBudget.text.toString().isNotEmpty())
+            if (startBudget.text.isNotEmpty())
                 filter.startBudget = Integer.parseInt(startBudget.text.toString())
-            else filter.startBudget = 0
-            if (endBudget.text.toString().isNotEmpty())
+            if (endBudget.text.isNotEmpty())
                 filter.endBudget = Integer.parseInt(endBudget.text.toString())
-            else filter.endBudget = 0
-            filter.sex = tempSex
+//            filter.startAge = tempStartAge
+//            filter.endAge = tempEndAge
+//            filter.startBudget = tempStartBudget
+//            filter.endBudget = tempEndBudget
+//            filter.startDate = tempStartDate.timeInMillis
+//            filter.endDate = tempEndDate.timeInMillis
+//            filter.sex = tempSex
             filter.startCity = startCity.text.toString()
             filter.endCity = endCity.text.toString()
+
+            Log.d("tag", "user: " + "filter.endAge: " + filter.endAge + " filter.startAge: " + filter.startAge + " filter.startDate: " + filter.startDate + " filter.endDate: " + filter.endDate + " filter.startBudget: " + filter.startBudget + " filter.endBudget: " + filter.endBudget + " filter.sex: " + filter.sex)
 
             loading_where_load_users.visibility = View.VISIBLE
             viewModel.getAllUsers(filter)
         }
 
         cancelParameters.setOnClickListener {
+            filter.sex = 0
+            filter.startAge = 0
+            filter.endAge = extension.yearsOldUsers.size - 1
+            filter.startCity = ""
+            filter.endCity = ""
+            filter.startBudget = -1
+            filter.endBudget = -1
+            filter.startDate = 0L
+            filter.endDate = 0L
+
+            startAge.setSelection(filter.startAge)
+            endAge.setSelection(filter.endAge)
+            startBudget.setText("")
+            endBudget.setText("")
+            startCity.setText("")
+            endCity.setText("")
+
+            updateDateDialog()
+            updateChoseDateButtons()
+
             sexButtons.check(when (filter.sex) {
                 1 -> sex_M.id
                 2 -> sex_W.id
                 else -> sex_Any.id
             })
-            startAge.setSelection(filter.startAge)
-            endAge.setSelection(filter.endAge)
-            if (filter.startBudget > 0)
-                startBudget.setText(filter.startBudget.toString())
-            if (filter.endBudget > 0)
-                endBudget.setText(filter.endBudget.toString())
-            if (filter.startDate > 0)
-                tempStartDate.timeInMillis = filter.startDate
-            if (filter.endDate > 0)
-                tempEndDate.timeInMillis = filter.endDate
-
-            updateDateDialog()
-            updateChoseDateButtons(tempStartDate, tempEndDate)
-
         }
 
         view_contain_block_parameters.layoutTransition.setDuration(700L)
@@ -197,7 +203,7 @@ class AllUsersFragment : Fragment() {
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-                if ("".equals(newText)) {
+                if ("" == newText) {
                     loading_where_load_users.visibility = View.VISIBLE
                     viewModel.getAllUsers(filter)
                 }
@@ -236,15 +242,30 @@ class AllUsersFragment : Fragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
+        if (startBudget.text.isNotEmpty())
+            filter.startBudget = Integer.parseInt(startBudget.text.toString())
+        if (endBudget.text.isNotEmpty())
+            filter.endBudget = Integer.parseInt(endBudget.text.toString())
         outState.putSerializable("filter", filter)
-        outState.putInt("tempStartAge", tempStartAge)
-        outState.putInt("tempEndAge", tempEndAge)
-        outState.putSerializable("tempStartDate", tempStartDate)
-        outState.putSerializable("tempEndDate", tempEndDate)
-        outState.putInt("tempSex", tempSex)
+//        outState.putInt("tempStartAge", tempStartAge)
+//        outState.putInt("tempEndAge", tempEndAge)
+//        outState.putInt("tempStartBudget", tempStartBudget)
+//        outState.putInt("tempEndBudget", tempEndBudget)
+//        outState.putSerializable("tempStartDate", tempStartDate)
+//        outState.putSerializable("tempEndDate", tempEndDate)
+//        outState.putInt("tempSex", tempSex)
+
+        Log.d("tag", "user: " + "filter.endAge: " + filter.endAge + " filter.startAge: " + filter.startAge + " filter.startDate: " + filter.startDate + " filter.endDate: " + filter.endDate + " filter.startBudget: " + filter.startBudget + " filter.endBudget: " + filter.endBudget + " filter.sex: " + filter.sex)
+
     }
 
     private fun updateDateDialog() {
+        val currentStartDate = Calendar.getInstance()
+        if (filter.startDate > 0L) currentStartDate.timeInMillis = filter.startDate
+        val currentEndDate = Calendar.getInstance()
+        currentEndDate.timeInMillis = currentEndDate.timeInMillis + 1000L * 60 * 60 * 24
+        if (filter.endDate > 0L) currentEndDate.timeInMillis = filter.endDate
+
         dateDialog = DatePickerDialog.newInstance(
                 { _, year, monthOfYear, dayOfMonth, yearEnd, monthOfYearEnd, dayOfMonthEnd ->
                     Log.d("tag", " year + $year ; monthOfYear + $monthOfYear ; dayOfMonth + $dayOfMonth ; yearEnd + $yearEnd ; monthOfYearEnd + $monthOfYearEnd ; dayOfMonthEnd + $dayOfMonthEnd ")
@@ -262,21 +283,31 @@ class AllUsersFragment : Fragment() {
                         Snackbar.make(activity.findViewById(android.R.id.content), "даты оказались некорректными, попробуйте ввести их снова", Snackbar.LENGTH_LONG).show()
                         return@newInstance
                     }
-                    tempStartDate = calendarStartDate
-                    tempEndDate = calendarEndDate
-                    updateChoseDateButtons(calendarStartDate, calendarEndDate)
+                    filter.startDate = calendarStartDate.timeInMillis
+                    filter.endDate = calendarEndDate.timeInMillis
+                    updateChoseDateButtons()
                 },
-                tempStartDate.get(Calendar.YEAR),
-                tempStartDate.get(Calendar.MONTH),
-                tempStartDate.get(Calendar.DAY_OF_MONTH),
-                tempEndDate.get(Calendar.YEAR),
-                tempEndDate.get(Calendar.MONTH),
-                tempEndDate.get(Calendar.DAY_OF_MONTH))
+                currentStartDate.get(Calendar.YEAR),
+                currentStartDate.get(Calendar.MONTH),
+                currentStartDate.get(Calendar.DAY_OF_MONTH),
+                currentEndDate.get(Calendar.YEAR),
+                currentEndDate.get(Calendar.MONTH),
+                currentEndDate.get(Calendar.DAY_OF_MONTH))
+        dateDialog.setStartTitle("НАЧАЛО")
+        dateDialog.setEndTitle("КОНЕЦ")
     }
 
-    private fun updateChoseDateButtons(calendarStartDate: Calendar, calendarEndDate: Calendar) {
-        choseDate.text = ("c: " + calendarStartDate.get(Calendar.DAY_OF_MONTH) + " " + context.resources.getStringArray(R.array.months_array)[calendarStartDate.get(Calendar.MONTH)]
-                + " по: " + calendarEndDate.get(Calendar.DAY_OF_MONTH) + " " + context.resources.getStringArray(R.array.months_array)[calendarEndDate.get(Calendar.MONTH)])
+    private fun updateChoseDateButtons() {
+        if (filter.startDate > 0L && filter.endDate > 0L) {
+            val calendarStartDate = Calendar.getInstance()
+            calendarStartDate.timeInMillis = filter.startDate
+        val calendarEndDate = Calendar.getInstance()
+            calendarEndDate.timeInMillis = filter.endDate
+            //todo add years, if necessary
+            choseDate.text = ("c: " + calendarStartDate.get(Calendar.DAY_OF_MONTH) + " " + context.resources.getStringArray(R.array.months_array)[calendarStartDate.get(Calendar.MONTH)]
+                    + " по: " + calendarEndDate.get(Calendar.DAY_OF_MONTH) + " " + context.resources.getStringArray(R.array.months_array)[calendarEndDate.get(Calendar.MONTH)])
+        } else
+            choseDate.text = "выберите даты"
     }
 
     companion object {

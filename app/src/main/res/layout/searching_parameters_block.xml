@@ -38,7 +38,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/endCity"
         android:layout_toEndOf="@id/date_text"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        android:text="выбери даты"/>
 
     <TextView
         android:id="@+id/sex_text"
@@ -152,7 +153,8 @@
         android:layout_alignEnd="@+id/startAge"
         android:layout_alignStart="@+id/startAge"
         android:layout_below="@id/age_text"
-        android:layout_toEndOf="@id/from_budget_text" />
+        android:layout_toEndOf="@id/from_budget_text"
+        android:inputType="number" />
 
 
     <TextView
@@ -170,7 +172,8 @@
         android:layout_height="wrap_content"
         android:layout_alignEnd="@+id/endAge"
         android:layout_alignStart="@+id/endAge"
-        android:layout_below="@id/age_text" />
+        android:layout_below="@id/age_text"
+        android:inputType="number" />
 
     <Button
         android:id="@+id/saveParameters"
