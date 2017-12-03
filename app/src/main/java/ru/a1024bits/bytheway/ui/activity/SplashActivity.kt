@@ -6,10 +6,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
-import com.crashlytics.android.Crashlytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import io.fabric.sdk.android.Fabric
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.util.Constants
 
@@ -20,9 +18,6 @@ class SplashActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
-        Fabric.with(this, Crashlytics())
-        Crashlytics.setUserEmail(FirebaseAuth.getInstance().currentUser?.email)
-        Crashlytics.setUserIdentifier(FirebaseAuth.getInstance().currentUser?.uid)
     }
 
     override fun onResume() {

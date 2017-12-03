@@ -29,6 +29,7 @@ import com.google.android.gms.location.places.Places
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.android.synthetic.main.activity_menu.*
 import kotlinx.android.synthetic.main.custom_dialog_feedback.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -144,6 +145,12 @@ class MenuActivity : AppCompatActivity(),
                 .build()
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
 
+        sing_out.setOnClickListener {
+            preferences.edit().putBoolean(Constants.FIRST_ENTER, true).apply()
+            FirebaseAuth.getInstance().signOut()
+            finishAffinity()
+        }
+        feedback.setOnClickListener { openDialogFeedback() }
     }
 
     private fun markFirstEnter() = preferences.edit()
@@ -321,11 +328,6 @@ class MenuActivity : AppCompatActivity(),
             R.id.profile_item -> navigator.applyCommand(Replace(Screens.USER_PROFILE_SCREEN, 1))
             R.id.search_item -> navigator.applyCommand(Replace(Screens.SEARCH_MAP_SCREEN, 1))
             R.id.all_users_item -> navigator.applyCommand(Replace(Screens.ALL_USERS_SCREEN, 1))
-            R.id.feedback -> openDialogFeedback()//navigator.applyCommand(Replace(Screens.FEEDBACK_SCREEN, 1))
-            R.id.sing_out -> {
-                preferences.edit().putBoolean(Constants.FIRST_ENTER, true).apply() //prepare for next first start
-                finishAffinity()
-            }
         }
 
         val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
