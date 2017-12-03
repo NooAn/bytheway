@@ -4,9 +4,11 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
+import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -16,10 +18,15 @@ import com.borax12.materialdaterangepicker.date.DatePickerDialog
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.request.RequestOptions
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException
+import com.google.android.gms.common.GooglePlayServicesRepairableException
+import com.google.android.gms.location.places.AutocompleteFilter
+import com.google.android.gms.location.places.ui.PlaceAutocomplete
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.GeoPoint
 import kotlinx.android.synthetic.main.fragment_my_user_profile.*
 import kotlinx.android.synthetic.main.profile_direction.*
 import kotlinx.android.synthetic.main.profile_main_image.*
@@ -29,8 +36,17 @@ import ru.a1024bits.bytheway.model.Method
 import ru.a1024bits.bytheway.model.SocialNetwork
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
+import ru.a1024bits.bytheway.router.Screens
+import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.a1024bits.bytheway.util.Constants
+import ru.a1024bits.bytheway.util.Constants.END_DATE
+import ru.a1024bits.bytheway.util.Constants.FIRST_INDEX_CITY
+import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
+import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM
+import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO
+import ru.a1024bits.bytheway.util.Constants.START_DATE
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
+import ru.terrakok.cicerone.commands.Replace
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -54,6 +70,18 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                 .append(context.resources.getStringArray(R.array.months_array)[monthOfYearEnd])
                 .append(" ")
                 .append(yearEnd).toString())
+
+        dates.put(START_DATE, getLongFromDate(dayOfMonth, monthOfYear, year))
+        dates.put(END_DATE, getLongFromDate(dayOfMonthEnd, monthOfYearEnd, yearEnd))
+    }
+
+    private fun getLongFromDate(day: Int, month: Int, year: Int): Long {
+        val dateString = "09 9 2012"
+        val dateFormat = SimpleDateFormat("dd MM yyyy")
+        val date = dateFormat.parse(dateString)
+        val unixTime = date.time.toLong() / 1000
+        Log.e("LOG time", unixTime.toString())
+        return unixTime
     }
 
     private var viewModel: MyProfileViewModel? = null
@@ -69,6 +97,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     private var uid = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
 
     private var name = ""
+    private var cityFromLatLng = GeoPoint(0.0, 0.0)
+    private var cityToLatLng = GeoPoint(0.0, 0.0)
 
     private var lastName = ""
 
@@ -82,11 +112,11 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     private var csLink = "https://www.couchsurfing.com/people/"
     private var fbLink = "https://www.facebook.com/"
 
-    private var methods: ArrayList<Method> = arrayListOf()
+    private var methods: HashMap<String, Boolean> = hashMapOf()
 
     private var socNet: HashMap<String, String> = hashMapOf()
 
-    private var dates: ArrayList<Long> = arrayListOf()
+    private var dates: HashMap<String, Long> = hashMapOf()
 
     private var sex: Int = 0
 
@@ -98,7 +128,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     private var kilometers: Long = 0
 
-    private var cities: ArrayList<String> = arrayListOf()
+    private var cities: HashMap<String, String> = hashMapOf()
 
     private var budget: Long = 0 // default const
 
@@ -128,6 +158,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     private fun fillProfile(user: User) {
         username.text = StringBuilder(user.name).append(" ").append(user.lastName)
+        add_info_user.setText(user.addInformation)
 
         lastName = user.lastName
         name = user.name
@@ -158,25 +189,20 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         }
 
         if (user.cities.size > 0) {
-            val lastIndexArr = user.cities.size - 1
-            textCityFrom.setText(user.cities.get(0))
-            textCityTo.setText(user.cities.get(lastIndexArr))
-            cities.add(user.cities.get(0))
-            cities.add(user.cities.get(lastIndexArr))
+            textCityFrom.setText(user.cities.get(FIRST_INDEX_CITY))
+            textCityTo.setText(user.cities.get(LAST_INDEX_CITY))
+            cities = user.cities
         }
 
         val formatDate = SimpleDateFormat("dd.MM.yyyy")
 
         if (user.dates.size > 0) {
-            val lastIndexArr = user.dates.size - 1
-            val dayBegin = formatDate.format(Date(user.dates.get(0)))
-            val dayArrival = formatDate.format(Date(user.dates.get(lastIndexArr)))
+            val dayBegin = formatDate.format(Date(user.dates.get(START_DATE) ?: 0))
+            val dayArrival = formatDate.format(Date(user.dates.get(END_DATE) ?: 0))
             textDateFrom.setText(dayBegin)
             dateArrived.setText(dayArrival)
-            dates.add(user.dates.get(0))
-            dates.add(user.dates.get(lastIndexArr))
+            dates = user.dates
         }
-
 
         fillAgeSex(user.age, user.sex)
 
@@ -197,27 +223,24 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
             }
         }
-        for (method in user.method) {
+        methods.clear()
+        methods.putAll(user.method)
+        for (method in user.method.keys) {
             when (method) {
-                Method.TRAIN -> {
+                Method.TRAIN.link -> {
                     with(iconTrain) { isActivated = true }
-                    methods.add(Method.TRAIN)
                 }
-                Method.BUS -> {
+                Method.BUS.link -> {
                     with(iconBus) { isActivated = true }
-                    methods.add(Method.BUS)
                 }
-                Method.CAR -> {
+                Method.CAR.link -> {
                     with(iconCar) { isActivated = true }
-                    methods.add(Method.CAR)
                 }
-                Method.PLANE -> {
+                Method.PLANE.link -> {
                     with(iconPlane) { isActivated = true }
-                    methods.add(Method.PLANE)
                 }
-                Method.HITCHHIKING -> {
+                Method.HITCHHIKING.link -> {
                     with(iconHitchHicking) { isActivated = true }
-                    methods.add(Method.HITCHHIKING)
                 }
             }
         }
@@ -225,6 +248,48 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
         if (user.budget > 0) {
             budget = user.budget
+            displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(budget)
+
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        Log.e("LOG code:", requestCode.toString() + " " + resultCode + " " + PlaceAutocomplete.getPlace(activity, data))
+
+        // FIXME refactoring in viewModel
+
+        when (requestCode) {
+            PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM -> when (resultCode) {
+                AppCompatActivity.RESULT_OK -> {
+                    val place = PlaceAutocomplete.getPlace(activity, data);
+                    textCityFrom.setText(place.name)
+                    cityFromLatLng = GeoPoint(place.latLng.latitude, place.latLng.longitude)
+                    cities.put(FIRST_INDEX_CITY, place.name.toString())
+                }
+                else -> {
+                    val status = PlaceAutocomplete.getStatus(activity, data);
+                    Log.i("LOG", status.getStatusMessage() + " ");
+                    if (textCityFrom.text.toString().length == 0)
+                        textCityFrom.setText("")
+                }
+            }
+
+            PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO -> when (resultCode) {
+                AppCompatActivity.RESULT_OK -> {
+                    val place = PlaceAutocomplete.getPlace(activity, data);
+                    textCityTo.setText(place.name)
+                    cityToLatLng = GeoPoint(place.latLng.latitude, place.latLng.longitude)
+                    cities.put(LAST_INDEX_CITY, place.name.toString())
+
+                }
+                else -> {
+                    val status = PlaceAutocomplete.getStatus(activity, data);
+                    Log.i("LOG", status.statusMessage + " ");
+                    if (textCityTo.text.toString().length == 0)
+                        textCityTo.setText("")
+                }
+            }
         }
     }
 
@@ -260,6 +325,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         direction.visibility = View.GONE
         maplayout.visibility = View.GONE
         method_moving.visibility = View.GONE
+        appinTheAirEnter.visibility = View.GONE
+        layoutTravelMethod.visibility = View.GONE
         moneyfortrip.visibility = View.GONE
         descriptionprofile.visibility = View.GONE
         button_remove_travel_info.visibility = View.GONE
@@ -297,7 +364,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                 now.get(Calendar.MONTH),
                 now.get(Calendar.DAY_OF_MONTH)
         )
-        val displayPriceTravel = view.findViewById<TextView>(R.id.display_price_travel)
+        val displayPriceTravel = view.findViewById<TextView>(R.id.displayPriceTravel)
         displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(budget)
 
         view.findViewById<LinearLayout>(R.id.headerprofile).setOnClickListener({
@@ -320,9 +387,9 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         view.findViewById<View>(R.id.iconCar).setOnClickListener({
             with(travelCarText) { isActivated = !isActivated }
             if (checkInMethods(Method.CAR)) {
-                methods.remove(Method.CAR)
+                methods.put(Method.CAR.link, false)
             } else {
-                methods.add(Method.CAR)
+                methods.put(Method.CAR.link, true)
             }
 
 
@@ -331,37 +398,36 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         view.findViewById<View>(R.id.iconTrain).setOnClickListener({
             with(travelTrainText) { isActivated = !isActivated }
             if (checkInMethods(Method.TRAIN)) {
-                methods.remove(Method.TRAIN)
+                methods.put(Method.TRAIN.link, false)
             } else {
-                methods.add(Method.TRAIN)
+                methods.put(Method.TRAIN.link, true)
             }
         })
 
         view.findViewById<View>(R.id.iconBus).setOnClickListener({
             with(travelBusText) { isActivated = !isActivated }
             if (checkInMethods(Method.BUS)) {
-
-                methods.remove(Method.BUS)
+                methods.put(Method.BUS.link, false)
             } else {
-                methods.add(Method.BUS)
+                methods.put(Method.BUS.link, true)
             }
         })
 
         view.findViewById<View>(R.id.iconPlane).setOnClickListener({
             with(travelPlaneText) { isActivated = !isActivated }
             if (checkInMethods(Method.PLANE)) {
-                methods.remove(Method.PLANE)
+                methods.put(Method.PLANE.link, false)
             } else {
-                methods.add(Method.PLANE)
+                methods.put(Method.PLANE.link, true)
             }
         })
 
         view.findViewById<View>(R.id.iconHitchHicking).setOnClickListener({
             with(travelHitchHikingText) { isActivated = !isActivated }
             if (checkInMethods(Method.HITCHHIKING)) {
-                methods.remove(Method.HITCHHIKING)
+                methods.put(Method.HITCHHIKING.link, false)
             } else {
-                methods.add(Method.HITCHHIKING)
+                methods.put(Method.HITCHHIKING.link, true)
             }
         })
 
@@ -401,6 +467,16 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         view.findViewById<View>(R.id.textDateFrom).setOnClickListener {
             openDateDialog()
         }
+
+        view.findViewById<View>(R.id.textCityFrom).setOnClickListener {
+            sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM)
+        }
+        view.findViewById<View>(R.id.textCityTo).setOnClickListener {
+            sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO)
+        }
+        view.findViewById<View>(R.id.appinTheAirEnter).setOnClickListener {
+            (activity as MenuActivity).navigator.applyCommand(Replace(Screens.USER_SINHRONIZED_SCREEN, 1))
+        }
         mMapView = view?.findViewById<MapView>(R.id.mapView)
         mMapView?.onCreate(savedInstanceState)
         mMapView?.onResume()// needed to get the map to display immediately
@@ -412,6 +488,20 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         }
         mMapView?.getMapAsync(this)
         return view
+    }
+
+    private fun sendIntentForSearch(code: Int) {
+        try {
+            val typeFilter = AutocompleteFilter.Builder()
+                    .setTypeFilter(AutocompleteFilter.TYPE_FILTER_CITIES)
+                    .build()
+            val intent = PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY).setFilter(typeFilter).build(activity)
+            startActivityForResult(intent, code)
+        } catch (e: GooglePlayServicesRepairableException) {
+            e.printStackTrace()
+        } catch (e: GooglePlayServicesNotAvailableException) {
+            e.printStackTrace()
+        }
     }
 
     private fun openDateDialog() {
@@ -431,7 +521,9 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         direction.visibility = View.VISIBLE
         maplayout.visibility = View.VISIBLE
         method_moving.visibility = View.VISIBLE
+        layoutTravelMethod.visibility = View.VISIBLE
         moneyfortrip.visibility = View.VISIBLE
+        appinTheAirEnter.visibility = View.VISIBLE
         descriptionprofile.visibility = View.VISIBLE
         button_remove_travel_info.visibility = View.VISIBLE
         button_save_travel_info.visibility = View.VISIBLE
@@ -670,8 +762,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     fun checkInMethods(method: Method): Boolean {
         var result = false
-        for (item in methods) {
-            if (method == item) result = true
+        for (item in methods.keys) {
+            if (method.link == item) result = true
         }
         return result
     }
@@ -682,9 +774,11 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         hashMap.set("lastName", lastName)
         hashMap.set("city", city)
         hashMap.set("cities", cities)
-        //  hashMap.set("method", methods)
+        hashMap.set("method", methods)
         hashMap.set("dates", dates)
         hashMap.set("budget", budget)
+        hashMap.set("cityFromLatLng", cityFromLatLng)
+        hashMap.set("cityToLatLng", cityToLatLng)
         hashMap.set("addInformation", add_info_user.text.toString())
         hashMap.set("sex", sex)
         hashMap.set("age", age)

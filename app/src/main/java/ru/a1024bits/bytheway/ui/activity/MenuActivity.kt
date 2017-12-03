@@ -28,6 +28,8 @@ import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.places.Places
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.android.synthetic.main.custom_dialog_feedback.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -94,6 +96,7 @@ class MenuActivity : AppCompatActivity(),
         super.onCreate(savedInstanceState)
         App.component.inject(this)
         glide = Glide.with(this)
+        FirebaseFirestore.setLoggingEnabled(true)
 
         setContentView(R.layout.activity_menu)
 

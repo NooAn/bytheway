@@ -11,12 +11,15 @@
 
     <EditText
         android:id="@+id/textCityFrom"
-        android:layout_width="100dp"
+        android:layout_width="110dp"
         android:layout_height="wrap_content"
         android:layout_margin="15dp"
         android:layout_marginStart="24dp"
         android:backgroundTint="@color/hint"
         android:hint="@string/city_from"
+        android:clickable="false"
+        android:cursorVisible="false"
+        android:focusableInTouchMode="false"
         android:inputType="text"
         android:textColor="@color/textColor"
         android:textColorHint="@color/hint"
@@ -26,7 +29,7 @@
 
     <EditText
         android:id="@+id/textDateFrom"
-        android:layout_width="100dp"
+        android:layout_width="110dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="18dp"
         android:backgroundTint="@color/hint"
@@ -46,9 +49,12 @@
 
     <EditText
         android:id="@+id/textCityTo"
-        android:layout_width="100dp"
+        android:layout_width="110dp"
         android:layout_height="wrap_content"
         android:layout_margin="15dp"
+        android:clickable="false"
+        android:cursorVisible="false"
+        android:focusableInTouchMode="false"
         android:layout_marginEnd="32dp"
         android:backgroundTint="@android:color/white"
         android:hint="@string/city_to"
@@ -70,7 +76,7 @@
 
     <EditText
         android:id="@+id/dateArrived"
-        android:layout_width="100dp"
+        android:layout_width="110dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginTop="16dp"
