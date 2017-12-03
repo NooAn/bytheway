@@ -11,7 +11,6 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
@@ -113,7 +112,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     private var csLink = "https://www.couchsurfing.com/people/"
     private var fbLink = "https://www.facebook.com/"
 
-    private var methods: ArrayList<Method> = arrayListOf()
+    private var methods: HashMap<String, Boolean> = hashMapOf()
 
     private var socNet: HashMap<String, String> = hashMapOf()
 
@@ -159,6 +158,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     private fun fillProfile(user: User) {
         username.text = StringBuilder(user.name).append(" ").append(user.lastName)
+        add_info_user.setText(user.addInformation)
 
         lastName = user.lastName
         name = user.name
@@ -223,27 +223,24 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
             }
         }
-        for (method in user.method) {
+        methods.clear()
+        methods.putAll(user.method)
+        for (method in user.method.keys) {
             when (method) {
-                Method.TRAIN -> {
+                Method.TRAIN.link -> {
                     with(iconTrain) { isActivated = true }
-                    methods.add(Method.TRAIN)
                 }
-                Method.BUS -> {
+                Method.BUS.link -> {
                     with(iconBus) { isActivated = true }
-                    methods.add(Method.BUS)
                 }
-                Method.CAR -> {
+                Method.CAR.link -> {
                     with(iconCar) { isActivated = true }
-                    methods.add(Method.CAR)
                 }
-                Method.PLANE -> {
+                Method.PLANE.link -> {
                     with(iconPlane) { isActivated = true }
-                    methods.add(Method.PLANE)
                 }
-                Method.HITCHHIKING -> {
+                Method.HITCHHIKING.link -> {
                     with(iconHitchHicking) { isActivated = true }
-                    methods.add(Method.HITCHHIKING)
                 }
             }
         }
@@ -251,6 +248,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
         if (user.budget > 0) {
             budget = user.budget
+            displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(budget)
+
         }
     }
 
@@ -365,7 +364,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                 now.get(Calendar.MONTH),
                 now.get(Calendar.DAY_OF_MONTH)
         )
-        val displayPriceTravel = view.findViewById<TextView>(R.id.display_price_travel)
+        val displayPriceTravel = view.findViewById<TextView>(R.id.displayPriceTravel)
         displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(budget)
 
         view.findViewById<LinearLayout>(R.id.headerprofile).setOnClickListener({
@@ -388,9 +387,9 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         view.findViewById<View>(R.id.iconCar).setOnClickListener({
             with(travelCarText) { isActivated = !isActivated }
             if (checkInMethods(Method.CAR)) {
-                methods.remove(Method.CAR)
+                methods.put(Method.CAR.link, false)
             } else {
-                methods.add(Method.CAR)
+                methods.put(Method.CAR.link, true)
             }
 
 
@@ -399,37 +398,36 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         view.findViewById<View>(R.id.iconTrain).setOnClickListener({
             with(travelTrainText) { isActivated = !isActivated }
             if (checkInMethods(Method.TRAIN)) {
-                methods.remove(Method.TRAIN)
+                methods.put(Method.TRAIN.link, false)
             } else {
-                methods.add(Method.TRAIN)
+                methods.put(Method.TRAIN.link, true)
             }
         })
 
         view.findViewById<View>(R.id.iconBus).setOnClickListener({
             with(travelBusText) { isActivated = !isActivated }
             if (checkInMethods(Method.BUS)) {
-
-                methods.remove(Method.BUS)
+                methods.put(Method.BUS.link, false)
             } else {
-                methods.add(Method.BUS)
+                methods.put(Method.BUS.link, true)
             }
         })
 
         view.findViewById<View>(R.id.iconPlane).setOnClickListener({
             with(travelPlaneText) { isActivated = !isActivated }
             if (checkInMethods(Method.PLANE)) {
-                methods.remove(Method.PLANE)
+                methods.put(Method.PLANE.link, false)
             } else {
-                methods.add(Method.PLANE)
+                methods.put(Method.PLANE.link, true)
             }
         })
 
         view.findViewById<View>(R.id.iconHitchHicking).setOnClickListener({
             with(travelHitchHikingText) { isActivated = !isActivated }
             if (checkInMethods(Method.HITCHHIKING)) {
-                methods.remove(Method.HITCHHIKING)
+                methods.put(Method.HITCHHIKING.link, false)
             } else {
-                methods.add(Method.HITCHHIKING)
+                methods.put(Method.HITCHHIKING.link, true)
             }
         })
 
@@ -764,8 +762,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     fun checkInMethods(method: Method): Boolean {
         var result = false
-        for (item in methods) {
-            if (method == item) result = true
+        for (item in methods.keys) {
+            if (method.link == item) result = true
         }
         return result
     }

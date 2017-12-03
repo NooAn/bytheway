@@ -449,11 +449,12 @@
                 android:thumbTint="@color/colorPrimary" />
 
             <TextView
-                android:id="@+id/display_price_travel"
+                android:id="@+id/displayPriceTravel"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginStart="@dimen/margin_left_profile"
                 android:layout_marginTop="12dp"
+                android:drawablePadding="10dp"
                 android:drawableStart="@drawable/ic_rubles"
                 android:text="@string/budget"
                 android:textSize="16sp" />
