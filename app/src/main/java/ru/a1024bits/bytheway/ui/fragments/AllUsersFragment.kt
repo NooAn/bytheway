@@ -14,6 +14,7 @@ import android.view.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import com.borax12.materialdaterangepicker.date.DatePickerDialog
+import com.crashlytics.android.Crashlytics
 import kotlinx.android.synthetic.main.fragment_display_all_users.*
 import kotlinx.android.synthetic.main.searching_parameters_block.*
 import ru.a1024bits.bytheway.App
@@ -198,6 +199,7 @@ class AllUsersFragment : Fragment() {
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(ShowUsersViewModel::class.java)
         showUsersAdapter = ShowAllUsersAdapter(this.context)
         display_all_users.adapter = showUsersAdapter
+//        FirebaseCrash.log(FirebaseAuth.getInstance().currentUser?.email + " purchased product ")
 
         viewModel.usersLiveData.observe(this, Observer<List<User>> { list ->
             Log.e("LOG", "onChanged $list")

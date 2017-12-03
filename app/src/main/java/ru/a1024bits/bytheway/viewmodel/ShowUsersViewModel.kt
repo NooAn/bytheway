@@ -3,6 +3,7 @@ package ru.a1024bits.bytheway.viewmodel
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import android.util.Log
+import com.crashlytics.android.Crashlytics
 import com.google.firebase.firestore.DocumentSnapshot
 import ru.a1024bits.bytheway.model.Method
 import ru.a1024bits.bytheway.model.SocialNetwork
