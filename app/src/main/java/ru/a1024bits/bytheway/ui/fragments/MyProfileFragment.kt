@@ -7,12 +7,12 @@ import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
-import android.text.Layout
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import com.borax12.materialdaterangepicker.date.DatePickerDialog
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.request.RequestOptions
@@ -32,13 +32,33 @@ import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import javax.inject.Inject
 import kotlin.collections.HashMap
 
 
-class MyProfileFragment : Fragment(), OnMapReadyCallback {
+class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDateSetListener {
+    override fun onDateSet(view: DatePickerDialog?, year: Int, monthOfYear: Int, dayOfMonth: Int, yearEnd: Int, monthOfYearEnd: Int, dayOfMonthEnd: Int) {
+        Log.e("LOG Date", "$year  $monthOfYear $dayOfMonth - $yearEnd $monthOfYearEnd $dayOfMonthEnd")
+        textDateFrom.setText(StringBuilder(" ")
+                .append(dayOfMonth)
+                .append(" ")
+                .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
+                .append(" ")
+                .append(year).toString())
+
+        dateArrived.setText(StringBuilder(" ")
+                .append(dayOfMonthEnd)
+                .append(" ")
+                .append(context.resources.getStringArray(R.array.months_array)[monthOfYearEnd])
+                .append(" ")
+                .append(yearEnd).toString())
+    }
+
     private var viewModel: MyProfileViewModel? = null
+
+
     private var mListener: OnFragmentInteractionListener? = null
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
 
@@ -53,8 +73,10 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
     private var lastName = ""
 
     private var city = ""
+    private lateinit var dateDialog: DatePickerDialog
 
     private var numberPhone: String = "+7"
+    private var whatsAppNumber: String = "+7"
     private var vkLink: String = "https://www.vk.com/"
     private var tgNick = "@"
     private var csLink = "https://www.couchsurfing.com/people/"
@@ -68,7 +90,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
     private var sex: Int = 0
 
-    private var age: Long = 0
+    private var age: Int = 0
 
     private var countries: Long = 0
 
@@ -81,6 +103,10 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
     private var budget: Long = 0 // default const
 
     private var glide: RequestManager? = null
+
+    private var yearNow: Int = 0
+
+    private var yearsArr: ArrayList<Int> = arrayListOf()
 
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -105,17 +131,14 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
         lastName = user.lastName
         name = user.name
-
         numberPhone = user.phone
+
+        whatsAppNumber = user.socialNetwork.get(SocialNetwork.WHATSAPP.link) ?: whatsAppNumber
         vkLink = user.socialNetwork.get(SocialNetwork.VK.link) ?: vkLink
         fbLink = user.socialNetwork.get(SocialNetwork.FB.link) ?: fbLink
         csLink = user.socialNetwork.get(SocialNetwork.CS.link) ?: csLink
 
-        if (user.flightHours == 0L) {
-            travelledStatistics.visibility = View.GONE
-        } else {
-            travelledStatistics.visibility = View.VISIBLE
-        }
+        travelledStatistics.visibility = if (user.flightHours == 0L) View.GONE else View.VISIBLE
 
         travelledCountries.text = user.countries.toString()
         flightHours.text = user.flightHours.toString()
@@ -125,7 +148,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             cityview.text = user.city
             city = user.city
         }
-        Log.e("LOGER", "" + user.countTrip)
 
         if (user.countTrip == 0) {
             showBlockAddTrip()
@@ -155,7 +177,10 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             dates.add(user.dates.get(lastIndexArr))
         }
 
+
         fillAgeSex(user.age, user.sex)
+
+        age = user.age
 
         glide?.load(user.urlPhoto)
                 ?.apply(RequestOptions.circleCropTransform())
@@ -167,7 +192,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
                 SocialNetwork.VK.link -> vkIcon.setImageResource(R.drawable.ic_vk_color)
                 SocialNetwork.CS.link -> csIcon.setImageResource(R.drawable.ic_cs_color)
                 SocialNetwork.FB.link -> fbcon.setImageResource(R.drawable.ic_fb_color)
-                SocialNetwork.WHATSAAP.link -> whatsUpIcon.setImageResource(R.drawable.ic_whats_icon_color)
+                SocialNetwork.WHATSAPP.link -> whatsAppIcon.setImageResource(R.drawable.ic_whats_icon_color)
                 SocialNetwork.TG.link -> tgIcon.setImageResource(R.drawable.ic_tg_color)
 
             }
@@ -203,7 +228,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    fun fillAgeSex(userAge: Long, userSex: Int) {
+    fun fillAgeSex(userAge: Int, userSex: Int) {
         val gender = when (userSex) {
             1 -> "М"
             2 -> "Ж"
@@ -265,7 +290,13 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater!!.inflate(R.layout.fragment_my_user_profile, container, false)
-
+        val now = Calendar.getInstance()
+        dateDialog = DatePickerDialog.newInstance(
+                this@MyProfileFragment,
+                now.get(Calendar.YEAR),
+                now.get(Calendar.MONTH),
+                now.get(Calendar.DAY_OF_MONTH)
+        )
         val displayPriceTravel = view.findViewById<TextView>(R.id.display_price_travel)
         displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(budget)
 
@@ -293,6 +324,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             } else {
                 methods.add(Method.CAR)
             }
+
+
         })
 
         view.findViewById<View>(R.id.iconTrain).setOnClickListener({
@@ -307,6 +340,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         view.findViewById<View>(R.id.iconBus).setOnClickListener({
             with(travelBusText) { isActivated = !isActivated }
             if (checkInMethods(Method.BUS)) {
+
                 methods.remove(Method.BUS)
             } else {
                 methods.add(Method.BUS)
@@ -347,8 +381,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         view.findViewById<ImageView>(R.id.csIcon).setOnClickListener() {
             openDialog(SocialNetwork.CS)
         }
-        view.findViewById<ImageView>(R.id.whatsUpIcon).setOnClickListener({
-            openDialog(SocialNetwork.WHATSAAP)
+        view.findViewById<ImageView>(R.id.whatsAppIcon).setOnClickListener({
+            openDialog(SocialNetwork.WHATSAPP)
         })
         view.findViewById<ImageView>(R.id.fbcon).setOnClickListener({
             openDialog(SocialNetwork.FB)
@@ -361,7 +395,12 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             Log.e("LOG", "save travel")
             sendUserInfoToServer()
         })
-
+        view.findViewById<View>(R.id.dateArrived).setOnClickListener {
+            openDateDialog()
+        }
+        view.findViewById<View>(R.id.textDateFrom).setOnClickListener {
+            openDateDialog()
+        }
         mMapView = view?.findViewById<MapView>(R.id.mapView)
         mMapView?.onCreate(savedInstanceState)
         mMapView?.onResume()// needed to get the map to display immediately
@@ -373,6 +412,13 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         }
         mMapView?.getMapAsync(this)
         return view
+    }
+
+    private fun openDateDialog() {
+        dateDialog.setStartTitle("НАЧАЛО")
+        dateDialog.setEndTitle("КОНЕЦ")
+        dateDialog.accentColor = resources.getColor(R.color.colorPrimary)
+        dateDialog.show(activity.fragmentManager, "")
     }
 
 //    private fun checkInSocialMethods(value: SocialNetwork) = (value in socNet.keys)
@@ -407,8 +453,9 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         lastNameChoose.setText(lastName)
         val cityChoose = dialogView.findViewById<View>(R.id.dialog_city) as EditText
         cityChoose.setText(city)
-        val ageChoose = dialogView.findViewById<View>(R.id.dialog_year) as EditText
-        ageChoose.setText(age.toString())
+
+        val spinnerYearsView = dialogView.findViewById<View>(R.id.spinnerYearsView) as Spinner
+
         val man = dialogView.findViewById<RadioButton>(R.id.man)
 
         val woman = dialogView.findViewById<RadioButton>(R.id.woman)
@@ -419,14 +466,38 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         } else if (sex == 2) {
             sexChoose.check(woman.id)
         }
-        simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Сохранить", { dialogInterface, i ->
-            if (man.isChecked) {
-                sex = 1
-            } else if (woman.isChecked) {
-                sex = 2
-            } else sex = 0
 
-            age = ageChoose.text.toString().toLongOrNull() ?: 0
+        val calendar = Calendar.getInstance()
+        yearNow = calendar.get(Calendar.YEAR)
+
+        for (i in 1920..yearNow) {
+            yearsArr.add(i)
+        }
+
+        Log.e("LOG", "array check! : ${yearsArr.size}")
+
+        val yearsAdapter = ArrayAdapter<Int>(this.context, android.R.layout.simple_spinner_item, yearsArr);
+
+        yearsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerYearsView.adapter = yearsAdapter
+        spinnerYearsView.prompt = "Дата"
+
+        spinnerYearsView.setSelection(yearsArr.size - age - 1)
+        spinnerYearsView.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                val selectedItem = parent.getItemAtPosition(position).toString().toLong()
+                age = (yearNow - selectedItem).toInt()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                Log.e("LOG", "Nothing 2")
+            }
+        }
+
+        simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Сохранить", { dialogInterface, i ->
+            sex = if (man.isChecked) 1 else if (woman.isChecked) 2 else 0
+
+            //  age = ageChoose.text.toString().toLongOrNull() ?: 0
             fillAgeSex(age, sex)
             name = nameChoose.text.toString()
 
@@ -443,6 +514,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         simpleAlert.show()
     }
 
+
     private fun openDialog(socialNetwork: SocialNetwork) {
         val simpleAlert = AlertDialog.Builder(activity).create()
         simpleAlert.setTitle("Ссылки на социальные сети")
@@ -453,7 +525,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         dialogView.findViewById<EditText>(R.id.socLinkText).setText(
                 when (socialNetwork) {
                     SocialNetwork.VK -> vkLink
-                    SocialNetwork.WHATSAAP -> numberPhone
+                    SocialNetwork.WHATSAPP -> whatsAppNumber
                     SocialNetwork.CS -> csLink
                     SocialNetwork.FB -> fbLink
                     SocialNetwork.TG -> (if (tgNick.length > 1) tgNick else numberPhone)
@@ -485,7 +557,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
                         socNet.put(socialNetwork.link, newLink)
                         when (socialNetwork) {
                             SocialNetwork.VK -> vkLink = newLink
-                            SocialNetwork.WHATSAAP -> numberPhone = newLink
+                            SocialNetwork.WHATSAPP -> numberPhone = newLink
                             SocialNetwork.CS -> csLink = newLink
                             SocialNetwork.FB -> fbLink = newLink
                             SocialNetwork.TG -> tgNick = newLink
@@ -503,7 +575,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             SocialNetwork.VK -> vkIcon.setImageResource(R.drawable.ic_vk_color)
             SocialNetwork.CS -> csIcon.setImageResource(R.drawable.ic_cs_color)
             SocialNetwork.FB -> fbcon.setImageResource(R.drawable.ic_fb_color)
-            SocialNetwork.WHATSAAP -> whatsUpIcon.setImageResource(R.drawable.ic_whats_icon_color)
+            SocialNetwork.WHATSAPP -> whatsAppIcon.setImageResource(R.drawable.ic_whats_icon_color)
             SocialNetwork.TG -> tgIcon.setImageResource(R.drawable.ic_tg_color)
 
         }
@@ -514,7 +586,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
             SocialNetwork.VK -> vkIcon.setImageResource(R.drawable.ic_vk_gray)
             SocialNetwork.CS -> csIcon.setImageResource(R.drawable.ic_cs_grey)
             SocialNetwork.FB -> fbcon.setImageResource(R.drawable.ic_fb_grey)
-            SocialNetwork.WHATSAAP -> whatsUpIcon.setImageResource(R.drawable.ic_whats_icon_grey)
+            SocialNetwork.WHATSAPP -> whatsAppIcon.setImageResource(R.drawable.ic_whats_icon_grey)
             SocialNetwork.TG -> tgIcon.setImageResource(R.drawable.tg_grey)
 
         }
@@ -620,3 +692,5 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback {
         return hashMap
     }
 }
+
+
