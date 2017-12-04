@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:layout_marginLeft="10dp"
     android:layout_marginRight="10dp"
-    android:background="#EFEFEF">
+    android:background="@color/colorFilters">
 
     <EditText
         android:id="@+id/startCity"
@@ -38,8 +38,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/endCity"
         android:layout_toEndOf="@id/date_text"
-        android:textSize="18sp"
-        android:text="выбери даты"/>
+        android:text="выбери даты"
+        android:textSize="18sp" />
 
     <TextView
         android:id="@+id/sex_text"
@@ -57,7 +57,6 @@
         android:layout_alignStart="@id/choseDate"
         android:layout_below="@id/date_text"
         android:orientation="horizontal">
-        <!--android:layout_toEndOf="@+id/sex_text"-->
 
         <RadioButton
             android:id="@+id/sex_M"
@@ -190,6 +189,5 @@
         android:layout_below="@id/budget_text"
         android:layout_toStartOf="@id/saveParameters"
         android:text="Отмена" />
-    <!--android:layout_toStartOf="@id/save_parameters"-->
 
 </RelativeLayout>
