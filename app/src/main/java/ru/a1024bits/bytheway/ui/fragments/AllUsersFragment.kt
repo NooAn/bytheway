@@ -103,6 +103,7 @@ class AllUsersFragment : Fragment() {
         updateChoseDateButtons()
 
         saveParameters.setOnClickListener {
+            block_search_parameters.visibility = View.GONE
             if (startBudget.text.isNotEmpty())
                 filter.startBudget = Integer.parseInt(startBudget.text.toString())
             if (endBudget.text.isNotEmpty())
