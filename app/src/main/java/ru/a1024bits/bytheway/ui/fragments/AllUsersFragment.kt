@@ -1,5 +1,6 @@
 package ru.a1024bits.bytheway.ui.fragments
 
+import android.animation.LayoutTransition
 import android.app.SearchManager
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
@@ -25,6 +26,7 @@ import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.viewmodel.ShowUsersViewModel
 import java.util.*
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 
 class AllUsersFragment : Fragment() {
@@ -102,17 +104,29 @@ class AllUsersFragment : Fragment() {
         })
         updateChoseDateButtons()
 
+        view_contain_block_parameters.layoutTransition.setDuration(700L)
         saveParameters.setOnClickListener {
-            block_search_parameters.visibility = View.GONE
             if (startBudget.text.isNotEmpty())
                 filter.startBudget = Integer.parseInt(startBudget.text.toString())
             if (endBudget.text.isNotEmpty())
                 filter.endBudget = Integer.parseInt(endBudget.text.toString())
             filter.startCity = startCity.text.toString()
             filter.endCity = endCity.text.toString()
-
-            loading_where_load_users.visibility = View.VISIBLE
             viewModel.getAllUsers(filter)
+
+            view_contain_block_parameters.layoutTransition.addTransitionListener(object : LayoutTransition.TransitionListener {
+                override fun startTransition(p0: LayoutTransition?, p1: ViewGroup?, p2: View?, p3: Int) {}
+                override fun endTransition(p0: LayoutTransition?, p1: ViewGroup?, view: View, p3: Int) {
+                    if ((view.id == block_search_parameters.id) && (block_search_parameters.visibility == View.GONE)) {
+                        view_contain_block_parameters.layoutTransition.setDuration(0L)
+                        display_all_users.visibility = View.GONE
+                        loading_where_load_users.visibility = View.VISIBLE
+                        view_contain_block_parameters.layoutTransition.setDuration(700L)
+                        view_contain_block_parameters.layoutTransition.removeTransitionListener(this)
+                    }
+                }
+            })
+            block_search_parameters.visibility = View.GONE
         }
 
         cancelParameters.setOnClickListener {
@@ -176,6 +190,7 @@ class AllUsersFragment : Fragment() {
 
             override fun onQueryTextChange(newText: String): Boolean {
                 if ("" == newText) {
+                    display_all_users.visibility = View.GONE
                     loading_where_load_users.visibility = View.VISIBLE
                     viewModel.getAllUsers(filter)
                 }
@@ -199,14 +214,14 @@ class AllUsersFragment : Fragment() {
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(ShowUsersViewModel::class.java)
         showUsersAdapter = ShowAllUsersAdapter(this.context)
         display_all_users.adapter = showUsersAdapter
-//        FirebaseCrash.log(FirebaseAuth.getInstance().currentUser?.email + " purchased product ")
 
         viewModel.usersLiveData.observe(this, Observer<List<User>> { list ->
             Log.e("LOG", "onChanged $list")
             if (list != null) {
                 Log.e("LOG", "update $list")
-                showUsersAdapter.setItems(list)
                 loading_where_load_users.visibility = View.GONE
+                showUsersAdapter.setItems(list)
+                display_all_users.visibility = View.VISIBLE
             }
         })
         loading_where_load_users.visibility = View.VISIBLE
@@ -263,11 +278,18 @@ class AllUsersFragment : Fragment() {
         if (filter.startDate > 0L && filter.endDate > 0L) {
             val calendarStartDate = Calendar.getInstance()
             calendarStartDate.timeInMillis = filter.startDate
-        val calendarEndDate = Calendar.getInstance()
+            val calendarEndDate = Calendar.getInstance()
             calendarEndDate.timeInMillis = filter.endDate
-            //todo add years, if necessary
-            choseDate.text = ("c: " + calendarStartDate.get(Calendar.DAY_OF_MONTH) + " " + context.resources.getStringArray(R.array.months_array)[calendarStartDate.get(Calendar.MONTH)]
-                    + " по: " + calendarEndDate.get(Calendar.DAY_OF_MONTH) + " " + context.resources.getStringArray(R.array.months_array)[calendarEndDate.get(Calendar.MONTH)])
+            var yearStart = ""
+            var yearEnd = ""
+            if (calendarStartDate.get(Calendar.YEAR) != calendarEndDate.get(Calendar.YEAR)) {
+                yearStart = calendarStartDate.get(Calendar.YEAR).toString() + " "
+                yearEnd = calendarEndDate.get(Calendar.YEAR).toString() + " "
+            }
+            choseDate.text = StringBuilder("c: ").append(yearStart).append(calendarStartDate.get(Calendar.DAY_OF_MONTH)).append(" ")
+                    .append(context.resources.getStringArray(R.array.months_array)[calendarStartDate.get(Calendar.MONTH)])
+                    .append("   по: ").append(yearEnd).append(calendarEndDate.get(Calendar.DAY_OF_MONTH)).append(" ")
+                    .append(context.resources.getStringArray(R.array.months_array)[calendarEndDate.get(Calendar.MONTH)]).toString()
         } else
             choseDate.text = "выберите даты"
     }
