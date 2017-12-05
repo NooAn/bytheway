@@ -236,9 +236,7 @@ class MenuActivity : AppCompatActivity(),
         outState?.putSerializable(STATE_SCREEN_NAMES, screenNames as java.io.Serializable)
     }
 
-    override fun onFragmentInteraction() {
-
-    }
+    override fun onFragmentInteraction() {}
 
 
     override fun onResume() {
@@ -252,6 +250,7 @@ class MenuActivity : AppCompatActivity(),
             // use the parameter your API exposes for the code (mostly it's "code")
             val code = uri.getQueryParameter("code")
             if (code != null) {
+                //FIXME перенести следующий код в viewmodel и создать репозиторий для этого.
                 // get access token
                 // we'll do that in a minute
                 val generator = ServiceGenerator()
@@ -261,7 +260,7 @@ class MenuActivity : AppCompatActivity(),
                         redirectUri)
                 call.enqueue(object : Callback<AccessToken?> {
                     override fun onFailure(call: Call<AccessToken?>?, t: Throwable?) {
-                        Log.e("LOG", "on Fail")
+                        Log.e("LOG", "on Fail for authorization ")
                     }
 
                     override fun onResponse(call: Call<AccessToken?>?, response: Response<AccessToken?>?) {

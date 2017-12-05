@@ -78,4 +78,6 @@
     <string name="feedback_writte">Напишите отзыв или предложение</string>
     <string name="add_new_trip_from_app_in_the_air">+ Добавить поездку  App in the Air</string>
     <string name="feedback">Обратная связь</string>
+    <string name="textBodyDisaster">Мы не смогли найти ваши предстоящие поездки.</string>
+    <string name="textHeadAirDisaster">Ваш аккаунт синхронизирован!</string>
 </resources>

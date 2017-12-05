@@ -27,7 +27,11 @@ class AirSuccesfullFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
-        val view = inflater!!.inflate(R.layout.fragment_air_succesfull, container, false)
+        val view: View?
+        if (arguments != null && arguments.getString(NAME).length > 0)
+            view = inflater!!.inflate(R.layout.fragment_air_succesfull, container, false)
+        else view = inflater!!.inflate(R.layout.fragment_air_disaster, container, false)
+
         return view
     }
 
@@ -41,7 +45,6 @@ class AirSuccesfullFragment : Fragment() {
             city_from_air.text = arguments.getString(NAME);
             date_air_go.text = arguments.getString(DATE);
         }
-
     }
 
     fun onButtonPressed(uri: Uri) {
