@@ -25,15 +25,23 @@ class SplashActivity : Activity() {
     override fun onResume() {
         super.onResume()
 
-        val mAuth: FirebaseAuth = FirebaseAuth.getInstance();
+        val mAuth: FirebaseAuth = FirebaseAuth.getInstance()
 
-        val currentUser: FirebaseUser? = mAuth.currentUser;
+        val currentUser: FirebaseUser? = mAuth.currentUser
 
         Log.e("LOG spalsh activity", currentUser.toString())
 
-        Handler().postDelayed({ checkRegistrationAndForward() }, 1000L)
-
-        start_indicator_image.startAnimation(AnimationUtils.loadAnimation(this, R.anim.start_indicator_animation))
+        val handler = Handler()
+        handler.postDelayed({ checkRegistrationAndForward() }, 1420L)
+        handler.postDelayed({
+            start_indicator_image_1.startAnimation(AnimationUtils.loadAnimation(this, R.anim.flash_point_with_delay))
+        }, 200)
+        handler.postDelayed({
+            start_indicator_image_2.startAnimation(AnimationUtils.loadAnimation(this, R.anim.flash_point_with_delay))
+        }, 800)
+        handler.postDelayed({
+            start_indicator_image_3.startAnimation(AnimationUtils.loadAnimation(this, R.anim.flash_point_with_delay))
+        }, 1400)
     }
 
     private fun checkRegistrationAndForward() {
