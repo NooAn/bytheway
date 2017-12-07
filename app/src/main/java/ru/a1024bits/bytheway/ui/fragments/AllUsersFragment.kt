@@ -23,7 +23,7 @@ import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.adapter.DisplayAllUsersAdapter
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
-import ru.a1024bits.bytheway.viewmodel.ShowUsersViewModel
+import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
@@ -32,7 +32,7 @@ import kotlin.collections.ArrayList
 class AllUsersFragment : Fragment() {
     private val SIZE_INITIAL_ELEMENTS = 2
     private lateinit var filter: Filter
-    private lateinit var viewModel: ShowUsersViewModel
+    private lateinit var viewModel: DisplayUsersViewModel
     private lateinit var extension: ExtensionsAllUsers
     private lateinit var dateDialog: DatePickerDialog
     private lateinit var displayUsersAdapter: DisplayAllUsersAdapter
@@ -112,7 +112,6 @@ class AllUsersFragment : Fragment() {
                 filter.endBudget = Integer.parseInt(endBudget.text.toString())
             filter.startCity = startCity.text.toString()
             filter.endCity = endCity.text.toString()
-            viewModel.getAllUsers(filter)
 
             view_contain_block_parameters.layoutTransition.addTransitionListener(object : LayoutTransition.TransitionListener {
                 override fun startTransition(p0: LayoutTransition?, p1: ViewGroup?, p2: View?, p3: Int) {}
@@ -127,6 +126,7 @@ class AllUsersFragment : Fragment() {
                 }
             })
             block_search_parameters.visibility = View.GONE
+            viewModel.getAllUsers(filter)
         }
 
         cancelParameters.setOnClickListener {
@@ -211,7 +211,7 @@ class AllUsersFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         App.component.inject(this)
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(ShowUsersViewModel::class.java)
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(DisplayUsersViewModel::class.java)
         displayUsersAdapter = DisplayAllUsersAdapter(this.context, extension)
         display_all_users.adapter = displayUsersAdapter
 
@@ -220,8 +220,8 @@ class AllUsersFragment : Fragment() {
             if (list != null) {
                 Log.e("LOG", "update $list")
                 loading_where_load_users.visibility = View.GONE
-                displayUsersAdapter.setItems(list)
                 display_all_users.visibility = View.VISIBLE
+                displayUsersAdapter.setItems(list)
             }
         })
         loading_where_load_users.visibility = View.VISIBLE

@@ -13,7 +13,7 @@ import javax.inject.Inject
 /**
  * Created by andrey.gusenkov on 25/09/2017.
  */
-class ShowUsersViewModel @Inject constructor(var userRepository: UserRepository) : ViewModel() {
+class DisplayUsersViewModel @Inject constructor(var userRepository: UserRepository) : ViewModel() {
 
     var listUser: MutableLiveData<List<User>> = MutableLiveData<List<User>>()
     var usersLiveData: MutableLiveData<List<User>> = MutableLiveData<List<User>>()
@@ -34,12 +34,11 @@ class ShowUsersViewModel @Inject constructor(var userRepository: UserRepository)
 //                        for (document in task.result) {
 //                            try {
 //                                val user = document.toObject(User::class.java)
-//                                Log.d(TAG, document.id + " => " + document.data)
 //
 //                                if ((filter.startBudget >= 0) && (filter.endBudget > 0))
 //                                    if (user.budget < filter.startBudget || user.budget > filter.endBudget) continue
 //                                if ((filter.startDate > 0L) && (filter.endDate > 0L))
-//                                    if (user.data < filter.startDate || user.data > filter.endDate) continue
+//                                    if ((user.dates["start_date"] as Long) > filter.startDate || (user.dates["end_date"] as Long) < filter.endDate) continue
 //                                if (user.age < filter.startAge || user.age > filter.endAge) continue
 //                                if (filter.sex != 0)
 //                                    if (user.sex != filter.sex) continue
@@ -49,6 +48,7 @@ class ShowUsersViewModel @Inject constructor(var userRepository: UserRepository)
 //                                    if (!user.cities.contains(filter.endCity)) continue
 //
 //                                result.add(user)
+//
 //                            } catch (e: Exception) {
 //                            }
 //                        }
@@ -82,6 +82,7 @@ class ShowUsersViewModel @Inject constructor(var userRepository: UserRepository)
 
     class InstallUsers : AsyncTask<Any, Void, Array<Any>>() {
         override fun doInBackground(vararg dataQuery: Any): Array<Any> {
+            Thread.sleep(700)
             val filter = dataQuery[1] as Filter
             val result: MutableList<User> = ArrayList()
             for (document in dataQuery[0] as QuerySnapshot) {
@@ -91,7 +92,7 @@ class ShowUsersViewModel @Inject constructor(var userRepository: UserRepository)
                     if ((filter.startBudget >= 0) && (filter.endBudget > 0))
                         if (user.budget < filter.startBudget || user.budget > filter.endBudget) continue
                     if ((filter.startDate > 0L) && (filter.endDate > 0L))
-                        if ((user.dates["first_data"] as Long) < filter.startDate || (user.dates["last_data"] as Long) > filter.endDate) continue
+                        if ((user.dates["start_date"] as Long) > filter.startDate || (user.dates["end_date"] as Long) < filter.endDate) continue
                     if (user.age < filter.startAge || user.age > filter.endAge) continue
                     if (filter.sex != 0)
                         if (user.sex != filter.sex) continue

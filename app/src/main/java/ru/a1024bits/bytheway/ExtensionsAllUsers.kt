@@ -24,7 +24,7 @@ class ExtensionsAllUsers(val context: Context) {
             }
             StringBuilder("c   ").append(yearStart).append(calendarStartDate.get(Calendar.DAY_OF_MONTH)).append(" ")
                     .append(context.resources.getStringArray(R.array.months_array)[calendarStartDate.get(Calendar.MONTH)])
-                    .append("     по   ").append(yearEnd).append(calendarEndDate.get(Calendar.DAY_OF_MONTH)).append(" ")
+                    .append("   по   ").append(yearEnd).append(calendarEndDate.get(Calendar.DAY_OF_MONTH)).append(" ")
                     .append(context.resources.getStringArray(R.array.months_array)[calendarEndDate.get(Calendar.MONTH)]).toString()
 
         } else ""

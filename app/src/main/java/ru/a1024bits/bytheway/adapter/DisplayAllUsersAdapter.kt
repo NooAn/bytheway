@@ -2,6 +2,7 @@ package ru.a1024bits.bytheway.adapter;
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -33,8 +34,7 @@ class DisplayAllUsersAdapter(val context: Context, val extensions: ExtensionsAll
     override fun onBindViewHolder(holder: UserViewHolder?, position: Int) {
         val currentUser = users[position]
         holder?.name?.text = currentUser.name
-//        if (currentUser.dates["start_date"] != null && currentUser.dates["end_date"] != null)
-            holder?.dates?.text = currentUser.dates["start_date"]?.let { currentUser.dates["end_date"]?.let { it1 -> extensions.getTextFromDates(it, it1) } }
+        holder?.dates?.text = currentUser.dates["start_date"]?.let { currentUser.dates["end_date"]?.let { it1 -> extensions.getTextFromDates(it, it1) } }
         glide.load(currentUser.urlPhoto).into(holder?.avatar)
         holder?.itemView?.setOnClickListener {
             if (context is MenuActivity) {
