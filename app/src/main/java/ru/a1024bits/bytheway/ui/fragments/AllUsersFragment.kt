@@ -9,6 +9,7 @@ import android.content.Context
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.SearchView
 import android.util.Log
 import android.view.*
@@ -286,10 +287,11 @@ class AllUsersFragment : Fragment() {
                 yearStart = calendarStartDate.get(Calendar.YEAR).toString() + " "
                 yearEnd = calendarEndDate.get(Calendar.YEAR).toString() + " "
             }
-            choseDate.text = StringBuilder("c: ").append(yearStart).append(calendarStartDate.get(Calendar.DAY_OF_MONTH)).append(" ")
+            choseDate.text = StringBuilder("c   ").append(yearStart).append(calendarStartDate.get(Calendar.DAY_OF_MONTH)).append(" ")
                     .append(context.resources.getStringArray(R.array.months_array)[calendarStartDate.get(Calendar.MONTH)])
-                    .append("   по: ").append(yearEnd).append(calendarEndDate.get(Calendar.DAY_OF_MONTH)).append(" ")
+                    .append("     по   ").append(yearEnd).append(calendarEndDate.get(Calendar.DAY_OF_MONTH)).append(" ")
                     .append(context.resources.getStringArray(R.array.months_array)[calendarEndDate.get(Calendar.MONTH)]).toString()
+
         } else
             choseDate.text = "выберите даты"
     }

@@ -5,11 +5,13 @@
     <color name="colorAccent">#009688</color>
     <color name="hint">#c9c9c9</color>
     <color name="white">#fff</color>
+    <color name="black">#000000</color>
     <color name="textColor">#fff</color>
     <color name="gray">#AEAEAE</color>
     <color name="colorLine">#009688</color>
-    <color name="colorFilters">#EFEFEF</color>
-    <color name="colorBlueText">#006889</color>
+    <color name="colorFiltersBackground">#EFEFEF</color>
+    <color name="colorFiltersText">#808080</color>
+    <color name="colorPrimaryTeams">#006889</color>
 
     <color name="greyInactive">#1F000000</color>
     <color name="greyTravelTypeDivider">#80989898</color>
