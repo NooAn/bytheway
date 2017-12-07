@@ -9,11 +9,12 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
+import ru.a1024bits.bytheway.ExtensionsAllUsers
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
 
-class ShowAllUsersAdapter(val context: Context) : RecyclerView.Adapter<ShowAllUsersAdapter.UserViewHolder>() {
+class DisplayAllUsersAdapter(val context: Context, val extensions: ExtensionsAllUsers) : RecyclerView.Adapter<DisplayAllUsersAdapter.UserViewHolder>() {
     private var glide: RequestManager = Glide.with(this.context)
     var users: MutableList<User> = ArrayList()
 
@@ -32,6 +33,8 @@ class ShowAllUsersAdapter(val context: Context) : RecyclerView.Adapter<ShowAllUs
     override fun onBindViewHolder(holder: UserViewHolder?, position: Int) {
         val currentUser = users[position]
         holder?.name?.text = currentUser.name
+//        if (currentUser.dates["start_date"] != null && currentUser.dates["end_date"] != null)
+            holder?.dates?.text = currentUser.dates["start_date"]?.let { currentUser.dates["end_date"]?.let { it1 -> extensions.getTextFromDates(it, it1) } }
         glide.load(currentUser.urlPhoto).into(holder?.avatar)
         holder?.itemView?.setOnClickListener {
             if (context is MenuActivity) {
@@ -45,5 +48,6 @@ class ShowAllUsersAdapter(val context: Context) : RecyclerView.Adapter<ShowAllUs
     inner class UserViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         var name = view.findViewById<TextView>(R.id.name_content_user)
         var avatar = view.findViewById<ImageView>(R.id.user_avatar)
+        var dates = view.findViewById<TextView>(R.id.users_dates)
     }
 }

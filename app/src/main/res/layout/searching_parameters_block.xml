@@ -41,7 +41,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/endCity"
         android:layout_toEndOf="@id/date_text"
-        android:text="выбери даты"
+        android:text="с   ___     по   ___ "
         android:textSize="18sp" />
 
     <TextView
@@ -193,7 +193,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_below="@id/budget_text"
-        android:layout_marginStart="20dp"
+        android:layout_marginStart="24dp"
         android:background="@color/colorFiltersBackground"
         android:gravity="end|center_vertical"
         android:stateListAnimator="@null"

@@ -9,7 +9,6 @@ import android.content.Context
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat
 import android.support.v7.widget.SearchView
 import android.util.Log
 import android.view.*
@@ -21,7 +20,7 @@ import kotlinx.android.synthetic.main.searching_parameters_block.*
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.ExtensionsAllUsers
 import ru.a1024bits.bytheway.R
-import ru.a1024bits.bytheway.adapter.ShowAllUsersAdapter
+import ru.a1024bits.bytheway.adapter.DisplayAllUsersAdapter
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.viewmodel.ShowUsersViewModel
@@ -36,7 +35,7 @@ class AllUsersFragment : Fragment() {
     private lateinit var viewModel: ShowUsersViewModel
     private lateinit var extension: ExtensionsAllUsers
     private lateinit var dateDialog: DatePickerDialog
-    private lateinit var showUsersAdapter: ShowAllUsersAdapter
+    private lateinit var displayUsersAdapter: DisplayAllUsersAdapter
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
     private var countInitialElements = 0
 
@@ -179,13 +178,13 @@ class AllUsersFragment : Fragment() {
             override fun onQueryTextSubmit(quer: String): Boolean {
                 val query = quer.toLowerCase()
                 val result = ArrayList<User>()
-                showUsersAdapter.users.filterTo(result) {
+                displayUsersAdapter.users.filterTo(result) {
                     it.cities.contains(query) || it.name.toLowerCase().contains(query) || it.email.toLowerCase().contains(query) ||
                             it.age.toString().contains(query) || it.budget.toString().contains(query) ||
                             it.city.toLowerCase().contains(query) || it.lastName.toLowerCase().contains(query) ||
                             it.phone.contains(query) || it.route.contains(query)
                 }
-                showUsersAdapter.setItems(result)
+                displayUsersAdapter.setItems(result)
                 return true
             }
 
@@ -213,15 +212,15 @@ class AllUsersFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         App.component.inject(this)
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(ShowUsersViewModel::class.java)
-        showUsersAdapter = ShowAllUsersAdapter(this.context)
-        display_all_users.adapter = showUsersAdapter
+        displayUsersAdapter = DisplayAllUsersAdapter(this.context, extension)
+        display_all_users.adapter = displayUsersAdapter
 
         viewModel.usersLiveData.observe(this, Observer<List<User>> { list ->
             Log.e("LOG", "onChanged $list")
             if (list != null) {
                 Log.e("LOG", "update $list")
                 loading_where_load_users.visibility = View.GONE
-                showUsersAdapter.setItems(list)
+                displayUsersAdapter.setItems(list)
                 display_all_users.visibility = View.VISIBLE
             }
         })
@@ -292,8 +291,8 @@ class AllUsersFragment : Fragment() {
                     .append("     по   ").append(yearEnd).append(calendarEndDate.get(Calendar.DAY_OF_MONTH)).append(" ")
                     .append(context.resources.getStringArray(R.array.months_array)[calendarEndDate.get(Calendar.MONTH)]).toString()
 
-        } else
-            choseDate.text = "выберите даты"
+        }
+//            choseDate.text = "выберите даты"
     }
 
     companion object {

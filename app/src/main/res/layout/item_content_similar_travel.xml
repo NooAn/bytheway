@@ -8,30 +8,28 @@
     android:orientation="horizontal"
     android:padding="10dp">
 
-    <ImageView
-        tools:ignore="ContentDescription"
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/user_avatar"
-        android:paddingStart="16dp"
-        android:paddingEnd="4dp"
         android:layout_width="@dimen/similarTravelPhotoSize"
         android:layout_height="@dimen/similarTravelPhotoSize"
-        android:scaleType="center"
+        android:paddingEnd="4dp"
+        android:paddingStart="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:srcCompat="@mipmap/ic_launcher_round" />
+        app:srcCompat="@mipmap/ic_launcher_round"
+        tools:ignore="ContentDescription" />
 
 
     <TextView
-        tools:text="Николаев Алексей"
         android:id="@+id/name_content_user"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
         android:textColor="@color/mdtp_dark_gray"
         android:textSize="16sp"
-        app:layout_constraintStart_toEndOf="@+id/user_avatar" />
+        app:layout_constraintStart_toEndOf="@+id/user_avatar"
+        tools:text="Николаев Алексей" />
 
     <TextView
-        tools:text="Киев, Украина"
         android:id="@+id/text_city"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -41,17 +39,18 @@
         android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="@+id/user_avatar"
         app:layout_constraintStart_toStartOf="@+id/name_content_user"
-        app:layout_constraintTop_toBottomOf="@+id/name_content_user" />
+        app:layout_constraintTop_toBottomOf="@+id/name_content_user"
+        tools:text="Киев, Украина" />
 
     <TextView
-        tools:text="90%"
-        android:textSize="24sp"
-        android:textStyle="bold"
         android:id="@+id/percent_similar_travel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
+        android:textSize="24sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="90%" />
     <!--app:layout_constraintEnd_toEndOf="@+id/item_content_similar_traver_layout"-->
 </android.support.constraint.ConstraintLayout>
