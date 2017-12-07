@@ -34,7 +34,11 @@ class DisplayAllUsersAdapter(val context: Context, val extensions: ExtensionsAll
     override fun onBindViewHolder(holder: UserViewHolder?, position: Int) {
         val currentUser = users[position]
         holder?.name?.text = currentUser.name
-        holder?.dates?.text = currentUser.dates["start_date"]?.let { currentUser.dates["end_date"]?.let { it1 -> extensions.getTextFromDates(it, it1) } }
+        holder?.dates?.text = currentUser.dates["start_date"]?.let {
+            currentUser.dates["end_date"]?.let { it1 ->
+                if (it > 0L && it1 > 0L) extensions.getTextFromDates(it, it1, 1) else ""
+            }
+        }
         glide.load(currentUser.urlPhoto).into(holder?.avatar)
         holder?.itemView?.setOnClickListener {
             if (context is MenuActivity) {

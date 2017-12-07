@@ -193,7 +193,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_below="@id/budget_text"
-        android:layout_marginStart="24dp"
+        android:layout_marginStart="32dp"
         android:background="@color/colorFiltersBackground"
         android:gravity="end|center_vertical"
         android:stateListAnimator="@null"

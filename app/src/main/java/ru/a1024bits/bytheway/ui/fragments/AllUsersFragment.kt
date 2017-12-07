@@ -275,24 +275,9 @@ class AllUsersFragment : Fragment() {
     }
 
     private fun updateChoseDateButtons() {
-        if (filter.startDate > 0L && filter.endDate > 0L) {
-            val calendarStartDate = Calendar.getInstance()
-            calendarStartDate.timeInMillis = filter.startDate
-            val calendarEndDate = Calendar.getInstance()
-            calendarEndDate.timeInMillis = filter.endDate
-            var yearStart = ""
-            var yearEnd = ""
-            if (calendarStartDate.get(Calendar.YEAR) != calendarEndDate.get(Calendar.YEAR)) {
-                yearStart = calendarStartDate.get(Calendar.YEAR).toString() + " "
-                yearEnd = calendarEndDate.get(Calendar.YEAR).toString() + " "
-            }
-            choseDate.text = StringBuilder("c   ").append(yearStart).append(calendarStartDate.get(Calendar.DAY_OF_MONTH)).append(" ")
-                    .append(context.resources.getStringArray(R.array.months_array)[calendarStartDate.get(Calendar.MONTH)])
-                    .append("     по   ").append(yearEnd).append(calendarEndDate.get(Calendar.DAY_OF_MONTH)).append(" ")
-                    .append(context.resources.getStringArray(R.array.months_array)[calendarEndDate.get(Calendar.MONTH)]).toString()
-
-        }
-//            choseDate.text = "выберите даты"
+            choseDate.text = if (filter.startDate > 0L && filter.endDate > 0L)
+                extension.getTextFromDates(filter.startDate, filter.endDate, 0)
+        else "с   ___   по   ___"
     }
 
     companion object {
