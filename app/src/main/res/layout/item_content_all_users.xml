@@ -28,30 +28,39 @@
             android:layout_height="0dp"
             android:layout_marginStart="16dp"
             android:textColor="@color/black"
-            android:textSize="18sp"
-            app:layout_constraintStart_toEndOf="@+id/user_avatar"
+            android:textSize="20sp"
+            app:layout_constraintStart_toEndOf="@id/user_avatar"
             tools:text="Николаев Алексей" />
 
         <TextView
-            android:id="@+id/text_city"
+            android:id="@+id/age_content_user"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            app:layout_constraintStart_toEndOf="@id/name_content_user"
+            tools:text=", 16" />
+
+        <TextView
+            android:id="@+id/users_cities"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="Киев, Украина"
+            android:layout_marginTop="12dp"
+            android:text="@string/not_cities"
             android:textColor="@color/black"
             android:textSize="16sp"
-            app:layout_constraintStart_toStartOf="@+id/name_content_user"
-            app:layout_constraintTop_toBottomOf="@+id/name_content_user" />
+            app:layout_constraintStart_toStartOf="@id/name_content_user"
+            app:layout_constraintTop_toBottomOf="@id/name_content_user" />
 
         <TextView
             android:id="@+id/users_dates"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text=""
+            android:text="@string/item_all_users_empty_date"
             android:textColor="@color/colorPrimaryTeams"
             android:textSize="16sp"
-            app:layout_constraintStart_toStartOf="@+id/name_content_user"
-            app:layout_constraintTop_toBottomOf="@+id/user_avatar" />
+            app:layout_constraintStart_toStartOf="@id/name_content_user"
+            app:layout_constraintTop_toBottomOf="@id/user_avatar" />
 
     </android.support.constraint.ConstraintLayout>
 

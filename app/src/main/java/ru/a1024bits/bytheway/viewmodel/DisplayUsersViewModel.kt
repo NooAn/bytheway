@@ -92,7 +92,7 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
                     if ((filter.startBudget >= 0) && (filter.endBudget > 0))
                         if (user.budget < filter.startBudget || user.budget > filter.endBudget) continue
                     if ((filter.startDate > 0L) && (filter.endDate > 0L))
-                        if ((user.dates["start_date"] as Long) > filter.startDate || (user.dates["end_date"] as Long) < filter.endDate) continue
+                        if ((user.dates["start_date"] as Long) < filter.startDate || (user.dates["end_date"] as Long) > filter.endDate) continue
                     if (user.age < filter.startAge || user.age > filter.endAge) continue
                     if (filter.sex != 0)
                         if (user.sex != filter.sex) continue

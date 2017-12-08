@@ -23,6 +23,7 @@ import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.adapter.DisplayAllUsersAdapter
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
+import ru.a1024bits.bytheway.util.DecimalInputFilter
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
 import java.util.*
 import javax.inject.Inject
@@ -63,6 +64,9 @@ class AllUsersFragment : Fragment() {
 
         startCity.setText(filter.startCity)
         endCity.setText(filter.endCity)
+
+        startBudget.filters = arrayOf(DecimalInputFilter())
+        endBudget.filters = arrayOf(DecimalInputFilter())
 
         startAge.adapter = ArrayAdapter<String>(context, android.R.layout.simple_spinner_item,
                 extension.yearsOldUsers)
@@ -106,10 +110,8 @@ class AllUsersFragment : Fragment() {
 
         view_contain_block_parameters.layoutTransition.setDuration(700L)
         saveParameters.setOnClickListener {
-            if (startBudget.text.isNotEmpty())
-                filter.startBudget = Integer.parseInt(startBudget.text.toString())
-            if (endBudget.text.isNotEmpty())
-                filter.endBudget = Integer.parseInt(endBudget.text.toString())
+            filter.startBudget = if (startBudget.text.isNotEmpty()) Integer.parseInt(startBudget.text.toString()) else -1
+            filter.endBudget = if (endBudget.text.isNotEmpty()) Integer.parseInt(endBudget.text.toString()) else -1
             filter.startCity = startCity.text.toString()
             filter.endCity = endCity.text.toString()
 
@@ -131,6 +133,8 @@ class AllUsersFragment : Fragment() {
 
         cancelParameters.setOnClickListener {
             filter.sex = 0
+            filter.startAge = -1
+            filter.endAge = - 1
             filter.startAge = 0
             filter.endAge = extension.yearsOldUsers.size - 1
             filter.startCity = ""
@@ -219,9 +223,10 @@ class AllUsersFragment : Fragment() {
             Log.e("LOG", "onChanged $list")
             if (list != null) {
                 Log.e("LOG", "update $list")
+                display_all_users.adapter = displayUsersAdapter
                 loading_where_load_users.visibility = View.GONE
-                display_all_users.visibility = View.VISIBLE
                 displayUsersAdapter.setItems(list)
+                display_all_users.visibility = View.VISIBLE
             }
         })
         loading_where_load_users.visibility = View.VISIBLE
@@ -230,10 +235,8 @@ class AllUsersFragment : Fragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        if (startBudget.text.isNotEmpty())
-            filter.startBudget = Integer.parseInt(startBudget.text.toString())
-        if (endBudget.text.isNotEmpty())
-            filter.endBudget = Integer.parseInt(endBudget.text.toString())
+        filter.startBudget = if (startBudget.text.isNotEmpty()) Integer.parseInt(startBudget.text.toString()) else -1
+        filter.endBudget = if (endBudget.text.isNotEmpty()) Integer.parseInt(endBudget.text.toString()) else -1
         outState.putSerializable("filter", filter)
     }
 
@@ -277,7 +280,7 @@ class AllUsersFragment : Fragment() {
     private fun updateChoseDateButtons() {
             choseDate.text = if (filter.startDate > 0L && filter.endDate > 0L)
                 extension.getTextFromDates(filter.startDate, filter.endDate, 0)
-        else "с   ___   по   ___"
+        else context.getString(R.string.filters_all_users_empty_date)
     }
 
     companion object {

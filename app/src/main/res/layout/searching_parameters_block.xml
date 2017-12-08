@@ -41,7 +41,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/endCity"
         android:layout_toEndOf="@id/date_text"
-        android:text="с   ___     по   ___ "
+        android:text="@string/filters_all_users_empty_date"
         android:textSize="18sp" />
 
     <TextView
@@ -114,7 +114,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/sex_text"
         android:layout_marginStart="16dp"
-        android:layout_toEndOf="@+id/from_age_text"
+        android:layout_toEndOf="@id/from_age_text"
         android:theme="@style/UsersTextInFilters" />
 
     <TextView
@@ -123,7 +123,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/sex_text"
         android:layout_marginStart="16dp"
-        android:layout_toEndOf="@+id/startAge"
+        android:layout_toEndOf="@id/startAge"
         android:text="до"
         android:textSize="18sp" />
 
@@ -133,7 +133,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/sex_text"
         android:layout_marginStart="16dp"
-        android:layout_toEndOf="@+id/by_age_text"
+        android:layout_toEndOf="@id/by_age_text"
         android:theme="@style/UsersTextInFilters" />
 
 
@@ -150,7 +150,7 @@
         android:id="@+id/from_budget_text"
         android:layout_width="wrap_content"
         android:layout_height="35dp"
-        android:layout_alignStart="@+id/from_age_text"
+        android:layout_alignStart="@id/from_age_text"
         android:layout_below="@id/age_text"
         android:gravity="top"
         android:text="от"
@@ -160,9 +160,9 @@
         android:id="@+id/startBudget"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/from_budget_text"
-        android:layout_alignEnd="@+id/startAge"
-        android:layout_alignStart="@+id/startAge"
+        android:layout_alignBottom="@id/from_budget_text"
+        android:layout_alignEnd="@id/startAge"
+        android:layout_alignStart="@id/startAge"
         android:layout_toEndOf="@id/from_budget_text"
         android:inputType="number"
         android:theme="@style/UsersTextInFilters" />
@@ -171,7 +171,7 @@
         android:id="@+id/by_budget_text"
         android:layout_width="wrap_content"
         android:layout_height="35dp"
-        android:layout_alignStart="@+id/by_age_text"
+        android:layout_alignStart="@id/by_age_text"
         android:layout_below="@id/age_text"
         android:gravity="top"
         android:text="до"
@@ -182,8 +182,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@id/by_budget_text"
-        android:layout_alignEnd="@+id/endAge"
-        android:layout_alignStart="@+id/endAge"
+        android:layout_alignEnd="@id/endAge"
+        android:layout_alignStart="@id/endAge"
         android:inputType="number"
         android:theme="@style/UsersTextInFilters" />
 

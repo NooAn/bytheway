@@ -34,11 +34,16 @@ class DisplayAllUsersAdapter(val context: Context, val extensions: ExtensionsAll
     override fun onBindViewHolder(holder: UserViewHolder?, position: Int) {
         val currentUser = users[position]
         holder?.name?.text = currentUser.name
-        holder?.dates?.text = currentUser.dates["start_date"]?.let {
-            currentUser.dates["end_date"]?.let { it1 ->
-                if (it > 0L && it1 > 0L) extensions.getTextFromDates(it, it1, 1) else ""
-            }
-        }
+        holder?.dates?.text = if (currentUser.dates["start_date"] != null && currentUser.dates["end_date"] != null)
+            extensions.getTextFromDates(currentUser.dates["start_date"], currentUser.dates["end_date"], 1)
+        else
+            context.getString(R.string.item_all_users_empty_date)
+        if (currentUser.age > 0)
+            holder?.age?.text = if (currentUser.age > 0) StringBuilder(", ").append(currentUser.age.toString()) else ""
+        holder?.cities?.text = if (currentUser.cities["first_city"] != null && currentUser.cities["last_city"] != null)
+            StringBuilder(currentUser.cities["first_city"]).append(" - ").append(currentUser.cities["last_city"])
+        else
+            context.getString(R.string.not_cities)
         glide.load(currentUser.urlPhoto).into(holder?.avatar)
         holder?.itemView?.setOnClickListener {
             if (context is MenuActivity) {
@@ -53,5 +58,7 @@ class DisplayAllUsersAdapter(val context: Context, val extensions: ExtensionsAll
         var name = view.findViewById<TextView>(R.id.name_content_user)
         var avatar = view.findViewById<ImageView>(R.id.user_avatar)
         var dates = view.findViewById<TextView>(R.id.users_dates)
+        var age = view.findViewById<TextView>(R.id.age_content_user)
+        var cities = view.findViewById<TextView>(R.id.users_cities)
     }
 }
