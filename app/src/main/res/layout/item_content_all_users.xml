@@ -1,47 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginBottom="2dp">
 
-    android:background="?android:selectableItemBackground"
-    android:orientation="horizontal"
-    android:padding="10dp">
-
-    <ImageView
-        android:id="@+id/user_avatar"
-        android:layout_width="@dimen/size_user_avatar"
-        android:layout_height="@dimen/size_user_avatar"
-        android:scaleType="center"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:srcCompat="@mipmap/ic_launcher_round"
-        tools:ignore="ContentDescription" />
-
-
-    <TextView
-        android:id="@+id/name_content_user"
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginStart="8dp"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toEndOf="@+id/user_avatar"
-        tools:text="Николаев Алексей" />
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:paddingBottom="4dp"
+        android:paddingStart="16dp"
+        android:paddingTop="16dp">
 
-    <TextView
-        android:id="@+id/text_city"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="Киев, Украина"
-        android:textColor="@android:color/black"
-        android:textSize="12sp"
-        app:layout_constraintStart_toStartOf="@+id/name_content_user"
-        app:layout_constraintTop_toBottomOf="@+id/name_content_user" />
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/user_avatar"
+            android:layout_width="@dimen/size_user_avatar"
+            android:layout_height="@dimen/size_user_avatar"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:src="@mipmap/ic_launcher_round" />
 
+        <TextView
+            android:id="@+id/name_content_user"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginStart="16dp"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            app:layout_constraintStart_toEndOf="@id/user_avatar"
+            tools:text="Николаев Алексей" />
 
-</android.support.constraint.ConstraintLayout>
+        <TextView
+            android:id="@+id/age_content_user"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            app:layout_constraintStart_toEndOf="@id/name_content_user"
+            tools:text=", 16" />
+
+        <TextView
+            android:id="@+id/users_cities"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/not_cities"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="@id/name_content_user"
+            app:layout_constraintTop_toBottomOf="@id/name_content_user" />
+
+        <TextView
+            android:id="@+id/users_dates"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/item_all_users_empty_date"
+            android:textColor="@color/colorPrimaryTeams"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="@id/name_content_user"
+            app:layout_constraintTop_toBottomOf="@id/user_avatar" />
+
+    </android.support.constraint.ConstraintLayout>
+
+</android.support.v7.widget.CardView>

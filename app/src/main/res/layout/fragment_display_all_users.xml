@@ -14,11 +14,12 @@
             android:layout_height="wrap_content"
             android:paddingBottom="19dp"
             android:paddingStart="17dp"
+            android:textSize="18sp"
             android:paddingTop="19dp"
             android:gravity="center_vertical|start"
-            android:background="#EFEFEF"
-            android:text="+Параметры поиска"
-            android:textColor="#006889" />
+            android:background="@color/colorFiltersBackground"
+            android:text="+ Параметры поиска"
+            android:textColor="@color/colorPrimaryTeams" />
 
         <include
             android:id="@+id/block_search_parameters"
