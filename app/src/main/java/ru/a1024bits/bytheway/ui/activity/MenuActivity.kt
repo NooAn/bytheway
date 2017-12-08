@@ -241,8 +241,6 @@ class MenuActivity : AppCompatActivity(),
 
     override fun onResume() {
         super.onResume()
-        navigatorHolder.setNavigator(navigator)
-
         // the intent filter defined in AndroidManifest will handle the return from ACTION_VIEW intent
         val uri = intent.data
         if (uri != null && uri.toString().startsWith(redirectUri)) {
@@ -297,6 +295,7 @@ class MenuActivity : AppCompatActivity(),
                 Log.e("LOGI:", "error: ${uri.getQueryParameter("error")}")
             }
         }
+        navigatorHolder.setNavigator(navigator)
     }
 
     private fun saveToken(accessToken: AccessToken?) {
