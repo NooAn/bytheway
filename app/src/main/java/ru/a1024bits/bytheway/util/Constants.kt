@@ -17,4 +17,5 @@ object Constants {
     val FIRST_INDEX_CITY = "last_city"
     val START_DATE = "start_date"
     val END_DATE = "end_date"
+    val PROFILE_CHANCHED = "profile_changed"
 }

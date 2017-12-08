@@ -95,12 +95,13 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
         })
     }
 
-    fun sendUserData(map: HashMap<String, Any>, id: String) {
+    fun sendUserData(map: HashMap<String, Any>, id: String, success: () -> Unit = {}) {
         Log.e("LOG map:", map.toString())
         userRepository.changeUserProfile(map, id)
                 .addOnCompleteListener {
                     //fixme
                     Log.e("LOG", "complete сhange profile user")
+                    success()
                 }
                 .addOnFailureListener {
                     Log.e("LOG", "fail change user")

@@ -101,6 +101,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     private var cityToLatLng = GeoPoint(0.0, 0.0)
 
     private var lastName = ""
+    private val preferences by lazy { activity.getSharedPreferences(Constants.APP_PREFERENCES, Context.MODE_PRIVATE) }
 
     private var city = ""
     private lateinit var dateDialog: DatePickerDialog
@@ -420,6 +421,11 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             hideBlockNewTrip()
             showBlockTravelInformation()
         }
+        view.findViewById<TextView>(R.id.add_info_user).setOnKeyListener {v, i, keyEvent ->
+            setChanged()
+            false
+        }
+
         view.findViewById<ImageView>(R.id.vkIcon).setOnClickListener {
             /*
              Если контакты еще не добавлены, тогда открываем диалоговое окно.
@@ -494,9 +500,10 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         dateDialog.show(activity.fragmentManager, "")
     }
 
-
     private fun sendUserInfoToServer() {
-        viewModel?.sendUserData(getHashMapUser(), uid)
+        viewModel?.sendUserData(getHashMapUser(), uid, {
+            preferences.edit().putString(Constants.PROFILE_CHANCHED, "").apply()
+        })
     }
 
     private fun showBlockTravelInformation() {
@@ -513,6 +520,10 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     private fun hideBlockNewTrip() {
         add_new_trip.visibility = View.GONE
+    }
+
+    private fun setChanged() {
+        preferences.edit().putString(Constants.PROFILE_CHANCHED, "1").apply()
     }
 
     private fun openInformationEditDialog() {

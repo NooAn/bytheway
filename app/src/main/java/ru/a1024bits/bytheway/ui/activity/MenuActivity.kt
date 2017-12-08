@@ -16,10 +16,7 @@ import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.request.RequestOptions
@@ -30,7 +27,6 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_menu.*
-import kotlinx.android.synthetic.main.custom_dialog_feedback.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -146,9 +142,11 @@ class MenuActivity : AppCompatActivity(),
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
 
         sing_out.setOnClickListener {
-            preferences.edit().putBoolean(Constants.FIRST_ENTER, true).apply()
-            FirebaseAuth.getInstance().signOut()
-            finishAffinity()
+            openAwayFromProfileDialog({
+                preferences.edit().putBoolean(Constants.FIRST_ENTER, true).apply()
+                FirebaseAuth.getInstance().signOut()
+                finishAffinity()
+            })
         }
         feedback.setOnClickListener { openDialogFeedback() }
     }
@@ -320,19 +318,46 @@ class MenuActivity : AppCompatActivity(),
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
-        val id = item.itemId
-
-        when (id) {
-            R.id.profile_item -> navigator.applyCommand(Replace(Screens.USER_PROFILE_SCREEN, 1))
-            R.id.search_item -> navigator.applyCommand(Replace(Screens.SEARCH_MAP_SCREEN, 1))
-            R.id.all_users_item -> navigator.applyCommand(Replace(Screens.ALL_USERS_SCREEN, 1))
+        if(preferences.getString(Constants.PROFILE_CHANCHED, "").length > 0){
+            openAwayFromProfileDialog({
+                onNavigationItemSelected(item)
+            })
+            return false
+        } else {
+            when (item.itemId) {
+                R.id.profile_item -> navigator.applyCommand(Replace(Screens.USER_PROFILE_SCREEN, 1))
+                R.id.search_item -> navigator.applyCommand(Replace(Screens.SEARCH_MAP_SCREEN, 1))
+                R.id.all_users_item -> navigator.applyCommand(Replace(Screens.ALL_USERS_SCREEN, 1))
+            }
+            val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
+            drawer.closeDrawer(GravityCompat.START)
+            return true
         }
-
-        val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
-        drawer.closeDrawer(GravityCompat.START)
-        return true
     }
 
+    private fun openAwayFromProfileDialog(cb: () -> Unit) {
+        val simpleAlert = AlertDialog.Builder(this).create()
+        val inflater = this.layoutInflater
+        val dialogView = inflater.inflate(R.layout.away_from_profile_dialog, null)
+        simpleAlert.setView(dialogView)
+
+        simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Да", { dialogInterface, i ->
+            Log.e("LOG", " accepted")
+            val myProfile = supportFragmentManager.findFragmentById(R.id.fragment_container) as MyProfileFragment
+            viewModel?.sendUserData(myProfile.getHashMapUser(), FirebaseAuth.getInstance().currentUser?.uid.toString(), {
+                preferences.edit().putString(Constants.PROFILE_CHANCHED, "").apply()
+                Toast.makeText(this, "Profile successfully saved", Toast.LENGTH_SHORT).show()
+                cb()
+            })
+
+        })
+        simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, "Нет", { dialogInterface, i ->
+            Log.e("LOG", " refused")
+            preferences.edit().putString(Constants.PROFILE_CHANCHED, "").apply()
+            cb()
+        })
+        simpleAlert.show()
+    }
     private fun openDialogFeedback() {
         val simpleAlert = AlertDialog.Builder(this).create()
         val inflater = this.layoutInflater
