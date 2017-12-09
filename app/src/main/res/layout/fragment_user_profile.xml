@@ -252,8 +252,8 @@
         </LinearLayout>
 
 
-        <LinearLayout
-            android:id="@+id/method_moving"
+        <RelativeLayout
+            android:id="@+id/layout_method_moving"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@+id/maplayout"
@@ -267,109 +267,77 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_toStartOf="@+id/travelWayImagesContainer"
                 android:text="@string/method_move"
                 android:textSize="16sp" />
-        </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/layout_method_moving"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/method_moving"
-            android:layout_gravity="center_horizontal|center"
-            android:layout_marginBottom="24dp"
-            android:layout_marginEnd="@dimen/margin_left_profile"
-            android:layout_marginStart="@dimen/margin_left_profile"
-            android:layout_marginTop="24dp"
-            android:baselineAligned="false"
-            android:orientation="horizontal"
-            android:visibility="gone"
-            tools:visibility="visible">
+            <LinearLayout
+                android:id="@+id/travelWayImagesContainer"
+                android:orientation="horizontal"
+                android:layout_alignParentEnd="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <ImageView
+                    tools:ignore="ContentDescription"
+                    android:id="@+id/directions_car"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:layout_marginStart="6dp"
+                    android:src="@drawable/ic_directions_car_grey"
+                    android:visibility="gone"
+                    tools:src="@drawable/ic_directions_car" />
+                <ImageView
+                    tools:ignore="ContentDescription"
+                    android:id="@+id/directions_railway"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:layout_marginStart="6dp"
+                    android:src="@drawable/ic_directions_railway_grey"
+                    tools:src="@drawable/ic_directions_railway" />
+                <ImageView
+                    tools:ignore="ContentDescription"
+                    android:id="@+id/directions_bus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:layout_marginStart="6dp"
+                    android:src="@drawable/ic_directions_bus_grey"
+                    android:visibility="gone"
+                    tools:src="@drawable/ic_directions_bus" />
+                <ImageView
+                    tools:ignore="ContentDescription"
+                    android:id="@+id/directions_flight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:layout_marginStart="6dp"
+                    android:src="@drawable/ic_flight_grey"
+                    tools:src="@drawable/ic_flight" />
+                <ImageView
+                    tools:ignore="ContentDescription"
+                    android:id="@+id/csIcon1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:layout_marginStart="6dp"
+                    android:src="@drawable/ic_directions_hitchhiking_grey"
+                    android:visibility="gone"
+                    tools:src="@drawable/ic_directions_hitchhiking" />
 
-            <ImageView
-                tools:ignore="ContentDescription"
-                android:id="@+id/directions_car"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginEnd="6dp"
-                android:layout_marginStart="6dp"
-                android:layout_weight="1.0"
-                android:src="@drawable/ic_directions_car_grey"
-                tools:src="@drawable/ic_directions_car" />
+            </LinearLayout>
+        </RelativeLayout>
 
-            <View
-                android:layout_width="1dp"
-                android:layout_height="30dp"
-                android:background="@color/gray" />
-
-            <ImageView
-                tools:ignore="ContentDescription"
-                android:id="@+id/directions_railway"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginEnd="6dp"
-                android:layout_marginStart="6dp"
-                android:layout_weight="1.0"
-                android:src="@drawable/ic_directions_railway_grey"
-                tools:src="@drawable/ic_directions_railway" />
-
-            <View
-                android:layout_width="1dp"
-                android:layout_height="30dp"
-                android:background="@color/gray" />
-
-            <ImageView
-                tools:ignore="ContentDescription"
-                android:id="@+id/directions_bus"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginEnd="6dp"
-                android:layout_marginStart="6dp"
-                android:layout_weight="1.0"
-                android:src="@drawable/ic_directions_bus_grey"
-                tools:src="@drawable/ic_directions_bus" />
-
-            <View
-                android:layout_width="1dp"
-                android:layout_height="30dp"
-                android:background="@color/gray" />
-
-            <ImageView
-                tools:ignore="ContentDescription"
-                android:id="@+id/directions_flight"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginEnd="6dp"
-                android:layout_marginStart="6dp"
-                android:layout_weight="1.0"
-                android:src="@drawable/ic_flight_grey"
-                tools:src="@drawable/ic_flight" />
-
-            <View
-                android:layout_width="1dp"
-                android:layout_height="30dp"
-                android:background="@color/gray" />
-
-            <ImageView
-                tools:ignore="ContentDescription"
-                android:id="@+id/csIcon1"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginEnd="6dp"
-                android:layout_marginStart="6dp"
-                android:layout_weight="1.0"
-                android:src="@drawable/ic_directions_hitchhiking_grey"
-                tools:src="@drawable/ic_directions_hitchhiking" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/moneyfortrip"
+        <RelativeLayout
+            android:id="@+id/moneyForTrip"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@+id/layout_method_moving"
             android:layout_marginEnd="@dimen/margin_left_profile"
             android:layout_marginStart="@dimen/margin_left_profile"
             android:layout_marginTop="24dp"
+            android:gravity="center_vertical"
             android:orientation="vertical"
             android:visibility="gone"
             tools:visibility="visible">
@@ -377,87 +345,50 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_toStartOf="@+id/travelBudget"
                 android:text="@string/money"
                 android:textSize="16sp" />
 
-            <SeekBar
-                android:id="@+id/choose_price_travel"
-                style="@style/Widget.AppCompat.SeekBar"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_marginTop="24dp"
-                android:layout_weight="1"
-                android:max="30"
-                android:progress="50"
-                android:progressTint="@color/colorPrimary"
-                android:thumbTint="@color/colorPrimary" />
-
             <TextView
-                android:id="@+id/display_price_travel"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginStart="@dimen/margin_left_profile"
-                android:layout_marginTop="12dp"
-                android:drawableStart="@drawable/ic_rubles"
-                android:text="@string/budget"
-                android:textSize="16sp" />
+                tools:text="8000"
+                android:id="@+id/travelBudget"
+                android:layout_alignParentEnd="true"
+                android:drawableStart="@drawable/ic_ruble_blue"
+                android:drawablePadding="4dp"
+                android:textColor="@color/colorPrimary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
-        </LinearLayout>
+        </RelativeLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/descriptionprofile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/moneyfortrip"
+            android:layout_below="@+id/moneyForTrip"
             android:layout_marginEnd="@dimen/margin_left_profile"
             android:layout_marginStart="@dimen/margin_left_profile"
+            android:layout_marginBottom="@dimen/margin_left_profile"
             android:layout_marginTop="24dp"
             android:orientation="vertical"
             android:visibility="gone"
             tools:visibility="visible">
 
+            <ImageView
+                android:id="@+id/imageQuoteDescription"
+                android:scaleType="center"
+                android:src="@drawable/ic_quote"
+                android:contentDescription="@null"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
             <TextView
+                tools:text="Собираюсь провести отпуск в Ижевске. Шутка))) Еду в Карловы Вары"
+                android:layout_toEndOf="@+id/imageQuoteDescription"
+                android:layout_below="@+id/imageQuoteDescription"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="@string/add_info_profile"
-                android:textSize="16sp" />
-
-            <EditText
-                android:id="@+id/add_info_user"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:backgroundTint="@color/colorPrimary"
-                android:hint="@string/description"
-                android:inputType="textMultiLine"
-                android:textSize="14sp" />
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/button_save_travel_info"
-            android:layout_width="150dp"
-            android:layout_height="match_parent"
-            android:layout_alignParentEnd="true"
-            android:layout_below="@+id/descriptionprofile"
-            android:layout_marginEnd="19dp"
-            android:layout_marginTop="12dp"
-            android:padding="24dp"
-            android:text="Сохранить"
-            android:theme="@style/WhiteButton"
-            android:visibility="gone"
-            tools:visibility="visible" />
-
-        <Button
-            android:id="@+id/button_remove_travel_info"
-            android:layout_width="150dp"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/descriptionprofile"
-            android:layout_marginEnd="19dp"
-            android:layout_marginTop="12dp"
-            android:padding="24dp"
-            android:text="Удалить"
-            android:theme="@style/WhiteButton"
-            android:visibility="gone"
-            tools:visibility="visible" />
+                android:layout_height="wrap_content" />
+        </RelativeLayout>
     </RelativeLayout>
 
 
