@@ -22,12 +22,16 @@ import com.google.android.gms.common.GooglePlayServicesNotAvailableException
 import com.google.android.gms.common.GooglePlayServicesRepairableException
 import com.google.android.gms.location.places.AutocompleteFilter
 import com.google.android.gms.location.places.ui.PlaceAutocomplete
-import com.google.android.gms.maps.*
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.MapsInitializer
+import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.GeoPoint
 import kotlinx.android.synthetic.main.fragment_my_user_profile.*
+import kotlinx.android.synthetic.main.profile_add_trip.*
 import kotlinx.android.synthetic.main.profile_direction.*
 import kotlinx.android.synthetic.main.profile_main_image.*
 import ru.a1024bits.bytheway.App
@@ -152,7 +156,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             if (user != null) fillProfile(user)
         })
 
-        viewModel!!.load(uid)
+        viewModel?.load(uid)
     }
 
 
@@ -344,7 +348,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     override fun onResume() {
         super.onResume()
-        mMapView?.onResume()
+        mapView.onResume()
     }
 
     override fun onMapReady(map: GoogleMap?) {
@@ -357,11 +361,10 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(CENTRE, ZOOM))
     }
 
-    private var mMapView: MapView? = null
     private var googleMap: GoogleMap? = null
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater!!.inflate(R.layout.fragment_my_user_profile, container, false)
+        val view = inflater?.inflate(R.layout.fragment_my_user_profile, container, false)
         val now = Calendar.getInstance()
         dateDialog = DatePickerDialog.newInstance(
                 this@MyProfileFragment,
@@ -369,14 +372,13 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                 now.get(Calendar.MONTH),
                 now.get(Calendar.DAY_OF_MONTH)
         )
-        val displayPriceTravel = view.findViewById<TextView>(R.id.displayPriceTravel)
         displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(budget)
 
-        view.findViewById<LinearLayout>(R.id.headerprofile).setOnClickListener({
+        headerprofile.setOnClickListener({
             openInformationEditDialog()
         })
 
-        view.findViewById<SeekBar>(R.id.choose_price_travel).setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        choose_price_travel.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, number: Int, p2: Boolean) {
                 budget = fibbonaci(number)
                 displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(budget)
@@ -389,87 +391,87 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             }
         })
 
-        view.findViewById<View>(R.id.iconCar).setOnClickListener({
+        iconCar.setOnClickListener({
             with(travelCarText) { isActivated = !isActivated }
             methods.put(Method.CAR.link, travelCarText.isActivated)
         })
 
-        view.findViewById<View>(R.id.iconTrain).setOnClickListener({
+        iconTrain.setOnClickListener({
             with(travelTrainText) { isActivated = !isActivated }
             methods.put(Method.TRAIN.link, travelTrainText.isActivated)
         })
 
-        view.findViewById<View>(R.id.iconBus).setOnClickListener({
+        iconBus.setOnClickListener({
             with(travelBusText) { isActivated = !isActivated }
             methods.put(Method.BUS.link, travelBusText.isActivated)
         })
 
-        view.findViewById<View>(R.id.iconPlane).setOnClickListener({
+        iconPlane.setOnClickListener({
             with(travelPlaneText) { isActivated = !isActivated }
             methods.put(Method.PLANE.link, travelPlaneText.isActivated)
         })
 
-        view.findViewById<View>(R.id.iconHitchHicking).setOnClickListener({
+        iconHitchHicking.setOnClickListener({
             with(travelHitchHikingText) { isActivated = !isActivated }
             methods.put(Method.HITCHHIKING.link, travelHitchHikingText.isActivated)
         })
 
 
-        view.findViewById<TextView>(R.id.add)
-        view.findViewById<TextView>(R.id.new_trip_text).setOnClickListener {
+        //view.findViewById<TextView>(R.id.add)
+        new_trip_text.setOnClickListener {
             hideBlockNewTrip()
             showBlockTravelInformation()
         }
-        view.findViewById<ImageView>(R.id.vkIcon).setOnClickListener {
+        vkIcon.setOnClickListener {
             /*
              Если контакты еще не добавлены, тогда открываем диалоговое окно.
              Если были какие-то изменения в линках то сохраняем в бд. И меняем цвет иконки соответсвенно значениям.
              */
             openDialog(SocialNetwork.VK)
         }
-        view.findViewById<ImageView>(R.id.csIcon).setOnClickListener() {
+        csIcon.setOnClickListener() {
             openDialog(SocialNetwork.CS)
         }
-        view.findViewById<ImageView>(R.id.whatsAppIcon).setOnClickListener({
+        whatsAppIcon.setOnClickListener({
             openDialog(SocialNetwork.WHATSAPP)
         })
-        view.findViewById<ImageView>(R.id.fbcon).setOnClickListener({
+        fbcon.setOnClickListener({
             openDialog(SocialNetwork.FB)
         })
-        view.findViewById<ImageView>(R.id.tgIcon).setOnClickListener({
+        tgIcon.setOnClickListener({
             openDialog(SocialNetwork.TG)
         })
 
-        view.findViewById<Button>(R.id.button_save_travel_info).setOnClickListener({
+        button_save_travel_info.setOnClickListener({
             Log.e("LOG", "save travel")
             sendUserInfoToServer()
         })
-        view.findViewById<View>(R.id.dateArrived).setOnClickListener {
+        dateArrived.setOnClickListener {
             openDateDialog()
         }
-        view.findViewById<View>(R.id.textDateFrom).setOnClickListener {
+        textDateFrom.setOnClickListener {
             openDateDialog()
         }
 
-        view.findViewById<View>(R.id.textCityFrom).setOnClickListener {
+        textCityFrom.setOnClickListener {
             sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM)
         }
-        view.findViewById<View>(R.id.textCityTo).setOnClickListener {
+        textCityTo.setOnClickListener {
             sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO)
         }
-        view.findViewById<View>(R.id.appinTheAirEnter).setOnClickListener {
+        appinTheAirEnter.setOnClickListener {
             (activity as MenuActivity).navigator.applyCommand(Replace(Screens.USER_SINHRONIZED_SCREEN, 1))
         }
-        mMapView = view?.findViewById<MapView>(R.id.mapView)
-        mMapView?.onCreate(savedInstanceState)
-        mMapView?.onResume()// needed to get the map to display immediately
+
+        mapView.onCreate(savedInstanceState)
+        mapView.onResume()// needed to get the map to display immediately
 
         try {
             MapsInitializer.initialize(activity.applicationContext)
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        mMapView?.getMapAsync(this)
+        mapView?.getMapAsync(this)
         return view
     }
 
@@ -675,13 +677,13 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         if (context is OnFragmentInteractionListener) {
             mListener = context
         } else {
-            throw RuntimeException(context!!.toString() + " must implement OnFragmentInteractionListener")
+            throw RuntimeException(context?.toString() + " must implement OnFragmentInteractionListener")
         }
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
-        mMapView?.onSaveInstanceState(outState)
+        mapView.onSaveInstanceState(outState)
     }
 
     override fun onDetach() {
@@ -691,27 +693,27 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     override fun onPause() {
         super.onPause()
-        mMapView?.onPause()
+        mapView.onPause()
     }
 
     override fun onStart() {
         super.onStart()
-        mMapView?.onStart()
+        mapView.onStart()
     }
 
     override fun onStop() {
         super.onStop()
-        mMapView?.onStop()
+        mapView.onStop()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        mMapView?.onDestroy()
+        mapView.onDestroy()
     }
 
     override fun onLowMemory() {
         super.onLowMemory()
-        mMapView?.onLowMemory()
+        mapView.onLowMemory()
     }
 
     fun fibbonaci(n: Int): Long {
