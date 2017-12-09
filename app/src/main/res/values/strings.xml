@@ -83,4 +83,6 @@
     <string name="item_all_users_empty_date">___ - ___</string>
     <string name="filters_all_users_empty_date">с ___ по ___</string>
     <string name="not_cities">нет городов</string>
+    <string name="textBodyDisaster">Мы не смогли найти ваши предстоящие поездки.</string>
+    <string name="textHeadAirDisaster">Ваш аккаунт синхронизирован!</string>
 </resources>

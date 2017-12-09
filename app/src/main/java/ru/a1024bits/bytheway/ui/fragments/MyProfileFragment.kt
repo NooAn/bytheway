@@ -76,7 +76,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     }
 
     private fun getLongFromDate(day: Int, month: Int, year: Int): Long {
-        val dateString = "09 9 2012"
+        val dateString = "$day $month $year"
         val dateFormat = SimpleDateFormat("dd MM yyyy")
         val date = dateFormat.parse(dateString)
         val unixTime = date.time.toLong() / 1000
@@ -228,19 +228,24 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         for (method in user.method.keys) {
             when (method) {
                 Method.TRAIN.link -> {
-                    with(iconTrain) { isActivated = true }
+                    if (user.method.get(method) == true)
+                        with(iconTrain) { isActivated = true }
                 }
                 Method.BUS.link -> {
-                    with(iconBus) { isActivated = true }
+                    if (user.method.get(method) == true)
+                        with(iconBus) { isActivated = true }
                 }
                 Method.CAR.link -> {
-                    with(iconCar) { isActivated = true }
+                    if (user.method.get(method) == true)
+                        with(iconCar) { isActivated = true }
                 }
                 Method.PLANE.link -> {
-                    with(iconPlane) { isActivated = true }
+                    if (user.method.get(method) == true)
+                        with(iconPlane) { isActivated = true }
                 }
                 Method.HITCHHIKING.link -> {
-                    with(iconHitchHicking) { isActivated = true }
+                    if (user.method.get(method) == true)
+                        with(iconHitchHicking) { isActivated = true }
                 }
             }
         }
@@ -386,49 +391,27 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
         view.findViewById<View>(R.id.iconCar).setOnClickListener({
             with(travelCarText) { isActivated = !isActivated }
-            if (checkInMethods(Method.CAR)) {
-                methods.put(Method.CAR.link, false)
-            } else {
-                methods.put(Method.CAR.link, true)
-            }
-
-
+            methods.put(Method.CAR.link, travelCarText.isActivated)
         })
 
         view.findViewById<View>(R.id.iconTrain).setOnClickListener({
             with(travelTrainText) { isActivated = !isActivated }
-            if (checkInMethods(Method.TRAIN)) {
-                methods.put(Method.TRAIN.link, false)
-            } else {
-                methods.put(Method.TRAIN.link, true)
-            }
+            methods.put(Method.TRAIN.link, travelTrainText.isActivated)
         })
 
         view.findViewById<View>(R.id.iconBus).setOnClickListener({
             with(travelBusText) { isActivated = !isActivated }
-            if (checkInMethods(Method.BUS)) {
-                methods.put(Method.BUS.link, false)
-            } else {
-                methods.put(Method.BUS.link, true)
-            }
+            methods.put(Method.BUS.link, travelBusText.isActivated)
         })
 
         view.findViewById<View>(R.id.iconPlane).setOnClickListener({
             with(travelPlaneText) { isActivated = !isActivated }
-            if (checkInMethods(Method.PLANE)) {
-                methods.put(Method.PLANE.link, false)
-            } else {
-                methods.put(Method.PLANE.link, true)
-            }
+            methods.put(Method.PLANE.link, travelPlaneText.isActivated)
         })
 
         view.findViewById<View>(R.id.iconHitchHicking).setOnClickListener({
             with(travelHitchHikingText) { isActivated = !isActivated }
-            if (checkInMethods(Method.HITCHHIKING)) {
-                methods.put(Method.HITCHHIKING.link, false)
-            } else {
-                methods.put(Method.HITCHHIKING.link, true)
-            }
+            methods.put(Method.HITCHHIKING.link, travelHitchHikingText.isActivated)
         })
 
 
@@ -511,7 +494,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         dateDialog.show(activity.fragmentManager, "")
     }
 
-//    private fun checkInSocialMethods(value: SocialNetwork) = (value in socNet.keys)
 
     private fun sendUserInfoToServer() {
         viewModel?.sendUserData(getHashMapUser(), uid)
@@ -757,15 +739,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             fragment.arguments = args
             return fragment
         }
-    }
-
-
-    fun checkInMethods(method: Method): Boolean {
-        var result = false
-        for (item in methods.keys) {
-            if (method.link == item) result = true
-        }
-        return result
     }
 
     fun getHashMapUser(): HashMap<String, Any> {
