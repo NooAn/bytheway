@@ -101,7 +101,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     private var cityToLatLng = GeoPoint(0.0, 0.0)
 
     private var lastName = ""
-    private val preferences by lazy { activity.getSharedPreferences(Constants.APP_PREFERENCES, Context.MODE_PRIVATE) }
 
     private var city = ""
     private lateinit var dateDialog: DatePickerDialog
@@ -422,7 +421,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             showBlockTravelInformation()
         }
         view.findViewById<TextView>(R.id.add_info_user).setOnKeyListener {v, i, keyEvent ->
-            setChanged()
+            (activity as MenuActivity).profileChanged = true
             false
         }
 
@@ -502,7 +501,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     private fun sendUserInfoToServer() {
         viewModel?.sendUserData(getHashMapUser(), uid, {
-            preferences.edit().putString(Constants.PROFILE_CHANCHED, "").apply()
+            (activity as MenuActivity).profileChanged = false
         })
     }
 
@@ -520,10 +519,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     private fun hideBlockNewTrip() {
         add_new_trip.visibility = View.GONE
-    }
-
-    private fun setChanged() {
-        preferences.edit().putString(Constants.PROFILE_CHANCHED, "1").apply()
     }
 
     private fun openInformationEditDialog() {

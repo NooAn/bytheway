@@ -149,5 +149,4 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
 
         Log.e("LOG name", "" + body?.data?.trips?.get(0)?.flights?.get(0)?.arrivalUtc)
     }
-
 }

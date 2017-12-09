@@ -84,6 +84,7 @@ class MenuActivity : AppCompatActivity(),
 
     private var glide: RequestManager? = null
     var mainUser: User? = null
+    var profileChanged: Boolean? = false
 
     private var viewModel: MyProfileViewModel? = null
     private var viewModelFeedback: ViewModelFeedback? = null
@@ -318,8 +319,9 @@ class MenuActivity : AppCompatActivity(),
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
-        if(preferences.getString(Constants.PROFILE_CHANCHED, "").length > 0){
+        if(this.profileChanged == true){
             openAwayFromProfileDialog({
+                this.profileChanged = false
                 onNavigationItemSelected(item)
             })
             return false
@@ -345,7 +347,6 @@ class MenuActivity : AppCompatActivity(),
             Log.e("LOG", " accepted")
             val myProfile = supportFragmentManager.findFragmentById(R.id.fragment_container) as MyProfileFragment
             viewModel?.sendUserData(myProfile.getHashMapUser(), FirebaseAuth.getInstance().currentUser?.uid.toString(), {
-                preferences.edit().putString(Constants.PROFILE_CHANCHED, "").apply()
                 Toast.makeText(this, "Profile successfully saved", Toast.LENGTH_SHORT).show()
                 cb()
             })
@@ -353,7 +354,6 @@ class MenuActivity : AppCompatActivity(),
         })
         simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, "Нет", { dialogInterface, i ->
             Log.e("LOG", " refused")
-            preferences.edit().putString(Constants.PROFILE_CHANCHED, "").apply()
             cb()
         })
         simpleAlert.show()
