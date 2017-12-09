@@ -16,14 +16,14 @@ import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.adapter.DisplaySimilarTravelsAdapter
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
-import ru.a1024bits.bytheway.viewmodel.ShowUsersViewModel
+import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
 import java.util.*
 import javax.inject.Inject
 
 class SimilarTravelsFragment : Fragment() {
     private lateinit var currentView: View
     private lateinit var filter: Filter
-    private lateinit var viewModel: ShowUsersViewModel
+    private lateinit var viewModel: DisplayUsersViewModel
     private lateinit var showUsersAdapter: DisplaySimilarTravelsAdapter
     private lateinit var recyclerView: RecyclerView
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -61,7 +61,7 @@ class SimilarTravelsFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         App.component.inject(this)
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(ShowUsersViewModel::class.java)
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(DisplayUsersViewModel::class.java)
         showUsersAdapter = DisplaySimilarTravelsAdapter(this.context)
         recyclerView.adapter = showUsersAdapter
 

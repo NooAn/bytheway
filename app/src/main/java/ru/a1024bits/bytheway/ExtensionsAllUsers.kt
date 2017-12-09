@@ -1,43 +1,38 @@
 package ru.a1024bits.bytheway
 
 import android.content.Context
-import android.util.Log
 import java.util.*
 import kotlin.collections.ArrayList
 
 
 class ExtensionsAllUsers(val context: Context) {
     var yearsOldUsers = (0..120).mapTo(ArrayList<String>()) { it.toString() }
-    private val calendarTempDate: Calendar = Calendar.getInstance()
-    val currentDate: Calendar = Calendar.getInstance()
-    var daysInMonths: ArrayList<Long>
 
-    init {
-        calendarTempDate.set(Calendar.DAY_OF_MONTH, calendarTempDate.get(Calendar.DAY_OF_MONTH) - 1)
-        calendarTempDate.set(Calendar.HOUR_OF_DAY, 0)
-        calendarTempDate.set(Calendar.MINUTE, 0)
-        calendarTempDate.set(Calendar.SECOND, 0)
-        calendarTempDate.set(Calendar.MILLISECOND, 0)
-        daysInMonths = (0..122).mapTo(ArrayList()) {
-            calendarTempDate.set(Calendar.DAY_OF_MONTH, calendarTempDate.get(Calendar.DAY_OF_MONTH) + 1)
-            calendarTempDate.timeInMillis
+    fun getTextFromDates(startDate: Long?, endDate: Long?, variant: Int): String {
+        var fromWord = context.getString(R.string.from_date_filter)
+        var toWord = context.getString(R.string.to_date_filter)
+        if (variant == 1) {
+            fromWord = ""
+            toWord = " - "
         }
-        calendarTempDate.time = Date()
+        val calendarStartDate = Calendar.getInstance()
+        calendarStartDate.timeInMillis = startDate?: 0L
+        val calendarEndDate = Calendar.getInstance()
+        calendarEndDate.timeInMillis = endDate?: 0L
+        var yearStart = ""
+        var yearEnd = ""
+        if (calendarStartDate.get(Calendar.YEAR) != calendarEndDate.get(Calendar.YEAR)) {
+            yearStart = calendarStartDate.get(Calendar.YEAR).toString()
+            yearEnd = calendarEndDate.get(Calendar.YEAR).toString()
+        }
+        return getTextStartEndDates(fromWord, calendarStartDate, yearStart, toWord, calendarEndDate, yearEnd)
     }
 
-    fun getPositionFromDate(date: Long, isEndAge: Boolean): Int {
-        if (date > 0L) {
-            (0 until daysInMonths.size)
-                    .filter { it -> daysInMonths[it] == date }
-                    .forEach { it -> return it }
-        }
-        return if (isEndAge) daysInMonths.size - 1 else 0
-    }
-
-    fun getDaysInEndDataStr(): MutableList<String> {
-        return (0 until daysInMonths.size).mapTo(ArrayList()) {
-            calendarTempDate.time = Date(daysInMonths[it])
-            calendarTempDate.get(Calendar.DAY_OF_MONTH).toString() + " " + context.resources.getStringArray(R.array.months_array)[calendarTempDate.get(Calendar.MONTH)]
-        }
+    private fun getTextStartEndDates(fromWord: String?, calendarStartDate: Calendar, yearStart: String, toWord: String?, calendarEndDate: Calendar, yearEnd: String): String {
+        return StringBuilder(fromWord).append(calendarStartDate.get(Calendar.DAY_OF_MONTH)).append(" ")
+                .append(context.resources.getStringArray(R.array.months_array)[calendarStartDate.get(Calendar.MONTH)]).append(" ")
+                .append(yearStart).append(toWord).append(calendarEndDate.get(Calendar.DAY_OF_MONTH)).append(" ")
+                .append(context.resources.getStringArray(R.array.months_array)[calendarEndDate.get(Calendar.MONTH)]).append(" ")
+                .append(yearEnd).toString()
     }
 }
