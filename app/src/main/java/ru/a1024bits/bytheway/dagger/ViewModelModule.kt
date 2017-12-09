@@ -7,7 +7,7 @@ import dagger.Module
 import dagger.multibindings.IntoMap
 import ru.a1024bits.bytheway.viewmodel.MapViewModel
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
-import ru.a1024bits.bytheway.viewmodel.ShowUsersViewModel
+import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
 import ru.a1024bits.bytheway.viewmodel.ViewModelFactory
 
 /**
@@ -18,9 +18,9 @@ abstract class ViewModelModule {
     
     @Binds
     @IntoMap
-    @ViewModelKey(ShowUsersViewModel::class)
+    @ViewModelKey(DisplayUsersViewModel::class)
     // Bind your View Model here
-    abstract fun bindShowViewModel(mainViewModel: ShowUsersViewModel): ViewModel
+    abstract fun bindShowViewModel(mainViewModel: DisplayUsersViewModel): ViewModel
     
     
     @Binds

@@ -2,27 +2,24 @@
 <android.support.v7.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/view_contain_block_parameters"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
     android:orientation="vertical">
 
-    <LinearLayout
-        android:id="@+id/view_contain_block_parameters"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/hint"
-        android:orientation="vertical">
-
         <TextView
             android:id="@+id/searchParametersText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#006889"
-            android:layout_marginBottom="19dp"
-            android:layout_marginStart="17dp"
-            android:layout_marginTop="19dp"
-            android:text="+Параметры поиска" />
+            android:paddingBottom="19dp"
+            android:paddingStart="17dp"
+            android:textSize="18sp"
+            android:paddingTop="19dp"
+            android:gravity="center_vertical|start"
+            android:background="@color/colorFiltersBackground"
+            android:text="+ Параметры поиска"
+            android:textColor="@color/colorPrimaryTeams" />
 
         <include
             android:id="@+id/block_search_parameters"
@@ -30,7 +27,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="gone" />
-    </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/display_all_users"

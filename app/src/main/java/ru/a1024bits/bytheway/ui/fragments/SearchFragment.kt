@@ -18,6 +18,8 @@ import com.google.android.gms.maps.model.LatLng
 import kotlinx.android.synthetic.main.fragment_search_block.*
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
+import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM
+import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO
 import ru.a1024bits.bytheway.util.DecimalInputFilter
 
 
@@ -27,8 +29,6 @@ import ru.a1024bits.bytheway.util.DecimalInputFilter
 class SearchFragment : Fragment() {
 
 
-    var PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM = 1
-    var PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO = 2
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

@@ -12,7 +12,12 @@ import com.google.firebase.firestore.FirebaseFirestore
 import ru.a1024bits.bytheway.model.*
 import ru.a1024bits.bytheway.repository.COLLECTION_USERS
 import ru.a1024bits.bytheway.repository.UserRepository
+import ru.a1024bits.bytheway.util.Constants
+import ru.a1024bits.bytheway.util.Constants.END_DATE
 import ru.a1024bits.bytheway.util.Constants.ERROR
+import ru.a1024bits.bytheway.util.Constants.FIRST_INDEX_CITY
+import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
+import ru.a1024bits.bytheway.util.Constants.START_DATE
 import ru.a1024bits.bytheway.util.Constants.SUCCESS
 import javax.inject.Inject
 
@@ -25,7 +30,6 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
     val error: MutableLiveData<Int> = MutableLiveData<Int>()
 
     fun load(userId: String) {
-        Log.e("LOG", "start load user: $userId")
         userRepository.getUserById(userId)
                 .addOnFailureListener {
                     Log.e("LOG", "error ${it.message}")
@@ -34,9 +38,7 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                     val profile = document.toObject(User::class.java)
                     user.setValue(profile)
                 }
-        Log.e("LOG", "end load user: $userId")
     }
-
 
     fun saveLinks(arraySocNetwork: HashMap<String, String>, id: String) {
         val map: HashMap<String, Any> = hashMapOf()
@@ -120,9 +122,6 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
         })
         map.put("countries", set.size)
         map.put("kilometers", airUser?.data?.kilometers?.toLong() ?: 0)
-//        var airInfo = AirInfo(airUser.data.flightHours, set.size.toString(), airUser.data.kilometers)
-//        hash.put("airInfo", airInfo)
-
         sendUserData(map, id)
     }
 
@@ -133,15 +132,15 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
             for (flight in body?.data?.trips?.get(0)?.flights) {
                 Log.d("LOG", (flight.departureUtc.toLong().toString() + " " + currentTime / 1000 + " " + (flight.departureLocale.toLong() > currentTime)))
                 if (flight.departureUtc.toLong() > currentTime / 1000) {
-                    val listCities = arrayListOf<String>()
-                    listCities.add(flight.origin.name)
-                    listCities.add(flight.destination.name)
-                    val listDates = arrayListOf<Long>()
-                    listDates.add(flight.departureUtc.toLong())
-                    listDates.add(flight.arrivalUtc.toLong())
-                    map.put("cities", listCities)
+                    val mapCities = hashMapOf<String, String>()
+                    mapCities.put(FIRST_INDEX_CITY, flight.origin.name)
+                    mapCities.put(LAST_INDEX_CITY, flight.destination.name)
+                    val mapDates = hashMapOf<String, Long>()
+                    mapDates.put(START_DATE, flight.departureUtc.toLong() * 1000)
+                    mapDates.put(END_DATE, flight.arrivalUtc.toLong() * 1000)
+                    map.put("cities", mapCities)
                     map.put("countTrip", 1)
-                    map.put("dates", listDates)
+                    map.put("dates", mapDates)
                     break
                 }
             }

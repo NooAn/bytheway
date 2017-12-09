@@ -28,6 +28,8 @@
     <string name="date_from">Дата</string>
     <string name="city_to">Куда</string>
     <string name="date_to">Дата</string>
+    <string name="from_date_filter">"c   "</string>
+    <string name="to_date_filter">"   по   "</string>
     <string name="date_trip">Дата путешествия</string>
     <string name="method_move">Способ передвижения</string>
     <string name="budget">1000 руб.</string>
@@ -50,18 +52,18 @@
     <string name="miss">пропустить</string>
 
     <string-array name="months_array">
-        <item>янв.</item>
-        <item>фев.</item>
+        <item>янв</item>
+        <item>фев</item>
         <item>март</item>
-        <item>апр.</item>
-        <item>май.</item>
+        <item>апр</item>
+        <item>май</item>
         <item>июнь</item>
         <item>июль</item>
-        <item>авг.</item>
-        <item>сен.</item>
-        <item>окт.</item>
-        <item>ноя.</item>
-        <item>дек.</item>
+        <item>авг</item>
+        <item>сен</item>
+        <item>окт</item>
+        <item>ноя</item>
+        <item>дек</item>
     </string-array>
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
@@ -78,4 +80,9 @@
     <string name="feedback_writte">Напишите отзыв или предложение</string>
     <string name="add_new_trip_from_app_in_the_air">+ Добавить поездку  App in the Air</string>
     <string name="feedback">Обратная связь</string>
+    <string name="textBodyDisaster">Мы не смогли найти ваши предстоящие поездки.</string>
+    <string name="textHeadAirDisaster">Ваш аккаунт синхронизирован!</string>
+    <string name="item_all_users_empty_date">___ - ___</string>
+    <string name="filters_all_users_empty_date">с ___ по ___</string>
+    <string name="not_cities">нет городов</string>
 </resources>

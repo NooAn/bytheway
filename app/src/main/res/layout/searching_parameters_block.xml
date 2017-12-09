@@ -1,25 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginLeft="10dp"
-    android:layout_marginRight="10dp">
+    android:background="@color/colorFiltersBackground"
+    android:paddingEnd="20dp"
+    android:paddingStart="20dp">
 
     <EditText
         android:id="@+id/startCity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:hint="откудa" />
+        android:layout_marginBottom="26dp"
+        android:hint="Откудa"
+        android:textColor="@color/black"
+        android:textSize="18sp" />
 
     <EditText
         android:id="@+id/endCity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/startCity"
-        android:layout_marginBottom="16dp"
-        android:hint="Куда" />
+        android:layout_marginBottom="26dp"
+        android:hint="Куда"
+        android:textColor="@color/black"
+        android:textSize="18sp" />
 
     <TextView
         android:id="@+id/date_text"
@@ -28,55 +32,61 @@
         android:layout_below="@id/endCity"
         android:layout_marginBottom="26dp"
         android:layout_marginEnd="70dp"
-        android:text="дата"
+        android:text="Дата"
         android:textSize="18sp" />
 
-    <Button
-        android:id="@+id/startDate"
+    <TextView
+        android:id="@+id/choseDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/endCity"
-        android:layout_toEndOf="@id/date_text"/>
+        android:layout_toEndOf="@id/date_text"
+        android:text="@string/filters_all_users_empty_date"
+        android:textSize="18sp" />
 
     <TextView
         android:id="@+id/sex_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/date_text"
-        android:layout_marginBottom="16dp"
-        android:text="пол"
+        android:layout_marginBottom="26dp"
+        android:text="Пол"
         android:textSize="18sp" />
 
     <RadioGroup
         android:id="@+id/sexButtons"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@id/startDate"
+        android:layout_alignStart="@id/choseDate"
         android:layout_below="@id/date_text"
         android:orientation="horizontal">
-        <!--android:layout_toEndOf="@+id/sex_text"-->
 
         <RadioButton
             android:id="@+id/sex_M"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="М" />
+            android:layout_marginEnd="20dp"
+            android:text="М"
+            android:textColor="@color/colorFiltersText"
+            android:textSize="18sp" />
 
         <RadioButton
             android:id="@+id/sex_W"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Ж" />
+            android:layout_marginEnd="20dp"
+            android:text="Ж"
+            android:textColor="@color/colorFiltersText"
+            android:textSize="18sp" />
 
         <RadioButton
             android:id="@+id/sex_Any"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:checked="true"
-            android:text="Любой" />
+            android:text="Любой"
+            android:textColor="@color/colorFiltersText"
+            android:textSize="18sp" />
     </RadioGroup>
 
 
@@ -85,8 +95,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/sex_text"
-        android:layout_marginBottom="16dp"
-        android:text="возраст"
+        android:layout_marginBottom="26dp"
+        android:text="Возраст"
         android:textSize="18sp" />
 
     <TextView
@@ -103,16 +113,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/sex_text"
-        android:layout_marginStart="20dp"
-        android:layout_alignStart="@id/from_age_text" />
+        android:layout_marginStart="16dp"
+        android:layout_toEndOf="@id/from_age_text"
+        android:theme="@style/UsersTextInFilters" />
 
     <TextView
         android:id="@+id/by_age_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@+id/startAge"
         android:layout_below="@id/sex_text"
-        android:layout_marginStart="20dp"
+        android:layout_marginStart="16dp"
+        android:layout_toEndOf="@id/startAge"
         android:text="до"
         android:textSize="18sp" />
 
@@ -120,9 +131,10 @@
         android:id="@+id/endAge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_toEndOf="@+id/by_age_text"
-        android:layout_below="@id/sex_text" />
+        android:layout_below="@id/sex_text"
+        android:layout_marginStart="16dp"
+        android:layout_toEndOf="@id/by_age_text"
+        android:theme="@style/UsersTextInFilters" />
 
 
     <TextView
@@ -130,16 +142,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/age_text"
-        android:layout_marginBottom="40dp"
-        android:text="бюджет"
+        android:layout_marginBottom="30dp"
+        android:text="Бюджет"
         android:textSize="18sp" />
 
     <TextView
         android:id="@+id/from_budget_text"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/from_age_text"
+        android:layout_height="35dp"
+        android:layout_alignStart="@id/from_age_text"
         android:layout_below="@id/age_text"
+        android:gravity="top"
         android:text="от"
         android:textSize="18sp" />
 
@@ -147,18 +160,20 @@
         android:id="@+id/startBudget"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/startAge"
-        android:layout_alignStart="@+id/startAge"
-        android:layout_below="@id/age_text"
-        android:layout_toEndOf="@id/from_budget_text" />
-
+        android:layout_alignBottom="@id/from_budget_text"
+        android:layout_alignEnd="@id/startAge"
+        android:layout_alignStart="@id/startAge"
+        android:layout_toEndOf="@id/from_budget_text"
+        android:inputType="number"
+        android:theme="@style/UsersTextInFilters" />
 
     <TextView
         android:id="@+id/by_budget_text"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/by_age_text"
+        android:layout_height="35dp"
+        android:layout_alignStart="@id/by_age_text"
         android:layout_below="@id/age_text"
+        android:gravity="top"
         android:text="до"
         android:textSize="18sp" />
 
@@ -166,9 +181,11 @@
         android:id="@+id/endBudget"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/endAge"
-        android:layout_alignStart="@+id/endAge"
-        android:layout_below="@id/age_text" />
+        android:layout_alignBottom="@id/by_budget_text"
+        android:layout_alignEnd="@id/endAge"
+        android:layout_alignStart="@id/endAge"
+        android:inputType="number"
+        android:theme="@style/UsersTextInFilters" />
 
     <Button
         android:id="@+id/saveParameters"
@@ -176,7 +193,15 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_below="@id/budget_text"
-        android:text="Поиск" />
+        android:layout_marginStart="32dp"
+        android:background="@color/colorFiltersBackground"
+        android:gravity="end|center_vertical"
+        android:stateListAnimator="@null"
+        android:text=" ПОИСК"
+        android:drawableStart="@android:drawable/ic_menu_search"
+        android:textAllCaps="false"
+        android:textColor="@color/colorPrimaryTeams"
+        android:textSize="18sp" />
 
     <Button
         android:id="@+id/cancelParameters"
@@ -184,7 +209,11 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/budget_text"
         android:layout_toStartOf="@id/saveParameters"
-        android:text="Отмена" />
-    <!--android:layout_toStartOf="@id/save_parameters"-->
+        android:background="@color/colorFiltersBackground"
+        android:stateListAnimator="@null"
+        android:text="ОТМЕНА"
+        android:textAllCaps="false"
+        android:textColor="@color/colorPrimaryTeams"
+        android:textSize="18sp" />
 
 </RelativeLayout>
