@@ -12,6 +12,7 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
+
     <style name="WhiteButton" parent="Theme.AppCompat.Light">
         <item name="android:buttonStyle">@style/Widget.AppCompat.Button.Borderless.Colored</item>
         <item name="colorControlHighlight">@color/colorAccent</item>
@@ -21,5 +22,14 @@
     <style name="PrimaryButton" parent="Theme.AppCompat">
         <item name="colorButtonNormal">@color/colorPrimary</item>
         <item name="colorControlHighlight">@color/colorAccent</item>
+    </style>
+
+    <style name="StyleLabelMenuActivity" parent="android:TextAppearance">
+        <item name="android:fontFamily">@font/font_menu_activity</item>
+    </style>
+
+    <style name="UsersTextInFilters" >
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">16sp</item>
     </style>
 </resources>

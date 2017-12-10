@@ -3,17 +3,20 @@ package ru.a1024bits.bytheway.ui.activity
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.app.Fragment
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -25,6 +28,9 @@ import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.places.Places
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.android.synthetic.main.activity_menu.*
+import kotlinx.android.synthetic.main.custom_dialog_feedback.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -47,6 +53,7 @@ import ru.a1024bits.bytheway.ui.fragments.*
 import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.util.ServiceGenerator
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
+import ru.a1024bits.bytheway.viewmodel.ViewModelFeedback
 import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.android.SupportFragmentNavigator
 import ru.terrakok.cicerone.commands.Command
@@ -83,12 +90,14 @@ class MenuActivity : AppCompatActivity(),
     var mainUser: User? = null
 
     private var viewModel: MyProfileViewModel? = null
+    private var viewModelFeedback: ViewModelFeedback? = null
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         App.component.inject(this)
         glide = Glide.with(this)
+        FirebaseFirestore.setLoggingEnabled(true)
 
         setContentView(R.layout.activity_menu)
 
@@ -136,6 +145,12 @@ class MenuActivity : AppCompatActivity(),
                 .build()
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
 
+        sing_out.setOnClickListener {
+            preferences.edit().putBoolean(Constants.FIRST_ENTER, true).apply()
+            FirebaseAuth.getInstance().signOut()
+            finishAffinity()
+        }
+        feedback.setOnClickListener { openDialogFeedback() }
     }
 
     private fun markFirstEnter() = preferences.edit()
@@ -221,15 +236,11 @@ class MenuActivity : AppCompatActivity(),
         outState?.putSerializable(STATE_SCREEN_NAMES, screenNames as java.io.Serializable)
     }
 
-    override fun onFragmentInteraction() {
-
-    }
+    override fun onFragmentInteraction() {}
 
 
     override fun onResume() {
         super.onResume()
-        navigatorHolder.setNavigator(navigator)
-
         // the intent filter defined in AndroidManifest will handle the return from ACTION_VIEW intent
         val uri = intent.data
         if (uri != null && uri.toString().startsWith(redirectUri)) {
@@ -237,8 +248,7 @@ class MenuActivity : AppCompatActivity(),
             // use the parameter your API exposes for the code (mostly it's "code")
             val code = uri.getQueryParameter("code")
             if (code != null) {
-
-                Log.e("LOGI:", "code $code")
+                //FIXME перенести следующий код в viewmodel и создать репозиторий для этого.
                 // get access token
                 // we'll do that in a minute
                 val generator = ServiceGenerator()
@@ -248,7 +258,7 @@ class MenuActivity : AppCompatActivity(),
                         redirectUri)
                 call.enqueue(object : Callback<AccessToken?> {
                     override fun onFailure(call: Call<AccessToken?>?, t: Throwable?) {
-                        Log.e("LOG", "on Fail")
+                        Log.e("LOG", "on Fail for authorization ")
                     }
 
                     override fun onResponse(call: Call<AccessToken?>?, response: Response<AccessToken?>?) {
@@ -285,6 +295,7 @@ class MenuActivity : AppCompatActivity(),
                 Log.e("LOGI:", "error: ${uri.getQueryParameter("error")}")
             }
         }
+        navigatorHolder.setNavigator(navigator)
     }
 
     private fun saveToken(accessToken: AccessToken?) {
@@ -315,15 +326,35 @@ class MenuActivity : AppCompatActivity(),
             R.id.profile_item -> navigator.applyCommand(Replace(Screens.USER_PROFILE_SCREEN, 1))
             R.id.search_item -> navigator.applyCommand(Replace(Screens.SEARCH_MAP_SCREEN, 1))
             R.id.all_users_item -> navigator.applyCommand(Replace(Screens.ALL_USERS_SCREEN, 1))
-            R.id.similar_travel_item -> navigator.applyCommand(Replace(Screens.SIMILAR_TRAVELS_SCREEN, 1))
-            R.id.exit_item -> {
-                preferences.edit().putBoolean(Constants.FIRST_ENTER, true).apply() //prepare for next first start
-                finishAffinity()
-            }
         }
 
         val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
         drawer.closeDrawer(GravityCompat.START)
         return true
+    }
+
+    private fun openDialogFeedback() {
+        val simpleAlert = AlertDialog.Builder(this).create()
+        val inflater = this.layoutInflater
+        val dialogView = inflater.inflate(R.layout.custom_dialog_feedback, null)
+        val textMail = dialogView.findViewById<EditText>(R.id.textMailAddress)
+        val textFeedback = dialogView.findViewById<EditText>(R.id.textFeedback)
+
+        simpleAlert.setView(dialogView)
+        textMail.setText(FirebaseAuth.getInstance().currentUser?.email.toString())
+
+        simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Отправить", { dialogInterface, i ->
+            val emailIntent = Intent(Intent.ACTION_SEND)
+            emailIntent.setType("message/rfc822")
+            emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, arrayOf("travells2323@gmail.com"))
+            emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Обращение от пользователя")
+            emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, textFeedback.text.toString())
+            this@MenuActivity.startActivity(Intent.createChooser(emailIntent, "Отправка письма. Выберите почтовый клиент"))
+            simpleAlert.hide()
+        })
+        simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, "Отмена", { dialogInterface, i ->
+            simpleAlert.hide()
+        })
+        simpleAlert.show()
     }
 }
