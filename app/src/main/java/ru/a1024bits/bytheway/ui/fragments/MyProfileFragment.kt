@@ -9,6 +9,8 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -74,6 +76,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
         dates.put(START_DATE, getLongFromDate(dayOfMonth, monthOfYear, year))
         dates.put(END_DATE, getLongFromDate(dayOfMonthEnd, monthOfYearEnd, yearEnd))
+        profileStateHashMap.set("dates",dates.toString())
+        profileChanged()
     }
 
     private fun getLongFromDate(day: Int, month: Int, year: Int): Long {
@@ -132,6 +136,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     private var cities: HashMap<String, String> = hashMapOf()
 
     private var budget: Long = 0 // default const
+    private var budPos: Int = 0 // default const
 
     private var glide: RequestManager? = null
 
@@ -139,6 +144,9 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     private var yearsArr: ArrayList<Int> = arrayListOf()
 
+    private var profileStateHashMap: HashMap<String, String> = hashMapOf()
+    private var oldProfileState: Int = 0
+    private var methodsMask: ArrayList<Boolean> = arrayListOf(false,false,false,false,false)
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -159,7 +167,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     private fun fillProfile(user: User) {
         username.text = StringBuilder(user.name).append(" ").append(user.lastName)
-        add_info_user.setText(user.addInformation)
 
         lastName = user.lastName
         name = user.name
@@ -232,32 +239,42 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                 Method.TRAIN.link -> {
                     if (user.method.get(method) == true)
                         with(iconTrain) { isActivated = true }
+                    methodsMask.add(user.method.get(method) == true)
                 }
                 Method.BUS.link -> {
                     if (user.method.get(method) == true)
                         with(iconBus) { isActivated = true }
+                    methodsMask.add(user.method.get(method) == true)
                 }
                 Method.CAR.link -> {
                     if (user.method.get(method) == true)
                         with(iconCar) { isActivated = true }
+                    methodsMask.add(user.method.get(method) == true)
                 }
                 Method.PLANE.link -> {
                     if (user.method.get(method) == true)
                         with(iconPlane) { isActivated = true }
+                    methodsMask.add(user.method.get(method) == true)
                 }
                 Method.HITCHHIKING.link -> {
                     if (user.method.get(method) == true)
                         with(iconHitchHicking) { isActivated = true }
+                    methodsMask.add(user.method.get(method) == true)
                 }
             }
         }
-
+        profileStateHashMap.set("methods",methodsMask.hashCode().toString())
 
         if (user.budget > 0) {
             budget = user.budget
             displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(budget)
-
+            choose_price_travel.setProgress(user.budPos)
         }
+
+        profileStateHashMap.set("addInformation", user.addInformation)
+        saveProfileState()
+        //TODO fix this shit
+        add_info_user.setText(user.addInformation)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -273,6 +290,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                     textCityFrom.setText(place.name)
                     cityFromLatLng = GeoPoint(place.latLng.latitude, place.latLng.longitude)
                     cities.put(FIRST_INDEX_CITY, place.name.toString())
+                    profileStateHashMap.set("cityFromLatLng", cityFromLatLng.toString())
+                    profileChanged()
                 }
                 else -> {
                     val status = PlaceAutocomplete.getStatus(activity, data);
@@ -288,7 +307,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                     textCityTo.setText(place.name)
                     cityToLatLng = GeoPoint(place.latLng.latitude, place.latLng.longitude)
                     cities.put(LAST_INDEX_CITY, place.name.toString())
-
+                    profileStateHashMap.set("cityToLatLng", cityToLatLng.toString())
+                    profileChanged()
                 }
                 else -> {
                     val status = PlaceAutocomplete.getStatus(activity, data);
@@ -385,9 +405,23 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             e.printStackTrace()
         }
         mapView?.getMapAsync(this)
+
         return view
     }
 
+    fun TextView.afterTextChanged(afterTextChanged: (String) -> Unit) {
+        this.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            }
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            }
+
+            override fun afterTextChanged(editable: Editable?) {
+                afterTextChanged.invoke(editable.toString())
+            }
+        })
+    }
     private fun sendIntentForSearch(code: Int) {
         try {
             val typeFilter = AutocompleteFilter.Builder()
@@ -412,7 +446,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     private fun sendUserInfoToServer() {
         countTrip = 1
         viewModel?.sendUserData(getHashMapUser(), uid, {
-            (activity as MenuActivity).profileChanged = false
+            profileChanged(false)
         })
     }
 
@@ -633,6 +667,10 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             override fun onProgressChanged(p0: SeekBar?, number: Int, p2: Boolean) {
                 budget = fibbonaci(number)
                 displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(budget)
+                budPos = number
+                profileStateHashMap.set("budPos", number.toString())
+                profileStateHashMap.set("budget", budget.toString())
+                profileChanged()
             }
 
             override fun onStartTrackingTouch(p0: SeekBar?) {
@@ -645,30 +683,38 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         iconCar.setOnClickListener({
             with(travelCarText) { isActivated = !isActivated }
             methods.put(Method.CAR.link, travelCarText.isActivated)
+            methodsMask.set(0,travelCarText.isActivated)
+            profileChanged()
         })
 
         iconTrain.setOnClickListener({
             with(travelTrainText) { isActivated = !isActivated }
             methods.put(Method.TRAIN.link, travelTrainText.isActivated)
+            methodsMask.set(1,travelTrainText.isActivated)
+            profileChanged()
         })
 
         iconBus.setOnClickListener({
             with(travelBusText) { isActivated = !isActivated }
             methods.put(Method.BUS.link, travelBusText.isActivated)
+            methodsMask.set(1,travelBusText.isActivated)
+            profileChanged()
         })
 
         iconPlane.setOnClickListener({
             with(travelPlaneText) { isActivated = !isActivated }
             methods.put(Method.PLANE.link, travelPlaneText.isActivated)
+            methodsMask.set(1,travelPlaneText.isActivated)
+            profileChanged()
         })
 
         iconHitchHicking.setOnClickListener({
             with(travelHitchHikingText) { isActivated = !isActivated }
             methods.put(Method.HITCHHIKING.link, travelHitchHikingText.isActivated)
+            methodsMask.set(1,travelHitchHikingText.isActivated)
+            profileChanged()
         })
 
-
-        //view.findViewById<TextView>(R.id.add)
         new_trip_text.setOnClickListener {
             hideBlockNewTrip()
             showBlockTravelInformation()
@@ -703,7 +749,10 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         textDateFrom.setOnClickListener {
             openDateDialog()
         }
-
+        add_info_user.afterTextChanged({
+            profileStateHashMap.set("addInformation",it)
+            profileChanged()
+        })
         textCityFrom.setOnClickListener {
             sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM)
         }
@@ -782,6 +831,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         hashMap.set("method", methods)
         hashMap.set("dates", dates)
         hashMap.set("budget", budget)
+        hashMap.set("budPos", budPos)
         hashMap.set("cityFromLatLng", cityFromLatLng)
         hashMap.set("cityToLatLng", cityToLatLng)
         hashMap.set("addInformation", add_info_user.text.toString())
@@ -789,6 +839,27 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         hashMap.set("age", age)
         hashMap.put("countTrip", countTrip)
         return hashMap
+    }
+
+    fun saveProfileState(){
+        profileStateHashMap.set("dates", dates.toString())
+        profileStateHashMap.set("budget", budget.toString())
+        profileStateHashMap.set("budPos", budPos.toString())
+        profileStateHashMap.set("cityFromLatLng", cityFromLatLng.toString())
+        profileStateHashMap.set("cityToLatLng", cityToLatLng.toString())
+        oldProfileState = profileStateHashMap.hashCode()
+    }
+
+    fun profileChanged(force:Boolean? = null){
+        profileStateHashMap.set("methods",methodsMask.hashCode().toString())
+        var changed: Boolean
+        if(force != null){
+            changed = force
+        } else {
+            changed = profileStateHashMap.hashCode() != oldProfileState
+        }
+        Log.e("LOG","is changed  ${changed}")
+        (activity as MenuActivity).profileChanged = changed
     }
 }
 
