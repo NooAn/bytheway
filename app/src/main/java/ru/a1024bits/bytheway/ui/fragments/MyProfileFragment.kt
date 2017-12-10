@@ -167,7 +167,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     private fun fillProfile(user: User) {
         username.text = StringBuilder(user.name).append(" ").append(user.lastName)
-
+        profileStateHashMap.clear()
         lastName = user.lastName
         name = user.name
         numberPhone = user.phone
@@ -233,6 +233,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             }
         }
         methods.clear()
+        methodStateArray.clear()
         methods.putAll(user.method)
         for (method in user.method.keys) {
             when (method) {
@@ -268,7 +269,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         if (user.budget > 0) {
             budget = user.budget
             displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(budget)
-            choose_price_travel.setProgress(user.budPos)
+            budgetPosition = user.budgetPosition
+            choose_price_travel.setProgress(budgetPosition)
         }
 
         profileStateHashMap.set("addInformation", user.addInformation)
@@ -668,8 +670,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                 budget = fibbonaci(number)
                 displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(budget)
                 budgetPosition = number
-                profileStateHashMap.set("budgetPosition", number.toString())
                 profileStateHashMap.set("budget", budget.toString())
+                profileStateHashMap.set("budgetPosition", number.toString())
                 profileChanged()
             }
 
