@@ -136,7 +136,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     private var cities: HashMap<String, String> = hashMapOf()
 
     private var budget: Long = 0
-    private var budPos: Int = 0
+    private var budgetPosition: Int = 0
 
     private var glide: RequestManager? = null
 
@@ -146,7 +146,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     private var profileStateHashMap: HashMap<String, String> = hashMapOf()
     private var oldProfileState: Int = 0
-    private var methodsMask: ArrayList<Boolean> = arrayListOf(false,false,false,false,false)
+    private var methodStateArray: ArrayList<Boolean> = arrayListOf(false,false,false,false,false)
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -239,31 +239,31 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                 Method.TRAIN.link -> {
                     if (user.method.get(method) == true)
                         with(iconTrain) { isActivated = true }
-                    methodsMask.add(user.method.get(method) == true)
+                    methodStateArray.add(user.method.get(method) == true)
                 }
                 Method.BUS.link -> {
                     if (user.method.get(method) == true)
                         with(iconBus) { isActivated = true }
-                    methodsMask.add(user.method.get(method) == true)
+                    methodStateArray.add(user.method.get(method) == true)
                 }
                 Method.CAR.link -> {
                     if (user.method.get(method) == true)
                         with(iconCar) { isActivated = true }
-                    methodsMask.add(user.method.get(method) == true)
+                    methodStateArray.add(user.method.get(method) == true)
                 }
                 Method.PLANE.link -> {
                     if (user.method.get(method) == true)
                         with(iconPlane) { isActivated = true }
-                    methodsMask.add(user.method.get(method) == true)
+                    methodStateArray.add(user.method.get(method) == true)
                 }
                 Method.HITCHHIKING.link -> {
                     if (user.method.get(method) == true)
                         with(iconHitchHicking) { isActivated = true }
-                    methodsMask.add(user.method.get(method) == true)
+                    methodStateArray.add(user.method.get(method) == true)
                 }
             }
         }
-        profileStateHashMap.set("methods",methodsMask.hashCode().toString())
+        profileStateHashMap.set("methods", methodStateArray.hashCode().toString())
 
         if (user.budget > 0) {
             budget = user.budget
@@ -667,8 +667,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             override fun onProgressChanged(p0: SeekBar?, number: Int, p2: Boolean) {
                 budget = fibbonaci(number)
                 displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(budget)
-                budPos = number
-                profileStateHashMap.set("budPos", number.toString())
+                budgetPosition = number
+                profileStateHashMap.set("budgetPosition", number.toString())
                 profileStateHashMap.set("budget", budget.toString())
                 profileChanged()
             }
@@ -683,35 +683,40 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         iconCar.setOnClickListener({
             with(travelCarText) { isActivated = !isActivated }
             methods.put(Method.CAR.link, travelCarText.isActivated)
-            methodsMask.set(0,travelCarText.isActivated)
+            methodStateArray.set(0,travelCarText.isActivated)
+            profileStateHashMap.set("methods", methodStateArray.hashCode().toString())
             profileChanged()
         })
 
         iconTrain.setOnClickListener({
             with(travelTrainText) { isActivated = !isActivated }
             methods.put(Method.TRAIN.link, travelTrainText.isActivated)
-            methodsMask.set(1,travelTrainText.isActivated)
+            methodStateArray.set(1,travelTrainText.isActivated)
+            profileStateHashMap.set("methods", methodStateArray.hashCode().toString())
             profileChanged()
         })
 
         iconBus.setOnClickListener({
             with(travelBusText) { isActivated = !isActivated }
             methods.put(Method.BUS.link, travelBusText.isActivated)
-            methodsMask.set(2,travelBusText.isActivated)
+            methodStateArray.set(2,travelBusText.isActivated)
+            profileStateHashMap.set("methods", methodStateArray.hashCode().toString())
             profileChanged()
         })
 
         iconPlane.setOnClickListener({
             with(travelPlaneText) { isActivated = !isActivated }
             methods.put(Method.PLANE.link, travelPlaneText.isActivated)
-            methodsMask.set(3,travelPlaneText.isActivated)
+            methodStateArray.set(3,travelPlaneText.isActivated)
+            profileStateHashMap.set("methods", methodStateArray.hashCode().toString())
             profileChanged()
         })
 
         iconHitchHicking.setOnClickListener({
             with(travelHitchHikingText) { isActivated = !isActivated }
             methods.put(Method.HITCHHIKING.link, travelHitchHikingText.isActivated)
-            methodsMask.set(4,travelHitchHikingText.isActivated)
+            methodStateArray.set(4,travelHitchHikingText.isActivated)
+            profileStateHashMap.set("methods", methodStateArray.hashCode().toString())
             profileChanged()
         })
 
@@ -763,6 +768,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             (activity as MenuActivity).navigator.applyCommand(Replace(Screens.USER_SINHRONIZED_SCREEN, 1))
         }
         button_remove_travel_info.setOnClickListener {
+            profileChanged(false)
             removeTrip()
         }
 
@@ -831,7 +837,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         hashMap.set("method", methods)
         hashMap.set("dates", dates)
         hashMap.set("budget", budget)
-        hashMap.set("budPos", budPos)
+        hashMap.set("budgetPosition", budgetPosition)
         hashMap.set("cityFromLatLng", cityFromLatLng)
         hashMap.set("cityToLatLng", cityToLatLng)
         hashMap.set("addInformation", add_info_user.text.toString())
@@ -844,20 +850,14 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     fun saveProfileState(){
         profileStateHashMap.set("dates", dates.toString())
         profileStateHashMap.set("budget", budget.toString())
-        profileStateHashMap.set("budPos", budPos.toString())
+        profileStateHashMap.set("budgetPosition", budgetPosition.toString())
         profileStateHashMap.set("cityFromLatLng", cityFromLatLng.toString())
         profileStateHashMap.set("cityToLatLng", cityToLatLng.toString())
         oldProfileState = profileStateHashMap.hashCode()
     }
 
     fun profileChanged(force:Boolean? = null){
-        profileStateHashMap.set("methods",methodsMask.hashCode().toString())
-        var changed: Boolean
-        if(force != null){
-            changed = force
-        } else {
-            changed = profileStateHashMap.hashCode() != oldProfileState
-        }
+        var changed = force?:profileStateHashMap.hashCode() != oldProfileState
         Log.e("LOG","is changed  ${changed}")
         (activity as MenuActivity).profileChanged = changed
     }
