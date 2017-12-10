@@ -859,8 +859,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     }
 
     fun profileChanged(force:Boolean? = null){
-        var changed = force?:profileStateHashMap.hashCode() != oldProfileState
-        Log.e("LOG","is changed  ${changed}")
+        val changed: Boolean = if (force != null) force
+        else profileStateHashMap.hashCode() != oldProfileState
         (activity as MenuActivity).profileChanged = changed
     }
 }
