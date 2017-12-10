@@ -509,10 +509,8 @@
             android:id="@+id/button_save_travel_info"
             android:layout_width="150dp"
             android:layout_height="match_parent"
-            android:layout_alignParentEnd="true"
-            android:layout_below="@+id/appinTheAirEnter"
-            android:layout_marginEnd="19dp"
-            android:layout_marginTop="12dp"
+            android:layout_alignEnd="@+id/appinTheAirEnter"
+            android:layout_alignParentBottom="true"
             android:padding="24dp"
             android:text="Сохранить"
             android:theme="@style/WhiteButton"
@@ -524,14 +522,13 @@
             android:layout_width="150dp"
             android:layout_height="match_parent"
             android:layout_below="@+id/appinTheAirEnter"
-            android:layout_marginEnd="19dp"
             android:layout_marginTop="12dp"
+            android:layout_toStartOf="@+id/button_save_travel_info"
             android:padding="24dp"
             android:text="Удалить"
             android:theme="@style/WhiteButton"
             android:visibility="gone"
             tools:visibility="visible" />
-
     </RelativeLayout>
 
 
