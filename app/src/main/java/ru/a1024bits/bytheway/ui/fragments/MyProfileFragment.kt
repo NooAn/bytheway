@@ -141,6 +141,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     private var yearNow: Int = 0
 
     private var yearsArr: ArrayList<Int> = arrayListOf()
+    private var routes: ArrayList<String> = arrayListOf()
 
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -167,6 +168,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         lastName = user.lastName
         name = user.name
         numberPhone = user.phone
+        routes=user.route
 
         whatsAppNumber = user.socialNetwork.get(SocialNetwork.WHATSAPP.link) ?: whatsAppNumber
         vkLink = user.socialNetwork.get(SocialNetwork.VK.link) ?: vkLink
@@ -356,6 +358,13 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             this.googleMap = map
 
         googleMap?.addMarker(MarkerOptions().position(CENTRE).title("Hello, Dude!"))
+
+
+        if (routes!=null){
+            for(concreteRoute in routes){
+
+            }
+        }
 
         // Zooming to the Campus location
         googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(CENTRE, ZOOM))
