@@ -85,4 +85,5 @@
     <string name="item_all_users_empty_date">___ - ___</string>
     <string name="filters_all_users_empty_date">с ___ по ___</string>
     <string name="not_cities">нет городов</string>
+    <string name="optionSearch">+ Параметры поиска</string>
 </resources>

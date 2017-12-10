@@ -22,10 +22,7 @@ import com.google.android.gms.common.GooglePlayServicesNotAvailableException
 import com.google.android.gms.common.GooglePlayServicesRepairableException
 import com.google.android.gms.location.places.AutocompleteFilter
 import com.google.android.gms.location.places.ui.PlaceAutocomplete
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.MapsInitializer
-import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.auth.FirebaseAuth
@@ -141,6 +138,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     private var yearNow: Int = 0
 
     private var yearsArr: ArrayList<Int> = arrayListOf()
+    private var routes: ArrayList<String> = arrayListOf()
 
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -167,11 +165,13 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         lastName = user.lastName
         name = user.name
         numberPhone = user.phone
+        routes=user.route
 
         whatsAppNumber = user.socialNetwork.get(SocialNetwork.WHATSAPP.link) ?: whatsAppNumber
         vkLink = user.socialNetwork.get(SocialNetwork.VK.link) ?: vkLink
         fbLink = user.socialNetwork.get(SocialNetwork.FB.link) ?: fbLink
         csLink = user.socialNetwork.get(SocialNetwork.CS.link) ?: csLink
+        tgNick = user.socialNetwork.get(SocialNetwork.TG.link) ?: tgNick
 
         travelledStatistics.visibility = if (user.flightHours == 0L) View.GONE else View.VISIBLE
 
@@ -332,12 +332,24 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     private fun hideBlockTravelInforamtion() {
         direction.visibility = View.GONE
+        textCityFrom.setText("")
+        textCityTo.setText("")
+        dateArrived.setText("")
+        textDateFrom.setText("")
         maplayout.visibility = View.GONE
         method_moving.visibility = View.GONE
+        with(travelBusText) { isActivated = false }
+        with(travelHitchHikingText) { isActivated = false }
+        with(travelCarText) { isActivated = false }
+        with(travelPlaneText) { isActivated = false }
+        with(travelTrainText) { isActivated = false }
+
         appinTheAirEnter.visibility = View.GONE
         layoutTravelMethod.visibility = View.GONE
         moneyfortrip.visibility = View.GONE
+        displayPriceTravel.text = ""
         descriptionprofile.visibility = View.GONE
+        add_info_user.setText("")
         button_remove_travel_info.visibility = View.GONE
         button_save_travel_info.visibility = View.GONE
     }
@@ -357,113 +369,23 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
         googleMap?.addMarker(MarkerOptions().position(CENTRE).title("Hello, Dude!"))
 
+
+        if (routes!=null){
+            for(concreteRoute in routes){
+
+            }
+        }
+
         // Zooming to the Campus location
         googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(CENTRE, ZOOM))
     }
 
     private var googleMap: GoogleMap? = null
-
+    private lateinit var mapView: MapView
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater?.inflate(R.layout.fragment_my_user_profile, container, false)
-        val now = Calendar.getInstance()
-        dateDialog = DatePickerDialog.newInstance(
-                this@MyProfileFragment,
-                now.get(Calendar.YEAR),
-                now.get(Calendar.MONTH),
-                now.get(Calendar.DAY_OF_MONTH)
-        )
-        displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(budget)
 
-        headerprofile.setOnClickListener({
-            openInformationEditDialog()
-        })
-
-        choose_price_travel.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(p0: SeekBar?, number: Int, p2: Boolean) {
-                budget = fibbonaci(number)
-                displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(budget)
-            }
-
-            override fun onStartTrackingTouch(p0: SeekBar?) {
-            }
-
-            override fun onStopTrackingTouch(p0: SeekBar?) {
-            }
-        })
-
-
-        iconCar.setOnClickListener({
-            with(travelCarText) { isActivated = !isActivated }
-            methods.put(Method.CAR.link, travelCarText.isActivated)
-
-        })
-
-        iconTrain.setOnClickListener({
-            with(travelTrainText) { isActivated = !isActivated }
-            methods.put(Method.TRAIN.link, travelTrainText.isActivated)
-        })
-
-        iconBus.setOnClickListener({
-            with(travelBusText) { isActivated = !isActivated }
-            methods.put(Method.BUS.link, travelBusText.isActivated)
-        })
-
-        iconPlane.setOnClickListener({
-            with(travelPlaneText) { isActivated = !isActivated }
-            methods.put(Method.PLANE.link, travelPlaneText.isActivated)
-        })
-
-        iconHitchHicking.setOnClickListener({
-            with(travelHitchHikingText) { isActivated = !isActivated }
-            methods.put(Method.HITCHHIKING.link, travelHitchHikingText.isActivated)
-        })
-
-
-        //view.findViewById<TextView>(R.id.add)
-        new_trip_text.setOnClickListener {
-            hideBlockNewTrip()
-            showBlockTravelInformation()
-        }
-        vkIcon.setOnClickListener {
-            /*
-             Если контакты еще не добавлены, тогда открываем диалоговое окно.
-             Если были какие-то изменения в линках то сохраняем в бд. И меняем цвет иконки соответсвенно значениям.
-             */
-            openDialog(SocialNetwork.VK)
-        }
-        csIcon.setOnClickListener() {
-            openDialog(SocialNetwork.CS)
-        }
-        whatsAppIcon.setOnClickListener({
-            openDialog(SocialNetwork.WHATSAPP)
-        })
-        fbcon.setOnClickListener({
-            openDialog(SocialNetwork.FB)
-        })
-        tgIcon.setOnClickListener({
-            openDialog(SocialNetwork.TG)
-        })
-
-        button_save_travel_info.setOnClickListener({
-            Log.e("LOG", "save travel")
-            sendUserInfoToServer()
-        })
-        dateArrived.setOnClickListener {
-            openDateDialog()
-        }
-        textDateFrom.setOnClickListener {
-            openDateDialog()
-        }
-
-        textCityFrom.setOnClickListener {
-            sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM)
-        }
-        textCityTo.setOnClickListener {
-            sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO)
-        }
-        appinTheAirEnter.setOnClickListener {
-            (activity as MenuActivity).navigator.applyCommand(Replace(Screens.USER_SINHRONIZED_SCREEN, 1))
-        }
+        mapView = view?.findViewById<MapView>(R.id.mapView)!!
 
         mapView.onCreate(savedInstanceState)
         mapView.onResume()// needed to get the map to display immediately
@@ -500,6 +422,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
 
     private fun sendUserInfoToServer() {
+        countTrip = 1
         viewModel?.sendUserData(getHashMapUser(), uid)
     }
 
@@ -625,6 +548,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         })
         simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Сохранить", { dialogInterface, i ->
             val newLink = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString()
+            socNet.put(socialNetwork.link, newLink)
             viewModel?.error?.observe(this@MyProfileFragment, Observer<Int> { error ->
                 when (error) {
                     Constants.ERROR -> {
@@ -632,10 +556,9 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                     }
                     Constants.SUCCESS -> {
                         changeSocIconsActive(socialNetwork)
-                        socNet.put(socialNetwork.link, newLink)
                         when (socialNetwork) {
                             SocialNetwork.VK -> vkLink = newLink
-                            SocialNetwork.WHATSAPP -> numberPhone = newLink
+                            SocialNetwork.WHATSAPP -> whatsAppNumber = newLink
                             SocialNetwork.CS -> csLink = newLink
                             SocialNetwork.FB -> fbLink = newLink
                             SocialNetwork.TG -> tgNick = newLink
@@ -700,7 +623,123 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     override fun onStart() {
         super.onStart()
+        displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(budget)
+
+        val now = Calendar.getInstance()
+
+        dateDialog = DatePickerDialog.newInstance(
+                this@MyProfileFragment,
+                now.get(Calendar.YEAR),
+                now.get(Calendar.MONTH),
+                now.get(Calendar.DAY_OF_MONTH)
+        )
+
+
+        headerprofile.setOnClickListener({
+            openInformationEditDialog()
+        })
+
+        choose_price_travel.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(p0: SeekBar?, number: Int, p2: Boolean) {
+                budget = fibbonaci(number)
+                displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(budget)
+            }
+
+            override fun onStartTrackingTouch(p0: SeekBar?) {
+            }
+
+            override fun onStopTrackingTouch(p0: SeekBar?) {
+            }
+        })
+
+        iconCar.setOnClickListener({
+            with(travelCarText) { isActivated = !isActivated }
+            methods.put(Method.CAR.link, travelCarText.isActivated)
+        })
+
+        iconTrain.setOnClickListener({
+            with(travelTrainText) { isActivated = !isActivated }
+            methods.put(Method.TRAIN.link, travelTrainText.isActivated)
+        })
+
+        iconBus.setOnClickListener({
+            with(travelBusText) { isActivated = !isActivated }
+            methods.put(Method.BUS.link, travelBusText.isActivated)
+        })
+
+        iconPlane.setOnClickListener({
+            with(travelPlaneText) { isActivated = !isActivated }
+            methods.put(Method.PLANE.link, travelPlaneText.isActivated)
+        })
+
+        iconHitchHicking.setOnClickListener({
+            with(travelHitchHikingText) { isActivated = !isActivated }
+            methods.put(Method.HITCHHIKING.link, travelHitchHikingText.isActivated)
+        })
+
+
+        //view.findViewById<TextView>(R.id.add)
+        new_trip_text.setOnClickListener {
+            hideBlockNewTrip()
+            showBlockTravelInformation()
+        }
+        vkIcon.setOnClickListener {
+            /*
+             Если контакты еще не добавлены, тогда открываем диалоговое окно.
+             Если были какие-то изменения в линках то сохраняем в бд. И меняем цвет иконки соответсвенно значениям.
+             */
+            openDialog(SocialNetwork.VK)
+        }
+        csIcon.setOnClickListener() {
+            openDialog(SocialNetwork.CS)
+        }
+        whatsAppIcon.setOnClickListener({
+            openDialog(SocialNetwork.WHATSAPP)
+        })
+        fbcon.setOnClickListener({
+            openDialog(SocialNetwork.FB)
+        })
+        tgIcon.setOnClickListener({
+            openDialog(SocialNetwork.TG)
+        })
+
+        button_save_travel_info.setOnClickListener({
+            Log.e("LOG", "save travel")
+            sendUserInfoToServer()
+        })
+        dateArrived.setOnClickListener {
+            openDateDialog()
+        }
+        textDateFrom.setOnClickListener {
+            openDateDialog()
+        }
+
+        textCityFrom.setOnClickListener {
+            sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM)
+        }
+        textCityTo.setOnClickListener {
+            sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO)
+        }
+        appinTheAirEnter.setOnClickListener {
+            (activity as MenuActivity).navigator.applyCommand(Replace(Screens.USER_SINHRONIZED_SCREEN, 1))
+        }
+        button_remove_travel_info.setOnClickListener {
+            removeTrip()
+        }
+
         mapView.onStart()
+    }
+
+    private fun removeTrip() {
+        // FixME точно ли нужно удалять. спросить пользователя.
+        countTrip = 0
+        budget = 0
+        methods.clear()
+        cities.clear()
+        dates.clear()
+        getHashMapUser()
+        hideBlockTravelInforamtion()
+        showBlockAddTrip()
     }
 
     override fun onStop() {
@@ -745,11 +784,10 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         }
     }
 
+    private var countTrip: Int = 0
+
     fun getHashMapUser(): HashMap<String, Any> {
         val hashMap = HashMap<String, Any>()
-        hashMap.set("name", name)
-        hashMap.set("lastName", lastName)
-        hashMap.set("city", city)
         hashMap.set("cities", cities)
         hashMap.set("method", methods)
         hashMap.set("dates", dates)
@@ -759,7 +797,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         hashMap.set("addInformation", add_info_user.text.toString())
         hashMap.set("sex", sex)
         hashMap.set("age", age)
-        hashMap.put("countTrip", 1)
+        hashMap.put("countTrip", countTrip)
         return hashMap
     }
 }
