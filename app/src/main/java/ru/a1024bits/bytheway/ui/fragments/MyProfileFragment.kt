@@ -135,8 +135,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     private var cities: HashMap<String, String> = hashMapOf()
 
-    private var budget: Long = 0 // default const
-    private var budPos: Int = 0 // default const
+    private var budget: Long = 0
+    private var budPos: Int = 0
 
     private var glide: RequestManager? = null
 
@@ -697,21 +697,21 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         iconBus.setOnClickListener({
             with(travelBusText) { isActivated = !isActivated }
             methods.put(Method.BUS.link, travelBusText.isActivated)
-            methodsMask.set(1,travelBusText.isActivated)
+            methodsMask.set(2,travelBusText.isActivated)
             profileChanged()
         })
 
         iconPlane.setOnClickListener({
             with(travelPlaneText) { isActivated = !isActivated }
             methods.put(Method.PLANE.link, travelPlaneText.isActivated)
-            methodsMask.set(1,travelPlaneText.isActivated)
+            methodsMask.set(3,travelPlaneText.isActivated)
             profileChanged()
         })
 
         iconHitchHicking.setOnClickListener({
             with(travelHitchHikingText) { isActivated = !isActivated }
             methods.put(Method.HITCHHIKING.link, travelHitchHikingText.isActivated)
-            methodsMask.set(1,travelHitchHikingText.isActivated)
+            methodsMask.set(4,travelHitchHikingText.isActivated)
             profileChanged()
         })
 
