@@ -1,32 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/white"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".ui.activity.SplashActivity">
 
     <LinearLayout
-        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:gravity="center"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <ImageView
-            tools:ignore="ContentDescription"
-            android:src="@drawable/ic_splash_bytheway_title"
-            android:scaleType="center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        android:orientation="vertical">
 
         <ImageView
-            tools:ignore="ContentDescription"
-            android:src="@drawable/ic_splash_circles"
-            android:scaleType="center"
-            android:layout_marginTop="16dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:scaleType="center"
+            android:src="@drawable/ic_splash_bytheway_title"
+            tools:ignore="ContentDescription" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/start_indicator_image_1"
+            android:layout_width="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_splash_circle_1"
+            tools:ignore="ContentDescription" />
+
+        <ImageView
+            android:id="@+id/start_indicator_image_2"
+            android:layout_marginEnd="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_splash_circle_2"
+            tools:ignore="ContentDescription" />
+
+        <ImageView
+            android:id="@+id/start_indicator_image_3"
+            android:layout_marginEnd="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_splash_circle_3"
+            tools:ignore="ContentDescription" />
     </LinearLayout>
-    
+    </LinearLayout>
 </RelativeLayout>

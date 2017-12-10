@@ -18,7 +18,7 @@ class AccessToken {
         if (!Character.isUpperCase(tokenType.orEmpty()[0])) {
             tokenType = Character
                     .toString(tokenType.orEmpty()[0])
-                    .toUpperCase() + tokenType!!.substring(1)
+                    .toUpperCase() + tokenType?.substring(1)
         }
 
         return tokenType as String

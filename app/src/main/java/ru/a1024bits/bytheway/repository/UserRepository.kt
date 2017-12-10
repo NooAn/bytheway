@@ -26,32 +26,13 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) : IUsersR
         return store.collection(COLLECTION_USERS).get()
     }
 
-    //Rx wrapper
+
     override fun getUsers(): Task<QuerySnapshot> {
-//        val query = store.collection(COLLECTION_USERS)
-//        if ((filter.startBudget != 0) && (filter.endBudget != 0)) {
-//            query.whereGreaterThanOrEqualTo("budget", filter.startBudget).whereLessThanOrEqualTo("budget", filter.endBudget)
-//        }
-//        if ((filter.startDate != 0L) && (filter.endDate != 0L)) {
-//            query.whereGreaterThanOrEqualTo("data", filter.startDate).whereLessThanOrEqualTo("data", filter.endDate)
-//        }
-//        if ((filter.startAge != 0) && (filter.endAge != 0)) {
-//            query.whereGreaterThanOrEqualTo("age", filter.startAge).whereLessThanOrEqualTo("age", filter.endAge)
-//        }
-//        if (filter.sex != 0) {
-//            query.whereEqualTo("sex", filter.sex)
-//        }
-//        if ("" != filter.startCity) {
-//            query.whereEqualTo("startCity", filter.startCity)
-//        }
-//        if ("" != filter.endCity) {
-//            query.whereEqualTo("endCity", filter.endCity)
-//        }
         return store.collection(COLLECTION_USERS).get()
     }
 
     override fun getUserById(userID: String): Task<DocumentSnapshot> {
-        return store.collection(COLLECTION_USERS).document(userID).get();
+        return store.collection(COLLECTION_USERS).document(userID).get()
     }
 
     override fun addUser(user: User): Task<Void> {
@@ -60,7 +41,8 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) : IUsersR
     }
 
     override fun changeUserProfile(map: HashMap<String, Any>, id: String): Task<Void> {
-        val documentRef = store.collection(COLLECTION_USERS).document(id);
+        Log.d("LOG", "change user profile send....")
+        val documentRef = store.collection(COLLECTION_USERS).document(id)
         return store.runTransaction(object : Transaction.Function<Void> {
             override fun apply(transaction: Transaction): Void? {
                 map.put("timestamp", FieldValue.serverTimestamp());
