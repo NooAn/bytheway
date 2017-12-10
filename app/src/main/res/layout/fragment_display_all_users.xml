@@ -8,25 +8,26 @@
     android:animateLayoutChanges="true"
     android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/searchParametersText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="19dp"
-            android:paddingStart="17dp"
-            android:textSize="18sp"
-            android:paddingTop="19dp"
-            android:gravity="center_vertical|start"
-            android:background="@color/colorFiltersBackground"
-            android:text="+ Параметры поиска"
-            android:textColor="@color/colorPrimaryTeams" />
+    <TextView
+        android:id="@+id/searchParametersText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorFiltersBackground"
+        android:gravity="center_vertical|start"
+        android:paddingBottom="19dp"
+        android:paddingStart="17dp"
+        android:paddingTop="19dp"
+        android:text="@string/optionSearch"
+        android:textAllCaps="true"
+        android:textColor="@color/colorPrimaryTeams"
+        android:textSize="13sp" />
 
-        <include
-            android:id="@+id/block_search_parameters"
-            layout="@layout/searching_parameters_block"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone" />
+    <include
+        android:id="@+id/block_search_parameters"
+        layout="@layout/searching_parameters_block"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
 
 
     <android.support.v7.widget.RecyclerView
