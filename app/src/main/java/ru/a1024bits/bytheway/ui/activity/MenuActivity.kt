@@ -16,7 +16,10 @@ import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.*
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.request.RequestOptions
@@ -27,6 +30,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_menu.*
+import kotlinx.android.synthetic.main.custom_dialog_feedback.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -41,6 +45,7 @@ import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.router.Screens.Companion.AIR_SUCCES_SCREEN
 import ru.a1024bits.bytheway.router.Screens.Companion.ALL_USERS_SCREEN
+import ru.a1024bits.bytheway.router.Screens.Companion.MY_PROFILE_SCREEN
 import ru.a1024bits.bytheway.router.Screens.Companion.SEARCH_MAP_SCREEN
 import ru.a1024bits.bytheway.router.Screens.Companion.SIMILAR_TRAVELS_SCREEN
 import ru.a1024bits.bytheway.router.Screens.Companion.USER_PROFILE_SCREEN
@@ -130,7 +135,7 @@ class MenuActivity : AppCompatActivity(),
                 navigator.applyCommand(Replace(Screens.USER_SINHRONIZED_SCREEN, 1))
                 markFirstEnter()
             } else
-                navigator.applyCommand(Replace(Screens.USER_PROFILE_SCREEN, 1))
+                navigator.applyCommand(Replace(Screens.MY_PROFILE_SCREEN, 1))
         } else {
             screenNames = savedInstanceState.getSerializable(STATE_SCREEN_NAMES) as ArrayList<String>
         }
@@ -175,7 +180,7 @@ class MenuActivity : AppCompatActivity(),
                 UserProfileFragment.newInstance(data.id)
             else
                 when (screenKey) {
-                    USER_PROFILE_SCREEN -> return MyProfileFragment()
+                    MY_PROFILE_SCREEN -> return MyProfileFragment()
                     SEARCH_MAP_SCREEN -> return MapFragment()
                     AIR_SUCCES_SCREEN -> {
                         var name: String = ""
@@ -327,7 +332,7 @@ class MenuActivity : AppCompatActivity(),
             return false
         } else {
             when (item.itemId) {
-                R.id.profile_item -> navigator.applyCommand(Replace(Screens.USER_PROFILE_SCREEN, 1))
+                R.id.profile_item -> navigator.applyCommand(Replace(Screens.MY_PROFILE_SCREEN, 1))
                 R.id.search_item -> navigator.applyCommand(Replace(Screens.SEARCH_MAP_SCREEN, 1))
                 R.id.all_users_item -> navigator.applyCommand(Replace(Screens.ALL_USERS_SCREEN, 1))
             }

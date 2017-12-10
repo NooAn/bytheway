@@ -29,8 +29,8 @@ class AirSuccesfullFragment : Fragment() {
         // Inflate the layout for this fragment
         val view: View?
         if (arguments != null && arguments.getString(NAME).length > 0)
-            view = inflater!!.inflate(R.layout.fragment_air_succesfull, container, false)
-        else view = inflater!!.inflate(R.layout.fragment_air_disaster, container, false)
+            view = inflater?.inflate(R.layout.fragment_air_succesfull, container, false)
+        else view = inflater?.inflate(R.layout.fragment_air_disaster, container, false)
 
         return view
     }
@@ -57,7 +57,7 @@ class AirSuccesfullFragment : Fragment() {
         if (context is OnFragmentInteractionListener) {
             mListener = context
         } else {
-            throw RuntimeException(context!!.toString() + " must implement OnFragmentInteractionListener")
+            throw RuntimeException(context?.toString() + " must implement OnFragmentInteractionListener")
         }
     }
 
