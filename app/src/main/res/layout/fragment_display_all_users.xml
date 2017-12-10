@@ -8,33 +8,35 @@
     android:animateLayoutChanges="true"
     android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/searchParametersText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="19dp"
-            android:paddingStart="17dp"
-            android:textSize="18sp"
-            android:paddingTop="19dp"
-            android:gravity="center_vertical|start"
-            android:background="@color/colorFiltersBackground"
-            android:text="+ Параметры поиска"
-            android:textColor="@color/colorPrimaryTeams" />
+    <TextView
+        android:id="@+id/searchParametersText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorFiltersBackground"
+        android:gravity="center_vertical|start"
+        android:paddingBottom="@dimen/all_users_searchParametersText_vertical_margin"
+        android:paddingStart="@dimen/standard_margin"
+        android:paddingTop="@dimen/all_users_searchParametersText_vertical_margin"
+        android:text="+ ПАРАМЕТРЫ ПОИСКА"
+        android:textColor="@color/colorPrimaryTeams"
+        android:textSize="@dimen/all_users_searchParametersText_text_size" />
 
-        <include
-            android:id="@+id/block_search_parameters"
-            layout="@layout/searching_parameters_block"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone" />
+    <include
+        android:id="@+id/block_search_parameters"
+        layout="@layout/searching_parameters_block"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/display_all_users"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        app:layoutManager="LinearLayoutManager" />
+        android:layout_marginEnd="@dimen/standard_margin"
+        android:layout_marginStart="@dimen/standard_margin"
+        app:layoutManager="LinearLayoutManager"
+        tools:listitem="@layout/item_content_all_users" />
+    <!--tools:listitem="@android:layout/item_content_all_users"-->
 
     <ProgressBar
         android:id="@+id/loading_where_load_users"

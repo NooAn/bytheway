@@ -42,6 +42,7 @@
     <string name="name">Имя</string>
     <string name="save">Сохранить</string>
     <string name="exit">Выйти</string>
+    <string name="search_users_text">Поиск...</string>
     <string name="sex_and_age">Пол, возраст</string>
     <string name="add_new_trip">+ Создать поездку</string>
     <string name="app_in_the_air">App in the Air</string>

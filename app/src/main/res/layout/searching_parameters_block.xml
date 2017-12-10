@@ -10,30 +10,30 @@
         android:id="@+id/startCity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="26dp"
+        android:layout_marginBottom="23dp"
         android:hint="Откудa"
         android:textColor="@color/black"
-        android:textSize="18sp" />
+        android:textSize="@dimen/standard_text_size" />
 
     <EditText
         android:id="@+id/endCity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/startCity"
-        android:layout_marginBottom="26dp"
+        android:layout_marginBottom="34dp"
         android:hint="Куда"
         android:textColor="@color/black"
-        android:textSize="18sp" />
+        android:textSize="@dimen/standard_text_size" />
 
     <TextView
         android:id="@+id/date_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/endCity"
-        android:layout_marginBottom="26dp"
-        android:layout_marginEnd="70dp"
+        android:layout_marginBottom="30dp"
+        android:layout_marginEnd="60dp"
         android:text="Дата"
-        android:textSize="18sp" />
+        android:textSize="@dimen/standard_text_size" />
 
     <TextView
         android:id="@+id/choseDate"
@@ -42,16 +42,16 @@
         android:layout_below="@id/endCity"
         android:layout_toEndOf="@id/date_text"
         android:text="@string/filters_all_users_empty_date"
-        android:textSize="18sp" />
+        android:textSize="@dimen/standard_text_size" />
 
     <TextView
         android:id="@+id/sex_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/date_text"
-        android:layout_marginBottom="26dp"
+        android:layout_marginBottom="28dp"
         android:text="Пол"
-        android:textSize="18sp" />
+        android:textSize="@dimen/standard_text_size" />
 
     <RadioGroup
         android:id="@+id/sexButtons"
@@ -65,19 +65,19 @@
             android:id="@+id/sex_M"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="20dp"
+            android:layout_marginEnd="27dp"
             android:text="М"
             android:textColor="@color/colorFiltersText"
-            android:textSize="18sp" />
+            android:textSize="@dimen/standard_text_size" />
 
         <RadioButton
             android:id="@+id/sex_W"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="20dp"
+            android:layout_marginEnd="21dp"
             android:text="Ж"
             android:textColor="@color/colorFiltersText"
-            android:textSize="18sp" />
+            android:textSize="@dimen/standard_text_size" />
 
         <RadioButton
             android:id="@+id/sex_Any"
@@ -86,7 +86,7 @@
             android:checked="true"
             android:text="Любой"
             android:textColor="@color/colorFiltersText"
-            android:textSize="18sp" />
+            android:textSize="@dimen/standard_text_size" />
     </RadioGroup>
 
 
@@ -95,9 +95,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/sex_text"
-        android:layout_marginBottom="26dp"
+        android:layout_marginBottom="29dp"
         android:text="Возраст"
-        android:textSize="18sp" />
+        android:textSize="@dimen/standard_text_size" />
 
     <TextView
         android:id="@+id/from_age_text"
@@ -106,14 +106,14 @@
         android:layout_alignStart="@id/sexButtons"
         android:layout_below="@id/sex_text"
         android:text="от"
-        android:textSize="18sp" />
+        android:textSize="@dimen/standard_text_size" />
 
     <Spinner
         android:id="@+id/startAge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/sex_text"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="@dimen/standard_margin"
         android:layout_toEndOf="@id/from_age_text"
         android:theme="@style/UsersTextInFilters" />
 
@@ -122,17 +122,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/sex_text"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="@dimen/standard_margin"
         android:layout_toEndOf="@id/startAge"
         android:text="до"
-        android:textSize="18sp" />
+        android:textSize="@dimen/standard_text_size" />
 
     <Spinner
         android:id="@+id/endAge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/sex_text"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="@dimen/standard_margin"
         android:layout_toEndOf="@id/by_age_text"
         android:theme="@style/UsersTextInFilters" />
 
@@ -142,9 +142,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/age_text"
-        android:layout_marginBottom="30dp"
+        android:layout_marginBottom="28dp"
         android:text="Бюджет"
-        android:textSize="18sp" />
+        android:textSize="@dimen/standard_text_size" />
 
     <TextView
         android:id="@+id/from_budget_text"
@@ -154,7 +154,7 @@
         android:layout_below="@id/age_text"
         android:gravity="top"
         android:text="от"
-        android:textSize="18sp" />
+        android:textSize="@dimen/standard_text_size" />
 
     <EditText
         android:id="@+id/startBudget"
@@ -175,7 +175,7 @@
         android:layout_below="@id/age_text"
         android:gravity="top"
         android:text="до"
-        android:textSize="18sp" />
+        android:textSize="@dimen/standard_text_size" />
 
     <EditText
         android:id="@+id/endBudget"
@@ -201,7 +201,7 @@
         android:drawableStart="@android:drawable/ic_menu_search"
         android:textAllCaps="false"
         android:textColor="@color/colorPrimaryTeams"
-        android:textSize="18sp" />
+        android:textSize="@dimen/standard_text_size" />
 
     <Button
         android:id="@+id/cancelParameters"
@@ -214,6 +214,6 @@
         android:text="ОТМЕНА"
         android:textAllCaps="false"
         android:textColor="@color/colorPrimaryTeams"
-        android:textSize="18sp" />
+        android:textSize="@dimen/standard_text_size" />
 
 </RelativeLayout>

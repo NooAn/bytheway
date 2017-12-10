@@ -9,10 +9,8 @@
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
-        android:paddingBottom="4dp"
-        android:paddingStart="16dp"
-        android:paddingTop="16dp">
+        android:layout_marginBottom="@dimen/standard_margin_8dp"
+        android:paddingTop="@dimen/standard_margin">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/user_avatar"
@@ -26,9 +24,9 @@
             android:id="@+id/name_content_user"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="@dimen/standard_margin"
             android:textColor="@color/black"
-            android:textSize="20sp"
+            android:textSize="@dimen/item_all_users_main_text"
             app:layout_constraintStart_toEndOf="@id/user_avatar"
             tools:text="Николаев Алексей" />
 
@@ -37,7 +35,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:textColor="@color/black"
-            android:textSize="20sp"
+            android:textSize="@dimen/item_all_users_main_text"
             app:layout_constraintStart_toEndOf="@id/name_content_user"
             tools:text=", 16" />
 
@@ -45,10 +43,10 @@
             android:id="@+id/users_cities"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="8dp"
             android:text="@string/not_cities"
             android:textColor="@color/black"
-            android:textSize="16sp"
+            android:textSize="@dimen/item_all_users_subsidiary_text"
             app:layout_constraintStart_toStartOf="@id/name_content_user"
             app:layout_constraintTop_toBottomOf="@id/name_content_user" />
 
@@ -58,7 +56,7 @@
             android:layout_height="wrap_content"
             android:text="@string/item_all_users_empty_date"
             android:textColor="@color/colorPrimaryTeams"
-            android:textSize="16sp"
+            android:textSize="@dimen/item_all_users_subsidiary_text"
             app:layout_constraintStart_toStartOf="@id/name_content_user"
             app:layout_constraintTop_toBottomOf="@id/user_avatar" />
 
