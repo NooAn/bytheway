@@ -190,7 +190,7 @@ class MenuActivity : AppCompatActivity(),
                     USER_SINHRONIZED_SCREEN -> return AppInTheAirSinchronizedFragment()
                     ALL_USERS_SCREEN -> return AllUsersFragment.newInstance()
                     SIMILAR_TRAVELS_SCREEN -> return SimilarTravelsFragment.newInstance()
-                    else -> return SearchFragment()
+                    else -> return MyProfileFragment()
                 }
         }
 

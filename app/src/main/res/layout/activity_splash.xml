@@ -30,24 +30,30 @@
         <ImageView
             android:id="@+id/start_indicator_image_1"
             android:layout_width="wrap_content"
-            android:layout_marginEnd="10dp"
+            android:layout_marginEnd="15dp"
+            android:visibility="invisible"
+            tools:visibility="visible"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_splash_circle_1"
             tools:ignore="ContentDescription" />
 
         <ImageView
             android:id="@+id/start_indicator_image_2"
-            android:layout_marginEnd="10dp"
+            android:layout_marginEnd="15dp"
+            android:visibility="invisible"
             android:layout_width="wrap_content"
+            tools:visibility="visible"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_splash_circle_2"
             tools:ignore="ContentDescription" />
 
         <ImageView
             android:id="@+id/start_indicator_image_3"
-            android:layout_marginEnd="10dp"
+            android:visibility="invisible"
+            android:layout_marginEnd="15dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            tools:visibility="visible"
             android:src="@drawable/ic_splash_circle_3"
             tools:ignore="ContentDescription" />
     </LinearLayout>

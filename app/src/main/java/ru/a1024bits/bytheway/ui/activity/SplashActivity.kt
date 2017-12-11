@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
+import android.view.View
 import android.view.animation.AnimationUtils
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -32,16 +33,20 @@ class SplashActivity : Activity() {
         Log.e("LOG spalsh activity", currentUser.toString())
 
         val handler = Handler()
-        handler.postDelayed({ checkRegistrationAndForward() }, 1420L)
+//        handler.postDelayed({ checkRegistrationAndForward() }, 19000L)
+        handler.postDelayed({ checkRegistrationAndForward() }, 4000L)
         handler.postDelayed({
+            start_indicator_image_1.visibility = View.VISIBLE
             start_indicator_image_1.startAnimation(AnimationUtils.loadAnimation(this, R.anim.flash_point_with_delay))
-        }, 200)
+        }, 0)
         handler.postDelayed({
+            start_indicator_image_2.visibility = View.VISIBLE
             start_indicator_image_2.startAnimation(AnimationUtils.loadAnimation(this, R.anim.flash_point_with_delay))
-        }, 800)
+        }, 300)
         handler.postDelayed({
+            start_indicator_image_3.visibility = View.VISIBLE
             start_indicator_image_3.startAnimation(AnimationUtils.loadAnimation(this, R.anim.flash_point_with_delay))
-        }, 1400)
+        }, 600)
     }
 
     private fun checkRegistrationAndForward() {

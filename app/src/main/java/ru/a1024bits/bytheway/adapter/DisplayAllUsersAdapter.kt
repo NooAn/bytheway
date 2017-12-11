@@ -25,11 +25,8 @@ class DisplayAllUsersAdapter(val context: Context, val extensions: ExtensionsAll
         notifyDataSetChanged()
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
-        return UserViewHolder(
-                LayoutInflater.from(parent.context).inflate(R.layout.item_content_all_users, parent, false)
-        )
-    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder =
+         UserViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_content_all_users, parent, false))
 
     override fun onBindViewHolder(holder: UserViewHolder?, position: Int) {
         val currentUser = users[position]
@@ -45,16 +42,17 @@ class DisplayAllUsersAdapter(val context: Context, val extensions: ExtensionsAll
         else
             context.getString(R.string.not_cities)
         glide.load(currentUser.urlPhoto).into(holder?.avatar)
-        holder?.itemView?.setOnClickListener {
-            if (context is MenuActivity) {
-                context.showUserSimpleProfile(currentUser)
-            }
-        }
     }
 
     override fun getItemCount(): Int = users.size
 
     inner class UserViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        init {
+            view.setOnClickListener({ _ ->
+                if (adapterPosition != RecyclerView.NO_POSITION)
+                    (context as? MenuActivity)?.showUserSimpleProfile(users[adapterPosition])
+            })
+        }
         var name = view.findViewById<TextView>(R.id.name_content_user)
         var avatar = view.findViewById<ImageView>(R.id.user_avatar)
         var dates = view.findViewById<TextView>(R.id.users_dates)
