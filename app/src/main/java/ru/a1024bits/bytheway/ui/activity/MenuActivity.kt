@@ -45,7 +45,6 @@ import ru.a1024bits.bytheway.router.Screens.Companion.ALL_USERS_SCREEN
 import ru.a1024bits.bytheway.router.Screens.Companion.MY_PROFILE_SCREEN
 import ru.a1024bits.bytheway.router.Screens.Companion.SEARCH_MAP_SCREEN
 import ru.a1024bits.bytheway.router.Screens.Companion.SIMILAR_TRAVELS_SCREEN
-import ru.a1024bits.bytheway.router.Screens.Companion.USER_PROFILE_SCREEN
 import ru.a1024bits.bytheway.router.Screens.Companion.USER_SINHRONIZED_SCREEN
 import ru.a1024bits.bytheway.ui.fragments.*
 import ru.a1024bits.bytheway.util.Constants
@@ -162,12 +161,12 @@ class MenuActivity : AppCompatActivity(),
     }
 
     override fun onBackPressed() {
-        val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START)
-        } else {
-            drawer.openDrawer(GravityCompat.START)
-        }
+//        val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
+//        if (drawer.isDrawerOpen(GravityCompat.START)) {
+//            drawer.closeDrawer(GravityCompat.START)
+//        } else {
+//            drawer.openDrawer(GravityCompat.START)
+//        }
     }
 
     val navigator = object : SupportFragmentNavigator(supportFragmentManager, R.id.fragment_container) {
@@ -321,7 +320,7 @@ class MenuActivity : AppCompatActivity(),
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
-        if(this.profileChanged == true){
+        if (this.profileChanged == true) {
             openAwayFromProfileDialog({
                 this.profileChanged = false
                 onNavigationItemSelected(item)
@@ -360,6 +359,7 @@ class MenuActivity : AppCompatActivity(),
         })
         simpleAlert.show()
     }
+
     private fun openDialogFeedback() {
         val simpleAlert = AlertDialog.Builder(this).create()
         val inflater = this.layoutInflater
