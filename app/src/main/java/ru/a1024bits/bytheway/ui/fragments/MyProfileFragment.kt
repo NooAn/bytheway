@@ -84,7 +84,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         val dateString = "$day $month $year"
         val dateFormat = SimpleDateFormat("dd MM yyyy")
         val date = dateFormat.parse(dateString)
-        val unixTime = date.time.toLong() / 1000
+        val unixTime = date.time.toLong()
         Log.e("LOG time", unixTime.toString())
         return unixTime
     }
@@ -818,7 +818,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     companion object {
         private val ARG_PARAM1 = "param1"
-        private val UID_KEY = "uid"
         val CENTRE: LatLng = LatLng(-23.570991, -46.649886)
         val ZOOM = 9f
 
