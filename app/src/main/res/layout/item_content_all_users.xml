@@ -14,7 +14,7 @@
         android:paddingStart="16dp"
         android:paddingTop="16dp">
 
-        <de.hdodenhof.circleimageview.CircleImageView
+        <ImageView
             android:id="@+id/user_avatar"
             android:layout_width="@dimen/size_user_avatar"
             android:layout_height="@dimen/size_user_avatar"
@@ -28,39 +28,47 @@
             android:layout_height="0dp"
             android:layout_marginStart="16dp"
             android:textColor="@color/black"
-            android:textSize="20sp"
+            android:textSize="16sp"
             app:layout_constraintStart_toEndOf="@id/user_avatar"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="Николаев Алексей" />
 
         <TextView
             android:id="@+id/age_content_user"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginBottom="8dp"
             android:textColor="@color/black"
-            android:textSize="20sp"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@+id/users_cities"
             app:layout_constraintStart_toEndOf="@id/name_content_user"
+            app:layout_constraintTop_toTopOf="@+id/name_content_user"
             tools:text=", 16" />
 
         <TextView
             android:id="@+id/users_cities"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
             android:text="@string/not_cities"
             android:textColor="@color/black"
-            android:textSize="16sp"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@+id/user_avatar"
             app:layout_constraintStart_toStartOf="@id/name_content_user"
-            app:layout_constraintTop_toBottomOf="@id/name_content_user" />
+            app:layout_constraintTop_toBottomOf="@+id/name_content_user" />
 
         <TextView
             android:id="@+id/users_dates"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:text="@string/item_all_users_empty_date"
             android:textColor="@color/colorPrimaryTeams"
-            android:textSize="16sp"
+            android:textSize="14sp"
             app:layout_constraintStart_toStartOf="@id/name_content_user"
-            app:layout_constraintTop_toBottomOf="@id/user_avatar" />
+            app:layout_constraintTop_toBottomOf="@+id/users_cities"
+            tools:text="@string/date" />
 
     </android.support.constraint.ConstraintLayout>
 

@@ -16,10 +16,7 @@ import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.request.RequestOptions
@@ -48,7 +45,6 @@ import ru.a1024bits.bytheway.router.Screens.Companion.ALL_USERS_SCREEN
 import ru.a1024bits.bytheway.router.Screens.Companion.MY_PROFILE_SCREEN
 import ru.a1024bits.bytheway.router.Screens.Companion.SEARCH_MAP_SCREEN
 import ru.a1024bits.bytheway.router.Screens.Companion.SIMILAR_TRAVELS_SCREEN
-import ru.a1024bits.bytheway.router.Screens.Companion.USER_PROFILE_SCREEN
 import ru.a1024bits.bytheway.router.Screens.Companion.USER_SINHRONIZED_SCREEN
 import ru.a1024bits.bytheway.ui.fragments.*
 import ru.a1024bits.bytheway.util.Constants
@@ -89,6 +85,7 @@ class MenuActivity : AppCompatActivity(),
 
     private var glide: RequestManager? = null
     var mainUser: User? = null
+    var profileChanged: Boolean? = false
 
     private var viewModel: MyProfileViewModel? = null
     private var viewModelFeedback: ViewModelFeedback? = null
@@ -147,9 +144,11 @@ class MenuActivity : AppCompatActivity(),
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
 
         sing_out.setOnClickListener {
-            preferences.edit().putBoolean(Constants.FIRST_ENTER, true).apply()
-            FirebaseAuth.getInstance().signOut()
-            finishAffinity()
+            openAwayFromProfileDialog({
+                preferences.edit().putBoolean(Constants.FIRST_ENTER, true).apply()
+                FirebaseAuth.getInstance().signOut()
+                finishAffinity()
+            })
         }
         feedback.setOnClickListener { openDialogFeedback() }
     }
@@ -159,15 +158,6 @@ class MenuActivity : AppCompatActivity(),
 
     fun showUserSimpleProfile(displayingUser: User) {
         navigator.applyCommand(Replace(Screens.USER_PROFILE_SCREEN, displayingUser))
-    }
-
-    override fun onBackPressed() {
-        val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START)
-        } else {
-            drawer.openDrawer(GravityCompat.START)
-        }
     }
 
     val navigator = object : SupportFragmentNavigator(supportFragmentManager, R.id.fragment_container) {
@@ -190,7 +180,9 @@ class MenuActivity : AppCompatActivity(),
                     }
                     USER_SINHRONIZED_SCREEN -> return AppInTheAirSinchronizedFragment()
                     ALL_USERS_SCREEN -> return AllUsersFragment.newInstance()
-                    SIMILAR_TRAVELS_SCREEN -> return SimilarTravelsFragment.newInstance()
+                    SIMILAR_TRAVELS_SCREEN -> {
+                        SimilarTravelsFragment.newInstance(data as List<User>)
+                    }
                     else -> return SearchFragment()
                 }
         }
@@ -321,17 +313,44 @@ class MenuActivity : AppCompatActivity(),
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
-        val id = item.itemId
-
-        when (id) {
-            R.id.profile_item -> navigator.applyCommand(Replace(Screens.MY_PROFILE_SCREEN, 1))
-            R.id.search_item -> navigator.applyCommand(Replace(Screens.SEARCH_MAP_SCREEN, 1))
-            R.id.all_users_item -> navigator.applyCommand(Replace(Screens.ALL_USERS_SCREEN, 1))
+        if (this.profileChanged == true) {
+            openAwayFromProfileDialog({
+                this.profileChanged = false
+                onNavigationItemSelected(item)
+            })
+            return false
+        } else {
+            when (item.itemId) {
+                R.id.profile_item -> navigator.applyCommand(Replace(Screens.MY_PROFILE_SCREEN, 1))
+                R.id.search_item -> navigator.applyCommand(Replace(Screens.SEARCH_MAP_SCREEN, 1))
+                R.id.all_users_item -> navigator.applyCommand(Replace(Screens.ALL_USERS_SCREEN, 1))
+            }
+            val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
+            drawer.closeDrawer(GravityCompat.START)
+            return true
         }
+    }
 
-        val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
-        drawer.closeDrawer(GravityCompat.START)
-        return true
+    private fun openAwayFromProfileDialog(cb: () -> Unit) {
+        val simpleAlert = AlertDialog.Builder(this).create()
+        val inflater = this.layoutInflater
+        val dialogView = inflater.inflate(R.layout.away_from_profile_dialog, null)
+        simpleAlert.setView(dialogView)
+
+        simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Да", { dialogInterface, i ->
+            Log.e("LOG", " accepted")
+            val myProfile = supportFragmentManager.findFragmentById(R.id.fragment_container) as MyProfileFragment
+            viewModel?.sendUserData(myProfile.getHashMapUser(), FirebaseAuth.getInstance().currentUser?.uid.toString(), {
+                Toast.makeText(this, "Profile successfully saved", Toast.LENGTH_SHORT).show()
+                cb()
+            })
+
+        })
+        simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, "Нет", { dialogInterface, i ->
+            Log.e("LOG", " refused")
+            cb()
+        })
+        simpleAlert.show()
     }
 
     private fun openDialogFeedback() {
