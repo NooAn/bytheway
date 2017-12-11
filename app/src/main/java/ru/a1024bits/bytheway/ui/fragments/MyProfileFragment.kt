@@ -32,14 +32,14 @@ import com.google.android.gms.maps.model.PolylineOptions
 import com.google.maps.android.PolyUtil
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.GeoPoint
-import com.google.gson.Gson
-import com.google.gson.JsonArray
-import com.google.gson.JsonElement
+import com.google.gson.*
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.fragment_my_user_profile.*
 import kotlinx.android.synthetic.main.profile_add_trip.*
 import kotlinx.android.synthetic.main.profile_direction.*
 import kotlinx.android.synthetic.main.profile_main_image.*
+import org.json.JSONArray
+import org.json.JSONObject
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.Method
@@ -151,11 +151,12 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     private var yearNow: Int = 0
 
     private var yearsArr: ArrayList<Int> = arrayListOf()
-    private var routes: String?=null
+    private var routes: String=""
 
     private var profileStateHashMap: HashMap<String, String> = hashMapOf()
     private var oldProfileState: Int = 0
     private var methodStateArray: ArrayList<Boolean> = arrayListOf(false, false, false, false, false)
+    private var googleMap: GoogleMap? = null
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -398,23 +399,17 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         if (googleMap != null)
             this.googleMap = map
 
-val coordFrom=LatLng(cityFromLatLng.latitude,cityFromLatLng.longitude)
-val coordTo=LatLng(cityToLatLng.latitude,cityToLatLng.longitude)
-
-
-
-
+        val coordFrom = LatLng(cityFromLatLng.latitude, cityFromLatLng.longitude)
+        val coordTo = LatLng(cityToLatLng.latitude, cityToLatLng.longitude)
         googleMap?.addMarker(MarkerOptions().position(CENTRE).title("Hello, Dude!"))
         googleMap?.addMarker(MarkerOptions().position(coordFrom).title("First Point"))
         googleMap?.addMarker(MarkerOptions().position(coordTo).title("Final Point"))
-
 
         val options = PolylineOptions()
         options.color(Color.RED)
         options.width(5f)
 
-
-        val concreteRoute = "{" +
+        /*   val concreteRoute = "{" + /// for testing
                 "  \"routes\" : [" +
                 "    {" +
                 "      \"bounds\" : {" +
@@ -438,46 +433,47 @@ val coordTo=LatLng(cityToLatLng.latitude,cityToLatLng.longitude)
                 "    }" +
                 "  ]," +
                 "  \"status\" : \"OK\"" +
-                "}"
-        //    if (routes!=null){
-        //    for(concreteRoute in routes){
+                "}"*/
 
-        val json = Gson()
-        val routesInGson: Map<String, Any>? = json.fromJson<Map<String, Any>>(concreteRoute, object : TypeToken<Map<String, Any>>() {}.type)
-        Log.d("LOG", "++++routeInGson: ${routesInGson}")
+        if (routes != "") {
+           // for (concreteRoute in routes!!) {
 
-        val polylineMap: Map<String, Any>? =json.fromJson<Map<String, Any>>(routesInGson?.get("overview_polyline") as JsonArray?, object : TypeToken<Map<String, Any>>() {}.type)
 
-        Log.d("LOG", "++++polylineMap: ${polylineMap.toString()}")
+                var jsonObj = JSONObject(routes)
+                var routesArr = jsonObj.getJSONArray("routes")
 
-        val points: String? = polylineMap?.get("points") as String
-        var polyPts: List<LatLng>
+                var points: String
+                for (i in 0..(routesArr.length() - 1)) {
+                    var c = routesArr.getJSONObject(i)
+                    var polyline = c.getJSONObject("overview_polyline")
+                    points = polyline.getString("points")
 
-        Log.d("LOG", "++++points: $points")
+                    var polyPts: List<LatLng>
 
-        if (points != null) {
-            polyPts = PolyUtil.decode(points)
+                    if (points != null) {
+                        polyPts = PolyUtil.decode(points)
 
-        for (pts in polyPts) {
-            options.add(pts)
-        }
+                        for (pts in polyPts) {
+                            options.add(pts)
+                        }
+                    }
+                    Log.d("LOG", "+++POLYLINE++++++: $options")
+                    googleMap?.addPolyline(options)
+
+                }
+                    googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(50.0, 50.0), 9f))
+
+
+                    val sydney = LatLng(-34.0, 151.0)
+                    googleMap?.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
+                    googleMap?.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+                }
+
+
+
+       // }
     }
 
-                googleMap?.addPolyline(options)
-
-
-          //  }
-     //  }
-
-        // Zooming to the Campus location
-        googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(50.0, 50.0), 9f))
-    }
-
-
-
-
-
-    private var googleMap: GoogleMap? = null
     private lateinit var mapView: MapView
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater?.inflate(R.layout.fragment_my_user_profile, container, false)
@@ -612,11 +608,11 @@ val coordTo=LatLng(cityToLatLng.latitude,cityToLatLng.longitude)
             sex = if (man.isChecked) 1 else if (woman.isChecked) 2 else 0
 
             fillAgeSex(age, sex)
-            name = nameChoose.text.toString()
+            name = (nameChoose.text.toString()).capitalize()
 
-            lastName = lastNameChoose.text.toString()
+            lastName = (lastNameChoose.text.toString()).capitalize()
             username.text = StringBuilder(name).append(" ").append(lastName)
-            city = cityChoose.text.toString()
+            city = (cityChoose.text.toString()).capitalize()
             cityview.text = if (city.isNotEmpty()) city else "Родной город"
             sendUserInfoToServer()
         })
