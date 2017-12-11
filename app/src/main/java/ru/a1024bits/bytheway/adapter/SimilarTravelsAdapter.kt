@@ -14,9 +14,11 @@ import com.bumptech.glide.request.RequestOptions
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
+import ru.a1024bits.bytheway.util.Constants.FIRST_INDEX_CITY
+import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
 
 
-class DisplaySimilarTravelsAdapter(val context: Context) : RecyclerView.Adapter<DisplaySimilarTravelsAdapter.UserViewHolder>() {
+class SimilarTravelsAdapter(val context: Context) : RecyclerView.Adapter<SimilarTravelsAdapter.UserViewHolder>() {
     private var glide: RequestManager = Glide.with(this.context)
     var users: MutableList<User> = ArrayList()
 
@@ -36,12 +38,19 @@ class DisplaySimilarTravelsAdapter(val context: Context) : RecyclerView.Adapter<
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
         Log.d("LOG", "onBindViewHolder on position: " + position)
         val currentUser = users[position]
-        holder.lastName.text = currentUser.lastName
-        holder.name.text = currentUser.name
+
+        holder.cities.text = StringBuilder().append(currentUser.cities.get(FIRST_INDEX_CITY))
+                .append(" - ")
+                .append(currentUser.cities.get(LAST_INDEX_CITY))
+
+        holder.name.text = StringBuilder().append(currentUser.name)
+                .append(currentUser.lastName)
+                .append(", ")
+                .append(currentUser.age)
+
         holder.percentSimilarTravel.text = StringBuilder().append(currentUser.percentsSimilarTravel).append(" %")
 
-        glide
-                .load(currentUser.urlPhoto)
+        glide.load(currentUser.urlPhoto)
                 .apply(RequestOptions.circleCropTransform())
                 .into(holder.avatar)
 
@@ -57,7 +66,7 @@ class DisplaySimilarTravelsAdapter(val context: Context) : RecyclerView.Adapter<
     }
 
     inner class UserViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        var lastName = view.findViewById<TextView>(R.id.users_cities)
+        var cities = view.findViewById<TextView>(R.id.users_cities)
         var name = view.findViewById<TextView>(R.id.name_content_user)
         var avatar = view.findViewById<ImageView>(R.id.user_avatar)
         var percentSimilarTravel = view.findViewById<TextView>(R.id.percent_similar_travel)

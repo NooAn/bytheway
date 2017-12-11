@@ -18,17 +18,16 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) : IUsersR
 
     var TAG = "LOG UserRepository"
 
-    init {
-        Log.e("LOG", "init repos2")
-    }
-
     override fun getSimilarUsersTravels(data: Filter, observer: Observer<List<User>>): Task<QuerySnapshot> {
         return store.collection(COLLECTION_USERS).get()
     }
 
-
-    override fun getUsers(): Task<QuerySnapshot> {
+    override fun getAllUsers(): Task<QuerySnapshot> {
         return store.collection(COLLECTION_USERS).get()
+    }
+
+    override fun getReallUsers(): Task<QuerySnapshot> {
+        return store.collection(COLLECTION_USERS).get() // need request for (city != null) I don't know for now how do it // fixme for performances
     }
 
     override fun getUserById(userID: String): Task<DocumentSnapshot> {

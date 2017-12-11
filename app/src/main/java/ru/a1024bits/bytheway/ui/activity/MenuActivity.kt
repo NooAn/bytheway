@@ -160,15 +160,6 @@ class MenuActivity : AppCompatActivity(),
         navigator.applyCommand(Replace(Screens.USER_PROFILE_SCREEN, displayingUser))
     }
 
-    override fun onBackPressed() {
-//        val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
-//        if (drawer.isDrawerOpen(GravityCompat.START)) {
-//            drawer.closeDrawer(GravityCompat.START)
-//        } else {
-//            drawer.openDrawer(GravityCompat.START)
-//        }
-    }
-
     val navigator = object : SupportFragmentNavigator(supportFragmentManager, R.id.fragment_container) {
         override fun createFragment(screenKey: String?, data: Any?): Fragment {
             Log.e("LOG", screenKey + " " + data)
@@ -189,7 +180,9 @@ class MenuActivity : AppCompatActivity(),
                     }
                     USER_SINHRONIZED_SCREEN -> return AppInTheAirSinchronizedFragment()
                     ALL_USERS_SCREEN -> return AllUsersFragment.newInstance()
-                    SIMILAR_TRAVELS_SCREEN -> return SimilarTravelsFragment.newInstance()
+                    SIMILAR_TRAVELS_SCREEN -> {
+                        SimilarTravelsFragment.newInstance(data as List<User>)
+                    }
                     else -> return SearchFragment()
                 }
         }

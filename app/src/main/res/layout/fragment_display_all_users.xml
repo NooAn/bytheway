@@ -38,7 +38,7 @@
         app:layoutManager="LinearLayoutManager" />
 
     <ProgressBar
-        android:id="@+id/loading_where_load_users"
+        android:id="@+id/loadingWhereLoadUsers"
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
