@@ -117,7 +117,13 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     private var csLink = "https://www.couchsurfing.com/people/"
     private var fbLink = "https://www.facebook.com/"
 
-    private var methods: HashMap<String, Boolean> = hashMapOf()
+    private var methods: HashMap<String, Boolean> = hashMapOf(
+            Method.CAR.link to false,
+            Method.TRAIN.link to false,
+            Method.BUS.link to false,
+            Method.PLANE.link to false,
+            Method.HITCHHIKING.link to false
+    )
 
     private var socNet: HashMap<String, String> = hashMapOf()
 
@@ -146,7 +152,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     private var profileStateHashMap: HashMap<String, String> = hashMapOf()
     private var oldProfileState: Int = 0
-    private var methodStateArray: ArrayList<Boolean> = arrayListOf(false, false, false, false, false)
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -231,44 +236,37 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                 SocialNetwork.TG.link -> tgIcon.setImageResource(R.drawable.ic_tg_color)
             }
         }
-        methods.clear()
-        methodStateArray = arrayListOf(false, false, false, false, false)
         methods.putAll(user.method)
+        profileStateHashMap.set("methods", methods.hashCode().toString())
         for (method in user.method.keys) {
             when (method) {
                 Method.CAR.link -> {
                     if (user.method.get(method) == true) {
                         iconCar.isActivated = true
-                        methodStateArray.set(0, true)
                     }
                 }
                 Method.TRAIN.link -> {
                     if (user.method.get(method) == true) {
                         iconTrain.isActivated = true
-                        methodStateArray.set(1, true)
                     }
                 }
                 Method.BUS.link -> {
                     if (user.method.get(method) == true) {
                         iconBus.isActivated = true
-                        methodStateArray.set(2, true)
                     }
                 }
                 Method.PLANE.link -> {
                     if (user.method.get(method) == true) {
                         iconPlane.isActivated = true
-                        methodStateArray.set(3, true)
                     }
                 }
                 Method.HITCHHIKING.link -> {
                     if (user.method.get(method) == true) {
                         iconHitchHicking.isActivated = true
-                        methodStateArray.set(4, true)
                     }
                 }
             }
         }
-        profileStateHashMap.set("methods", methodStateArray.hashCode().toString())
 
         if (user.budget > 0) {
             budget = user.budget
@@ -687,40 +685,35 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         iconCar.setOnClickListener({
             with(travelCarText) { isActivated = !isActivated }
             methods.put(Method.CAR.link, travelCarText.isActivated)
-            methodStateArray.set(0, travelCarText.isActivated)
-            profileStateHashMap.set("methods", methodStateArray.hashCode().toString())
+            profileStateHashMap.set("methods", methods.hashCode().toString())
             profileChanged()
         })
 
         iconTrain.setOnClickListener({
             with(travelTrainText) { isActivated = !isActivated }
             methods.put(Method.TRAIN.link, travelTrainText.isActivated)
-            methodStateArray.set(1, travelTrainText.isActivated)
-            profileStateHashMap.set("methods", methodStateArray.hashCode().toString())
+            profileStateHashMap.set("methods", methods.hashCode().toString())
             profileChanged()
         })
 
         iconBus.setOnClickListener({
             with(travelBusText) { isActivated = !isActivated }
             methods.put(Method.BUS.link, travelBusText.isActivated)
-            methodStateArray.set(2, travelBusText.isActivated)
-            profileStateHashMap.set("methods", methodStateArray.hashCode().toString())
+            profileStateHashMap.set("methods", methods.hashCode().toString())
             profileChanged()
         })
 
         iconPlane.setOnClickListener({
             with(travelPlaneText) { isActivated = !isActivated }
             methods.put(Method.PLANE.link, travelPlaneText.isActivated)
-            methodStateArray.set(3, travelPlaneText.isActivated)
-            profileStateHashMap.set("methods", methodStateArray.hashCode().toString())
+            profileStateHashMap.set("methods", methods.hashCode().toString())
             profileChanged()
         })
 
         iconHitchHicking.setOnClickListener({
             with(travelHitchHikingText) { isActivated = !isActivated }
             methods.put(Method.HITCHHIKING.link, travelHitchHikingText.isActivated)
-            methodStateArray.set(4, travelHitchHikingText.isActivated)
-            profileStateHashMap.set("methods", methodStateArray.hashCode().toString())
+            profileStateHashMap.set("methods", methods.hashCode().toString())
             profileChanged()
         })
 
