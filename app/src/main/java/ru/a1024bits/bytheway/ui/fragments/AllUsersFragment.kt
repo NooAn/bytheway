@@ -223,7 +223,7 @@ class AllUsersFragment : Fragment() {
             Log.e("LOG", "onChanged $list")
             if (list != null) {
                 Log.e("LOG", "update $list")
-                display_all_users.adapter = displayUsersAdapter
+//                display_all_users.adapter = displayUsersAdapter
                 loading_where_load_users.visibility = View.GONE
                 displayUsersAdapter.setItems(list)
                 display_all_users.visibility = View.VISIBLE

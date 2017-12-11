@@ -22,8 +22,8 @@
 
         <TextView
             android:id="@+id/name_content_user"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/standard_margin"
             android:textColor="@color/black"
             android:textSize="@dimen/item_all_users_main_text"
@@ -32,8 +32,8 @@
 
         <TextView
             android:id="@+id/age_content_user"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:textColor="@color/black"
             android:textSize="@dimen/item_all_users_main_text"
             app:layout_constraintStart_toEndOf="@id/name_content_user"
