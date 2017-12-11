@@ -157,7 +157,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
 
         viewModel?.user?.observe(this, Observer<User> { user ->
-            Log.e("LOG", "fill Profile: $user")
             if (user != null) fillProfile(user)
         })
 
@@ -387,10 +386,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         if (googleMap != null)
             this.googleMap = map
 
-        googleMap?.addMarker(MarkerOptions().position(CENTRE).title("Hello, Dude!"))
-
         // Zooming to the Campus location
-        googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(CENTRE, ZOOM))
+        googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(50.0, 50.0), 9f))
     }
 
     private var googleMap: GoogleMap? = null
@@ -398,7 +395,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater?.inflate(R.layout.fragment_my_user_profile, container, false)
         mapView = view?.findViewById<MapView>(R.id.mapView)!!
-
 
         try {
             mapView.onCreate(savedInstanceState)
@@ -779,7 +775,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     }
 
     private fun removeTrip() {
-        // FixME точно ли нужно удалять. спросить пользователя.
         countTrip = 0
         budget = 0
         methods.clear()
@@ -815,20 +810,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             next = result
         }
         return result
-    }
-
-    companion object {
-        private val ARG_PARAM1 = "param1"
-        val CENTRE: LatLng = LatLng(-23.570991, -46.649886)
-        val ZOOM = 9f
-
-        fun newInstance(param1: String, param2: String): UserProfileFragment {
-            val fragment = UserProfileFragment()
-            val args = Bundle()
-            args.putString(ARG_PARAM1, param1)
-            fragment.arguments = args
-            return fragment
-        }
     }
 
     private var countTrip: Int = 0
