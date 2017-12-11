@@ -233,7 +233,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             }
         }
         methods.clear()
-        methodStateArray.clear()
+        methodStateArray = arrayListOf(false,false,false,false,false)
         methods.putAll(user.method)
         for (method in user.method.keys) {
             when (method) {
