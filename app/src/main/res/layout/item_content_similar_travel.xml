@@ -8,12 +8,10 @@
     android:orientation="horizontal"
     android:padding="10dp">
 
-    <de.hdodenhof.circleimageview.CircleImageView
+    <ImageView
         android:id="@+id/user_avatar"
         android:layout_width="@dimen/similarTravelPhotoSize"
         android:layout_height="@dimen/similarTravelPhotoSize"
-        android:paddingEnd="4dp"
-        android:paddingStart="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:srcCompat="@mipmap/ic_launcher_round"
         tools:ignore="ContentDescription" />
@@ -52,5 +50,4 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="90%" />
-    <!--app:layout_constraintEnd_toEndOf="@+id/item_content_similar_traver_layout"-->
 </android.support.constraint.ConstraintLayout>

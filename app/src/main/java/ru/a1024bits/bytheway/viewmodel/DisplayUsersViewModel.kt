@@ -21,46 +21,33 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
     val TAG = "showUserViewModel"
 
     fun getAllUsers(filter: Filter) {
-        userRepository.getUsers()
+        userRepository.getReallUsers()
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         InstallUsers().execute(task.result, filter, usersLiveData)
                     }
                 }
-//        userRepository.getUsers()
-//                .addOnCompleteListener { task ->
-//                    if (task.isSuccessful) {
-//                        val result: MutableList<User> = ArrayList()
-//                        for (document in task.result) {
-//                            try {
-//                                val user = document.toObject(User::class.java)
-//
-//                                if ((filter.startBudget >= 0) && (filter.endBudget > 0))
-//                                    if (user.budget < filter.startBudget || user.budget > filter.endBudget) continue
-//                                if ((filter.startDate > 0L) && (filter.endDate > 0L))
-//                                    if ((user.dates["start_date"] as Long) > filter.startDate || (user.dates["end_date"] as Long) < filter.endDate) continue
-//                                if (user.age < filter.startAge || user.age > filter.endAge) continue
-//                                if (filter.sex != 0)
-//                                    if (user.sex != filter.sex) continue
-//                                if ("" != filter.startCity)
-//                                    if (!user.cities.contains(filter.startCity)) continue
-//                                if ("" != filter.endCity)
-//                                    if (!user.cities.contains(filter.endCity)) continue
-//
-//                                result.add(user)
-//
-//                            } catch (e: Exception) {
-//                            }
-//                        }
-//                        usersLiveData.setValue(result)
-//                    } else {
-//                        Log.w(TAG, "Error getting documents.", task.exception)
-//                    }
-//                }
     }
 
-    fun getUsersWithSimilarTravel(filter: Filter) {
-        userRepository.getUsers()
+
+    fun sendUserData(map: HashMap<String, Any>, id: String) {
+        userRepository.changeUserProfile(map, id)
+                .addOnCompleteListener {
+                    //fixme
+                    Log.e("LOG", "${this::class.java.simpleName}: complete user: complete? ${it.isComplete}; successful? ${it.isSuccessful}")
+                }
+                .addOnFailureListener {
+                    Log.e("LOG", "${this::class.java.simpleName}: fail user")
+                    //fixme Здесь обработка лоадера и показь пользователю ошибку загрузки ну не здеь а во вью. пример как эт осделать смотри в вью моделаър
+                }
+                .addOnSuccessListener {
+                    Log.e("LOG", "${this::class.java.simpleName}: ok send user")
+                    //fixme
+                }
+    }
+
+    fun getUsersWithSimilarTravel() {
+        userRepository.getReallUsers()
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         val result: MutableList<User> = ArrayList()
@@ -68,8 +55,12 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
                             try {
                                 Log.d(TAG, document.id + " => " + document.data)
                                 val user = document.toObject(User::class.java)
-
-                                result.add(user)
+                                /*
+                                This filter;
+                                if user hasn't citi then I don't show him
+                                 */
+                                if (user.cities.size > 0)
+                                    result.add(user)
                             } catch (e: Exception) {
                             }
                         }

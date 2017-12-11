@@ -76,7 +76,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
         dates.put(START_DATE, getLongFromDate(dayOfMonth, monthOfYear, year))
         dates.put(END_DATE, getLongFromDate(dayOfMonthEnd, monthOfYearEnd, yearEnd))
-        profileStateHashMap.set("dates",dates.toString())
+        profileStateHashMap.set("dates", dates.toString())
         profileChanged()
     }
 
@@ -146,7 +146,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     private var profileStateHashMap: HashMap<String, String> = hashMapOf()
     private var oldProfileState: Int = 0
-    private var methodStateArray: ArrayList<Boolean> = arrayListOf(false,false,false,false,false)
+    private var methodStateArray: ArrayList<Boolean> = arrayListOf(false, false, false, false, false)
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -233,7 +233,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             }
         }
         methods.clear()
-        methodStateArray = arrayListOf(false,false,false,false,false)
+        methodStateArray = arrayListOf(false, false, false, false, false)
         methods.putAll(user.method)
         for (method in user.method.keys) {
             when (method) {
@@ -398,10 +398,11 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater?.inflate(R.layout.fragment_my_user_profile, container, false)
         mapView = view?.findViewById<MapView>(R.id.mapView)!!
-        mapView.onCreate(savedInstanceState)
-        mapView.onResume()// needed to get the map to display immediately
+
 
         try {
+            mapView.onCreate(savedInstanceState)
+            mapView.onResume()// needed to get the map to display immediately
             MapsInitializer.initialize(activity.applicationContext)
         } catch (e: Exception) {
             e.printStackTrace()
@@ -424,6 +425,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             }
         })
     }
+
     private fun sendIntentForSearch(code: Int) {
         try {
             val typeFilter = AutocompleteFilter.Builder()
@@ -524,7 +526,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Сохранить", { dialogInterface, i ->
             sex = if (man.isChecked) 1 else if (woman.isChecked) 2 else 0
 
-            //  age = ageChoose.text.toString().toLongOrNull() ?: 0
             fillAgeSex(age, sex)
             name = nameChoose.text.toString()
 
@@ -685,7 +686,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         iconCar.setOnClickListener({
             with(travelCarText) { isActivated = !isActivated }
             methods.put(Method.CAR.link, travelCarText.isActivated)
-            methodStateArray.set(0,travelCarText.isActivated)
+            methodStateArray.set(0, travelCarText.isActivated)
             profileStateHashMap.set("methods", methodStateArray.hashCode().toString())
             profileChanged()
         })
@@ -693,7 +694,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         iconTrain.setOnClickListener({
             with(travelTrainText) { isActivated = !isActivated }
             methods.put(Method.TRAIN.link, travelTrainText.isActivated)
-            methodStateArray.set(1,travelTrainText.isActivated)
+            methodStateArray.set(1, travelTrainText.isActivated)
             profileStateHashMap.set("methods", methodStateArray.hashCode().toString())
             profileChanged()
         })
@@ -701,7 +702,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         iconBus.setOnClickListener({
             with(travelBusText) { isActivated = !isActivated }
             methods.put(Method.BUS.link, travelBusText.isActivated)
-            methodStateArray.set(2,travelBusText.isActivated)
+            methodStateArray.set(2, travelBusText.isActivated)
             profileStateHashMap.set("methods", methodStateArray.hashCode().toString())
             profileChanged()
         })
@@ -709,7 +710,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         iconPlane.setOnClickListener({
             with(travelPlaneText) { isActivated = !isActivated }
             methods.put(Method.PLANE.link, travelPlaneText.isActivated)
-            methodStateArray.set(3,travelPlaneText.isActivated)
+            methodStateArray.set(3, travelPlaneText.isActivated)
             profileStateHashMap.set("methods", methodStateArray.hashCode().toString())
             profileChanged()
         })
@@ -717,7 +718,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         iconHitchHicking.setOnClickListener({
             with(travelHitchHikingText) { isActivated = !isActivated }
             methods.put(Method.HITCHHIKING.link, travelHitchHikingText.isActivated)
-            methodStateArray.set(4,travelHitchHikingText.isActivated)
+            methodStateArray.set(4, travelHitchHikingText.isActivated)
             profileStateHashMap.set("methods", methodStateArray.hashCode().toString())
             profileChanged()
         })
@@ -757,7 +758,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             openDateDialog()
         }
         add_info_user.afterTextChanged({
-            profileStateHashMap.set("addInformation",it)
+            profileStateHashMap.set("addInformation", it)
             profileChanged()
         })
         textCityFrom.setOnClickListener {
@@ -848,7 +849,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         return hashMap
     }
 
-    fun saveProfileState(){
+    fun saveProfileState() {
         profileStateHashMap.set("dates", dates.toString())
         profileStateHashMap.set("budget", budget.toString())
         profileStateHashMap.set("budgetPosition", budgetPosition.toString())
@@ -857,7 +858,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         oldProfileState = profileStateHashMap.hashCode()
     }
 
-    fun profileChanged(force:Boolean? = null){
+    fun profileChanged(force: Boolean? = null) {
         val changed: Boolean = if (force != null) force
         else profileStateHashMap.hashCode() != oldProfileState
         (activity as MenuActivity).profileChanged = changed
