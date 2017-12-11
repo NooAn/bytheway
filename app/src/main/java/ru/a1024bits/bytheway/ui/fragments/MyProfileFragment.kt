@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
@@ -25,8 +26,14 @@ import com.google.android.gms.location.places.ui.PlaceAutocomplete
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.PolylineOptions
+import com.google.maps.android.PolyUtil
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.GeoPoint
+import com.google.gson.Gson
+import com.google.gson.JsonArray
+import com.google.gson.JsonElement
+import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.fragment_my_user_profile.*
 import kotlinx.android.synthetic.main.profile_add_trip.*
 import kotlinx.android.synthetic.main.profile_direction.*
@@ -138,7 +145,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     private var yearNow: Int = 0
 
     private var yearsArr: ArrayList<Int> = arrayListOf()
-    private var routes: ArrayList<String> = arrayListOf()
+    private var routes: String?=null
 
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -166,6 +173,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         name = user.name
         numberPhone = user.phone
         routes=user.route
+        cityFromLatLng=user.cityFromLatLng
+        cityToLatLng=user.cityToLatLng
 
         whatsAppNumber = user.socialNetwork.get(SocialNetwork.WHATSAPP.link) ?: whatsAppNumber
         vkLink = user.socialNetwork.get(SocialNetwork.VK.link) ?: vkLink
@@ -366,19 +375,80 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     override fun onMapReady(map: GoogleMap?) {
         if (googleMap != null)
             this.googleMap = map
-
+val coordFrom=LatLng(cityFromLatLng.latitude,cityFromLatLng.longitude)
+val coordTo=LatLng(cityToLatLng.latitude,cityToLatLng.longitude)
         googleMap?.addMarker(MarkerOptions().position(CENTRE).title("Hello, Dude!"))
+        googleMap?.addMarker(MarkerOptions().position(coordFrom).title("First Point"))
+        googleMap?.addMarker(MarkerOptions().position(coordTo).title("Final Point"))
 
 
-        if (routes!=null){
-            for(concreteRoute in routes){
+        val options = PolylineOptions()
+        options.color(Color.RED)
+        options.width(5f)
 
-            }
+
+        val concreteRoute = "{" +
+                "  \"routes\" : [" +
+                "    {" +
+                "      \"bounds\" : {" +
+                "        \"northeast\" : {" +
+                "          \"lat\" : 55.79283659999999," +
+                "          \"lng\" : 49.2216592" +
+                "        }," +
+                "        \"southwest\" : {" +
+                "          \"lat\" : 55.73007759999999," +
+                "          \"lng\" : 49.1309371" +
+                "        }" +
+                "      }," +
+                "      \"copyrights\" : \"Картографические данные © 2014 Google\"," +
+                "      \"legs\" : [ ]," +
+                "      \"overview_polyline\" : {" +
+                "        \"points\" : \"qffsIk{zjHEwKpKcAvGo@bFk@bGg@vFg@hEIxFQHcTL{a@FkCF_AFm@L_@Zs@Pa@f@cB|@gDb@aBbAuDrByIrAqIhB{LTaDFoA?uAK_B]gEe@oEKk@]]}@u@AGCIEEkEsCgAy@o@o@mBwBmCyCyAaBSQiAg@iBq@aAWmGaA_AKUFm@MiACU@i@Jj@sAVW^YbAs@T_@Nq@?_@Eu@g@iCuBcHq@yCIy@Aq@Fq@He@nCmGhC{FnGcNbA}BNa@TeAPqAZmDzBiWJ}@Da@cA_CiFmLc@aAkBkEqBiEcP__@oHmPaE}IgD}HaCiFcGyM}H{PcFeLyKqV_BuDyA}CaCqF{HgQsCuGyAiDsAoCk@cAe@u@iAmAq@k@m@]aA_@oA]m@IuCK_C@yMGwUO_M@{B?yUSuEAqG?aD@cM@qFDoFEs@?iPGiDEgA?yAEoFAoDCo@?mGEmGE_JEsGAq@BaCHsAJKqAHcBn@HEsDBADEJ]FIPEZ?LJTB\"" +
+                "      }," +
+                "      \"summary\" : \"пр.  Победы\"," +
+                "      \"warnings\" : []," +
+                "      \"waypoint_order\" : []" +
+                "    }" +
+                "  ]," +
+                "  \"status\" : \"OK\"" +
+                "}"
+        //    if (routes!=null){
+        //    for(concreteRoute in routes){
+
+        val json = Gson()
+        val routesInGson: Map<String, Any>? = json.fromJson<Map<String, Any>>(concreteRoute, object : TypeToken<Map<String, Any>>() {}.type)
+        Log.d("LOG", "++++routeInGson: ${routesInGson}")
+
+        val polylineMap: Map<String, Any>? =json.fromJson<Map<String, Any>>(routesInGson?.get("overview_polyline") as JsonArray?, object : TypeToken<Map<String, Any>>() {}.type)
+
+        Log.d("LOG", "++++polylineMap: ${polylineMap.toString()}")
+
+        val points: String? = polylineMap?.get("points") as String
+        var polyPts: List<LatLng>
+
+        Log.d("LOG", "++++points: $points")
+
+        if (points != null) {
+            polyPts = PolyUtil.decode(points)
+
+        for (pts in polyPts) {
+            options.add(pts)
         }
+    }
+
+                googleMap?.addPolyline(options)
+
+
+          //  }
+     //  }
 
         // Zooming to the Campus location
         googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(CENTRE, ZOOM))
     }
+
+
+
+
 
     private var googleMap: GoogleMap? = null
     private lateinit var mapView: MapView
