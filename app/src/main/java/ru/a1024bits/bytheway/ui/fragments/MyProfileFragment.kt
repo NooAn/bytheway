@@ -151,7 +151,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     private var yearNow: Int = 0
 
     private var yearsArr: ArrayList<Int> = arrayListOf()
-    private var routes: String=""
+    private var routes: String = ""
 
     private var profileStateHashMap: HashMap<String, String> = hashMapOf()
     private var oldProfileState: Int = 0
@@ -180,9 +180,9 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         lastName = user.lastName
         name = user.name
         numberPhone = user.phone
-        routes=user.route
-        cityFromLatLng=user.cityFromLatLng
-        cityToLatLng=user.cityToLatLng
+        routes = user.route
+        cityFromLatLng = user.cityFromLatLng
+        cityToLatLng = user.cityToLatLng
 
         whatsAppNumber = user.socialNetwork.get(SocialNetwork.WHATSAPP.link) ?: whatsAppNumber
         vkLink = user.socialNetwork.get(SocialNetwork.VK.link) ?: vkLink
@@ -396,12 +396,19 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     }
 
     override fun onMapReady(map: GoogleMap?) {
-        if (googleMap != null)
-            this.googleMap = map
+        this.googleMap = map
 
-        val coordFrom = LatLng(cityFromLatLng.latitude, cityFromLatLng.longitude)
-        val coordTo = LatLng(cityToLatLng.latitude, cityToLatLng.longitude)
-        googleMap?.addMarker(MarkerOptions().position(CENTRE).title("Hello, Dude!"))
+
+          val coordFrom = LatLng(cityFromLatLng.latitude, cityFromLatLng.longitude)
+          val coordTo = LatLng(cityToLatLng.latitude, cityToLatLng.longitude)
+
+      //  val coordFrom = LatLng(33.981780, -118.236682)
+      //  val coordTo = LatLng(41.885098, -87.630201)
+      //  routes = "a~l~Fjk~uOnzh@vlbBtc~@tsE`vnApw{A`dw@~w\\|tNtqf@l{Yd_Fblh@rxo@b}@xxSfytAblk@xxaBeJxlcBb~t@zbh@jc|Bx}C`rv@rw|@rlhA~dVzeo@vrSnc}Axf]fjz@xfFbw~@dz{A~d{A|zOxbrBbdUvpo@`cFp~xBc`Hk@nurDznmFfwMbwz@bbl@lq~@loPpxq@bw_@v|{CbtY~jGqeMb{iF|n\\~mbDzeVh_Wr|Efc\\x`Ij{kE}mAb~uF{cNd}xBjp]fulBiwJpgg@|kHntyArpb@bijCk_Kv~eGyqTj_|@`uV`k|DcsNdwxAott@r}q@_gc@nu`CnvHx`k@dse@j|p@zpiAp|gEicy@`omFvaErfo@igQxnlApqGze~AsyRzrjAb__@ftyB}pIlo_BflmA~yQftNboWzoAlzp@mz`@|}_@fda@jakEitAn{fB_a]lexClshBtmqAdmY_hLxiZd~XtaBndgC"
+
+
+        val midPointLat = (coordFrom.latitude + coordTo.latitude) / 2
+        val midPointLong = (coordFrom.longitude + coordTo.longitude) / 2
         googleMap?.addMarker(MarkerOptions().position(coordFrom).title("First Point"))
         googleMap?.addMarker(MarkerOptions().position(coordTo).title("Final Point"))
 
@@ -409,69 +416,19 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         options.color(Color.RED)
         options.width(5f)
 
-        /*   val concreteRoute = "{" + /// for testing
-                "  \"routes\" : [" +
-                "    {" +
-                "      \"bounds\" : {" +
-                "        \"northeast\" : {" +
-                "          \"lat\" : 55.79283659999999," +
-                "          \"lng\" : 49.2216592" +
-                "        }," +
-                "        \"southwest\" : {" +
-                "          \"lat\" : 55.73007759999999," +
-                "          \"lng\" : 49.1309371" +
-                "        }" +
-                "      }," +
-                "      \"copyrights\" : \"Картографические данные © 2014 Google\"," +
-                "      \"legs\" : [ ]," +
-                "      \"overview_polyline\" : {" +
-                "        \"points\" : \"qffsIk{zjHEwKpKcAvGo@bFk@bGg@vFg@hEIxFQHcTL{a@FkCF_AFm@L_@Zs@Pa@f@cB|@gDb@aBbAuDrByIrAqIhB{LTaDFoA?uAK_B]gEe@oEKk@]]}@u@AGCIEEkEsCgAy@o@o@mBwBmCyCyAaBSQiAg@iBq@aAWmGaA_AKUFm@MiACU@i@Jj@sAVW^YbAs@T_@Nq@?_@Eu@g@iCuBcHq@yCIy@Aq@Fq@He@nCmGhC{FnGcNbA}BNa@TeAPqAZmDzBiWJ}@Da@cA_CiFmLc@aAkBkEqBiEcP__@oHmPaE}IgD}HaCiFcGyM}H{PcFeLyKqV_BuDyA}CaCqF{HgQsCuGyAiDsAoCk@cAe@u@iAmAq@k@m@]aA_@oA]m@IuCK_C@yMGwUO_M@{B?yUSuEAqG?aD@cM@qFDoFEs@?iPGiDEgA?yAEoFAoDCo@?mGEmGE_JEsGAq@BaCHsAJKqAHcBn@HEsDBADEJ]FIPEZ?LJTB\"" +
-                "      }," +
-                "      \"summary\" : \"пр.  Победы\"," +
-                "      \"warnings\" : []," +
-                "      \"waypoint_order\" : []" +
-                "    }" +
-                "  ]," +
-                "  \"status\" : \"OK\"" +
-                "}"*/
 
         if (routes != "") {
-           // for (concreteRoute in routes!!) {
+            var polyPts: List<LatLng>
+            polyPts = PolyUtil.decode(routes)
 
+            for (pts in polyPts) {
+                options.add(pts)
+            }
+            googleMap?.addPolyline(options)
+        }
+       // Log.d("LOG", "+++++++MIDPOINTS:$midPointLat ,   $midPointLong")
+        googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(midPointLat, midPointLong), 3.0f))
 
-                var jsonObj = JSONObject(routes)
-                var routesArr = jsonObj.getJSONArray("routes")
-
-                var points: String
-                for (i in 0..(routesArr.length() - 1)) {
-                    var c = routesArr.getJSONObject(i)
-                    var polyline = c.getJSONObject("overview_polyline")
-                    points = polyline.getString("points")
-
-                    var polyPts: List<LatLng>
-
-                    if (points != null) {
-                        polyPts = PolyUtil.decode(points)
-
-                        for (pts in polyPts) {
-                            options.add(pts)
-                        }
-                    }
-                    Log.d("LOG", "+++POLYLINE++++++: $options")
-                    googleMap?.addPolyline(options)
-
-                }
-                    googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(50.0, 50.0), 9f))
-
-
-                    val sydney = LatLng(-34.0, 151.0)
-                    googleMap?.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-                    googleMap?.moveCamera(CameraUpdateFactory.newLatLng(sydney))
-                }
-
-
-
-       // }
     }
 
     private lateinit var mapView: MapView
