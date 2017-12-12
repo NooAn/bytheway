@@ -27,9 +27,9 @@ import com.google.android.gms.location.places.AutocompleteFilter
 import com.google.android.gms.location.places.ui.PlaceAutocomplete
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.GeoPoint
+import kotlinx.android.synthetic.main.confirm_dialog.view.*
 import kotlinx.android.synthetic.main.fragment_my_user_profile.*
 import kotlinx.android.synthetic.main.profile_add_trip.*
 import kotlinx.android.synthetic.main.profile_direction.*
@@ -455,6 +455,28 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     private fun sendUserInfoToServer() {
         countTrip = 1
+        var isEmpty = textCityFrom.text.isEmpty() || textCityTo.text.isEmpty()
+
+        if (isEmpty) {
+            var toastString = getString(R.string.fill_required_fields)
+            if (textCityFrom.text.isEmpty()) {
+                textCityFrom.error = getString(R.string.name)
+                toastString += " " + getString(R.string.city_from)
+            } else {
+                textCityFrom.error = null
+            }
+            if (textCityTo.text.isEmpty()) {
+                textCityTo.error = getString(R.string.yes)
+                toastString += " " + getString(R.string.city_to)
+            } else {
+                textCityTo.error = null
+            }
+            textCityFrom.getParent().requestChildFocus(textCityFrom, textCityFrom)
+            Toast.makeText(this@MyProfileFragment.context, toastString, Toast.LENGTH_LONG).show();
+
+            return
+        }
+
         viewModel?.sendUserData(getHashMapInfoUser(), uid, {
             profileChanged(false)
         })
@@ -600,6 +622,20 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                 }
             })
             viewModel?.saveLinks(socNet, uid)
+        })
+        simpleAlert.show()
+    }
+
+    private fun openAlertDialog(callback: () -> Unit) {
+        val simpleAlert = AlertDialog.Builder(activity).create()
+        val inflater = this.layoutInflater
+        val dialogView = inflater.inflate(R.layout.confirm_dialog, null)
+        simpleAlert.setView(dialogView)
+        dialogView.textMessage.text = getString(R.string.text_confirm_remove_trip)
+        simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.yes), { dialogInterface, i ->
+            callback()
+        })
+        simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.no), { dialogInterface, i ->
         })
         simpleAlert.show()
     }
@@ -767,6 +803,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         textCityFrom.setOnClickListener {
             sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM)
         }
+
         textCityTo.setOnClickListener {
             sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO)
         }
@@ -774,8 +811,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             (activity as MenuActivity).navigator.applyCommand(Replace(Screens.USER_SINHRONIZED_SCREEN, 1))
         }
         button_remove_travel_info.setOnClickListener {
-            profileChanged(false)
-            removeTrip()
+            openAlertDialog(this::removeTrip)
         }
 
         mapView.onStart()
@@ -787,6 +823,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         methods.clear()
         cities.clear()
         dates.clear()
+        profileChanged(false)
         hideBlockTravelInforamtion()
         showBlockAddTrip()
     }

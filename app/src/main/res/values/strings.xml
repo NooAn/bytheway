@@ -43,6 +43,8 @@
     <string name="exit">Выйти</string>
     <string name="search_users_text">Поиск</string>
     <string name="text_away_from_profile">Сохранить измененные данные?</string>
+    <string name="fill_required_fields">Пожалуйста заполните обязательные поля:</string>
+    <string name="text_confirm_remove_trip">Все изменения будет потеряны. \n Вы действительно хотите удалить поездку?</string>
     <string name="sex_and_age">Пол, возраст</string>
     <string name="age">Возраст</string>
     <string name="add_new_trip">+ Создать поездку</string>
@@ -95,4 +97,6 @@
     <string name="any">Любой</string>
     <string name="native_city">Родной город</string>
     <string name="remove">Удалить</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
 </resources>

@@ -27,7 +27,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_menu.*
-import kotlinx.android.synthetic.main.custom_dialog_feedback.*
+import kotlinx.android.synthetic.main.confirm_dialog.view.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -335,23 +335,23 @@ class MenuActivity : AppCompatActivity(),
         }
     }
 
-    private fun openAwayFromProfileDialog(cb: () -> Unit) {
+    private fun openAwayFromProfileDialog(callback: () -> Unit) {
         val simpleAlert = AlertDialog.Builder(this).create()
         val inflater = this.layoutInflater
-        val dialogView = inflater.inflate(R.layout.away_from_profile_dialog, null)
+        val dialogView = inflater.inflate(R.layout.confirm_dialog, null)
         simpleAlert.setView(dialogView)
-
-        simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Да", { dialogInterface, i ->
+        dialogView.textMessage.text = getString(R.string.text_away_from_profile)
+        simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.yes), { dialogInterface, i ->
             val myProfile = supportFragmentManager.findFragmentById(R.id.fragment_container) as MyProfileFragment
             viewModel?.sendUserData(myProfile.getHashMapUser(), FirebaseAuth.getInstance().currentUser?.uid.toString(), {
                 Toast.makeText(this, resources.getString(R.string.save_succesfull), Toast.LENGTH_SHORT).show()
-                cb()
+                callback()
             })
 
         })
-        simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, "Нет", { dialogInterface, i ->
+        simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.no), { dialogInterface, i ->
             Log.e("LOG", " refused")
-            cb()
+            callback()
         })
         simpleAlert.show()
     }
