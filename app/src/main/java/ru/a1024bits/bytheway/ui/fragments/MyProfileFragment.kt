@@ -174,7 +174,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         val navigationView = activity.findViewById<NavigationView>(R.id.nav_view)
         val hView = navigationView.getHeaderView(0)
         val cityName = hView.findViewById<TextView>(R.id.menu_city_name)
-        cityName.text = user.city
+        cityName.text = StringBuilder().append("г.").append(user.city)
         val fullName = hView.findViewById<TextView>(R.id.menu_fullname)
         fullName.text = StringBuilder().append(user.name).append(" ").append(user.lastName)
         username.text = StringBuilder(user.name).append(" ").append(user.lastName)
@@ -285,8 +285,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
         profileStateHashMap.set("addInformation", user.addInformation)
         saveProfileState()
-        //TODO fix this shit
         add_info_user.setText(user.addInformation)
+        add_info_user.clearFocus()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

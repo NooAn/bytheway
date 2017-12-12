@@ -52,9 +52,9 @@ import ru.a1024bits.bytheway.util.ServiceGenerator
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import ru.a1024bits.bytheway.viewmodel.ViewModelFeedback
 import ru.terrakok.cicerone.NavigatorHolder
+import ru.terrakok.cicerone.Router
 import ru.terrakok.cicerone.android.SupportFragmentNavigator
-import ru.terrakok.cicerone.commands.Command
-import ru.terrakok.cicerone.commands.Replace
+import ru.terrakok.cicerone.commands.*
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -81,6 +81,7 @@ class MenuActivity : AppCompatActivity(),
     private val STATE_SCREEN_NAMES = "state_screen_names"
 
     @Inject lateinit var navigatorHolder: NavigatorHolder
+    @Inject lateinit var router: Router
 
     private var glide: RequestManager? = null
     var mainUser: User? = null
@@ -150,7 +151,7 @@ class MenuActivity : AppCompatActivity(),
             .putBoolean(Constants.FIRST_ENTER, false).apply()
 
     fun showUserSimpleProfile(displayingUser: User) {
-        navigator.applyCommand(Replace(Screens.USER_PROFILE_SCREEN, displayingUser))
+        navigator.applyCommand(Forward(Screens.USER_PROFILE_SCREEN, displayingUser))
     }
 
     val navigator = object : SupportFragmentNavigator(supportFragmentManager, R.id.fragment_container) {
@@ -160,8 +161,11 @@ class MenuActivity : AppCompatActivity(),
                 UserProfileFragment.newInstance(data.id)
             else
                 when (screenKey) {
+
                     MY_PROFILE_SCREEN -> return MyProfileFragment()
+
                     SEARCH_MAP_SCREEN -> return MapFragment()
+
                     AIR_SUCCES_SCREEN -> {
                         var name: String = ""
                         var date: String = ""
@@ -171,8 +175,11 @@ class MenuActivity : AppCompatActivity(),
                         }
                         return AirSuccesfullFragment.newInstance(name, date)
                     }
+
                     USER_SINHRONIZED_SCREEN -> return AppInTheAirSinchronizedFragment()
+
                     ALL_USERS_SCREEN -> return AllUsersFragment.newInstance()
+
                     SIMILAR_TRAVELS_SCREEN -> {
                         SimilarTravelsFragment.newInstance(data as List<User>)
                     }
@@ -293,6 +300,11 @@ class MenuActivity : AppCompatActivity(),
     fun getTypeToken(): String = preferences.getString(Constants.TYPE_TOKEN, "")
     fun getRefreshToken(): String = preferences.getString(Constants.REFRESH_TOKEN, "")
 
+    override fun onBackPressed() {
+        // router.backTo(Screens.MY_PROFILE_SCREEN);
+        navigator.applyCommand(BackTo(Screens.MY_PROFILE_SCREEN))
+        Log.e("LOG", "on back tap")
+    }
 
     override fun onPause() {
         super.onPause()
@@ -313,9 +325,9 @@ class MenuActivity : AppCompatActivity(),
             return false
         } else {
             when (item.itemId) {
-                R.id.profile_item -> navigator.applyCommand(Replace(Screens.MY_PROFILE_SCREEN, 1))
-                R.id.search_item -> navigator.applyCommand(Replace(Screens.SEARCH_MAP_SCREEN, 1))
-                R.id.all_users_item -> navigator.applyCommand(Replace(Screens.ALL_USERS_SCREEN, 1))
+                R.id.profile_item -> navigator.applyCommand(Forward(Screens.MY_PROFILE_SCREEN, 1))
+                R.id.search_item -> navigator.applyCommand(Forward(Screens.SEARCH_MAP_SCREEN, 1))
+                R.id.all_users_item -> navigator.applyCommand(Forward(Screens.ALL_USERS_SCREEN, 1))
             }
             val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
             drawer.closeDrawer(GravityCompat.START)

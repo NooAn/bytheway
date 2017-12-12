@@ -26,12 +26,6 @@ class SplashActivity : Activity() {
     override fun onResume() {
         super.onResume()
 
-        val mAuth: FirebaseAuth = FirebaseAuth.getInstance()
-
-        val currentUser: FirebaseUser? = mAuth.currentUser
-
-        Log.e("LOG spalsh activity", currentUser.toString())
-
         val handler = Handler()
 //        handler.postDelayed({ checkRegistrationAndForward() }, 19000L)
         handler.postDelayed({ checkRegistrationAndForward() }, 4000L)
@@ -55,7 +49,7 @@ class SplashActivity : Activity() {
             startActivity(Intent(this, RegistrationActivity::class.java))
         } else {
             //if it isn't first start
-            startActivity(Intent(this, MenuActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY))
+            startActivity(Intent(this, MenuActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
         }
     }
 }
