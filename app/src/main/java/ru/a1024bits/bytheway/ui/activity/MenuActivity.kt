@@ -341,7 +341,7 @@ class MenuActivity : AppCompatActivity(),
             Log.e("LOG", " accepted")
             val myProfile = supportFragmentManager.findFragmentById(R.id.fragment_container) as MyProfileFragment
             viewModel?.sendUserData(myProfile.getHashMapUser(), FirebaseAuth.getInstance().currentUser?.uid.toString(), {
-                Toast.makeText(this, "Profile successfully saved", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, resources.getString(R.string.save_succesfull), Toast.LENGTH_SHORT).show()
                 cb()
             })
 
