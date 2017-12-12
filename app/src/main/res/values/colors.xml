@@ -4,6 +4,7 @@
     <color name="colorPrimaryDark">#003d5c</color>
     <color name="colorAccent">@color/colorPrimary</color>
     <color name="hint">#c9c9c9</color>
+    <color name="new_trip_add">#D9FFFFFF</color>
     <color name="white">#fff</color>
     <color name="black">#000000</color>
     <color name="textColor">#fff</color>
