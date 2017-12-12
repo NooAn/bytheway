@@ -10,25 +10,75 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import com.borax12.materialdaterangepicker.date.DatePickerDialog
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException
 import com.google.android.gms.common.GooglePlayServicesRepairableException
 import com.google.android.gms.location.places.AutocompleteFilter
 import com.google.android.gms.location.places.ui.PlaceAutocomplete
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.android.synthetic.main.fragment_search_block.*
+import kotlinx.android.synthetic.main.profile_direction.*
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
+import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM
 import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO
 import ru.a1024bits.bytheway.util.DecimalInputFilter
+import java.util.*
 
 
 /**
  * Created by andrey.gusenkov on 29/09/2017.
  */
-class SearchFragment : Fragment() {
+class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
 
+    private lateinit var dateDialog: DatePickerDialog
 
+    private fun openDateDialog() {
+        dateDialog.setStartTitle("НАЧАЛО")
+        dateDialog.setEndTitle("КОНЕЦ")
+        dateDialog.accentColor = resources.getColor(R.color.colorPrimary)
+        dateDialog.show(activity.fragmentManager, "")
+    }
+
+    override fun onDateSet(view: DatePickerDialog?, year: Int, monthOfYear: Int, dayOfMonth: Int, yearEnd: Int, monthOfYearEnd: Int, dayOfMonthEnd: Int) {
+        Log.e("LOG Date", "$year  $monthOfYear $dayOfMonth - $yearEnd $monthOfYearEnd $dayOfMonthEnd")
+        dateFromValue.setText(StringBuilder(" ")
+                .append(dayOfMonth)
+                .append(" ")
+                .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
+                .append(" ")
+                .append(year).toString())
+
+        dateToValue.setText(StringBuilder(" ")
+                .append(dayOfMonthEnd)
+                .append(" ")
+                .append(context.resources.getStringArray(R.array.months_array)[monthOfYearEnd])
+                .append(" ")
+                .append(yearEnd).toString())
+
+//        dates.put(Constants.START_DATE, getLongFromDate(dayOfMonth, monthOfYear, year))
+//        dates.put(Constants.END_DATE, getLongFromDate(dayOfMonthEnd, monthOfYearEnd, yearEnd))
+
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val now = Calendar.getInstance()
+
+        dateDialog = DatePickerDialog.newInstance(
+                this@SearchFragment,
+                now.get(Calendar.YEAR),
+                now.get(Calendar.MONTH),
+                now.get(Calendar.DAY_OF_MONTH)
+        )
+        dateFromValue.setOnClickListener {
+            openDateDialog()
+        }
+        dateToValue.setOnClickListener {
+            openDateDialog()
+        }
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

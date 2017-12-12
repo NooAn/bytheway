@@ -33,6 +33,7 @@
     <string name="date_trip">Дата путешествия</string>
     <string name="method_move">Способ передвижения</string>
     <string name="budget">1000 руб.</string>
+    <string name="budgetName">Бюджет</string>
     <string name="add_info_profile">Дополнительная информация</string>
     <string name="date">Дата</string>
     <string name="save_filter">Сохранить фильтры</string>
@@ -43,6 +44,7 @@
     <string name="save">Сохранить</string>
     <string name="exit">Выйти</string>
     <string name="search_users_text">Поиск...</string>
+    <string name="text_away_from_profile">Сохранить измененные данные?</string>
     <string name="sex_and_age">Пол, возраст</string>
     <string name="add_new_trip">+ Создать поездку</string>
     <string name="app_in_the_air">App in the Air</string>
@@ -81,9 +83,12 @@
     <string name="feedback_writte">Напишите отзыв или предложение</string>
     <string name="add_new_trip_from_app_in_the_air">+ Добавить поездку  App in the Air</string>
     <string name="feedback">Обратная связь</string>
-    <string name="item_all_users_empty_date">___ - ___</string>
-    <string name="filters_all_users_empty_date">с ___ по ___</string>
-    <string name="not_cities">нет городов</string>
     <string name="textBodyDisaster">Мы не смогли найти ваши предстоящие поездки.</string>
     <string name="textHeadAirDisaster">Ваш аккаунт синхронизирован!</string>
+    <string name="item_all_users_empty_date"> </string>
+    <string name="filters_all_users_empty_date">с ___ по ___</string>
+    <string name="not_cities">Пока ни чего не ищет</string>
+    <string name="optionSearch">+ Параметры поиска</string>
+    <string name="to">до</string>
+    <string name="from">от</string>
 </resources>

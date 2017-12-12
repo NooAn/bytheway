@@ -121,7 +121,7 @@ class AllUsersFragment : Fragment() {
                     if ((view.id == block_search_parameters.id) && (block_search_parameters.visibility == View.GONE)) {
                         view_contain_block_parameters.layoutTransition.setDuration(0L)
                         display_all_users.visibility = View.GONE
-                        loading_where_load_users.visibility = View.VISIBLE
+                        loadingWhereLoadUsers.visibility = View.VISIBLE
                         view_contain_block_parameters.layoutTransition.setDuration(700L)
                         view_contain_block_parameters.layoutTransition.removeTransitionListener(this)
                     }
@@ -195,7 +195,7 @@ class AllUsersFragment : Fragment() {
             override fun onQueryTextChange(newText: String): Boolean {
                 if ("" == newText) {
                     display_all_users.visibility = View.GONE
-                    loading_where_load_users.visibility = View.VISIBLE
+                    loadingWhereLoadUsers.visibility = View.VISIBLE
                     viewModel.getAllUsers(filter)
                 }
                 return false
@@ -224,12 +224,12 @@ class AllUsersFragment : Fragment() {
             if (list != null) {
                 Log.e("LOG", "update $list")
 //                display_all_users.adapter = displayUsersAdapter
-                loading_where_load_users.visibility = View.GONE
+                loadingWhereLoadUsers.visibility = View.GONE
                 displayUsersAdapter.setItems(list)
                 display_all_users.visibility = View.VISIBLE
             }
         })
-        loading_where_load_users.visibility = View.VISIBLE
+        loadingWhereLoadUsers.visibility = View.VISIBLE
         viewModel.getAllUsers(filter)
     }
 

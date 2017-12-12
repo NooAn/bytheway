@@ -9,7 +9,6 @@
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/standard_margin_8dp"
         android:paddingTop="@dimen/standard_margin">
 
         <de.hdodenhof.circleimageview.CircleImageView
@@ -28,27 +27,31 @@
             android:textColor="@color/black"
             android:textSize="@dimen/item_all_users_main_text"
             app:layout_constraintStart_toEndOf="@id/user_avatar"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="Николаев Алексей" />
 
         <TextView
             android:id="@+id/age_content_user"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             android:textColor="@color/black"
             android:textSize="@dimen/item_all_users_main_text"
+            app:layout_constraintBottom_toTopOf="@+id/users_cities"
             app:layout_constraintStart_toEndOf="@id/name_content_user"
+            app:layout_constraintTop_toTopOf="@+id/name_content_user"
             tools:text=", 16" />
 
         <TextView
             android:id="@+id/users_cities"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:text="@string/not_cities"
             android:textColor="@color/black"
             android:textSize="@dimen/item_all_users_subsidiary_text"
+            app:layout_constraintBottom_toBottomOf="@+id/user_avatar"
             app:layout_constraintStart_toStartOf="@id/name_content_user"
-            app:layout_constraintTop_toBottomOf="@id/name_content_user" />
+            app:layout_constraintTop_toBottomOf="@+id/name_content_user" />
 
         <TextView
             android:id="@+id/users_dates"
@@ -58,7 +61,8 @@
             android:textColor="@color/colorPrimaryTeams"
             android:textSize="@dimen/item_all_users_subsidiary_text"
             app:layout_constraintStart_toStartOf="@id/name_content_user"
-            app:layout_constraintTop_toBottomOf="@id/user_avatar" />
+            app:layout_constraintTop_toBottomOf="@+id/users_cities"
+            tools:text="@string/date" />
 
     </android.support.constraint.ConstraintLayout>
 

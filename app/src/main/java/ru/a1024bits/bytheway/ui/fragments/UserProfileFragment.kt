@@ -3,6 +3,8 @@ package ru.a1024bits.bytheway.ui.fragments
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -11,6 +13,7 @@ import android.view.ViewGroup
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import kotlinx.android.synthetic.main.fragment_user_profile.*
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.viewmodel.UserProfileViewModel
@@ -21,11 +24,6 @@ class UserProfileFragment : Fragment(), OnMapReadyCallback {
     private var viewModel: UserProfileViewModel? = null
 
     private var mListener: OnFragmentInteractionListener? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -84,14 +82,27 @@ class UserProfileFragment : Fragment(), OnMapReadyCallback {
         return view
     }
 
+    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        whatsAppIcon.setOnClickListener { startActivity(createBrowserIntent("whatsapp://send?text=Привет, я нашел тебя в ByTheWay.&phone=+numberPhone&abid=+numberPhone")) }
+
+        vkIcon.setOnClickListener {
+            val linkUsers = "" //todo fill user links
+            startActivity(createBrowserIntent("https://vk.com/$linkUsers"))
+        }
+
+        csIcon.setOnClickListener { startActivity(createBrowserIntent("https://www.couchsurfing.com/people/selcukatesoglu")) }
+    }
+
+    private fun createBrowserIntent(url: String): Intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+
     private fun settingsSocialNetworkButtons() {
 
     }
 
     fun onButtonPressed() {
-        if (mListener != null) {
-            mListener!!.onFragmentInteraction()
-        }
+        mListener?.onFragmentInteraction()
     }
 
     override fun onAttach(context: Context?) {
@@ -99,7 +110,7 @@ class UserProfileFragment : Fragment(), OnMapReadyCallback {
         if (context is OnFragmentInteractionListener) {
             mListener = context
         } else {
-            throw RuntimeException(context!!.toString() + " must implement OnFragmentInteractionListener")
+            throw RuntimeException(context?.toString() + " must implement OnFragmentInteractionListener")
         }
     }
 
@@ -155,3 +166,4 @@ class UserProfileFragment : Fragment(), OnMapReadyCallback {
         }
     }
 }// Required empty public constructor
+

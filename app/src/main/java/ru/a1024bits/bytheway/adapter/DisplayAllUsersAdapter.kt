@@ -10,6 +10,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
+import com.bumptech.glide.request.RequestOptions
+import com.google.firebase.auth.FirebaseAuth
 import ru.a1024bits.bytheway.ExtensionsAllUsers
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.User
@@ -41,7 +43,9 @@ class DisplayAllUsersAdapter(val context: Context, val extensions: ExtensionsAll
             StringBuilder(currentUser.cities["first_city"]).append(" - ").append(currentUser.cities["last_city"])
         else
             context.getString(R.string.not_cities)
-        glide.load(currentUser.urlPhoto).into(holder?.avatar)
+        glide.load(currentUser.urlPhoto)
+                ?.apply(RequestOptions.circleCropTransform())
+                ?.into(holder?.avatar)
     }
 
     override fun getItemCount(): Int = users.size

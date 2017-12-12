@@ -7,7 +7,7 @@
     <color name="white">#fff</color>
     <color name="black">#000000</color>
     <color name="textColor">#fff</color>
-    <color name="gray">#AEAEAE</color>
+    <color name="grey">#AEAEAE</color>
     <color name="colorLine">#009688</color>
     <color name="colorFiltersBackground">#EFEFEF</color>
     <color name="colorFiltersText">#808080</color>

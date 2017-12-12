@@ -27,17 +27,8 @@ const val redirectUri = "https://www.appintheair.mobi/blank"
 
 class AppInTheAirSinchronizedFragment : Fragment() {
 
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-    }
-
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater!!.inflate(R.layout.fragment_app_in_the_air_sinchronized, container, false)
+        val view = inflater?.inflate(R.layout.fragment_app_in_the_air_sinchronized, container, false)
         return view;
     }
 

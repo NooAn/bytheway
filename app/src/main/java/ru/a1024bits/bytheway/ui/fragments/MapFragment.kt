@@ -29,11 +29,13 @@ import ru.a1024bits.aviaanimation.ui.util.MarkerAnimation
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.MapWebService
 import ru.a1024bits.bytheway.R
+import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.model.map_directions.RoutesList
 import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.a1024bits.bytheway.util.createMarker
 import ru.a1024bits.bytheway.util.toJsonString
+import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
 import ru.a1024bits.bytheway.viewmodel.MapViewModel
 import ru.terrakok.cicerone.commands.Replace
 import java.util.*
@@ -52,7 +54,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private val points: ArrayMap<Int, MarkerOptions> by lazy { ArrayMap<Int, MarkerOptions>() }
     private var routeString: String? = null
 
-    private var viewModel: MapViewModel? = null
+    private var viewModel: DisplayUsersViewModel? = null
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
 
     private val uid: String by lazy { FirebaseAuth.getInstance().currentUser?.uid.orEmpty() }
@@ -63,11 +65,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         super.onActivityCreated(savedInstanceState)
         App.component.inject(this)
 
-        //todo: work with this
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(MapViewModel::class.java)
-        viewModel?.load?.observe(this, android.arch.lifecycle.Observer {
-            Log.e("LOG", "observer map fragment")
-        })
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(DisplayUsersViewModel::class.java)
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -128,17 +126,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-
     var marker: Marker? = null
 
     override fun onMapReady(googleMap: GoogleMap) {
         this.mMap = googleMap
         val constLocation = LatLng(50.0, 50.0)
-
         mMap?.moveCamera(CameraUpdateFactory.newLatLng(constLocation))
-
         mMap?.animateCamera(CameraUpdateFactory.zoomTo(3F))
-
     }
 
     fun goFlyPlan() {
@@ -148,7 +142,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val endLocation = points.valueAt(1).position
 
         val markerOptions = MarkerOptions().position(fromLocation).anchor(0.5F, 1.0F).flat(true)
-
 
         var t = 0.0
         while (t < 1.000001) {
@@ -161,57 +154,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         marker = mMap?.addMarker(markerOptions)
         animateMarker()
-        // - delete after
-
-        val lat1 = fromLocation.latitude
-        val lat2 = endLocation.latitude
-
-        val lon1 = fromLocation.longitude
-        val lon2 = endLocation.longitude
-
-        val angle = findArctg(lat1, lat2, lon1, lon2)
-        val module = module(lat1, lat2, lon1, lon2)
-
-        val latCentral = (lat2 + lat1) / 2
-        val lonCentral = (lon2 + lon1) / 2
-
-        val latTop = latCentral + module / 4
-        val lonTop = lonCentral
-
-        val latBottom = latCentral - module / 4
-        val lonBottom = lonCentral
-
-        val rotatedTop = rotatePoint(lonTop, latTop, lonCentral, latCentral, Math.toRadians(angle))
-        val rotatedBottom = rotatePoint(lonBottom, latBottom, lonCentral, latCentral, Math.toRadians(angle))
-
-        val point2 = LatLng(rotatedTop[1], rotatedTop[0])
-        val point3 = LatLng(rotatedBottom[1], rotatedBottom[0])
-
-        Log.i("LOG", point3.toString())
-        Log.i("LOG", point2.toString())
-
-        /*mMap?.addMarker(MarkerOptions().position(point2).title("point2"))
-        mMap?.addMarker(MarkerOptions().position(point3).title("point3"))*/
     }
 
     //lat = y
     //lon = x
-
-    private fun findArctg(lat1: Double, lat2: Double, lon1: Double, lon2: Double): Double {
-        val arctg = Math.atan((lat2 - lat1) / (lon2 - lon1))
-        return Math.toDegrees(arctg)
-    }
-
-    /* Apply rotation matrix to the point(x,y) */
-    private fun rotatePoint(x: Double, y: Double, x0: Double, y0: Double, angle: Double): Array<Double> {
-        val x1 = -(y - y0) * Math.sin(angle) + Math.cos(angle) * (x - x0) + x0
-        val y1 = (y - y0) * +Math.cos(angle) + Math.sin(angle) * (x - x0) + y0
-        return arrayOf(x1, y1)
-    }
-
-    private fun module(lat1: Double, lat2: Double, lon1: Double, lon2: Double): Double {
-        return Math.sqrt((lat2 - lat1) * (lat2 - lat1) + (lon2 - lon1) * (lon2 - lon1))
-    }
 
     var listPointPath: ArrayList<LatLng> = ArrayList()
 
@@ -243,16 +189,17 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     val markerAnimation = MarkerAnimation()
 
     fun animateMarker() {
-        Log.e("LOG", "animate marker last and size: ${listPointPath.last()} ${listPointPath.size}")
         // Whatever destination coordinates
         if (markerAnimation.flag == false)
             markerAnimation.animateMarker(marker, listPointPath.first(), listPointPath.last(),
                     LatLngInterpolator.CurveBezie(), listPointPath,
-
                     onAnimationEnd = {
-                        (activity as MenuActivity).navigator
-                                .applyCommand(Replace(
-                                        Screens.SIMILAR_TRAVELS_SCREEN, 1))
+                        viewModel?.similarUsersLiveData?.observe(this@MapFragment, android.arch.lifecycle.Observer<List<User>> { list ->
+                            (activity as MenuActivity).navigator
+                                    .applyCommand(Replace(Screens.SIMILAR_TRAVELS_SCREEN, list))
+
+                        })
+                        viewModel?.getUsersWithSimilarTravel()
                     })
     }
 
@@ -335,7 +282,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             override fun onResponse(call: Call<RoutesList?>?, response: Response<RoutesList?>?) {
                 response?.body()?.routes?.map {
                     it.overviewPolyline?.encodedData?.let { routeString ->
-                        Log.w("myLogs", "uid: $uid; encoded direction route: $routeString")
                         this@MapFragment.routeString = routeString
                     }
                 }
