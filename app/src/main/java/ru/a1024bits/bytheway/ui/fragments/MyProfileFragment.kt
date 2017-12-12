@@ -379,7 +379,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         moneyfortrip.visibility = View.GONE
         displayPriceTravel.text = ""
         descriptionprofile.visibility = View.GONE
-        add_info_user.setText("")
         button_remove_travel_info.visibility = View.GONE
         button_save_travel_info.visibility = View.GONE
     }
@@ -677,10 +676,12 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             override fun onProgressChanged(p0: SeekBar?, number: Int, p2: Boolean) {
                 budget = fibbonaci(number)
                 displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(budget)
-                budgetPosition = number
-                profileStateHashMap.set("budget", budget.toString())
-                profileStateHashMap.set("budgetPosition", number.toString())
-                profileChanged()
+                if (number != budgetPosition) {
+                    budgetPosition = number
+                    profileStateHashMap.set("budget", budget.toString())
+                    profileStateHashMap.set("budgetPosition", number.toString())
+                    profileChanged()
+                }
             }
 
             override fun onStartTrackingTouch(p0: SeekBar?) {
@@ -855,6 +856,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     fun profileChanged(force: Boolean? = null) {
         val changed: Boolean = if (force != null) force
         else profileStateHashMap.hashCode() != oldProfileState
+
         (activity as MenuActivity).profileChanged = changed
     }
 }
