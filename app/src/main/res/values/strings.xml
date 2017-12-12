@@ -93,4 +93,6 @@
     <string name="save_succesfull">Профайл успешно сохранен</string>
     <string name="cancel">Отмена</string>
     <string name="any">Любой</string>
+    <string name="native_city">Родной город</string>
+    <string name="remove">Удалить</string>
 </resources>

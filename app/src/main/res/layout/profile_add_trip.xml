@@ -4,6 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="100dp"
+    android:layout_alignParentBottom="true"
+    android:gravity="bottom"
+    android:layout_gravity="bottom"
     android:layout_below="@+id/travelledStatistics"
     android:background="@color/colorPrimary">
 

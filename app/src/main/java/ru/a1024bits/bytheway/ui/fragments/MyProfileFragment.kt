@@ -6,6 +6,7 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.NavigationView
 import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
@@ -85,7 +86,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         val dateFormat = SimpleDateFormat("dd MM yyyy")
         val date = dateFormat.parse(dateString)
         val unixTime = date.time.toLong()
-        Log.e("LOG time", unixTime.toString())
         return unixTime
     }
 
@@ -108,6 +108,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     private var lastName = ""
 
     private var city = ""
+
     private lateinit var dateDialog: DatePickerDialog
 
     private var numberPhone: String = "+7"
@@ -170,7 +171,14 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
 
     private fun fillProfile(user: User) {
+        val navigationView = activity.findViewById<NavigationView>(R.id.nav_view)
+        val hView = navigationView.getHeaderView(0)
+        val cityName = hView.findViewById<TextView>(R.id.menu_city_name)
+        cityName.text = user.city
+        val fullName = hView.findViewById<TextView>(R.id.menu_fullname)
+        fullName.text = StringBuilder().append(user.name).append(" ").append(user.lastName)
         username.text = StringBuilder(user.name).append(" ").append(user.lastName)
+
         profileStateHashMap.clear()
         lastName = user.lastName
         name = user.name
@@ -448,7 +456,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     private fun sendUserInfoToServer() {
         countTrip = 1
-        viewModel?.sendUserData(getHashMapUser(), uid, {
+        viewModel?.sendUserData(getHashMapInfoUser(), uid, {
             profileChanged(false)
         })
     }
@@ -531,7 +539,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             lastName = lastNameChoose.text.toString()
             username.text = StringBuilder(name).append(" ").append(lastName)
             city = cityChoose.text.toString()
-            cityview.text = if (city.isNotEmpty()) city else "Родной город"
+            cityview.text = if (city.isNotEmpty()) city else resources.getString(R.string.native_city)
             sendUserInfoToServer()
         })
         simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, "Отмена", { dialogInterface, i ->
@@ -778,7 +786,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         methods.clear()
         cities.clear()
         dates.clear()
-        getHashMapUser()
         hideBlockTravelInforamtion()
         showBlockAddTrip()
     }
@@ -822,9 +829,17 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         hashMap.set("cityFromLatLng", cityFromLatLng)
         hashMap.set("cityToLatLng", cityToLatLng)
         hashMap.set("addInformation", add_info_user.text.toString())
+        hashMap.put("countTrip", countTrip)
+        return hashMap
+    }
+
+    fun getHashMapInfoUser(): HashMap<String, Any> {
+        val hashMap = HashMap<String, Any>()
         hashMap.set("sex", sex)
         hashMap.set("age", age)
-        hashMap.put("countTrip", countTrip)
+        hashMap.set("name", name)
+        hashMap.set("lastName", lastName)
+        hashMap.set("city", city)
         return hashMap
     }
 

@@ -484,6 +484,7 @@
                 android:id="@+id/add_info_user"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_marginTop="18dp"
                 android:backgroundTint="@color/colorPrimary"
                 android:hint="@string/description"
                 android:inputType="textMultiLine"
@@ -512,7 +513,7 @@
             android:layout_alignEnd="@+id/appinTheAirEnter"
             android:layout_alignParentBottom="true"
             android:padding="24dp"
-            android:text="Сохранить"
+            android:text="@string/save"
             android:theme="@style/WhiteButton"
             android:visibility="gone"
             tools:visibility="visible" />
@@ -525,7 +526,7 @@
             android:layout_marginTop="12dp"
             android:layout_toStartOf="@+id/button_save_travel_info"
             android:padding="24dp"
-            android:text="Удалить"
+            android:text="@string/remove"
             android:theme="@style/WhiteButton"
             android:visibility="gone"
             tools:visibility="visible" />
