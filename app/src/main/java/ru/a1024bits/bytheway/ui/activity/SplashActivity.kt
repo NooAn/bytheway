@@ -34,19 +34,15 @@ class SplashActivity : Activity() {
 
         val handler = Handler()
 //        handler.postDelayed({ checkRegistrationAndForward() }, 19000L)
-        handler.postDelayed({ checkRegistrationAndForward() }, 4000L)
-        handler.postDelayed({
-            start_indicator_image_1.visibility = View.VISIBLE
-            start_indicator_image_1.startAnimation(AnimationUtils.loadAnimation(this, R.anim.flash_point_with_delay))
-        }, 0)
-        handler.postDelayed({
-            start_indicator_image_2.visibility = View.VISIBLE
-            start_indicator_image_2.startAnimation(AnimationUtils.loadAnimation(this, R.anim.flash_point_with_delay))
-        }, 300)
-        handler.postDelayed({
-            start_indicator_image_3.visibility = View.VISIBLE
-            start_indicator_image_3.startAnimation(AnimationUtils.loadAnimation(this, R.anim.flash_point_with_delay))
-        }, 600)
+        handler.postDelayed({ checkRegistrationAndForward() }, 1500L)
+        var delay = 300L
+        for (it in arrayOf(start_indicator_image_1, start_indicator_image_2, start_indicator_image_3)) {
+            delay += 300L
+            handler.postDelayed({
+                it.visibility = View.VISIBLE
+                it.startAnimation(AnimationUtils.loadAnimation(this, R.anim.flash_point_with_delay))
+            }, delay)
+        }
     }
 
     private fun checkRegistrationAndForward() {
