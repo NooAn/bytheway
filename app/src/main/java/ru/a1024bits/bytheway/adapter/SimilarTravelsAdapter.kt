@@ -22,7 +22,6 @@ class SimilarTravelsAdapter(val context: Context) : RecyclerView.Adapter<Similar
     private var glide: RequestManager = Glide.with(this.context)
     var users: MutableList<User> = ArrayList()
 
-
     fun addItems(list: List<User>) {
         this.users = list as MutableList<User>
         notifyDataSetChanged()
@@ -50,6 +49,13 @@ class SimilarTravelsAdapter(val context: Context) : RecyclerView.Adapter<Similar
 
         holder.percentSimilarTravel.text = StringBuilder().append(currentUser.percentsSimilarTravel).append(" %")
 
+        holder.percentSimilarTravel.setTextColor(when (position) {
+            0 -> context.resources.getColor(R.color.one_level)
+            1,2 -> context.resources.getColor(R.color.two_level)
+            else -> {
+                context.resources.getColor(R.color.all_level)
+            }
+        })
         glide.load(currentUser.urlPhoto)
                 .apply(RequestOptions.circleCropTransform())
                 .into(holder.avatar)

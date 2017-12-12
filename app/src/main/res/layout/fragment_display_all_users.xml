@@ -17,10 +17,10 @@
         android:paddingBottom="@dimen/all_users_searchParametersText_vertical_margin"
         android:paddingStart="@dimen/standard_margin"
         android:paddingTop="@dimen/all_users_searchParametersText_vertical_margin"
-        android:textSize="@dimen/all_users_searchParametersText_text_size"
         android:text="@string/optionSearch"
         android:textAllCaps="true"
-        android:textColor="@color/colorPrimaryTeams" />
+        android:textColor="@color/colorPrimaryTeams"
+        android:textSize="@dimen/all_users_searchParametersText_text_size" />
 
     <include
         android:id="@+id/block_search_parameters"
@@ -37,7 +37,6 @@
         android:layout_marginStart="@dimen/standard_margin"
         app:layoutManager="LinearLayoutManager"
         tools:listitem="@layout/item_content_all_users" />
-    <!--tools:listitem="@android:layout/item_content_all_users"-->
 
     <ProgressBar
         android:id="@+id/loadingWhereLoadUsers"

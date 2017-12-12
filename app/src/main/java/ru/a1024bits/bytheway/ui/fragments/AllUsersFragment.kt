@@ -222,8 +222,6 @@ class AllUsersFragment : Fragment() {
         viewModel.usersLiveData.observe(this, Observer<List<User>> { list ->
             Log.e("LOG", "onChanged $list")
             if (list != null) {
-                Log.e("LOG", "update $list")
-//                display_all_users.adapter = displayUsersAdapter
                 loadingWhereLoadUsers.visibility = View.GONE
                 displayUsersAdapter.setItems(list)
                 display_all_users.visibility = View.VISIBLE

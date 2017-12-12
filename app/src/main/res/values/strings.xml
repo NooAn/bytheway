@@ -37,15 +37,14 @@
     <string name="add_info_profile">Дополнительная информация</string>
     <string name="date">Дата</string>
     <string name="save_filter">Сохранить фильтры</string>
-    <string name="sex">sex</string>
-    <string name="man">man</string>
-    <string name="woman">woman</string>
+    <string name="sex">Пол</string>
     <string name="name">Имя</string>
     <string name="save">Сохранить</string>
     <string name="exit">Выйти</string>
-    <string name="search_users_text">Поиск...</string>
+    <string name="search_users_text">Поиск</string>
     <string name="text_away_from_profile">Сохранить измененные данные?</string>
     <string name="sex_and_age">Пол, возраст</string>
+    <string name="age">Возраст</string>
     <string name="add_new_trip">+ Создать поездку</string>
     <string name="app_in_the_air">App in the Air</string>
     <string name="personal_flight_assistant">Personal flight assistant</string>
@@ -87,8 +86,13 @@
     <string name="textHeadAirDisaster">Ваш аккаунт синхронизирован!</string>
     <string name="item_all_users_empty_date"> </string>
     <string name="filters_all_users_empty_date">с ___ по ___</string>
-    <string name="not_cities">Пока ни чего не ищет</string>
+    <string name="not_cities">Пока ничего не ищет</string>
     <string name="optionSearch">+ Параметры поиска</string>
     <string name="to">до</string>
     <string name="from">от</string>
+    <string name="save_succesfull">Профайл успешно сохранен</string>
+    <string name="cancel">Отмена</string>
+    <string name="any">Любой</string>
+    <string name="native_city">Родной город</string>
+    <string name="remove">Удалить</string>
 </resources>

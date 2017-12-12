@@ -69,7 +69,6 @@ class MenuActivity : AppCompatActivity(),
     private var mGoogleApiClient: GoogleApiClient? = null
 
     override fun onSetPoint(l: LatLng, pos: Int) {
-
         val mapFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as MapFragment
         mapFragment.setMarker(l, pos)
     }
@@ -113,18 +112,12 @@ class MenuActivity : AppCompatActivity(),
         val navigationView = findViewById<NavigationView>(R.id.nav_view)
         navigationView.setNavigationItemSelectedListener(this)
         val hView = navigationView.getHeaderView(0)
+        val cityName = hView.findViewById<TextView>(R.id.menu_city_name)
         val image = hView.findViewById<ImageView>(R.id.menu_image_avatar)
 
         glide?.load(FirebaseAuth.getInstance().currentUser?.photoUrl)
                 ?.apply(RequestOptions.circleCropTransform())
                 ?.into(image)
-
-        val fullName = hView.findViewById<TextView>(R.id.menu_fullname)
-        fullName.text = FirebaseAuth.getInstance().currentUser?.displayName
-        val cityName = hView.findViewById<TextView>(R.id.menu_city_name)
-
-
-        // how make name and city!!?
 
         if (savedInstanceState == null) {
             if (preferences.getBoolean(Constants.FIRST_ENTER, true)) {
@@ -256,7 +249,6 @@ class MenuActivity : AppCompatActivity(),
 
                     override fun onResponse(call: Call<AccessToken?>?, response: Response<AccessToken?>?) {
                         val accessToken = response?.body()
-                        Log.e("LOGI", " ${accessToken?.accessToken} ${accessToken?.getTokenType()}")
                         saveToken(accessToken)
                         val loginService = generator.createService(AirWebService::class.java, accessToken?.getTokenType() + " " + accessToken?.accessToken);
                         loginService.getUserProfile().enqueue(object : Callback<AirUser?> {
@@ -338,10 +330,9 @@ class MenuActivity : AppCompatActivity(),
         simpleAlert.setView(dialogView)
 
         simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Да", { dialogInterface, i ->
-            Log.e("LOG", " accepted")
             val myProfile = supportFragmentManager.findFragmentById(R.id.fragment_container) as MyProfileFragment
             viewModel?.sendUserData(myProfile.getHashMapUser(), FirebaseAuth.getInstance().currentUser?.uid.toString(), {
-                Toast.makeText(this, "Profile successfully saved", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, resources.getString(R.string.save_succesfull), Toast.LENGTH_SHORT).show()
                 cb()
             })
 

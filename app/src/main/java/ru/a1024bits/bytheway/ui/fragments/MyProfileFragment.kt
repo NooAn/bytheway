@@ -6,6 +6,7 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.NavigationView
 import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
@@ -85,7 +86,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         val dateFormat = SimpleDateFormat("dd MM yyyy")
         val date = dateFormat.parse(dateString)
         val unixTime = date.time.toLong()
-        Log.e("LOG time", unixTime.toString())
         return unixTime
     }
 
@@ -108,6 +108,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     private var lastName = ""
 
     private var city = ""
+
     private lateinit var dateDialog: DatePickerDialog
 
     private var numberPhone: String = "+7"
@@ -117,7 +118,13 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     private var csLink = "https://www.couchsurfing.com/people/"
     private var fbLink = "https://www.facebook.com/"
 
-    private var methods: HashMap<String, Boolean> = hashMapOf()
+    private var methods: HashMap<String, Boolean> = hashMapOf(
+            Method.CAR.link to false,
+            Method.TRAIN.link to false,
+            Method.BUS.link to false,
+            Method.PLANE.link to false,
+            Method.HITCHHIKING.link to false
+    )
 
     private var socNet: HashMap<String, String> = hashMapOf()
 
@@ -146,7 +153,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     private var profileStateHashMap: HashMap<String, String> = hashMapOf()
     private var oldProfileState: Int = 0
-    private var methodStateArray: ArrayList<Boolean> = arrayListOf(false, false, false, false, false)
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -165,7 +171,14 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
 
     private fun fillProfile(user: User) {
+        val navigationView = activity.findViewById<NavigationView>(R.id.nav_view)
+        val hView = navigationView.getHeaderView(0)
+        val cityName = hView.findViewById<TextView>(R.id.menu_city_name)
+        cityName.text = user.city
+        val fullName = hView.findViewById<TextView>(R.id.menu_fullname)
+        fullName.text = StringBuilder().append(user.name).append(" ").append(user.lastName)
         username.text = StringBuilder(user.name).append(" ").append(user.lastName)
+
         profileStateHashMap.clear()
         lastName = user.lastName
         name = user.name
@@ -176,7 +189,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         fbLink = user.socialNetwork.get(SocialNetwork.FB.link) ?: fbLink
         csLink = user.socialNetwork.get(SocialNetwork.CS.link) ?: csLink
         tgNick = user.socialNetwork.get(SocialNetwork.TG.link) ?: tgNick
-
+        cityFromLatLng = user.cityFromLatLng
+        cityToLatLng = user.cityToLatLng
         travelledStatistics.visibility = if (user.flightHours == 0L) View.GONE else View.VISIBLE
 
         travelledCountries.text = user.countries.toString()
@@ -228,42 +242,39 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                 SocialNetwork.FB.link -> fbcon.setImageResource(R.drawable.ic_fb_color)
                 SocialNetwork.WHATSAPP.link -> whatsAppIcon.setImageResource(R.drawable.ic_whats_icon_color)
                 SocialNetwork.TG.link -> tgIcon.setImageResource(R.drawable.ic_tg_color)
-
             }
         }
-        methods.clear()
-        methodStateArray = arrayListOf(false, false, false, false, false)
         methods.putAll(user.method)
+        profileStateHashMap.set("methods", methods.hashCode().toString())
         for (method in user.method.keys) {
             when (method) {
+                Method.CAR.link -> {
+                    if (user.method.get(method) == true) {
+                        iconCar.isActivated = true
+                    }
+                }
                 Method.TRAIN.link -> {
-                    if (user.method.get(method) == true)
-                        with(iconTrain) { isActivated = true }
-                    methodStateArray.add(user.method.get(method) == true)
+                    if (user.method.get(method) == true) {
+                        iconTrain.isActivated = true
+                    }
                 }
                 Method.BUS.link -> {
-                    if (user.method.get(method) == true)
-                        with(iconBus) { isActivated = true }
-                    methodStateArray.add(user.method.get(method) == true)
-                }
-                Method.CAR.link -> {
-                    if (user.method.get(method) == true)
-                        with(iconCar) { isActivated = true }
-                    methodStateArray.add(user.method.get(method) == true)
+                    if (user.method.get(method) == true) {
+                        iconBus.isActivated = true
+                    }
                 }
                 Method.PLANE.link -> {
-                    if (user.method.get(method) == true)
-                        with(iconPlane) { isActivated = true }
-                    methodStateArray.add(user.method.get(method) == true)
+                    if (user.method.get(method) == true) {
+                        iconPlane.isActivated = true
+                    }
                 }
                 Method.HITCHHIKING.link -> {
-                    if (user.method.get(method) == true)
-                        with(iconHitchHicking) { isActivated = true }
-                    methodStateArray.add(user.method.get(method) == true)
+                    if (user.method.get(method) == true) {
+                        iconHitchHicking.isActivated = true
+                    }
                 }
             }
         }
-        profileStateHashMap.set("methods", methodStateArray.hashCode().toString())
 
         if (user.budget > 0) {
             budget = user.budget
@@ -291,7 +302,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                     textCityFrom.setText(place.name)
                     cityFromLatLng = GeoPoint(place.latLng.latitude, place.latLng.longitude)
                     cities.put(FIRST_INDEX_CITY, place.name.toString())
-                    profileStateHashMap.set("cityFromLatLng", cityFromLatLng.toString())
+                    profileStateHashMap.set("cityFromLatLng", cityFromLatLng.hashCode().toString())
                     profileChanged()
                 }
                 else -> {
@@ -308,7 +319,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                     textCityTo.setText(place.name)
                     cityToLatLng = GeoPoint(place.latLng.latitude, place.latLng.longitude)
                     cities.put(LAST_INDEX_CITY, place.name.toString())
-                    profileStateHashMap.set("cityToLatLng", cityToLatLng.toString())
+                    profileStateHashMap.set("cityToLatLng", cityToLatLng.hashCode().toString())
                     profileChanged()
                 }
                 else -> {
@@ -445,7 +456,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     private fun sendUserInfoToServer() {
         countTrip = 1
-        viewModel?.sendUserData(getHashMapUser(), uid, {
+        viewModel?.sendUserData(getHashMapInfoUser(), uid, {
             profileChanged(false)
         })
     }
@@ -528,7 +539,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             lastName = lastNameChoose.text.toString()
             username.text = StringBuilder(name).append(" ").append(lastName)
             city = cityChoose.text.toString()
-            cityview.text = if (city.isNotEmpty()) city else "Родной город"
+            cityview.text = if (city.isNotEmpty()) city else resources.getString(R.string.native_city)
             sendUserInfoToServer()
         })
         simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, "Отмена", { dialogInterface, i ->
@@ -682,40 +693,35 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         iconCar.setOnClickListener({
             with(travelCarText) { isActivated = !isActivated }
             methods.put(Method.CAR.link, travelCarText.isActivated)
-            methodStateArray.set(0, travelCarText.isActivated)
-            profileStateHashMap.set("methods", methodStateArray.hashCode().toString())
+            profileStateHashMap.set("methods", methods.hashCode().toString())
             profileChanged()
         })
 
         iconTrain.setOnClickListener({
             with(travelTrainText) { isActivated = !isActivated }
             methods.put(Method.TRAIN.link, travelTrainText.isActivated)
-            methodStateArray.set(1, travelTrainText.isActivated)
-            profileStateHashMap.set("methods", methodStateArray.hashCode().toString())
+            profileStateHashMap.set("methods", methods.hashCode().toString())
             profileChanged()
         })
 
         iconBus.setOnClickListener({
             with(travelBusText) { isActivated = !isActivated }
             methods.put(Method.BUS.link, travelBusText.isActivated)
-            methodStateArray.set(2, travelBusText.isActivated)
-            profileStateHashMap.set("methods", methodStateArray.hashCode().toString())
+            profileStateHashMap.set("methods", methods.hashCode().toString())
             profileChanged()
         })
 
         iconPlane.setOnClickListener({
             with(travelPlaneText) { isActivated = !isActivated }
             methods.put(Method.PLANE.link, travelPlaneText.isActivated)
-            methodStateArray.set(3, travelPlaneText.isActivated)
-            profileStateHashMap.set("methods", methodStateArray.hashCode().toString())
+            profileStateHashMap.set("methods", methods.hashCode().toString())
             profileChanged()
         })
 
         iconHitchHicking.setOnClickListener({
             with(travelHitchHikingText) { isActivated = !isActivated }
             methods.put(Method.HITCHHIKING.link, travelHitchHikingText.isActivated)
-            methodStateArray.set(4, travelHitchHikingText.isActivated)
-            profileStateHashMap.set("methods", methodStateArray.hashCode().toString())
+            profileStateHashMap.set("methods", methods.hashCode().toString())
             profileChanged()
         })
 
@@ -780,7 +786,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         methods.clear()
         cities.clear()
         dates.clear()
-        getHashMapUser()
         hideBlockTravelInforamtion()
         showBlockAddTrip()
     }
@@ -824,9 +829,17 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         hashMap.set("cityFromLatLng", cityFromLatLng)
         hashMap.set("cityToLatLng", cityToLatLng)
         hashMap.set("addInformation", add_info_user.text.toString())
+        hashMap.put("countTrip", countTrip)
+        return hashMap
+    }
+
+    fun getHashMapInfoUser(): HashMap<String, Any> {
+        val hashMap = HashMap<String, Any>()
         hashMap.set("sex", sex)
         hashMap.set("age", age)
-        hashMap.put("countTrip", countTrip)
+        hashMap.set("name", name)
+        hashMap.set("lastName", lastName)
+        hashMap.set("city", city)
         return hashMap
     }
 
@@ -834,8 +847,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         profileStateHashMap.set("dates", dates.toString())
         profileStateHashMap.set("budget", budget.toString())
         profileStateHashMap.set("budgetPosition", budgetPosition.toString())
-        profileStateHashMap.set("cityFromLatLng", cityFromLatLng.toString())
-        profileStateHashMap.set("cityToLatLng", cityToLatLng.toString())
+        profileStateHashMap.set("cityFromLatLng", cityFromLatLng.hashCode().toString())
+        profileStateHashMap.set("cityToLatLng", cityToLatLng.hashCode().toString())
         oldProfileState = profileStateHashMap.hashCode()
     }
 
