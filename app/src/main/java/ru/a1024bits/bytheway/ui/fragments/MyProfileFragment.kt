@@ -201,8 +201,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             cityview.text = user.city
             city = user.city
         }
-
-        if (user.countTrip == 0) {
+        countTrip = user.countTrip
+        if (countTrip == 0) {
             showBlockAddTrip()
             hideBlockTravelInforamtion()
         } else {
@@ -300,6 +300,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                 AppCompatActivity.RESULT_OK -> {
                     val place = PlaceAutocomplete.getPlace(activity, data);
                     textCityFrom.setText(place.name)
+                    textCityFrom.error = null
                     cityFromLatLng = GeoPoint(place.latLng.latitude, place.latLng.longitude)
                     cities.put(FIRST_INDEX_CITY, place.name.toString())
                     profileStateHashMap.set("cityFromLatLng", cityFromLatLng.hashCode().toString())
@@ -317,6 +318,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                 AppCompatActivity.RESULT_OK -> {
                     val place = PlaceAutocomplete.getPlace(activity, data);
                     textCityTo.setText(place.name)
+                    textCityTo.error = null
                     cityToLatLng = GeoPoint(place.latLng.latitude, place.latLng.longitude)
                     cities.put(LAST_INDEX_CITY, place.name.toString())
                     profileStateHashMap.set("cityToLatLng", cityToLatLng.hashCode().toString())
@@ -366,6 +368,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         textCityTo.setText("")
         dateArrived.setText("")
         textDateFrom.setText("")
+        add_info_user.setText("")
         maplayout.visibility = View.GONE
         method_moving.visibility = View.GONE
         with(travelBusText) { isActivated = false }
@@ -477,6 +480,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         }
         countTrip = 1
         viewModel?.sendUserData(getHashMapUser(), uid, {
+            Toast.makeText(this@MyProfileFragment.context, resources.getString(R.string.save_succesfull), Toast.LENGTH_SHORT).show()
             profileChanged(false)
         })
     }
@@ -820,7 +824,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         methods.clear()
         cities.clear()
         dates.clear()
-        countTrip = 0
         viewModel?.sendUserData(getHashMapUser(), uid)
         hideBlockTravelInforamtion()
         showBlockAddTrip()
@@ -890,10 +893,12 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     }
 
     fun profileChanged(force: Boolean? = null) {
-        val changed: Boolean = if (force != null) force
-        else profileStateHashMap.hashCode() != oldProfileState
+        if(countTrip == 1){
+            val changed: Boolean = if (force != null) force
+            else profileStateHashMap.hashCode() != oldProfileState
 
-        (activity as MenuActivity).profileChanged = changed
+            (activity as MenuActivity).profileChanged = changed
+        }
     }
 }
 
