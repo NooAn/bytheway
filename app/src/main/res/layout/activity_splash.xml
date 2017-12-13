@@ -23,7 +23,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
         android:gravity="center"
         android:orientation="horizontal">
 
@@ -32,7 +31,6 @@
             android:layout_width="wrap_content"
             android:layout_marginEnd="15dp"
             android:visibility="invisible"
-            tools:visibility="visible"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_splash_circle_1"
             tools:ignore="ContentDescription" />
@@ -42,7 +40,6 @@
             android:layout_marginEnd="15dp"
             android:visibility="invisible"
             android:layout_width="wrap_content"
-            tools:visibility="visible"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_splash_circle_2"
             tools:ignore="ContentDescription" />
@@ -53,7 +50,6 @@
             android:layout_marginEnd="15dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:visibility="visible"
             android:src="@drawable/ic_splash_circle_3"
             tools:ignore="ContentDescription" />
     </LinearLayout>
