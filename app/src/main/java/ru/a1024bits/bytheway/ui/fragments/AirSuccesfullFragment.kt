@@ -43,7 +43,7 @@ class AirSuccesfullFragment : Fragment() {
         }
         if (arguments != null) {
             city_from_air.text = arguments.getString(NAME);
-            date_air_go.text = arguments.getString(DATE);
+            if (date_air_go != null) date_air_go.text = arguments.getString(DATE);
         }
     }
 

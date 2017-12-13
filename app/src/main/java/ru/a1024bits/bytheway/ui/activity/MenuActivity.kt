@@ -124,8 +124,13 @@ class MenuActivity : AppCompatActivity(),
             if (preferences.getBoolean(Constants.FIRST_ENTER, true)) {
                 navigator.applyCommand(Replace(Screens.USER_SINHRONIZED_SCREEN, 1))
                 markFirstEnter()
-            } else
-                navigator.applyCommand(Replace(Screens.MY_PROFILE_SCREEN, 1))
+            } else {
+                if (intent.data != null && intent.data.host.contains("appintheair", true)) {
+                    navigator.applyCommand(Replace(Screens.AIR_SUCCES_SCREEN, 1))
+                } else {
+                    navigator.applyCommand(Replace(Screens.MY_PROFILE_SCREEN, 1))
+                }
+            }
         } else {
             screenNames = savedInstanceState.getSerializable(STATE_SCREEN_NAMES) as ArrayList<String>
         }
@@ -271,8 +276,9 @@ class MenuActivity : AppCompatActivity(),
                         loginService.getMyTrips().enqueue(object : Callback<AirUser?> {
                             override fun onResponse(call: Call<AirUser?>?, response: Response<AirUser?>?) {
                                 viewModel?.updateFeatureTrips(response?.body(), FirebaseAuth.getInstance().currentUser?.uid.toString())
-                                if (response?.body() != null)
+                                if (response?.body() != null && response?.body()?.data?.trips?.isEmpty() == false) {
                                     navigator.applyCommand(Replace(Screens.AIR_SUCCES_SCREEN, response?.body()?.data?.trips?.get(0)?.flights))
+                                }
                             }
 
                             override fun onFailure(call: Call<AirUser?>?, t: Throwable?) {
@@ -336,6 +342,10 @@ class MenuActivity : AppCompatActivity(),
     }
 
     private fun openAwayFromProfileDialog(callback: () -> Unit) {
+        if (this.profileChanged == false) {
+            callback()
+            return
+        }
         val simpleAlert = AlertDialog.Builder(this).create()
         val inflater = this.layoutInflater
         val dialogView = inflater.inflate(R.layout.confirm_dialog, null)
