@@ -99,4 +99,6 @@
     <string name="remove">Удалить</string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
+    <string name="year_born">Год рождения</string>
+    <string name="lastname">Фамилия</string>
 </resources>

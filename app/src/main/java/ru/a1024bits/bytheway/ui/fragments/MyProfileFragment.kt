@@ -174,7 +174,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         val navigationView = activity.findViewById<NavigationView>(R.id.nav_view)
         val hView = navigationView.getHeaderView(0)
         val cityName = hView.findViewById<TextView>(R.id.menu_city_name)
-        cityName.text = StringBuilder().append("г.").append(user.city)
+        cityName.text = user.city
         val fullName = hView.findViewById<TextView>(R.id.menu_fullname)
         fullName.text = StringBuilder().append(user.name).append(" ").append(user.lastName)
         username.text = StringBuilder(user.name).append(" ").append(user.lastName)
@@ -454,7 +454,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     }
 
     private fun sendUserInfoToServer() {
-        countTrip = 1
         var isEmpty = textCityFrom.text.isEmpty() || textCityTo.text.isEmpty()
 
         if (isEmpty) {
@@ -476,8 +475,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
             return
         }
-
-        viewModel?.sendUserData(getHashMapInfoUser(), uid, {
+        countTrip = 1
+        viewModel?.sendUserData(getHashMapUser(), uid, {
             profileChanged(false)
         })
     }
@@ -530,8 +529,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         for (i in 1920..yearNow) {
             yearsArr.add(i)
         }
-
-        Log.e("LOG", "array check! : ${yearsArr.size}")
 
         val yearsAdapter = ArrayAdapter<Int>(this.context, android.R.layout.simple_spinner_item, yearsArr);
 
@@ -823,7 +820,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         methods.clear()
         cities.clear()
         dates.clear()
-        profileChanged(false)
+        countTrip = 0
+        viewModel?.sendUserData(getHashMapUser(), uid)
         hideBlockTravelInforamtion()
         showBlockAddTrip()
     }
@@ -868,16 +866,17 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         hashMap.set("cityToLatLng", cityToLatLng)
         hashMap.set("addInformation", add_info_user.text.toString())
         hashMap.put("countTrip", countTrip)
-        return hashMap
-    }
-
-    fun getHashMapInfoUser(): HashMap<String, Any> {
-        val hashMap = HashMap<String, Any>()
         hashMap.set("sex", sex)
         hashMap.set("age", age)
         hashMap.set("name", name)
         hashMap.set("lastName", lastName)
         hashMap.set("city", city)
+        return hashMap
+    }
+
+    fun getHashMapInfoUser(): HashMap<String, Any> {
+        val hashMap = HashMap<String, Any>()
+
         return hashMap
     }
 
