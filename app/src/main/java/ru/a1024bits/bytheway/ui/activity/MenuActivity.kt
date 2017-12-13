@@ -119,13 +119,14 @@ class MenuActivity : AppCompatActivity(),
         glide?.load(FirebaseAuth.getInstance().currentUser?.photoUrl)
                 ?.apply(RequestOptions.circleCropTransform())
                 ?.into(image)
-
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
         if (savedInstanceState == null) {
             if (preferences.getBoolean(Constants.FIRST_ENTER, true)) {
                 navigator.applyCommand(Replace(Screens.USER_SINHRONIZED_SCREEN, 1))
                 markFirstEnter()
             } else {
                 if (intent.data != null && intent.data.host.contains("appintheair", true)) {
+                    viewModel?.load(FirebaseAuth.getInstance().currentUser?.uid.toString())
                     navigator.applyCommand(Replace(Screens.AIR_SUCCES_SCREEN, 1))
                 } else {
                     navigator.applyCommand(Replace(Screens.MY_PROFILE_SCREEN, 1))
@@ -140,7 +141,7 @@ class MenuActivity : AppCompatActivity(),
                 .addApi(Places.PLACE_DETECTION_API)
                 .enableAutoManage(this, this)
                 .build()
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
+
 
         sing_out.setOnClickListener {
             openAwayFromProfileDialog({
