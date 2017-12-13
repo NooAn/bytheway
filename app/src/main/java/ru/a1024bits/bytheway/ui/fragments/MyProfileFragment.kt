@@ -26,9 +26,7 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException
 import com.google.android.gms.location.places.AutocompleteFilter
 import com.google.android.gms.location.places.ui.PlaceAutocomplete
 import com.google.android.gms.maps.*
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.PolylineOptions
+import com.google.android.gms.maps.model.*
 import com.google.maps.android.PolyUtil
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.GeoPoint
@@ -399,21 +397,25 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         this.googleMap = map
 
 
-          val coordFrom = LatLng(cityFromLatLng.latitude, cityFromLatLng.longitude)
-          val coordTo = LatLng(cityToLatLng.latitude, cityToLatLng.longitude)
-
-      //  val coordFrom = LatLng(33.981780, -118.236682)
-      //  val coordTo = LatLng(41.885098, -87.630201)
-      //  routes = "a~l~Fjk~uOnzh@vlbBtc~@tsE`vnApw{A`dw@~w\\|tNtqf@l{Yd_Fblh@rxo@b}@xxSfytAblk@xxaBeJxlcBb~t@zbh@jc|Bx}C`rv@rw|@rlhA~dVzeo@vrSnc}Axf]fjz@xfFbw~@dz{A~d{A|zOxbrBbdUvpo@`cFp~xBc`Hk@nurDznmFfwMbwz@bbl@lq~@loPpxq@bw_@v|{CbtY~jGqeMb{iF|n\\~mbDzeVh_Wr|Efc\\x`Ij{kE}mAb~uF{cNd}xBjp]fulBiwJpgg@|kHntyArpb@bijCk_Kv~eGyqTj_|@`uV`k|DcsNdwxAott@r}q@_gc@nu`CnvHx`k@dse@j|p@zpiAp|gEicy@`omFvaErfo@igQxnlApqGze~AsyRzrjAb__@ftyB}pIlo_BflmA~yQftNboWzoAlzp@mz`@|}_@fda@jakEitAn{fB_a]lexClshBtmqAdmY_hLxiZd~XtaBndgC"
+        val coordFrom = LatLng(cityFromLatLng.latitude, cityFromLatLng.longitude)
+        val coordTo = LatLng(cityToLatLng.latitude, cityToLatLng.longitude)
 
 
         val midPointLat = (coordFrom.latitude + coordTo.latitude) / 2
         val midPointLong = (coordFrom.longitude + coordTo.longitude) / 2
-        googleMap?.addMarker(MarkerOptions().position(coordFrom).title("First Point"))
-        googleMap?.addMarker(MarkerOptions().position(coordTo).title("Final Point"))
+        val blueMarker = BitmapDescriptorFactory.fromResource(R.drawable.pin_blue)
+        val blueColor = -0x657db
+        googleMap?.addMarker(MarkerOptions()
+                .icon(blueMarker)
+                .position(coordFrom)
+                .title("First Point"))
+        googleMap?.addMarker(MarkerOptions()
+                .icon(blueMarker)
+                .position(coordTo)
+                .title("Final Point"))
 
         val options = PolylineOptions()
-        options.color(Color.RED)
+        options.color(blueColor)
         options.width(5f)
 
 
@@ -426,7 +428,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             }
             googleMap?.addPolyline(options)
         }
-       // Log.d("LOG", "+++++++MIDPOINTS:$midPointLat ,   $midPointLong")
+
         googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(midPointLat, midPointLong), 3.0f))
 
     }
