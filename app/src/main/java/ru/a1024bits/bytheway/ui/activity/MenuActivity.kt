@@ -106,7 +106,7 @@ class MenuActivity : AppCompatActivity(),
         val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
 
         val toggle = ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+                this, drawer, toolbar, R.string.optionSearch, R.string.remove)
         drawer.addDrawerListener(toggle)
         toggle.syncState()
 

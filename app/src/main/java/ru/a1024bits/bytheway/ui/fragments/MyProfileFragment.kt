@@ -111,6 +111,12 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     private lateinit var dateDialog: DatePickerDialog
 
+    val APPNUMBER: String = "+7"
+    val VKLINK: String = "https://www.vk.com/"
+    val TGLINK = "@"
+    val CSLINK = "https://www.couchsurfing.com/people/"
+    val FBLINK = "https://www.facebook.com/"
+
     private var numberPhone: String = "+7"
     private var whatsAppNumber: String = "+7"
     private var vkLink: String = "https://www.vk.com/"
@@ -552,17 +558,15 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             }
         }
 
-        simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Сохранить", { dialogInterface, i ->
+        simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.save), { dialogInterface, i ->
             sex = if (man.isChecked) 1 else if (woman.isChecked) 2 else 0
-
             fillAgeSex(age, sex)
             name = nameChoose.text.toString()
-
             lastName = lastNameChoose.text.toString()
             username.text = StringBuilder(name).append(" ").append(lastName)
             city = cityChoose.text.toString()
-            cityview.text = if (city.isNotEmpty()) city else resources.getString(R.string.native_city)
-            sendUserInfoToServer()
+            cityview.text = if (city.isNotEmpty()) city else getString(R.string.native_city)
+            viewModel?.sendUserData(getHashMapUser(), uid)
         })
         simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, "Отмена", { dialogInterface, i ->
             simpleAlert.hide()
@@ -589,13 +593,20 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                 })
         simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, "Удалить", { dialog, i ->
             viewModel?.error?.observe(this@MyProfileFragment, Observer<Int> { error ->
+                socNet.remove(socialNetwork.link)
                 when (error) {
                     Constants.ERROR -> {
-                        Toast.makeText(this@MyProfileFragment.context, " Ошибка сохранения", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@MyProfileFragment.context, " Ошибка обновления", Toast.LENGTH_SHORT).show()
                     }
                     Constants.SUCCESS -> {
                         changeSocIconsDisActive(socialNetwork)
-                        socNet.remove(socialNetwork.link)
+                        when (socialNetwork) {
+                            SocialNetwork.VK -> vkLink = VKLINK
+                            SocialNetwork.WHATSAPP -> whatsAppNumber = APPNUMBER
+                            SocialNetwork.CS -> csLink = CSLINK
+                            SocialNetwork.FB -> fbLink = FBLINK
+                            SocialNetwork.TG -> tgNick = TGLINK
+                        }
                     }
                 }
             })
@@ -693,6 +704,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     override fun onStart() {
         super.onStart()
+
         displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(budget)
 
         val now = Calendar.getInstance()
@@ -704,14 +716,13 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                 now.get(Calendar.DAY_OF_MONTH)
         )
 
-
         headerprofile.setOnClickListener({
             openInformationEditDialog()
         })
 
         choose_price_travel.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, number: Int, p2: Boolean) {
-                budget = fibbonaci(number)
+                budget = (150 * number).toLong()// = fibbonaci(number)
                 displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(budget)
                 if (number != budgetPosition) {
                     budgetPosition = number
@@ -893,7 +904,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     }
 
     fun profileChanged(force: Boolean? = null) {
-        if(countTrip == 1){
+        if (countTrip == 1) {
             val changed: Boolean = if (force != null) force
             else profileStateHashMap.hashCode() != oldProfileState
 
