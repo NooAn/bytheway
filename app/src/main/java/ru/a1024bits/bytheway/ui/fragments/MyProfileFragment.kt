@@ -491,6 +491,10 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         })
     }
 
+    fun validCellPhone(number: String): Boolean {
+        return android.util.Patterns.PHONE.matcher(number).matches()
+    }
+
     private fun showBlockTravelInformation() {
         direction.visibility = View.VISIBLE
         maplayout.visibility = View.VISIBLE
@@ -576,7 +580,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     }
 
 
-    private fun openDialog(socialNetwork: SocialNetwork) {
+    private fun openDialog(socialNetwork: SocialNetwork, errorText: String? = null) {
         val simpleAlert = AlertDialog.Builder(activity).create()
         simpleAlert.setTitle("Ссылки на социальные сети")
         simpleAlert.setMessage("Здесь вы можете указать ваши контактные данные для того что бы вас смогли найти другие путешественики")
@@ -591,7 +595,10 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                     SocialNetwork.FB -> fbLink
                     SocialNetwork.TG -> (if (tgNick.length > 1) tgNick else numberPhone)
                 })
-        simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, "Удалить", { dialog, i ->
+        if (errorText != null) {
+            dialogView.findViewById<EditText>(R.id.socLinkText).error = errorText
+        }
+        simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.remove), { dialog, i ->
             viewModel?.error?.observe(this@MyProfileFragment, Observer<Int> { error ->
                 socNet.remove(socialNetwork.link)
                 when (error) {
@@ -613,27 +620,37 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             viewModel?.saveLinks(socNet, uid)
 
         })
-        simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Сохранить", { dialogInterface, i ->
+        simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.save), { dialogInterface, i ->
             val newLink = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString()
-            socNet.put(socialNetwork.link, newLink)
-            viewModel?.error?.observe(this@MyProfileFragment, Observer<Int> { error ->
-                when (error) {
-                    Constants.ERROR -> {
-                        Toast.makeText(this@MyProfileFragment.context, " Ошибка сохранения", Toast.LENGTH_SHORT).show()
-                    }
-                    Constants.SUCCESS -> {
-                        changeSocIconsActive(socialNetwork)
-                        when (socialNetwork) {
-                            SocialNetwork.VK -> vkLink = newLink
-                            SocialNetwork.WHATSAPP -> whatsAppNumber = newLink
-                            SocialNetwork.CS -> csLink = newLink
-                            SocialNetwork.FB -> fbLink = newLink
-                            SocialNetwork.TG -> tgNick = newLink
+            var valid = true
+            var errorText = ""
+            if (socialNetwork == SocialNetwork.WHATSAPP && !validCellPhone(newLink)) {
+                valid = false
+                errorText = getString(R.string.fill_phone_invalid)
+            }
+            if (valid) {
+                socNet.put(socialNetwork.link, newLink)
+                viewModel?.error?.observe(this@MyProfileFragment, Observer<Int> { error ->
+                    when (error) {
+                        Constants.ERROR -> {
+                            Toast.makeText(this@MyProfileFragment.context, " Ошибка сохранения", Toast.LENGTH_SHORT).show()
+                        }
+                        Constants.SUCCESS -> {
+                            changeSocIconsActive(socialNetwork)
+                            when (socialNetwork) {
+                                SocialNetwork.VK -> vkLink = newLink
+                                SocialNetwork.WHATSAPP -> whatsAppNumber = newLink
+                                SocialNetwork.CS -> csLink = newLink
+                                SocialNetwork.FB -> fbLink = newLink
+                                SocialNetwork.TG -> tgNick = newLink
+                            }
                         }
                     }
-                }
-            })
-            viewModel?.saveLinks(socNet, uid)
+                })
+                viewModel?.saveLinks(socNet, uid)
+            } else {
+                openDialog(socialNetwork, errorText)
+            }
         })
         simpleAlert.show()
     }
@@ -670,7 +687,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             SocialNetwork.FB -> fbcon.setImageResource(R.drawable.ic_fb_grey)
             SocialNetwork.WHATSAPP -> whatsAppIcon.setImageResource(R.drawable.ic_whats_icon_grey)
             SocialNetwork.TG -> tgIcon.setImageResource(R.drawable.tg_grey)
-
         }
     }
 
