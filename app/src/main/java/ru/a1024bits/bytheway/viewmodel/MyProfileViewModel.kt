@@ -129,7 +129,7 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
     fun updateFeatureTrips(body: AirUser?, uid: String) {
         val map = HashMap<String, Any>()
         val currentTime = System.currentTimeMillis()
-        if (user.value?.cityFromLatLng != null && user.value?.cityToLatLng != null) {
+        if (user.value?.cities?.isEmpty() == false) {
             return
         }
         if (body?.data?.trips?.isEmpty() == false && body?.data?.trips?.get(0)?.flights != null) {
