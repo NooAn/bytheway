@@ -536,7 +536,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     }
 
     fun validCellPhone(number: String): Boolean {
-        return android.util.Patterns.PHONE.matcher(number).matches()
+        return number.matches(Regex("^\\+[0-9]{10,13}\$"))
     }
 
     private fun showBlockTravelInformation() {
