@@ -46,5 +46,4 @@ data class User(var name: String = "",
                 var sex: Int = 0,
                 var socialNetwork: HashMap<String, String> = hashMapOf<String, String>(),
                 var data: Long = 0,
-                var urlPhoto: String = "https://www.ischool.berkeley.edu/sites/default/files/default_images/avatar.jpeg") {
-}
+                var urlPhoto: String = "https://www.ischool.berkeley.edu/sites/default/files/default_images/avatar.jpeg")

@@ -11,7 +11,15 @@
     <dimen name="nav_header_height">176dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="margin_left_profile">16dp</dimen>
-    <dimen name="size_user_avatar">70dp</dimen>
+    <dimen name="size_user_avatar">50dp</dimen>
+    <dimen name="item_all_users_subsidiary_text">14sp</dimen>
+    <dimen name="item_all_users_main_text">16sp</dimen>
+    <dimen name="all_users_searchParametersText_text_size">13sp</dimen>
+    <dimen name="all_users_searchParametersText_vertical_margin">18dp</dimen>
+    <dimen name="standard_margin">16dp</dimen>
+    <dimen name="standard_text_size">16sp</dimen>
+    <dimen name="standard_margin_4dp">4dp</dimen>
+    <dimen name="standard_margin_8dp">8dp</dimen>
 
     <dimen name="similarTravelPhotoSize">45dp</dimen>
 

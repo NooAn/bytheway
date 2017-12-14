@@ -19,7 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:hint="Фамилия"
+        android:hint="@string/lastname"
         app:layout_constraintBottom_toTopOf="@+id/dialog_city" />
 
     <EditText
@@ -27,15 +27,61 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:hint="Город"
-        app:layout_constraintBottom_toTopOf="@+id/dialog_year" />
+        android:hint="@string/city"
+        app:layout_constraintBottom_toTopOf="@+id/spinnerYearsView"
+        />
 
-    <EditText
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="@string/sex"
+        android:textSize="@dimen/standard_text_size"
+        app:layout_constraintBottom_toBottomOf="@+id/sex"
+         />
+    <RadioGroup
+        android:id="@+id/sex"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.9"
+        app:layout_constraintStart_toEndOf="@+id/textView4"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/spinnerYearsView"
+        tools:ignore="MissingConstraints">
+
+        <RadioButton
+            android:id="@+id/man"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:text="М" />
+
+        <RadioButton
+            android:id="@+id/woman"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:text="Ж" />
+
+    </RadioGroup>
+
+    <TextView
         android:id="@+id/dialog_year"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:text="Год рождения"
+        android:layout_marginTop="16dp"
+        android:text="@string/year_born"
+        android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@+id/sex" />
 
 
@@ -43,47 +89,14 @@
         android:id="@+id/spinnerYearsView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
+        android:layout_marginBottom="16dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         app:layout_constraintBottom_toBottomOf="@+id/dialog_year"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.937"
-        app:layout_constraintStart_toEndOf="@+id/dialog_year" />
-
-
-    <RadioGroup
-        android:id="@+id/sex"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.03"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:ignore="MissingConstraints">
-
-        <RadioButton
-            android:id="@+id/man"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="М" />
-
-        <RadioButton
-            android:id="@+id/woman"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Ж" />
-
-    </RadioGroup>
-
-    <android.support.constraint.Guideline
-        android:id="@+id/guideline2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_begin="20dp" />
-
+        app:layout_constraintHorizontal_bias="0.901"
+        app:layout_constraintStart_toEndOf="@+id/dialog_year"
+        app:layout_constraintTop_toTopOf="@+id/dialog_year"
+        app:layout_constraintVertical_bias="0.0" />
 
 </android.support.constraint.ConstraintLayout>

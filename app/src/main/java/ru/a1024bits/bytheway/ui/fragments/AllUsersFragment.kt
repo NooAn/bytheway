@@ -236,8 +236,6 @@ class AllUsersFragment : Fragment() {
         viewModel.usersLiveData.observe(this, Observer<List<User>> { list ->
             Log.e("LOG", "onChanged $list")
             if (list != null) {
-                Log.e("LOG", "update $list")
-                display_all_users.adapter = displayUsersAdapter
                 loadingWhereLoadUsers.visibility = View.GONE
                 displayUsersAdapter.setItems(list)
                 display_all_users.visibility = View.VISIBLE
@@ -249,6 +247,7 @@ class AllUsersFragment : Fragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
+
         filter.startBudget = if (startBudget.text.isNotEmpty()) Integer.parseInt(startBudget.text.toString()) else -1
         filter.endBudget = if (endBudget.text.isNotEmpty()) Integer.parseInt(endBudget.text.toString()) else -1
         outState.putSerializable("filter", filter)

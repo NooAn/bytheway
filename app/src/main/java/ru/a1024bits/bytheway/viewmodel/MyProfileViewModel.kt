@@ -96,7 +96,7 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
     }
 
     fun sendUserData(map: HashMap<String, Any>, id: String, success: () -> Unit = {}) {
-        Log.e("LOG map:", map.toString())
+        Log.e("LOG map:", id + " " + map.toString())
         userRepository.changeUserProfile(map, id)
                 .addOnCompleteListener {
                     //fixme
@@ -129,7 +129,10 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
     fun updateFeatureTrips(body: AirUser?, uid: String) {
         val map = HashMap<String, Any>()
         val currentTime = System.currentTimeMillis()
-        if (body?.data?.trips?.get(0)?.flights != null)
+        if (user.value?.cityFromLatLng != null && user.value?.cityToLatLng != null) {
+            return
+        }
+        if (body?.data?.trips?.isEmpty() == false && body?.data?.trips?.get(0)?.flights != null) {
             for (flight in body?.data?.trips?.get(0)?.flights) {
                 Log.d("LOG", (flight.departureUtc.toLong().toString() + " " + currentTime / 1000 + " " + (flight.departureLocale.toLong() > currentTime)))
                 if (flight.departureUtc.toLong() > currentTime / 1000) {
@@ -145,8 +148,7 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                     break
                 }
             }
-        sendUserData(map, uid)
-
-        Log.e("LOG name", "" + body?.data?.trips?.get(0)?.flights?.get(0)?.arrivalUtc)
+            sendUserData(map, uid)
+        }
     }
 }

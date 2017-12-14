@@ -27,7 +27,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_menu.*
-import kotlinx.android.synthetic.main.custom_dialog_feedback.*
+import kotlinx.android.synthetic.main.confirm_dialog.view.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -52,9 +52,9 @@ import ru.a1024bits.bytheway.util.ServiceGenerator
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import ru.a1024bits.bytheway.viewmodel.ViewModelFeedback
 import ru.terrakok.cicerone.NavigatorHolder
+import ru.terrakok.cicerone.Router
 import ru.terrakok.cicerone.android.SupportFragmentNavigator
-import ru.terrakok.cicerone.commands.Command
-import ru.terrakok.cicerone.commands.Replace
+import ru.terrakok.cicerone.commands.*
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -69,7 +69,6 @@ class MenuActivity : AppCompatActivity(),
     private var mGoogleApiClient: GoogleApiClient? = null
 
     override fun onSetPoint(l: LatLng, pos: Int) {
-
         val mapFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as MapFragment
         mapFragment.setMarker(l, pos)
     }
@@ -82,6 +81,7 @@ class MenuActivity : AppCompatActivity(),
     private val STATE_SCREEN_NAMES = "state_screen_names"
 
     @Inject lateinit var navigatorHolder: NavigatorHolder
+    @Inject lateinit var router: Router
 
     private var glide: RequestManager? = null
     var mainUser: User? = null
@@ -106,32 +106,32 @@ class MenuActivity : AppCompatActivity(),
         val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
 
         val toggle = ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+                this, drawer, toolbar, R.string.optionSearch, R.string.remove)
         drawer.addDrawerListener(toggle)
         toggle.syncState()
 
         val navigationView = findViewById<NavigationView>(R.id.nav_view)
         navigationView.setNavigationItemSelectedListener(this)
         val hView = navigationView.getHeaderView(0)
+        val cityName = hView.findViewById<TextView>(R.id.menu_city_name)
         val image = hView.findViewById<ImageView>(R.id.menu_image_avatar)
 
         glide?.load(FirebaseAuth.getInstance().currentUser?.photoUrl)
                 ?.apply(RequestOptions.circleCropTransform())
                 ?.into(image)
-
-        val fullName = hView.findViewById<TextView>(R.id.menu_fullname)
-        fullName.text = FirebaseAuth.getInstance().currentUser?.displayName
-        val cityName = hView.findViewById<TextView>(R.id.menu_city_name)
-
-
-        // how make name and city!!?
-
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
         if (savedInstanceState == null) {
             if (preferences.getBoolean(Constants.FIRST_ENTER, true)) {
                 navigator.applyCommand(Replace(Screens.USER_SINHRONIZED_SCREEN, 1))
                 markFirstEnter()
-            } else
-                navigator.applyCommand(Replace(Screens.MY_PROFILE_SCREEN, 1))
+            } else {
+                if (intent.data != null && intent.data.host.contains("appintheair", true)) {
+                    viewModel?.load(FirebaseAuth.getInstance().currentUser?.uid.toString())
+                    navigator.applyCommand(Replace(Screens.AIR_SUCCES_SCREEN, 1))
+                } else {
+                    navigator.applyCommand(Replace(Screens.MY_PROFILE_SCREEN, 1))
+                }
+            }
         } else {
             screenNames = savedInstanceState.getSerializable(STATE_SCREEN_NAMES) as ArrayList<String>
         }
@@ -141,7 +141,7 @@ class MenuActivity : AppCompatActivity(),
                 .addApi(Places.PLACE_DETECTION_API)
                 .enableAutoManage(this, this)
                 .build()
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
+
 
         sing_out.setOnClickListener {
             openAwayFromProfileDialog({
@@ -157,7 +157,7 @@ class MenuActivity : AppCompatActivity(),
             .putBoolean(Constants.FIRST_ENTER, false).apply()
 
     fun showUserSimpleProfile(displayingUser: User) {
-        navigator.applyCommand(Replace(Screens.USER_PROFILE_SCREEN, displayingUser))
+        navigator.applyCommand(Forward(Screens.USER_PROFILE_SCREEN, displayingUser))
     }
 
     val navigator = object : SupportFragmentNavigator(supportFragmentManager, R.id.fragment_container) {
@@ -167,8 +167,11 @@ class MenuActivity : AppCompatActivity(),
                 UserProfileFragment.newInstance(data.id)
             else
                 when (screenKey) {
+
                     MY_PROFILE_SCREEN -> return MyProfileFragment()
+
                     SEARCH_MAP_SCREEN -> return MapFragment()
+
                     AIR_SUCCES_SCREEN -> {
                         var name: String = ""
                         var date: String = ""
@@ -178,8 +181,11 @@ class MenuActivity : AppCompatActivity(),
                         }
                         return AirSuccesfullFragment.newInstance(name, date)
                     }
+
                     USER_SINHRONIZED_SCREEN -> return AppInTheAirSinchronizedFragment()
+
                     ALL_USERS_SCREEN -> return AllUsersFragment.newInstance()
+
                     SIMILAR_TRAVELS_SCREEN -> {
                         SimilarTravelsFragment.newInstance(data as List<User>)
                     }
@@ -256,7 +262,6 @@ class MenuActivity : AppCompatActivity(),
 
                     override fun onResponse(call: Call<AccessToken?>?, response: Response<AccessToken?>?) {
                         val accessToken = response?.body()
-                        Log.e("LOGI", " ${accessToken?.accessToken} ${accessToken?.getTokenType()}")
                         saveToken(accessToken)
                         val loginService = generator.createService(AirWebService::class.java, accessToken?.getTokenType() + " " + accessToken?.accessToken);
                         loginService.getUserProfile().enqueue(object : Callback<AirUser?> {
@@ -272,8 +277,9 @@ class MenuActivity : AppCompatActivity(),
                         loginService.getMyTrips().enqueue(object : Callback<AirUser?> {
                             override fun onResponse(call: Call<AirUser?>?, response: Response<AirUser?>?) {
                                 viewModel?.updateFeatureTrips(response?.body(), FirebaseAuth.getInstance().currentUser?.uid.toString())
-                                if (response?.body() != null)
+                                if (response?.body() != null && response?.body()?.data?.trips?.isEmpty() == false) {
                                     navigator.applyCommand(Replace(Screens.AIR_SUCCES_SCREEN, response?.body()?.data?.trips?.get(0)?.flights))
+                                }
                             }
 
                             override fun onFailure(call: Call<AirUser?>?, t: Throwable?) {
@@ -301,6 +307,11 @@ class MenuActivity : AppCompatActivity(),
     fun getTypeToken(): String = preferences.getString(Constants.TYPE_TOKEN, "")
     fun getRefreshToken(): String = preferences.getString(Constants.REFRESH_TOKEN, "")
 
+    override fun onBackPressed() {
+        // router.backTo(Screens.MY_PROFILE_SCREEN);
+        navigator.applyCommand(BackTo(Screens.MY_PROFILE_SCREEN))
+        Log.e("LOG", "on back tap")
+    }
 
     override fun onPause() {
         super.onPause()
@@ -321,9 +332,9 @@ class MenuActivity : AppCompatActivity(),
             return false
         } else {
             when (item.itemId) {
-                R.id.profile_item -> navigator.applyCommand(Replace(Screens.MY_PROFILE_SCREEN, 1))
-                R.id.search_item -> navigator.applyCommand(Replace(Screens.SEARCH_MAP_SCREEN, 1))
-                R.id.all_users_item -> navigator.applyCommand(Replace(Screens.ALL_USERS_SCREEN, 1))
+                R.id.profile_item -> navigator.applyCommand(Forward(Screens.MY_PROFILE_SCREEN, 1))
+                R.id.search_item -> navigator.applyCommand(Forward(Screens.SEARCH_MAP_SCREEN, 1))
+                R.id.all_users_item -> navigator.applyCommand(Forward(Screens.ALL_USERS_SCREEN, 1))
             }
             val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
             drawer.closeDrawer(GravityCompat.START)
@@ -331,24 +342,27 @@ class MenuActivity : AppCompatActivity(),
         }
     }
 
-    private fun openAwayFromProfileDialog(cb: () -> Unit) {
+    private fun openAwayFromProfileDialog(callback: () -> Unit) {
+        if (this.profileChanged == false) {
+            callback()
+            return
+        }
         val simpleAlert = AlertDialog.Builder(this).create()
         val inflater = this.layoutInflater
-        val dialogView = inflater.inflate(R.layout.away_from_profile_dialog, null)
+        val dialogView = inflater.inflate(R.layout.confirm_dialog, null)
         simpleAlert.setView(dialogView)
-
-        simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Да", { dialogInterface, i ->
-            Log.e("LOG", " accepted")
+        dialogView.textMessage.text = getString(R.string.text_away_from_profile)
+        simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.yes), { dialogInterface, i ->
             val myProfile = supportFragmentManager.findFragmentById(R.id.fragment_container) as MyProfileFragment
             viewModel?.sendUserData(myProfile.getHashMapUser(), FirebaseAuth.getInstance().currentUser?.uid.toString(), {
-                Toast.makeText(this, "Profile successfully saved", Toast.LENGTH_SHORT).show()
-                cb()
+                Toast.makeText(this, resources.getString(R.string.save_succesfull), Toast.LENGTH_SHORT).show()
+                callback()
             })
 
         })
-        simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, "Нет", { dialogInterface, i ->
+        simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.no), { dialogInterface, i ->
             Log.e("LOG", " refused")
-            cb()
+            callback()
         })
         simpleAlert.show()
     }
