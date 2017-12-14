@@ -192,7 +192,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         routes = user.route
         cityFromLatLng = user.cityFromLatLng
         cityToLatLng = user.cityToLatLng
-        
+
         profileStateHashMap.clear()
         lastName = user.lastName
         name = user.name
@@ -316,9 +316,14 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                     textCityFrom.setText(place.name)
                     textCityFrom.error = null
                     cityFromLatLng = GeoPoint(place.latLng.latitude, place.latLng.longitude)
-                    cities.put(FIRST_INDEX_CITY, place.name.toString())
-                    profileStateHashMap.set("cityFromLatLng", cityFromLatLng.hashCode().toString())
-                    profileChanged()
+                    if (cityToLatLng.hashCode() == cityFromLatLng.hashCode()) {
+                        textCityFrom.error = "true"
+                        Toast.makeText(this@MyProfileFragment.context, getString(R.string.fill_diff_cities), Toast.LENGTH_LONG).show();
+                    } else {
+                        cities.put(FIRST_INDEX_CITY, place.name.toString())
+                        profileStateHashMap.set("cityFromLatLng", cityFromLatLng.hashCode().toString())
+                        profileChanged()
+                    }
                 }
                 else -> {
                     val status = PlaceAutocomplete.getStatus(activity, data);
@@ -334,9 +339,14 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                     textCityTo.setText(place.name)
                     textCityTo.error = null
                     cityToLatLng = GeoPoint(place.latLng.latitude, place.latLng.longitude)
-                    cities.put(LAST_INDEX_CITY, place.name.toString())
-                    profileStateHashMap.set("cityToLatLng", cityToLatLng.hashCode().toString())
-                    profileChanged()
+                    if (cityToLatLng.hashCode() == cityFromLatLng.hashCode()) {
+                        textCityTo.error = "true"
+                        Toast.makeText(this@MyProfileFragment.context, getString(R.string.fill_diff_cities), Toast.LENGTH_LONG).show();
+                    } else {
+                        cities.put(LAST_INDEX_CITY, place.name.toString())
+                        profileStateHashMap.set("cityToLatLng", cityToLatLng.hashCode().toString())
+                        profileChanged()
+                    }
                 }
                 else -> {
                     val status = PlaceAutocomplete.getStatus(activity, data);
@@ -507,27 +517,34 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     }
 
     private fun sendUserInfoToServer() {
-        var isEmpty = textCityFrom.text.isEmpty() || textCityTo.text.isEmpty()
+        var errorString = ""
 
-        if (isEmpty) {
-            var toastString = getString(R.string.fill_required_fields)
+        if (textCityFrom.text.isEmpty() || textCityTo.text.isEmpty()) {
+            errorString = getString(R.string.fill_required_fields)
             if (textCityFrom.text.isEmpty()) {
                 textCityFrom.error = getString(R.string.name)
-                toastString += " " + getString(R.string.city_from)
+                errorString += " " + getString(R.string.city_from)
             } else {
                 textCityFrom.error = null
             }
             if (textCityTo.text.isEmpty()) {
                 textCityTo.error = getString(R.string.yes)
-                toastString += " " + getString(R.string.city_to)
+                errorString += " " + getString(R.string.city_to)
             } else {
                 textCityTo.error = null
             }
             textCityFrom.getParent().requestChildFocus(textCityFrom, textCityFrom)
-            Toast.makeText(this@MyProfileFragment.context, toastString, Toast.LENGTH_LONG).show();
+        }
+        if (cityToLatLng.hashCode() == cityFromLatLng.hashCode()) {
+            errorString += " " + getString(R.string.fill_diff_cities)
+        }
 
+
+        if (errorString.isNotEmpty()) {
+            Toast.makeText(this@MyProfileFragment.context, errorString, Toast.LENGTH_LONG).show()
             return
         }
+
         countTrip = 1
         viewModel?.sendUserData(getHashMapUser(), uid, {
             Toast.makeText(this@MyProfileFragment.context, resources.getString(R.string.save_succesfull), Toast.LENGTH_SHORT).show()

@@ -42,6 +42,7 @@
     <string name="text_away_from_profile">Сохранить измененные данные?</string>
     <string name="fill_required_fields">Пожалуйста заполните обязательные поля:</string>
     <string name="fill_phone_invalid">Неверный формат телефона</string>
+    <string name="fill_diff_cities">Города не должны совпадать</string>
     <string name="text_confirm_remove_trip">Все изменения будет потеряны. \n Вы действительно хотите удалить поездку?</string>
     <string name="sex_and_age">Пол, возраст</string>
     <string name="age">Возраст</string>
