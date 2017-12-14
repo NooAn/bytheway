@@ -26,9 +26,13 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException
 import com.google.android.gms.location.places.AutocompleteFilter
 import com.google.android.gms.location.places.ui.PlaceAutocomplete
 import com.google.android.gms.maps.*
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.PolylineOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.GeoPoint
+import com.google.maps.android.PolyUtil
 import kotlinx.android.synthetic.main.confirm_dialog.view.*
 import kotlinx.android.synthetic.main.fragment_my_user_profile.*
 import kotlinx.android.synthetic.main.profile_add_trip.*
@@ -185,6 +189,10 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         fullName.text = StringBuilder().append(user.name).append(" ").append(user.lastName)
         username.text = StringBuilder(user.name).append(" ").append(user.lastName)
 
+        routes = user.route
+        cityFromLatLng = user.cityFromLatLng
+        cityToLatLng = user.cityToLatLng
+        
         profileStateHashMap.clear()
         lastName = user.lastName
         name = user.name
@@ -402,12 +410,48 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     }
 
     override fun onMapReady(map: GoogleMap?) {
-        if (googleMap != null)
-            this.googleMap = map
+        this.googleMap = map
 
-        // Zooming to the Campus location
-        googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(50.0, 50.0), 9f))
+
+        val coordFrom = LatLng(cityFromLatLng.latitude, cityFromLatLng.longitude)
+        val coordTo = LatLng(cityToLatLng.latitude, cityToLatLng.longitude)
+//          val coordFrom = LatLng(33.981780, -118.236682)
+//          val coordTo = LatLng(41.885098, -87.630201)
+//          routes = "a~l~Fjk~uOnzh@vlbBtc~@tsE`vnApw{A`dw@~w\\|tNtqf@l{Yd_Fblh@rxo@b}@xxSfytAblk@xxaBeJxlcBb~t@zbh@jc|Bx}C`rv@rw|@rlhA~dVzeo@vrSnc}Axf]fjz@xfFbw~@dz{A~d{A|zOxbrBbdUvpo@`cFp~xBc`Hk@nurDznmFfwMbwz@bbl@lq~@loPpxq@bw_@v|{CbtY~jGqeMb{iF|n\\~mbDzeVh_Wr|Efc\\x`Ij{kE}mAb~uF{cNd}xBjp]fulBiwJpgg@|kHntyArpb@bijCk_Kv~eGyqTj_|@`uV`k|DcsNdwxAott@r}q@_gc@nu`CnvHx`k@dse@j|p@zpiAp|gEicy@`omFvaErfo@igQxnlApqGze~AsyRzrjAb__@ftyB}pIlo_BflmA~yQftNboWzoAlzp@mz`@|}_@fda@jakEitAn{fB_a]lexClshBtmqAdmY_hLxiZd~XtaBndgC"
+
+
+        val midPointLat = (coordFrom.latitude + coordTo.latitude) / 2
+        val midPointLong = (coordFrom.longitude + coordTo.longitude) / 2
+        val blueMarker = BitmapDescriptorFactory.fromResource(R.drawable.pin_blue)
+        val blueColor = -0x657db
+        googleMap?.addMarker(MarkerOptions()
+                .icon(blueMarker)
+                .position(coordFrom)
+                .title("First Point"))
+        googleMap?.addMarker(MarkerOptions()
+                .icon(blueMarker)
+                .position(coordTo)
+                .title("Final Point"))
+
+        val options = PolylineOptions()
+        options.color(blueColor)
+        options.width(5f)
+
+
+        if (routes != "") {
+            var polyPts: List<LatLng>
+            polyPts = PolyUtil.decode(routes)
+
+            for (pts in polyPts) {
+                options.add(pts)
+            }
+            googleMap?.addPolyline(options)
+        }
+
+        googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(midPointLat, midPointLong), 3.0f))
     }
+
+    private var routes: String = ""
 
     private var googleMap: GoogleMap? = null
     private lateinit var mapView: MapView
@@ -565,10 +609,10 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.save), { dialogInterface, i ->
             sex = if (man.isChecked) 1 else if (woman.isChecked) 2 else 0
             fillAgeSex(age, sex)
-            name = nameChoose.text.toString()
-            lastName = lastNameChoose.text.toString()
+            name = nameChoose.text.toString().capitalize()
+            lastName = lastNameChoose.text.toString().capitalize()
             username.text = StringBuilder(name).append(" ").append(lastName)
-            city = cityChoose.text.toString()
+            city = cityChoose.text.toString().capitalize()
             cityview.text = if (city.isNotEmpty()) city else getString(R.string.native_city)
             viewModel?.sendUserData(getHashMapUser(), uid)
         })
