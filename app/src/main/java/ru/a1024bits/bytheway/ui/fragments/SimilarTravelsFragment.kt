@@ -38,16 +38,16 @@ class SimilarTravelsFragment : Fragment() {
         App.component.inject(this)
         showUsersAdapter = SimilarTravelsAdapter(this.context)
         recyclerView.adapter = showUsersAdapter
-        loadingWhereLoadUsers.visibility = View.VISIBLE
         if (listUser != null) {
             val random = Random()
             for (user in listUser!!) {
                 user.percentsSimilarTravel = random.nextInt(100)
             }
-            showUsersAdapter.addItems(listUser ?: arrayListOf())
-            loadingWhereLoadUsers.visibility = View.GONE
+            if (listUser?.isNotEmpty() == true) {
+                block_empty_users.visibility = View.GONE
+                showUsersAdapter.addItems(listUser ?: arrayListOf())
+            }
         }
-
     }
 
     var listUser: List<User>? = null

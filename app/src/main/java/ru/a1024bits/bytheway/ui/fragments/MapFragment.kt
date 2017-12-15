@@ -21,6 +21,8 @@ import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.fragment_maps.*
+import kotlinx.android.synthetic.main.fragment_search_block.*
+import kotlinx.android.synthetic.main.searching_parameters_block.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -229,7 +231,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                                     .applyCommand(Replace(Screens.SIMILAR_TRAVELS_SCREEN, list))
 
                         })
-                        viewModel?.getUsersWithSimilarTravel()
+                        viewModel?.getUsersWithSimilarTravel(text_from_city.text.toString(), text_to_city.text.toString())
                     })
     }
 

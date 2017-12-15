@@ -5,6 +5,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <include
+        android:id="@+id/block_empty_users"
+        layout="@layout/block_empty_users"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
     <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/display_similar_user_travels"
@@ -14,14 +20,5 @@
         android:paddingEnd="16dp"
         android:paddingStart="16dp"
         app:layoutManager="LinearLayoutManager" />
-
-    <ProgressBar
-        android:id="@+id/loadingWhereLoadUsers"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:indeterminate="true"
-        android:visibility="visible" />
 
 </android.support.v7.widget.LinearLayoutCompat>
