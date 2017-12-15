@@ -177,11 +177,11 @@ class AllUsersFragment : Fragment() {
                 (context.getSystemService(Context.SEARCH_SERVICE) as SearchManager).getSearchableInfo(activity.componentName))
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             var isNotStartSearch = false
-            override fun onQueryTextSubmit(quer: String): Boolean {
-                val query = quer.toLowerCase()
+            override fun onQueryTextSubmit(queryCustomRegister: String): Boolean {
+                val query = queryCustomRegister.toLowerCase()
                 val result = ArrayList<User>()
                 displayUsersAdapter.users.filterTo(result) {
-                    it.cities.contains(query) || it.name.toLowerCase().contains(query) || it.email.toLowerCase().contains(query) ||
+                    it.cities.containsValue(queryCustomRegister) || it.name.toLowerCase().contains(query) || it.email.toLowerCase().contains(query) ||
                             it.age.toString().contains(query) || it.budget.toString().contains(query) ||
                             it.city.toLowerCase().contains(query) || it.lastName.toLowerCase().contains(query) ||
                             it.phone.contains(query) || it.route.contains(query)
