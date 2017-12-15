@@ -63,6 +63,7 @@ import kotlin.collections.HashMap
 
 
 class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDateSetListener {
+
     override fun onDateSet(view: DatePickerDialog?, year: Int, monthOfYear: Int, dayOfMonth: Int, yearEnd: Int, monthOfYearEnd: Int, dayOfMonthEnd: Int) {
         Log.e("LOG Date", "$year  $monthOfYear $dayOfMonth - $yearEnd $monthOfYearEnd $dayOfMonthEnd")
         textDateFrom.setText(StringBuilder(" ")
@@ -94,7 +95,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     }
 
     private var viewModel: MyProfileViewModel? = null
-
 
     private var mListener: OnFragmentInteractionListener? = null
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -553,7 +553,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     }
 
     fun validCellPhone(number: String): Boolean {
-        return number.matches(Regex("^([0-9]|\\+[0-9]){10,13}\$"))
+        return number.matches(Regex("^([0-9]|\\+[0-9]){11,13}\$"))
     }
 
     private fun showBlockTravelInformation() {
@@ -642,12 +642,13 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
 
     private fun openDialog(socialNetwork: SocialNetwork, errorText: String? = null) {
-        val simpleAlert = AlertDialog.Builder(activity).create()
+        var simpleAlert = AlertDialog.Builder(activity).create()
         simpleAlert.setTitle("Ссылки на социальные сети")
         simpleAlert.setMessage("Здесь вы можете указать ваши контактные данные для того что бы вас смогли найти другие путешественики")
         val inflater = this.layoutInflater
         val dialogView = inflater.inflate(R.layout.custom_dialog_profile_soc_network, null)
         simpleAlert.setView(dialogView)
+
         dialogView.findViewById<EditText>(R.id.socLinkText).setText(
                 when (socialNetwork) {
                     SocialNetwork.VK -> vkLink
@@ -659,6 +660,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         if (errorText != null) {
             dialogView.findViewById<EditText>(R.id.socLinkText).error = errorText
         }
+
         simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.remove), { dialog, i ->
             viewModel?.error?.observe(this@MyProfileFragment, Observer<Int> { error ->
                 socNet.remove(socialNetwork.link)
@@ -683,36 +685,38 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         })
         simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.save), { dialogInterface, i ->
             val newLink = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString()
-            var valid = true
-            var errorText = ""
-            if (socialNetwork == SocialNetwork.WHATSAPP && !validCellPhone(newLink)) {
-                valid = false
-                errorText = getString(R.string.fill_phone_invalid)
-            }
-            if (valid) {
-                socNet.put(socialNetwork.link, newLink)
-                viewModel?.error?.observe(this@MyProfileFragment, Observer<Int> { error ->
-                    when (error) {
-                        Constants.ERROR -> {
-                            Toast.makeText(this@MyProfileFragment.context, " Ошибка сохранения", Toast.LENGTH_SHORT).show()
-                        }
-                        Constants.SUCCESS -> {
-                            changeSocIconsActive(socialNetwork)
-                            when (socialNetwork) {
-                                SocialNetwork.VK -> vkLink = newLink
-                                SocialNetwork.WHATSAPP -> whatsAppNumber = newLink
-                                SocialNetwork.CS -> csLink = newLink
-                                SocialNetwork.FB -> fbLink = newLink
-                                SocialNetwork.TG -> tgNick = newLink
-                            }
+
+            socNet.put(socialNetwork.link, newLink)
+            viewModel?.error?.observe(this@MyProfileFragment, Observer<Int> { error ->
+                when (error) {
+                    Constants.ERROR -> {
+                        Toast.makeText(this@MyProfileFragment.context, " Ошибка сохранения", Toast.LENGTH_SHORT).show()
+                    }
+                    Constants.SUCCESS -> {
+                        changeSocIconsActive(socialNetwork)
+                        when (socialNetwork) {
+                            SocialNetwork.VK -> vkLink = newLink
+                            SocialNetwork.WHATSAPP -> whatsAppNumber = newLink
+                            SocialNetwork.CS -> csLink = newLink
+                            SocialNetwork.FB -> fbLink = newLink
+                            SocialNetwork.TG -> tgNick = newLink
                         }
                     }
-                })
-                viewModel?.saveLinks(socNet, uid)
-            } else {
-                openDialog(socialNetwork, errorText)
-            }
+                }
+            })
+            viewModel?.saveLinks(socNet, uid)
         })
+
+        dialogView.findViewById<EditText>(R.id.socLinkText).afterTextChanged {
+            if (socialNetwork == SocialNetwork.WHATSAPP) {
+                val valid = validCellPhone(it)
+                if (!valid) {
+                    dialogView.findViewById<EditText>(R.id.socLinkText).error =
+                            getString(R.string.fill_phone_invalid)
+                }
+                simpleAlert.getButton(AlertDialog.BUTTON_POSITIVE)?.setEnabled(valid)
+            }
+        }
         simpleAlert.show()
     }
 
@@ -989,5 +993,3 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         }
     }
 }
-
-
