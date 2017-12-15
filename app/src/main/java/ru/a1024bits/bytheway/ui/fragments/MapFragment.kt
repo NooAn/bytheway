@@ -91,6 +91,36 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         return view
     }
 
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+        mMapView?.onSaveInstanceState(outState)
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mMapView?.onPause()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mMapView?.onStop()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mMapView?.onDestroy()
+        mMapView = null
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        mMapView?.onLowMemory()
+    }
+
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val params = appBarLayout.layoutParams as CoordinatorLayout.LayoutParams

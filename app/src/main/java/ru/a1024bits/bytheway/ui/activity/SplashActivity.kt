@@ -28,22 +28,15 @@ class SplashActivity : Activity() {
     override fun onResume() {
         super.onResume()
 
-        val mAuth: FirebaseAuth = FirebaseAuth.getInstance()
-
-        val currentUser: FirebaseUser? = mAuth.currentUser
-
-        Log.e("LOG spalsh activity", currentUser.toString())
-
-//        Handler().postDelayed({ checkRegistrationAndForward() }, 19000L)
         Handler().postDelayed({ checkRegistrationAndForward() }, 1400L)
 
         var delay = 0L
         for (it in arrayOf(start_indicator_image_1, start_indicator_image_2, start_indicator_image_3)) {
-            delay += 300L
+            delay += 350L
             val animation = AnimationUtils.loadAnimation(this, R.anim.flash_point_with_delay)
             animation.startOffset = delay
             it.visibility = View.VISIBLE
-          it.startAnimation(animation)
+            it.startAnimation(animation)
         }
     }
 
@@ -53,7 +46,7 @@ class SplashActivity : Activity() {
             startActivity(Intent(this, RegistrationActivity::class.java))
         } else {
             //if it isn't first start
-            startActivity(Intent(this, MenuActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY))
+            startActivity(Intent(this, MenuActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
         }
     }
 }
