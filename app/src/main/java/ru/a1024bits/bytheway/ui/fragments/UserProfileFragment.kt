@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.support.annotation.LayoutRes
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +16,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.android.synthetic.main.fragment_user_profile.*
 import ru.a1024bits.bytheway.R
+import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.viewmodel.UserProfileViewModel
 
@@ -31,10 +33,19 @@ class UserProfileFragment : Fragment(), OnMapReadyCallback {
             val userId: String = arguments.getString(UID_KEY, "")
             viewModel = ViewModelProviders.of(this).get(UserProfileViewModel::class.java)
             viewModel?.init(userId)
-            viewModel?.user?.observe(this, Observer {
+            viewModel?.user?.observe(this, Observer<User> {
 
             })
         }
+    }
+
+    @LayoutRes
+    protected fun getLayoutRes(): Int {
+        return R.layout.fragment_user_profile
+    }
+
+    protected fun getViewModelClass(): Class<UserProfileViewModel> {
+        return UserProfileViewModel::class.java
     }
 
     override fun onResume() {
@@ -45,9 +56,6 @@ class UserProfileFragment : Fragment(), OnMapReadyCallback {
     override fun onMapReady(map: GoogleMap?) {
         if (googleMap != null)
             this.googleMap = map
-
-        googleMap?.addMarker(MarkerOptions().position(CENTRE).title("Hello, Dude!"))
-
         // Zooming to the Campus location
         googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(CENTRE, ZOOM))
     }
@@ -59,11 +67,9 @@ class UserProfileFragment : Fragment(), OnMapReadyCallback {
         val view = inflater?.inflate(R.layout.fragment_user_profile, container, false)
 
         mMapView = view?.findViewById<MapView>(R.id.mapView)
-        mMapView?.onCreate(savedInstanceState)
-
-        mMapView?.onResume()// needed to get the map to display immediately
-
         try {
+            mMapView?.onCreate(savedInstanceState)
+            mMapView?.onResume()// needed to get the map to display immediately
             MapsInitializer.initialize(activity.applicationContext)
         } catch (e: Exception) {
             e.printStackTrace()
@@ -72,13 +78,6 @@ class UserProfileFragment : Fragment(), OnMapReadyCallback {
 
         mMapView?.getMapAsync(this)
 
-        // latitude and longitude
-        val latitude = 17.385044
-        val longitude = 78.486671
-
-        // create marker
-        val marker = MarkerOptions().position(
-                LatLng(latitude, longitude)).title("Hello Maps")
         return view
     }
 
@@ -151,8 +150,6 @@ class UserProfileFragment : Fragment(), OnMapReadyCallback {
 
 
     companion object {
-        // TODO: Rename parameter arguments, choose names that match
-        // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
         private val UID_KEY = "uid"
         val CENTRE: LatLng = LatLng(-23.570991, -46.649886)
         val ZOOM = 9f
