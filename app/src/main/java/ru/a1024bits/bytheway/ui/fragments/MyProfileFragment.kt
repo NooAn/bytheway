@@ -63,6 +63,7 @@ import kotlin.collections.HashMap
 
 
 class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDateSetListener {
+
     override fun onDateSet(view: DatePickerDialog?, year: Int, monthOfYear: Int, dayOfMonth: Int, yearEnd: Int, monthOfYearEnd: Int, dayOfMonthEnd: Int) {
         Log.e("LOG Date", "$year  $monthOfYear $dayOfMonth - $yearEnd $monthOfYearEnd $dayOfMonthEnd")
         textDateFrom.setText(StringBuilder(" ")
@@ -94,7 +95,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     }
 
     private var viewModel: MyProfileViewModel? = null
-
 
     private var mListener: OnFragmentInteractionListener? = null
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -192,7 +192,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         routes = user.route
         cityFromLatLng = user.cityFromLatLng
         cityToLatLng = user.cityToLatLng
-        
+
         profileStateHashMap.clear()
         lastName = user.lastName
         name = user.name
@@ -316,9 +316,14 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                     textCityFrom.setText(place.name)
                     textCityFrom.error = null
                     cityFromLatLng = GeoPoint(place.latLng.latitude, place.latLng.longitude)
-                    cities.put(FIRST_INDEX_CITY, place.name.toString())
-                    profileStateHashMap.set("cityFromLatLng", cityFromLatLng.hashCode().toString())
-                    profileChanged()
+                    if (cityToLatLng.hashCode() == cityFromLatLng.hashCode()) {
+                        textCityFrom.error = "true"
+                        Toast.makeText(this@MyProfileFragment.context, getString(R.string.fill_diff_cities), Toast.LENGTH_LONG).show();
+                    } else {
+                        cities.put(FIRST_INDEX_CITY, place.name.toString())
+                        profileStateHashMap.set("cityFromLatLng", cityFromLatLng.hashCode().toString())
+                        profileChanged()
+                    }
                 }
                 else -> {
                     val status = PlaceAutocomplete.getStatus(activity, data);
@@ -334,9 +339,14 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                     textCityTo.setText(place.name)
                     textCityTo.error = null
                     cityToLatLng = GeoPoint(place.latLng.latitude, place.latLng.longitude)
-                    cities.put(LAST_INDEX_CITY, place.name.toString())
-                    profileStateHashMap.set("cityToLatLng", cityToLatLng.hashCode().toString())
-                    profileChanged()
+                    if (cityToLatLng.hashCode() == cityFromLatLng.hashCode()) {
+                        textCityTo.error = "true"
+                        Toast.makeText(this@MyProfileFragment.context, getString(R.string.fill_diff_cities), Toast.LENGTH_LONG).show();
+                    } else {
+                        cities.put(LAST_INDEX_CITY, place.name.toString())
+                        profileStateHashMap.set("cityToLatLng", cityToLatLng.hashCode().toString())
+                        profileChanged()
+                    }
                 }
                 else -> {
                     val status = PlaceAutocomplete.getStatus(activity, data);
@@ -507,32 +517,43 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     }
 
     private fun sendUserInfoToServer() {
-        var isEmpty = textCityFrom.text.isEmpty() || textCityTo.text.isEmpty()
+        var errorString = ""
 
-        if (isEmpty) {
-            var toastString = getString(R.string.fill_required_fields)
+        if (textCityFrom.text.isEmpty() || textCityTo.text.isEmpty()) {
+            errorString = getString(R.string.fill_required_fields)
             if (textCityFrom.text.isEmpty()) {
                 textCityFrom.error = getString(R.string.name)
-                toastString += " " + getString(R.string.city_from)
+                errorString += " " + getString(R.string.city_from)
             } else {
                 textCityFrom.error = null
             }
             if (textCityTo.text.isEmpty()) {
                 textCityTo.error = getString(R.string.yes)
-                toastString += " " + getString(R.string.city_to)
+                errorString += " " + getString(R.string.city_to)
             } else {
                 textCityTo.error = null
             }
             textCityFrom.getParent().requestChildFocus(textCityFrom, textCityFrom)
-            Toast.makeText(this@MyProfileFragment.context, toastString, Toast.LENGTH_LONG).show();
+        }
+        if (cityToLatLng.hashCode() == cityFromLatLng.hashCode()) {
+            errorString += " " + getString(R.string.fill_diff_cities)
+        }
 
+
+        if (errorString.isNotEmpty()) {
+            Toast.makeText(this@MyProfileFragment.context, errorString, Toast.LENGTH_LONG).show()
             return
         }
+
         countTrip = 1
         viewModel?.sendUserData(getHashMapUser(), uid, {
             Toast.makeText(this@MyProfileFragment.context, resources.getString(R.string.save_succesfull), Toast.LENGTH_SHORT).show()
             profileChanged(false)
         })
+    }
+
+    fun validCellPhone(number: String): Boolean {
+        return number.matches(Regex("^([0-9]|\\+[0-9]){11,13}\$"))
     }
 
     private fun showBlockTravelInformation() {
@@ -620,13 +641,14 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     }
 
 
-    private fun openDialog(socialNetwork: SocialNetwork) {
-        val simpleAlert = AlertDialog.Builder(activity).create()
+    private fun openDialog(socialNetwork: SocialNetwork, errorText: String? = null) {
+        var simpleAlert = AlertDialog.Builder(activity).create()
         simpleAlert.setTitle("Ссылки на социальные сети")
         simpleAlert.setMessage("Здесь вы можете указать ваши контактные данные для того что бы вас смогли найти другие путешественики")
         val inflater = this.layoutInflater
         val dialogView = inflater.inflate(R.layout.custom_dialog_profile_soc_network, null)
         simpleAlert.setView(dialogView)
+
         dialogView.findViewById<EditText>(R.id.socLinkText).setText(
                 when (socialNetwork) {
                     SocialNetwork.VK -> vkLink
@@ -635,7 +657,11 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                     SocialNetwork.FB -> fbLink
                     SocialNetwork.TG -> (if (tgNick.length > 1) tgNick else numberPhone)
                 })
-        simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, "Удалить", { dialog, i ->
+        if (errorText != null) {
+            dialogView.findViewById<EditText>(R.id.socLinkText).error = errorText
+        }
+
+        simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.remove), { dialog, i ->
             viewModel?.error?.observe(this@MyProfileFragment, Observer<Int> { error ->
                 socNet.remove(socialNetwork.link)
                 when (error) {
@@ -657,8 +683,9 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             viewModel?.saveLinks(socNet, uid)
 
         })
-        simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Сохранить", { dialogInterface, i ->
+        simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.save), { dialogInterface, i ->
             val newLink = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString()
+
             socNet.put(socialNetwork.link, newLink)
             viewModel?.error?.observe(this@MyProfileFragment, Observer<Int> { error ->
                 when (error) {
@@ -679,6 +706,17 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             })
             viewModel?.saveLinks(socNet, uid)
         })
+
+        dialogView.findViewById<EditText>(R.id.socLinkText).afterTextChanged {
+            if (socialNetwork == SocialNetwork.WHATSAPP) {
+                val valid = validCellPhone(it)
+                if (!valid) {
+                    dialogView.findViewById<EditText>(R.id.socLinkText).error =
+                            getString(R.string.fill_phone_invalid)
+                }
+                simpleAlert.getButton(AlertDialog.BUTTON_POSITIVE)?.setEnabled(valid)
+            }
+        }
         simpleAlert.show()
     }
 
@@ -714,7 +752,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             SocialNetwork.FB -> fbcon.setImageResource(R.drawable.ic_fb_grey)
             SocialNetwork.WHATSAPP -> whatsAppIcon.setImageResource(R.drawable.ic_whats_icon_grey)
             SocialNetwork.TG -> tgIcon.setImageResource(R.drawable.tg_grey)
-
         }
     }
 
@@ -956,5 +993,3 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         }
     }
 }
-
-
