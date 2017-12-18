@@ -17,6 +17,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
+import android.widget.Toast
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
 import com.google.firebase.auth.FirebaseAuth
@@ -154,7 +155,26 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
 
         buttonSearch.setOnClickListener {
-            goFlyPlan()
+
+            var error = 0
+            val departure = text_from_city.text.isNotEmpty()
+            val destination = text_to_city.text.isNotEmpty()
+
+            if (departure && text_from_city.text == text_to_city.text) {
+                error = R.string.fill_diff_cities
+            } else if (!departure && destination) {
+                error = R.string.fill_from_location
+            } else if (!destination && departure) {
+                error = R.string.fill_to_location
+            } else if (!departure && !destination) {
+                error = R.string.fill_all_location
+            }
+
+            if (error != 0) {
+                Toast.makeText(this@MapFragment.context, getString(error), Toast.LENGTH_SHORT).show()
+            } else {
+                goFlyPlan()
+            }
         }
     }
 

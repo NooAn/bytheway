@@ -25,6 +25,8 @@
     <string name="city_to">Куда</string>
     <string name="date_from">Дата</string>
     <string name="date_to">Дата</string>
+    <string name="date_start">Начало</string>
+    <string name="date_end">Конец</string>
     <string name="from_date_filter">"c   "</string>
     <string name="to_date_filter">"   по   "</string>
     <string name="date_trip">Дата путешествия</string>
@@ -41,6 +43,11 @@
     <string name="search_users_text">Поиск</string>
     <string name="text_away_from_profile">Сохранить измененные данные?</string>
     <string name="fill_required_fields">Пожалуйста заполните обязательные поля:</string>
+    <string name="fill_phone_invalid">Неверный формат телефона</string>
+    <string name="fill_diff_cities">Города не должны совпадать</string>
+    <string name="fill_all_location">Не выбраны пункты</string>
+    <string name="fill_from_location">Не выбран пункт отправления</string>
+    <string name="fill_to_location">Не выбран пункт назначения</string>
     <string name="text_confirm_remove_trip">Все изменения будет потеряны. \n Вы действительно хотите удалить поездку?</string>
     <string name="sex_and_age">Пол, возраст</string>
     <string name="age">Возраст</string>
