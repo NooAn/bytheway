@@ -27,7 +27,7 @@ import android.util.Log
 import android.widget.TextView
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.request.RequestOptions
-import kotlinx.android.synthetic.main.profile_direction.*
+import kotlinx.android.synthetic.main.profilte_user_direction.*
 import kotlinx.android.synthetic.main.profile_main_image.*
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R.string.city
@@ -63,7 +63,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
 
         showRouteOnMap(user.route)
 
-        username.text = StringBuilder().append(user.lastName).append(user.name)
+        username.text = StringBuilder().append(user.name).append(user.lastName)
 
         travelledStatistics.visibility = if (user.flightHours == 0L) View.GONE else View.VISIBLE
 
@@ -76,8 +76,8 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
         }
 
         if (user.cities.size > 0) {
-            textCityFrom.setText(user.cities.get(Constants.FIRST_INDEX_CITY))
-            textCityTo.setText(user.cities.get(Constants.LAST_INDEX_CITY))
+            textCityFrom.text = user.cities.get(Constants.FIRST_INDEX_CITY)
+            textCityTo.text = user.cities.get(Constants.LAST_INDEX_CITY)
         }
 
         val formatDate = SimpleDateFormat("dd.MM.yyyy")

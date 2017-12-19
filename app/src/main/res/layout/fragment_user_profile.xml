@@ -232,7 +232,7 @@
 
         <include
             android:id="@+id/direction"
-            layout="@layout/profile_direction"
+            layout="@layout/profilte_user_direction"
             android:visibility="visible"
             tools:visibility="visible" />
 

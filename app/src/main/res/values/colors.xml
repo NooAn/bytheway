@@ -13,6 +13,7 @@
     <color name="colorFiltersBackground">#EFEFEF</color>
     <color name="colorFiltersText">#808080</color>
     <color name="colorPrimaryTeams">#006889</color>
+    <color name="colorTextGrey">#D7D7D7</color>
 
     <color name="greyInactive">#1F000000</color>
     <color name="greyTravelTypeDivider">#80989898</color>
