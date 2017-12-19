@@ -5,7 +5,6 @@ import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
@@ -13,6 +12,7 @@ import android.support.v7.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -30,14 +30,10 @@ import com.google.android.gms.maps.model.*
 import com.google.maps.android.PolyUtil
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.GeoPoint
-import com.google.gson.*
-import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.fragment_my_user_profile.*
 import kotlinx.android.synthetic.main.profile_add_trip.*
 import kotlinx.android.synthetic.main.profile_direction.*
 import kotlinx.android.synthetic.main.profile_main_image.*
-import org.json.JSONArray
-import org.json.JSONObject
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.Method
@@ -397,14 +393,19 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         this.googleMap = map
 
 
-        val coordFrom = LatLng(cityFromLatLng.latitude, cityFromLatLng.longitude)
-        val coordTo = LatLng(cityToLatLng.latitude, cityToLatLng.longitude)
+      //  val coordFrom = LatLng(cityFromLatLng.latitude, cityFromLatLng.longitude)
+      //  val coordTo = LatLng(cityToLatLng.latitude, cityToLatLng.longitude)
+
+        val coordFrom = LatLng(33.981780, -118.236682)
+        val coordTo = LatLng(41.885098, -87.630201)
+        routes = "a~l~Fjk~uOnzh@vlbBtc~@tsE`vnApw{A`dw@~w\\|tNtqf@l{Yd_Fblh@rxo@b}@xxSfytAblk@xxaBeJxlcBb~t@zbh@jc|Bx}C`rv@rw|@rlhA~dVzeo@vrSnc}Axf]fjz@xfFbw~@dz{A~d{A|zOxbrBbdUvpo@`cFp~xBc`Hk@nurDznmFfwMbwz@bbl@lq~@loPpxq@bw_@v|{CbtY~jGqeMb{iF|n\\~mbDzeVh_Wr|Efc\\x`Ij{kE}mAb~uF{cNd}xBjp]fulBiwJpgg@|kHntyArpb@bijCk_Kv~eGyqTj_|@`uV`k|DcsNdwxAott@r}q@_gc@nu`CnvHx`k@dse@j|p@zpiAp|gEicy@`omFvaErfo@igQxnlApqGze~AsyRzrjAb__@ftyB}pIlo_BflmA~yQftNboWzoAlzp@mz`@|}_@fda@jakEitAn{fB_a]lexClshBtmqAdmY_hLxiZd~XtaBndgC"
+
 
 
         val midPointLat = (coordFrom.latitude + coordTo.latitude) / 2
         val midPointLong = (coordFrom.longitude + coordTo.longitude) / 2
         val blueMarker = BitmapDescriptorFactory.fromResource(R.drawable.pin_blue)
-        val blueColor = -0x657db
+        val orangeColor = activity.resources.getColor(R.color.orangeLine)
         googleMap?.addMarker(MarkerOptions()
                 .icon(blueMarker)
                 .position(coordFrom)
@@ -415,7 +416,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                 .title("Final Point"))
 
         val options = PolylineOptions()
-        options.color(blueColor)
+        options.color(orangeColor )
         options.width(5f)
 
 
@@ -429,7 +430,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             googleMap?.addPolyline(options)
         }
 
-        googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(midPointLat, midPointLong), 3.0f))
+        googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(midPointLat, midPointLong), 1.0f))
 
     }
 
@@ -543,7 +544,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             yearsArr.add(i)
         }
 
-        Log.e("LOG", "array check! : ${yearsArr.size}")
 
         val yearsAdapter = ArrayAdapter<Int>(this.context, android.R.layout.simple_spinner_item, yearsArr);
 
@@ -563,24 +563,85 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             }
         }
 
+
+
+
+
         simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Сохранить", { dialogInterface, i ->
             sex = if (man.isChecked) 1 else if (woman.isChecked) 2 else 0
-
             fillAgeSex(age, sex)
             name = (nameChoose.text.toString()).capitalize()
-
             lastName = (lastNameChoose.text.toString()).capitalize()
-            username.text = StringBuilder(name).append(" ").append(lastName)
             city = (cityChoose.text.toString()).capitalize()
-            cityview.text = if (city.isNotEmpty()) city else "Родной город"
-            sendUserInfoToServer()
+           savingUserData(name,lastName,city)
+
         })
         simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, "Отмена", { dialogInterface, i ->
             simpleAlert.hide()
         })
 
+
+var enterCounter=0
+
+        nameChoose.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
+            if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                Log.d("LOG", "ENTER is Pressed on EditName")
+                lastNameChoose.requestFocus()
+                enterCounter=1
+
+                return@OnKeyListener true
+
+            }
+            false
+        })
+
+        lastNameChoose.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
+
+            if (keyCode == KeyEvent.KEYCODE_ENTER ) {
+                Log.d("LOG", "ENTER is Pressed on LastName")
+
+               if (enterCounter==0){
+                   cityChoose.requestFocus()
+                   enterCounter=1
+               }else enterCounter=0
+                return@OnKeyListener true
+            }
+            false
+        })
+
+        cityChoose.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
+
+            if (keyCode == KeyEvent.KEYCODE_ENTER ) {
+                Log.d("LOG", "ENTER is Pressed on city")
+
+                if (enterCounter==0){
+                    name = (nameChoose.text.toString()).capitalize()
+                    lastName = (lastNameChoose.text.toString()).capitalize()
+                    city = (cityChoose.text.toString()).capitalize()
+                    savingUserData(name,lastName,city)
+                    simpleAlert.hide()
+                }else enterCounter=0
+                return@OnKeyListener true
+            }
+            false
+        })
+
+
+
+
         simpleAlert.show()
+
     }
+
+private fun savingUserData(name:String,lastName:String,city:String){
+    username.text = StringBuilder(name).append(" ").append(lastName)
+    cityview.text = if (city.isNotEmpty()) city else "Родной город"
+    sendUserInfoToServer()
+
+}
+
+
+
 
 
     private fun openDialog(socialNetwork: SocialNetwork) {

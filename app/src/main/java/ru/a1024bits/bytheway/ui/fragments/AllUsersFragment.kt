@@ -166,18 +166,10 @@ class AllUsersFragment : Fragment() {
 
         view_contain_block_parameters.layoutTransition.setDuration(700L)
         searchParametersText.setOnClickListener {
-
-            val transOn= AnimationUtils.loadAnimation(context, R.anim.transition_on)
-
-            val transOut= AnimationUtils.loadAnimation(context, R.anim.transition_out)
             if (block_search_parameters.visibility == View.GONE) {
-                block_search_parameters.startAnimation(transOn)
                 block_search_parameters.visibility = View.VISIBLE
-
             } else {
-                block_search_parameters.startAnimation(transOut)
                 block_search_parameters.visibility = View.GONE
-
             }
         }
     }
