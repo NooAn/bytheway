@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.Toast
 import com.borax12.materialdaterangepicker.date.DatePickerDialog
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException
 import com.google.android.gms.common.GooglePlayServicesRepairableException
@@ -33,10 +34,12 @@ import java.util.*
 class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
 
     private lateinit var dateDialog: DatePickerDialog
+    var firstPoint: LatLng? = null
+    var secondPoint: LatLng? = null
 
     private fun openDateDialog() {
-        dateDialog.setStartTitle("НАЧАЛО")
-        dateDialog.setEndTitle("КОНЕЦ")
+        dateDialog.setStartTitle(getString(R.string.date_start))
+        dateDialog.setEndTitle(getString(R.string.date_end))
         dateDialog.accentColor = resources.getColor(R.color.colorPrimary)
         dateDialog.show(activity.fragmentManager, "")
     }
@@ -92,11 +95,19 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                     val place = PlaceAutocomplete.getPlace(activity, data);
                     text_from_city.text = place.name
                     firstPoint = place.latLng
+                    text_from_city.error = null
+                    if (secondPoint != null && firstPoint?.latitude == secondPoint?.latitude) {
+                        text_from_city.error = "true"
+                        Toast.makeText(this@SearchFragment.context, getString(R.string.fill_diff_cities), Toast.LENGTH_SHORT).show()
+                    } else {
+                        text_to_city.error = null
+                        text_from_city.error = null
+                    }
                     firstPoint?.let { latLng -> (activity as OnFragmentInteractionListener).onSetPoint(latLng, 1) }
                 }
                 else -> {
-                    val status = PlaceAutocomplete.getStatus(activity, data);
-                    Log.i("LOG", status.getStatusMessage() + " ");
+                    val status = PlaceAutocomplete.getStatus(activity, data)
+                    Log.i("LOG", status.getStatusMessage() + " ")
                     text_from_city.text = ""
                 }
             }
@@ -106,19 +117,25 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                     val place = PlaceAutocomplete.getPlace(activity, data);
                     text_to_city.text = place.name
                     secondPoint = place.latLng
+                    text_to_city.error = null
+                    if (firstPoint != null && firstPoint?.latitude == secondPoint?.latitude) {
+                        text_to_city.error = "true"
+                        Toast.makeText(this@SearchFragment.context, getString(R.string.fill_diff_cities), Toast.LENGTH_SHORT).show()
+                    } else {
+                        text_from_city.error = null
+                        text_to_city.error = null
+                    }
                     secondPoint?.let { latLng -> (activity as OnFragmentInteractionListener).onSetPoint(latLng, 2) }
                 }
                 else -> {
-                    val status = PlaceAutocomplete.getStatus(activity, data);
-                    Log.i("LOG", status.statusMessage + " ");
+                    val status = PlaceAutocomplete.getStatus(activity, data)
+                    Log.i("LOG", status.statusMessage + " ")
                     text_to_city.text = ""
                 }
             }
         }
     }
 
-    var firstPoint: LatLng? = null
-    var secondPoint: LatLng? = null
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater?.inflate(R.layout.fragment_search_block, container, false)

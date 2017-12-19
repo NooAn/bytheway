@@ -22,7 +22,6 @@ class SimilarTravelsAdapter(val context: Context) : RecyclerView.Adapter<Similar
     private var glide: RequestManager = Glide.with(this.context)
     var users: MutableList<User> = ArrayList()
 
-
     fun addItems(list: List<User>) {
         this.users = list as MutableList<User>
         notifyDataSetChanged()
@@ -39,9 +38,9 @@ class SimilarTravelsAdapter(val context: Context) : RecyclerView.Adapter<Similar
         Log.d("LOG", "onBindViewHolder on position: " + position)
         val currentUser = users[position]
 
-        holder.cities.text = StringBuilder().append(currentUser.cities.get(FIRST_INDEX_CITY))
+        holder.cities.text = StringBuilder().append(getShortCity(currentUser.cities.get(FIRST_INDEX_CITY)?:""))
                 .append(" - ")
-                .append(currentUser.cities.get(LAST_INDEX_CITY))
+                .append(getShortCity(currentUser.cities.get(LAST_INDEX_CITY)?:""))
 
         holder.name.text = StringBuilder().append(currentUser.name)
                 .append(currentUser.lastName)
@@ -49,6 +48,14 @@ class SimilarTravelsAdapter(val context: Context) : RecyclerView.Adapter<Similar
                 .append(currentUser.age)
 
         holder.percentSimilarTravel.text = StringBuilder().append(currentUser.percentsSimilarTravel).append(" %")
+
+        holder.percentSimilarTravel.setTextColor(when (position) {
+            0 -> context.resources.getColor(R.color.one_level)
+            1, 2 -> context.resources.getColor(R.color.two_level)
+            else -> {
+                context.resources.getColor(R.color.all_level)
+            }
+        })
 
         glide.load(currentUser.urlPhoto)
                 .apply(RequestOptions.circleCropTransform())
@@ -58,6 +65,16 @@ class SimilarTravelsAdapter(val context: Context) : RecyclerView.Adapter<Similar
             if (context is MenuActivity) {
                 context.showUserSimpleProfile(currentUser)
             }
+        }
+    }
+
+    private fun getShortCity(city: String): String? {
+        val n = if (city?.length > 14) 14 else city.length
+        val shortCity = city?.substring(0, n )
+        if (shortCity?.length == city?.length) {
+            return city
+        } else {
+            return shortCity + "..."
         }
     }
 

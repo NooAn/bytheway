@@ -26,10 +26,11 @@
 
     <style name="StyleLabelMenuActivity" parent="android:TextAppearance">
         <item name="android:fontFamily">@font/font_menu_activity</item>
+        <item name="android:textSize">20sp</item>
     </style>
 
     <style name="UsersTextInFilters" >
         <item name="android:textColor">@color/black</item>
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">@dimen/standard_text_size</item>
     </style>
 </resources>

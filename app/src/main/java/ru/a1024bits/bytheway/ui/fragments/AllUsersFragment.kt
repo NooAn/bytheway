@@ -12,7 +12,6 @@ import android.support.v4.app.Fragment
 import android.support.v7.widget.SearchView
 import android.util.Log
 import android.view.*
-import android.view.animation.AnimationUtils
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import com.borax12.materialdaterangepicker.date.DatePickerDialog
@@ -49,14 +48,12 @@ class AllUsersFragment : Fragment() {
 
         filter = if (savedInstanceState != null) {
             savedInstanceState.getSerializable("filter") as Filter
-
         } else {
             val result = Filter()
             result.endAge = extension.yearsOldUsers.size - 1
             result
         }
         updateDateDialog()
-
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
@@ -122,10 +119,7 @@ class AllUsersFragment : Fragment() {
                 override fun startTransition(p0: LayoutTransition?, p1: ViewGroup?, p2: View?, p3: Int) {}
                 override fun endTransition(p0: LayoutTransition?, p1: ViewGroup?, view: View, p3: Int) {
                     if ((view.id == block_search_parameters.id) && (block_search_parameters.visibility == View.GONE)) {
-                        view_contain_block_parameters.layoutTransition.setDuration(0L)
-                        display_all_users.visibility = View.GONE
-                        loadingWhereLoadUsers.visibility = View.VISIBLE
-                        view_contain_block_parameters.layoutTransition.setDuration(700L)
+                        updateViewsBeforeSearch()
                         view_contain_block_parameters.layoutTransition.removeTransitionListener(this)
                     }
                 }
@@ -137,7 +131,7 @@ class AllUsersFragment : Fragment() {
         cancelParameters.setOnClickListener {
             filter.sex = 0
             filter.startAge = -1
-            filter.endAge = - 1
+            filter.endAge = -1
             filter.startAge = 0
             filter.endAge = extension.yearsOldUsers.size - 1
             filter.startCity = ""
@@ -177,19 +171,17 @@ class AllUsersFragment : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.all_users_menu, menu)
-        
-
-
 
         val searchView = menu.findItem(R.id.search_all_users_item).actionView as SearchView
         searchView.setSearchableInfo(
                 (context.getSystemService(Context.SEARCH_SERVICE) as SearchManager).getSearchableInfo(activity.componentName))
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(quer: String): Boolean {
-                val query = quer.toLowerCase()
+            var isNotStartSearch = false
+            override fun onQueryTextSubmit(queryCustomRegister: String): Boolean {
+                val query = queryCustomRegister.toLowerCase()
                 val result = ArrayList<User>()
                 displayUsersAdapter.users.filterTo(result) {
-                    it.cities.contains(query) || it.name.toLowerCase().contains(query) || it.email.toLowerCase().contains(query) ||
+                    it.cities.containsValue(queryCustomRegister) || it.name.toLowerCase().contains(query) || it.email.toLowerCase().contains(query) ||
                             it.age.toString().contains(query) || it.budget.toString().contains(query) ||
                             it.city.toLowerCase().contains(query) || it.lastName.toLowerCase().contains(query) ||
                             it.phone.contains(query) || it.route.contains(query)
@@ -199,14 +191,13 @@ class AllUsersFragment : Fragment() {
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-                if ("" == newText) {
-                    display_all_users.visibility = View.GONE
-                    loadingWhereLoadUsers.visibility = View.VISIBLE
+                if ("" == newText && isNotStartSearch) {
+                    updateViewsBeforeSearch()
                     viewModel.getAllUsers(filter)
                 }
+                isNotStartSearch = true
                 return false
             }
-
         })
     }
 
@@ -228,11 +219,9 @@ class AllUsersFragment : Fragment() {
         viewModel.usersLiveData.observe(this, Observer<List<User>> { list ->
             Log.e("LOG", "onChanged $list")
             if (list != null) {
-                Log.e("LOG", "update $list")
-                display_all_users.adapter = displayUsersAdapter
-                loadingWhereLoadUsers.visibility = View.GONE
-                displayUsersAdapter.setItems(list)
-                display_all_users.visibility = View.VISIBLE
+                if (list.isNotEmpty())
+                    displayUsersAdapter.setItems(list)
+                updateViewsAfterSearch(list.isNotEmpty())
             }
         })
         loadingWhereLoadUsers.visibility = View.VISIBLE
@@ -283,9 +272,23 @@ class AllUsersFragment : Fragment() {
         dateDialog.setEndTitle("КОНЕЦ")
     }
 
+    private fun updateViewsBeforeSearch() {
+        display_all_users.visibility = View.GONE
+        block_empty_users.visibility = View.GONE
+        loadingWhereLoadUsers.visibility = View.VISIBLE
+    }
+
+    private fun updateViewsAfterSearch(isNotEmptyListUsers: Boolean) {
+        loadingWhereLoadUsers.visibility = View.GONE
+        if (isNotEmptyListUsers)
+            display_all_users.visibility = View.VISIBLE
+        else
+            block_empty_users.visibility = View.VISIBLE
+    }
+
     private fun updateChoseDateButtons() {
-            choseDate.text = if (filter.startDate > 0L && filter.endDate > 0L)
-                extension.getTextFromDates(filter.startDate, filter.endDate, 0)
+        choseDate.text = if (filter.startDate > 0L && filter.endDate > 0L)
+            extension.getTextFromDates(filter.startDate, filter.endDate, 0)
         else context.getString(R.string.filters_all_users_empty_date)
     }
 

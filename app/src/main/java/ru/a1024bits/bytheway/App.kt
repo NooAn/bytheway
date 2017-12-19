@@ -1,6 +1,7 @@
 package ru.a1024bits.bytheway
 
 import android.app.Application
+import com.squareup.leakcanary.LeakCanary
 import ru.a1024bits.bytheway.dagger.*
 import ru.terrakok.cicerone.Cicerone
 import ru.terrakok.cicerone.NavigatorHolder
@@ -27,6 +28,12 @@ class App : Application() {
                 .userRepositoryModule(UserRepositoryModule())
                 .build();
         initCicerone()
+        if (LeakCanary.isInAnalyzerProcess(this)) {
+            // This process is dedicated to LeakCanary for heap analysis.
+            // You should not init your app in this process.
+            return;
+        }
+        LeakCanary.install(this);
     }
     
     private fun initCicerone() {

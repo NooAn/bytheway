@@ -17,10 +17,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
+import android.widget.Toast
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.fragment_maps.*
+import kotlinx.android.synthetic.main.fragment_search_block.*
+import kotlinx.android.synthetic.main.searching_parameters_block.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -91,6 +94,36 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         return view
     }
 
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+        mMapView?.onSaveInstanceState(outState)
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mMapView?.onPause()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mMapView?.onStop()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mMapView?.onDestroy()
+        mMapView = null
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        mMapView?.onLowMemory()
+    }
+
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val params = appBarLayout.layoutParams as CoordinatorLayout.LayoutParams
@@ -122,7 +155,26 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
 
         buttonSearch.setOnClickListener {
-            goFlyPlan()
+
+            var error = 0
+            val departure = text_from_city.text.isNotEmpty()
+            val destination = text_to_city.text.isNotEmpty()
+
+            if (departure && text_from_city.text == text_to_city.text) {
+                error = R.string.fill_diff_cities
+            } else if (!departure && destination) {
+                error = R.string.fill_from_location
+            } else if (!destination && departure) {
+                error = R.string.fill_to_location
+            } else if (!departure && !destination) {
+                error = R.string.fill_all_location
+            }
+
+            if (error != 0) {
+                Toast.makeText(this@MapFragment.context, getString(error), Toast.LENGTH_SHORT).show()
+            } else {
+                goFlyPlan()
+            }
         }
     }
 
@@ -199,7 +251,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                                     .applyCommand(Replace(Screens.SIMILAR_TRAVELS_SCREEN, list))
 
                         })
-                        viewModel?.getUsersWithSimilarTravel()
+                        viewModel?.getUsersWithSimilarTravel(text_from_city.text.toString(), text_to_city.text.toString())
                     })
     }
 

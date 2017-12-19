@@ -5,7 +5,10 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.util.AttributeSet
 import android.util.Log
+import android.view.View
+import android.view.animation.AlphaAnimation
 import android.view.animation.AnimationUtils
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -25,23 +28,16 @@ class SplashActivity : Activity() {
     override fun onResume() {
         super.onResume()
 
-        val mAuth: FirebaseAuth = FirebaseAuth.getInstance()
+        Handler().postDelayed({ checkRegistrationAndForward() }, 1400L)
 
-        val currentUser: FirebaseUser? = mAuth.currentUser
-
-        Log.e("LOG spalsh activity", currentUser.toString())
-
-        val handler = Handler()
-        handler.postDelayed({ checkRegistrationAndForward() }, 1420L)
-        handler.postDelayed({
-            start_indicator_image_1.startAnimation(AnimationUtils.loadAnimation(this, R.anim.flash_point_with_delay))
-        }, 200)
-        handler.postDelayed({
-            start_indicator_image_2.startAnimation(AnimationUtils.loadAnimation(this, R.anim.flash_point_with_delay))
-        }, 800)
-        handler.postDelayed({
-            start_indicator_image_3.startAnimation(AnimationUtils.loadAnimation(this, R.anim.flash_point_with_delay))
-        }, 1400)
+        var delay = 0L
+        for (it in arrayOf(start_indicator_image_1, start_indicator_image_2, start_indicator_image_3)) {
+            delay += 350L
+            val animation = AnimationUtils.loadAnimation(this, R.anim.flash_point_with_delay)
+            animation.startOffset = delay
+            it.visibility = View.VISIBLE
+            it.startAnimation(animation)
+        }
     }
 
     private fun checkRegistrationAndForward() {
@@ -50,7 +46,7 @@ class SplashActivity : Activity() {
             startActivity(Intent(this, RegistrationActivity::class.java))
         } else {
             //if it isn't first start
-            startActivity(Intent(this, MenuActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY))
+            startActivity(Intent(this, MenuActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
         }
     }
 }
