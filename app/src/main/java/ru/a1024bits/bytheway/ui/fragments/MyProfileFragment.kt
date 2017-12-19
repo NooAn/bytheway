@@ -203,8 +203,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         fbLink = user.socialNetwork.get(SocialNetwork.FB.link) ?: fbLink
         csLink = user.socialNetwork.get(SocialNetwork.CS.link) ?: csLink
         tgNick = user.socialNetwork.get(SocialNetwork.TG.link) ?: tgNick
-        cityFromLatLng = user.cityFromLatLng
-        cityToLatLng = user.cityToLatLng
         travelledStatistics.visibility = if (user.flightHours == 0L) View.GONE else View.VISIBLE
 
         travelledCountries.text = user.countries.toString()

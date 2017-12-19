@@ -16,37 +16,193 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.android.synthetic.main.fragment_user_profile.*
 import ru.a1024bits.bytheway.R
-import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
+import ru.a1024bits.bytheway.viewmodel.BaseViewModel
 import ru.a1024bits.bytheway.viewmodel.UserProfileViewModel
+import android.widget.Toast
+import android.R.attr.data
+import android.arch.lifecycle.ViewModelProvider
+import android.support.design.widget.NavigationView
+import android.util.Log
+import android.widget.TextView
+import com.bumptech.glide.RequestManager
+import com.bumptech.glide.request.RequestOptions
+import kotlinx.android.synthetic.main.profile_direction.*
+import kotlinx.android.synthetic.main.profile_main_image.*
+import ru.a1024bits.bytheway.App
+import ru.a1024bits.bytheway.R.string.city
+import ru.a1024bits.bytheway.R.string.name
+import ru.a1024bits.bytheway.model.*
+import ru.a1024bits.bytheway.util.Constants
+import java.text.SimpleDateFormat
+import java.util.*
+import javax.inject.Inject
 
 
-class UserProfileFragment : Fragment(), OnMapReadyCallback {
-
-    private var viewModel: UserProfileViewModel? = null
+class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCallback {
 
     private var mListener: OnFragmentInteractionListener? = null
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        if (arguments != null) {
-            val userId: String = arguments.getString(UID_KEY, "")
-            viewModel = ViewModelProviders.of(this).get(UserProfileViewModel::class.java)
-            viewModel?.init(userId)
-            viewModel?.user?.observe(this, Observer<User> {
+    private val userLoad: Observer<Response<User>> = Observer<Response<User>> { response ->
+        when (response?.status) {
+            Status.SUCCESS -> if (response.data == null) showErrorLoading() else fillProfile(response.data)
 
-            })
+            Status.ERROR -> {
+                Log.e("LOG", "log e:" + response.error)
+                showErrorLoading()
+            }
         }
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        App.component.inject(this)
+    }
+
+    private fun fillProfile(user: User) {
+
+        showRouteOnMap(user.route)
+
+        username.text = StringBuilder().append(user.lastName).append(user.name)
+
+        travelledStatistics.visibility = if (user.flightHours == 0L) View.GONE else View.VISIBLE
+
+        travelledCountries.text = user.countries.toString()
+        flightHours.text = user.flightHours.toString()
+        flightDistance.text = user.kilometers.toString()
+
+        if (user.city.length > 0) {
+            cityview.text = user.city
+        }
+
+        if (user.cities.size > 0) {
+            textCityFrom.setText(user.cities.get(Constants.FIRST_INDEX_CITY))
+            textCityTo.setText(user.cities.get(Constants.LAST_INDEX_CITY))
+        }
+
+        val formatDate = SimpleDateFormat("dd.MM.yyyy")
+
+        if (user.dates.size > 0) {
+            val dayBegin = formatDate.format(Date(user.dates.get(Constants.START_DATE) ?: 0))
+            val dayArrival = formatDate.format(Date(user.dates.get(Constants.END_DATE) ?: 0))
+            textDateFrom.setText(dayBegin)
+            dateArrived.setText(dayArrival)
+        }
+
+        fillAgeSex(user.age, user.sex)
+
+
+        glide?.load(user.urlPhoto)
+                ?.apply(RequestOptions.circleCropTransform())
+                ?.into(image_avatar)
+
+        for (name in user.socialNetwork) {
+            when (name.key) {
+                SocialNetwork.VK.link -> vkIcon.setImageResource(R.drawable.ic_vk_color)
+                SocialNetwork.CS.link -> csIcon.setImageResource(R.drawable.ic_cs_color)
+                SocialNetwork.FB.link -> fbcon.setImageResource(R.drawable.ic_fb_color)
+                SocialNetwork.WHATSAPP.link -> whatsAppIcon.setImageResource(R.drawable.ic_whats_icon_color)
+                SocialNetwork.TG.link -> tgIcon.setImageResource(R.drawable.ic_tg_color)
+            }
+        }
+        for (method in user.method.keys) {
+            when (method) {
+                Method.CAR.link -> {
+                    directions_car.visibility = if (user.method.get(method) == true) View.VISIBLE else View.GONE
+                }
+                Method.TRAIN.link -> {
+                    directions_railway.visibility = if (user.method.get(method) == true) View.VISIBLE else View.GONE
+                }
+                Method.BUS.link -> {
+                    directions_bus.visibility = if (user.method.get(method) == true) View.VISIBLE else View.GONE
+                }
+                Method.PLANE.link -> {
+                    directions_flight.visibility = if (user.method.get(method) == true) View.VISIBLE else View.GONE
+                }
+                Method.HITCHHIKING.link -> {
+                    direction_hitchiking.visibility = if (user.method.get(method) == true) View.VISIBLE else View.GONE
+                }
+            }
+        }
+
+        if (user.budget > 0) {
+            displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(user.budget)
+        }
+        add_info_user.text = user.addInformation
+
+//        whatsAppIcon.setOnClickListener { startActivity(createBrowserIntent("whatsapp://send?text=Привет, я нашел тебя в ByTheWay.&phone=+numberPhone&abid=+numberPhone")) }
+//
+//        vkIcon.setOnClickListener {
+//            val linkUsers = user.socialNetwork.get()
+//            startActivity(createBrowserIntent("https://vk.com/$linkUsers"))
+//        }
+//
+//        csIcon.setOnClickListener { startActivity(createBrowserIntent("https://www.couchsurfing.com/people/selcukatesoglu")) }
+
+
+    }
+
+    fun fillAgeSex(userAge: Int, userSex: Int) {
+        val gender = when (userSex) {
+            1 -> "М"
+            2 -> "Ж"
+            else -> {
+                ""
+            }
+        }
+
+        if (userSex != 0) {
+            if (userAge > 0) {
+                sex_and_age.text = StringBuilder(gender).append(", ").append(userAge)
+            } else {
+                sex_and_age.text = StringBuilder(gender).append(", Возраст ").append(userAge)
+            }
+        }
+
+        if (userAge > 0) {
+            if (userSex != 0) {
+                sex_and_age.text = StringBuilder(gender).append(", ").append(userAge)
+            } else {
+                sex_and_age.text = StringBuilder("Пол, ").append(userAge)
+            }
+        }
+    }
+
+    private fun showRouteOnMap(route: String) {
+
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        viewModel?.response?.observe(this, userLoad)
+
+        if (arguments != null) {
+            val userId: String = arguments.getString(UID_KEY, "")
+            viewModel?.load(userId)
+        } else {
+            // fix me error when don't load user
+            showErrorLoading()
+        }
+    }
+
+    private fun showErrorLoading() {
+        Log.e("LOg", "ERROR")
+        Toast.makeText(activity, "Ошибка загрузки", Toast.LENGTH_SHORT).show()
+
+    }
+
+    override fun getViewFactoryClass(): ViewModelProvider.Factory = viewModelFactory
+
+    @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
+
     @LayoutRes
-    protected fun getLayoutRes(): Int {
+    override fun getLayoutRes(): Int {
         return R.layout.fragment_user_profile
     }
 
-    protected fun getViewModelClass(): Class<UserProfileViewModel> {
-        return UserProfileViewModel::class.java
-    }
+    override fun getViewModelClass(): Class<UserProfileViewModel> = UserProfileViewModel::class.java
+
 
     override fun onResume() {
         super.onResume()
@@ -83,15 +239,6 @@ class UserProfileFragment : Fragment(), OnMapReadyCallback {
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        whatsAppIcon.setOnClickListener { startActivity(createBrowserIntent("whatsapp://send?text=Привет, я нашел тебя в ByTheWay.&phone=+numberPhone&abid=+numberPhone")) }
-
-        vkIcon.setOnClickListener {
-            val linkUsers = "" //todo fill user links
-            startActivity(createBrowserIntent("https://vk.com/$linkUsers"))
-        }
-
-        csIcon.setOnClickListener { startActivity(createBrowserIntent("https://www.couchsurfing.com/people/selcukatesoglu")) }
     }
 
     private fun createBrowserIntent(url: String): Intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))

@@ -4,6 +4,7 @@ import dagger.Component
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.a1024bits.bytheway.ui.activity.RegistrationActivity
 import ru.a1024bits.bytheway.ui.fragments.*
+import ru.a1024bits.bytheway.viewmodel.BaseViewModel
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
 import javax.inject.Singleton
 
@@ -27,5 +28,5 @@ interface AppComponent {
     fun inject(fragment: SearchFragment)
     fun inject(registrationActivity: RegistrationActivity)
     fun inject(mapFragment: MapFragment)
-
+    fun inject(userProfileFragment: UserProfileFragment)
 }
