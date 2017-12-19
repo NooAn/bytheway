@@ -98,11 +98,33 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
 
         for (name in user.socialNetwork) {
             when (name.key) {
-                SocialNetwork.VK.link -> vkIcon.setImageResource(R.drawable.ic_vk_color)
-                SocialNetwork.CS.link -> csIcon.setImageResource(R.drawable.ic_cs_color)
-                SocialNetwork.FB.link -> fbcon.setImageResource(R.drawable.ic_fb_color)
-                SocialNetwork.WHATSAPP.link -> whatsAppIcon.setImageResource(R.drawable.ic_whats_icon_color)
-                SocialNetwork.TG.link -> tgIcon.setImageResource(R.drawable.ic_tg_color)
+                SocialNetwork.VK.link -> {
+                    vkIcon.setImageResource(R.drawable.ic_vk_color)
+                    vkIcon.setOnClickListener {
+                        startActivity(createBrowserIntent(user.socialNetwork.get(name.key) ?: ""))
+                    }
+                }
+                SocialNetwork.CS.link -> {
+                    csIcon.setImageResource(R.drawable.ic_cs_color)
+                    csIcon.setOnClickListener { startActivity(createBrowserIntent(user.socialNetwork.get(name.key) ?: "")) }
+
+                }
+                SocialNetwork.FB.link -> {
+                    fbcon.setImageResource(R.drawable.ic_fb_color)
+                    fbcon.setOnClickListener {
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("facebook:/profile/id=${user.socialNetwork.get(name.key)}")))
+                    }
+                }
+                SocialNetwork.WHATSAPP.link -> {
+                    whatsAppIcon.setImageResource(R.drawable.ic_whats_icon_color)
+                    whatsAppIcon.setOnClickListener {
+                        startActivity(createBrowserIntent("whatsapp://send?text=Привет, я нашел тебя в ByTheWay.&phone=+${user.socialNetwork.get(name.key)}&abid = +${user.socialNetwork.get(name.key)})}"))
+                    }
+                }
+                SocialNetwork.TG.link -> {
+                    tgIcon.setImageResource(R.drawable.ic_tg_color)
+                    tgIcon.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://telegram.me/${user.socialNetwork.get(name.key)})}"))) }
+                }
             }
         }
         for (method in user.method.keys) {
@@ -129,17 +151,6 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
             displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(user.budget)
         }
         add_info_user.text = user.addInformation
-
-//        whatsAppIcon.setOnClickListener { startActivity(createBrowserIntent("whatsapp://send?text=Привет, я нашел тебя в ByTheWay.&phone=+numberPhone&abid=+numberPhone")) }
-//
-//        vkIcon.setOnClickListener {
-//            val linkUsers = user.socialNetwork.get()
-//            startActivity(createBrowserIntent("https://vk.com/$linkUsers"))
-//        }
-//
-//        csIcon.setOnClickListener { startActivity(createBrowserIntent("https://www.couchsurfing.com/people/selcukatesoglu")) }
-
-
     }
 
     fun fillAgeSex(userAge: Int, userSex: Int) {
