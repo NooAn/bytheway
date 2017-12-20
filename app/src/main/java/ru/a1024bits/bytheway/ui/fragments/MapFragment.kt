@@ -40,6 +40,7 @@ import ru.a1024bits.bytheway.util.createMarker
 import ru.a1024bits.bytheway.util.toJsonString
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
 import ru.a1024bits.bytheway.viewmodel.MapViewModel
+import ru.terrakok.cicerone.commands.Forward
 import ru.terrakok.cicerone.commands.Replace
 import java.util.*
 import javax.inject.Inject
@@ -64,6 +65,17 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     @Inject lateinit var mapService: MapWebService
 
+    var user: User = User()
+
+    companion object {
+        fun newInstance(user: User?): MapFragment {
+            val fragment = MapFragment()
+            fragment.arguments = Bundle()
+            fragment.user = user ?: User()
+            return fragment
+        }
+    }
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         App.component.inject(this)
@@ -79,9 +91,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         mMapView = view?.findViewById<MapView>(R.id.map)
 
-        mMapView?.onCreate(savedInstanceState)
-
         try {
+            mMapView?.onCreate(savedInstanceState)
             MapsInitializer.initialize(activity.applicationContext)
         } catch (e: Exception) {
             e.printStackTrace()
@@ -247,8 +258,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     LatLngInterpolator.CurveBezie(), listPointPath,
                     onAnimationEnd = {
                         viewModel?.similarUsersLiveData?.observe(this@MapFragment, android.arch.lifecycle.Observer<List<User>> { list ->
-                            (activity as MenuActivity).navigator
-                                    .applyCommand(Replace(Screens.SIMILAR_TRAVELS_SCREEN, list))
+                            (activity as MenuActivity).navigator.applyCommand(Forward(Screens.SIMILAR_TRAVELS_SCREEN, list))
 
                         })
                         viewModel?.getUsersWithSimilarTravel(text_from_city.text.toString(), text_to_city.text.toString())
@@ -256,7 +266,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun initBoxInputFragment() {
-        val searchFragment = SearchFragment()
+        val searchFragment = SearchFragment.newInstance(user)
         childFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container_box, searchFragment, "SearchFragment")
                 .commitAllowingStateLoss()
@@ -270,16 +280,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private val COLOR_BLUE_ARGB = -0x657db
     // Draw polyline on map
     fun drawPolyLineOnMap(list: List<LatLng>) {
-
         val strokeColor = COLOR_BLUE_ARGB
-
         val polyOptions = PolylineOptions()
         polyOptions.color(Color.RED)
         polyOptions.width(5f)
         polyOptions.addAll(list)
         polyOptions.color(strokeColor)
         polyOptions.pattern(PATTERN_POLYGON_ALPHA)
-        //  mMap.clear()
         mMap?.addPolyline(polyOptions)
 
     }
@@ -292,7 +299,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     fun setMarker(point: LatLng, position: Int) {
         mMap?.clear()
 
-        Log.e("LOg", point.toString() + " " + position)
         if (position == 1) {
             points.put(key = position, value = point.createMarker("Старт"))
         }

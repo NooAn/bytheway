@@ -91,7 +91,7 @@
     <string name="textBodyDisaster">Мы не смогли найти ваши предстоящие поездки.</string>
     <string name="textHeadAirDisaster">Ваш аккаунт синхронизирован!</string>
     <string name="item_all_users_empty_date"> </string>
-    <string name="filters_all_users_empty_date">с ___ по ___</string>
+    <string name="filters_all_users_empty_date">с\t\t\t_____\t\t\tпо\t\t\t_____</string>
     <string name="not_cities">Пока ничего не ищет</string>
     <string name="optionSearch">+ Параметры поиска</string>
     <string name="to">до</string>
@@ -105,4 +105,7 @@
     <string name="no">Нет</string>
     <string name="year_born">Год рождения</string>
     <string name="lastname">Фамилия</string>
+    <string name="feedback_text1">Мы будем Вам благодарны  за оставленный отзыв.</string>
+    <string name="feedback_text2">Вместе мы сделаем наше приложение лучше! :)</string>
+    <string name="email">Ваша почта</string>
 </resources>

@@ -230,8 +230,12 @@ class AllUsersFragment : Fragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        filter.startBudget = if (startBudget.text.isNotEmpty()) Integer.parseInt(startBudget.text.toString()) else -1
-        filter.endBudget = if (endBudget.text.isNotEmpty()) Integer.parseInt(endBudget.text.toString()) else -1
+        try {
+            filter.startBudget = if (startBudget.text.isNotEmpty()) Integer.parseInt(startBudget.text.toString()) else -1
+            filter.endBudget = if (endBudget.text.isNotEmpty()) Integer.parseInt(endBudget.text.toString()) else -1
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
         outState.putSerializable("filter", filter)
     }
 
@@ -268,8 +272,8 @@ class AllUsersFragment : Fragment() {
                 currentEndDate.get(Calendar.YEAR),
                 currentEndDate.get(Calendar.MONTH),
                 currentEndDate.get(Calendar.DAY_OF_MONTH))
-        dateDialog.setStartTitle("НАЧАЛО")
-        dateDialog.setEndTitle("КОНЕЦ")
+        dateDialog.setStartTitle(resources.getString(R.string.date_start))
+        dateDialog.setEndTitle(resources.getString(R.string.date_end))
     }
 
     private fun updateViewsBeforeSearch() {

@@ -2,10 +2,10 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/colorFiltersBackground"
-    android:paddingTop="16dp"
-    android:paddingStart="16dp"
-    android:paddingEnd="16dp">
+    android:background="@drawable/custom_rec"
+    android:elevation="8dp"
+    android:paddingEnd="16dp"
+    android:paddingStart="16dp">
 
     <EditText
         android:id="@+id/startCity"
@@ -21,7 +21,7 @@
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_below="@id/startCity"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="26dp"
         android:hint="@string/city_to"
         android:textColor="@color/black"
         android:textSize="@dimen/standard_text_size" />
@@ -52,6 +52,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/date_text"
         android:layout_marginBottom="26dp"
+        android:layout_marginEnd="62dp"
         android:text="@string/sex"
         android:textSize="@dimen/standard_text_size"
         android:textStyle="bold" />
@@ -60,10 +61,12 @@
         android:id="@+id/sexButtons"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@id/choseDate"
-        android:layout_below="@id/date_text"
+        android:layout_alignBottom="@id/sex_text"
+        android:layout_alignTop="@id/sex_text"
         android:backgroundTint="@color/colorPrimary"
+        android:layout_toRightOf="@id/sex_text"
         android:orientation="horizontal">
+        <!--android:layout_alignStart="@id/choseDate"-->
 
         <RadioButton
             android:id="@+id/sex_M"
@@ -111,7 +114,7 @@
         android:id="@+id/from_age_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@id/sexButtons"
+        android:layout_alignStart="@id/choseDate"
         android:layout_below="@id/sex_text"
         android:text="@string/from"
         android:textSize="@dimen/standard_text_size" />
@@ -120,7 +123,8 @@
         android:id="@+id/startAge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/sex_text"
+        android:layout_alignBottom="@id/age_text"
+        android:layout_alignTop="@id/age_text"
         android:layout_marginStart="@dimen/standard_margin"
         android:layout_toEndOf="@id/from_age_text"
         android:theme="@style/UsersTextInFilters" />
@@ -139,7 +143,8 @@
         android:id="@+id/endAge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/sex_text"
+        android:layout_alignBottom="@id/age_text"
+        android:layout_alignTop="@id/age_text"
         android:layout_marginStart="@dimen/standard_margin"
         android:layout_toEndOf="@id/by_age_text"
         android:theme="@style/UsersTextInFilters" />
@@ -159,7 +164,7 @@
         android:id="@+id/from_budget_text"
         android:layout_width="wrap_content"
         android:layout_height="35dp"
-        android:layout_alignStart="@id/from_age_text"
+        android:layout_alignStart="@id/choseDate"
         android:layout_below="@id/age_text"
         android:gravity="top"
         android:text="@string/from"
@@ -202,7 +207,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_below="@id/budget_text"
-        android:layout_marginStart="32dp"
+        android:layout_marginStart="10dp"
         android:drawablePadding="10dp"
         android:drawableStart="@drawable/places_ic_search"
         android:gravity="end|center_vertical"

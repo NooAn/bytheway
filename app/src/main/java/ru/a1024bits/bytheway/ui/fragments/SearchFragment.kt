@@ -18,13 +18,21 @@ import com.google.android.gms.location.places.AutocompleteFilter
 import com.google.android.gms.location.places.ui.PlaceAutocomplete
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.android.synthetic.main.fragment_search_block.*
+import kotlinx.android.synthetic.main.fragment_user_profile.*
 import kotlinx.android.synthetic.main.profile_direction.*
 import ru.a1024bits.bytheway.R
+import ru.a1024bits.bytheway.model.Method
+import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.util.Constants
+import ru.a1024bits.bytheway.util.Constants.END_DATE
+import ru.a1024bits.bytheway.util.Constants.FIRST_INDEX_CITY
+import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM
 import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO
+import ru.a1024bits.bytheway.util.Constants.START_DATE
 import ru.a1024bits.bytheway.util.DecimalInputFilter
+import java.text.SimpleDateFormat
 import java.util.*
 
 
@@ -36,6 +44,72 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     private lateinit var dateDialog: DatePickerDialog
     var firstPoint: LatLng? = null
     var secondPoint: LatLng? = null
+    var user: User = User()
+
+    companion object {
+        fun newInstance(user: User?): SearchFragment {
+            val fragment = SearchFragment()
+            fragment.arguments = Bundle()
+            fragment.user = user ?: User()
+            return fragment
+        }
+    }
+
+    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val view = inflater?.inflate(R.layout.fragment_search_block, container, false)
+        activity.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+        return view
+    }
+
+    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        for (method in user.method.keys) {
+            when (method) {
+                Method.CAR.link -> {
+                    iconCar.isActivated = user.method.get(method) == true
+                }
+                Method.TRAIN.link -> {
+                    iconTrain.isActivated = user.method.get(method) == true
+                }
+                Method.BUS.link -> {
+                    iconBus.isActivated = user.method.get(method) == true
+                }
+                Method.PLANE.link -> {
+                    iconPlane.isActivated = user.method.get(method) == true
+                }
+                Method.HITCHHIKING.link -> {
+                    iconHitchHicking.isActivated = user.method.get(method) == true
+                }
+            }
+        }
+        iconCar.setOnClickListener { with(travelCarText) { isActivated = !isActivated } }
+        iconTrain.setOnClickListener { with(travelTrainText) { isActivated = !isActivated } }
+        iconBus.setOnClickListener { with(travelBusText) { isActivated = !isActivated } }
+        iconPlane.setOnClickListener { with(travelPlaneText) { isActivated = !isActivated } }
+        iconHitchHicking.setOnClickListener { with(travelHitchHikingText) { isActivated = !isActivated } }
+
+        text_from_city.text = user.cities.get(FIRST_INDEX_CITY)
+        text_from_city.setOnClickListener {
+            sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM)
+        }
+
+        text_to_city.text = user.cities.get(LAST_INDEX_CITY)
+        text_to_city.setOnClickListener {
+            sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO)
+        }
+        dateFromValue.text = user.dates.get(START_DATE)?.getNormallDate()
+        dateToValue.text = user.dates.get(END_DATE)?.getNormallDate()
+
+        swap_cities.setOnClickListener {
+            val tempString = text_from_city.text
+            text_from_city.text = text_to_city.text
+            text_to_city.text = tempString
+        }
+
+        budgetFromValue.setText(user.budget.toString())
+        budgetFromValue.filters = arrayOf(DecimalInputFilter())
+        budgetToValue.filters = arrayOf(DecimalInputFilter())
+    }
 
     private fun openDateDialog() {
         dateDialog.setStartTitle(getString(R.string.date_start))
@@ -136,39 +210,6 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         }
     }
 
-
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater?.inflate(R.layout.fragment_search_block, container, false)
-        activity.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-        return view
-    }
-
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        iconCar.setOnClickListener { with(travelCarText) { isActivated = !isActivated } }
-        iconTrain.setOnClickListener { with(travelTrainText) { isActivated = !isActivated } }
-        iconBus.setOnClickListener { with(travelBusText) { isActivated = !isActivated } }
-        iconPlane.setOnClickListener { with(travelPlaneText) { isActivated = !isActivated } }
-        iconHitchHicking.setOnClickListener { with(travelHitchHikingText) { isActivated = !isActivated } }
-
-        text_from_city.setOnClickListener {
-            sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM)
-        }
-        text_to_city.setOnClickListener {
-            sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO)
-        }
-
-        swap_cities.setOnClickListener {
-            val tempString = text_from_city.text
-            text_from_city.text = text_to_city.text
-            text_to_city.text = tempString
-        }
-
-        budgetFromValue.filters = arrayOf(DecimalInputFilter())
-        budgetToValue.filters = arrayOf(DecimalInputFilter())
-    }
-
     private fun sendIntentForSearch(code: Int) {
         try {
             val typeFilter = AutocompleteFilter.Builder()
@@ -176,10 +217,10 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                     .build()
             val intent = PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY).setFilter(typeFilter).build(activity)
             startActivityForResult(intent, code)
-        } catch (e: GooglePlayServicesRepairableException) {
-            e.printStackTrace()
         } catch (e: GooglePlayServicesNotAvailableException) {
             e.printStackTrace()
         }
     }
 }
+
+private fun Long.getNormallDate(): CharSequence? = SimpleDateFormat("dd.MMMM.yyyy").format(this)

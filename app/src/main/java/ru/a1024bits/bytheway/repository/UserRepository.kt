@@ -4,6 +4,7 @@ import android.arch.lifecycle.Observer
 import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.*
+import io.reactivex.Single
 import ru.a1024bits.bytheway.model.User
 import javax.inject.Inject
 
@@ -15,8 +16,18 @@ const val COLLECTION_USERS = "users"
  */
 class UserRepository @Inject constructor(val store: FirebaseFirestore) : IUsersRepository {
 
-
     var TAG = "LOG UserRepository"
+
+    override fun getUser(id: String): Single<User> =
+            Single.create<User> { e ->
+                store.collection(COLLECTION_USERS).document(id).get().addOnSuccessListener({ document ->
+                    val user = document.toObject(User::class.java)
+                    e.onSuccess(user)
+                }).addOnFailureListener({ t ->
+                    e.onError(t)
+                })
+            }
+
 
     override fun getSimilarUsersTravels(data: Filter, observer: Observer<List<User>>): Task<QuerySnapshot> {
         return store.collection(COLLECTION_USERS).get()
