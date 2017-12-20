@@ -1,37 +1,27 @@
 package ru.a1024bits.bytheway.ui.fragments
 
 import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.annotation.LayoutRes
-import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.android.synthetic.main.fragment_user_profile.*
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
-import ru.a1024bits.bytheway.viewmodel.BaseViewModel
 import ru.a1024bits.bytheway.viewmodel.UserProfileViewModel
 import android.widget.Toast
-import android.R.attr.data
 import android.arch.lifecycle.ViewModelProvider
-import android.support.design.widget.NavigationView
 import android.util.Log
-import android.widget.TextView
-import com.bumptech.glide.RequestManager
 import com.bumptech.glide.request.RequestOptions
 import kotlinx.android.synthetic.main.profilte_user_direction.*
 import kotlinx.android.synthetic.main.profile_main_image.*
 import ru.a1024bits.bytheway.App
-import ru.a1024bits.bytheway.R.string.city
-import ru.a1024bits.bytheway.R.string.name
 import ru.a1024bits.bytheway.model.*
 import ru.a1024bits.bytheway.util.Constants
 import java.text.SimpleDateFormat
@@ -78,7 +68,6 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
         if (user.cities.size > 0) {
             textCityFrom.text = user.cities.get(Constants.FIRST_INDEX_CITY)
             textCityTo.text = user.cities.get(Constants.LAST_INDEX_CITY)
-
         }
 
         val formatDate = SimpleDateFormat("dd.MM.yyyy")
@@ -260,10 +249,6 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
 
     }
 
-    fun onButtonPressed() {
-        mListener?.onFragmentInteraction()
-    }
-
     override fun onAttach(context: Context?) {
         super.onAttach(context)
         if (context is OnFragmentInteractionListener) {
@@ -306,6 +291,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
     override fun onLowMemory() {
         super.onLowMemory()
         mMapView?.onLowMemory()
+        mListener = null
     }
 
 

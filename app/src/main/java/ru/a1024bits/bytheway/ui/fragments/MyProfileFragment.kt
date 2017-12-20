@@ -174,7 +174,10 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
 
         viewModel?.user?.observe(this, Observer<User> { user ->
-            if (user != null) fillProfile(user)
+            if (user != null) {
+                fillProfile(user)
+                mListener?.onFragmentInteraction(user)
+            }
         })
 
         viewModel?.load(uid)
@@ -421,11 +424,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     override fun onMapReady(map: GoogleMap?) {
         this.googleMap = map
 
-
-
         val coordFrom = LatLng(cityFromLatLng.latitude, cityFromLatLng.longitude)
         val coordTo = LatLng(cityToLatLng.latitude, cityToLatLng.longitude)
-
 
         val midPointLat = (coordFrom.latitude + coordTo.latitude) / 2
         val midPointLong = (coordFrom.longitude + coordTo.longitude) / 2
@@ -441,9 +441,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                 .title("Final Point"))
 
         val options = PolylineOptions()
-        options.color(orangeColor )
+        options.color(orangeColor)
         options.width(5f)
-
 
         if (routes != "") {
             var polyPts: List<LatLng>
@@ -454,10 +453,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             }
             googleMap?.addPolyline(options)
         }
-
-
         googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(midPointLat, midPointLong), 3.0f))
-
     }
 
     private var routes: String = ""
@@ -509,8 +505,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     }
 
     private fun openDateDialog() {
-        dateDialog.setStartTitle("НАЧАЛО")
-        dateDialog.setEndTitle("КОНЕЦ")
+        dateDialog.setStartTitle(resources.getString(R.string.date_start))
+        dateDialog.setEndTitle(resources.getString(R.string.date_end))
         dateDialog.accentColor = resources.getColor(R.color.colorPrimary)
         dateDialog.show(activity.fragmentManager, "")
     }
@@ -622,46 +618,38 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                 Log.e("LOG", "Nothing 2")
             }
         }
-
-
         simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Сохранить", { dialogInterface, i ->
             sex = if (man.isChecked) 1 else if (woman.isChecked) 2 else 0
             fillAgeSex(age, sex)
             name = (nameChoose.text.toString()).capitalize()
             lastName = (lastNameChoose.text.toString()).capitalize()
             city = (cityChoose.text.toString()).capitalize()
-           savingUserData(name,lastName,city)
-
-
+            savingUserData(name, lastName, city)
         })
         simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, "Отмена", { dialogInterface, i ->
             simpleAlert.hide()
         })
 
-
-var enterCounter=0
+        var enterCounter = 0
 
         nameChoose.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
             if (keyCode == KeyEvent.KEYCODE_ENTER) {
                 Log.d("LOG", "ENTER is Pressed on EditName")
                 lastNameChoose.requestFocus()
-                enterCounter=1
-
+                enterCounter = 1
                 return@OnKeyListener true
-
             }
             false
         })
 
         lastNameChoose.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
 
-            if (keyCode == KeyEvent.KEYCODE_ENTER ) {
+            if (keyCode == KeyEvent.KEYCODE_ENTER) {
                 Log.d("LOG", "ENTER is Pressed on LastName")
-
-               if (enterCounter==0){
-                   cityChoose.requestFocus()
-                   enterCounter=1
-               }else enterCounter=0
+                if (enterCounter == 0) {
+                    cityChoose.requestFocus()
+                    enterCounter = 1
+                } else enterCounter = 0
                 return@OnKeyListener true
             }
             false
@@ -669,38 +657,27 @@ var enterCounter=0
 
         cityChoose.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
 
-            if (keyCode == KeyEvent.KEYCODE_ENTER ) {
+            if (keyCode == KeyEvent.KEYCODE_ENTER) {
                 Log.d("LOG", "ENTER is Pressed on city")
-
-                if (enterCounter==0){
+                if (enterCounter == 0) {
                     name = (nameChoose.text.toString()).capitalize()
                     lastName = (lastNameChoose.text.toString()).capitalize()
                     city = (cityChoose.text.toString()).capitalize()
-                    savingUserData(name,lastName,city)
+                    savingUserData(name, lastName, city)
                     simpleAlert.hide()
-                }else enterCounter=0
+                } else enterCounter = 0
                 return@OnKeyListener true
             }
             false
         })
-
-
-
-
         simpleAlert.show()
-
     }
 
-private fun savingUserData(name:String,lastName:String,city:String){
-    username.text = StringBuilder(name).append(" ").append(lastName)
-    cityview.text = if (city.isNotEmpty()) city else getString(R.string.native_city)
-    viewModel?.sendUserData(getHashMapUser(), uid)
-
-}
-
-
-
-
+    private fun savingUserData(name: String, lastName: String, city: String) {
+        username.text = StringBuilder(name).append(" ").append(lastName)
+        cityview.text = if (city.isNotEmpty()) city else getString(R.string.native_city)
+        viewModel?.sendUserData(getHashMapUser(), uid)
+    }
 
     private fun openDialog(socialNetwork: SocialNetwork, errorText: String? = null) {
         var simpleAlert = AlertDialog.Builder(activity).create()
@@ -814,10 +791,6 @@ private fun savingUserData(name:String,lastName:String,city:String){
             SocialNetwork.WHATSAPP -> whatsAppIcon.setImageResource(R.drawable.ic_whats_icon_grey)
             SocialNetwork.TG -> tgIcon.setImageResource(R.drawable.tg_grey)
         }
-    }
-
-    fun onButtonPressed() {
-        mListener?.onFragmentInteraction()
     }
 
     override fun onAttach(context: Context?) {

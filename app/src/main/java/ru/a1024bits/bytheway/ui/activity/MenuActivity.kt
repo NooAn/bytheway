@@ -3,7 +3,6 @@ package ru.a1024bits.bytheway.ui.activity
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.app.Fragment
@@ -51,7 +50,6 @@ import ru.a1024bits.bytheway.ui.fragments.*
 import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.util.ServiceGenerator
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
-import ru.a1024bits.bytheway.viewmodel.ViewModelFeedback
 import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.Router
 import ru.terrakok.cicerone.android.SupportFragmentNavigator
@@ -89,7 +87,6 @@ class MenuActivity : AppCompatActivity(),
     var profileChanged: Boolean? = false
 
     private var viewModel: MyProfileViewModel? = null
-    private var viewModelFeedback: ViewModelFeedback? = null
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -100,12 +97,9 @@ class MenuActivity : AppCompatActivity(),
 
         setContentView(R.layout.activity_menu)
 
-
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
-
         val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
-
         val toggle = ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.optionSearch, R.string.remove)
         drawer.addDrawerListener(toggle)
@@ -121,6 +115,7 @@ class MenuActivity : AppCompatActivity(),
                 ?.apply(RequestOptions.circleCropTransform())
                 ?.into(image)
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
+
         if (savedInstanceState == null) {
             if (preferences.getBoolean(Constants.FIRST_ENTER, true)) {
                 navigator.applyCommand(Replace(Screens.USER_SINHRONIZED_SCREEN, 1))
@@ -142,7 +137,6 @@ class MenuActivity : AppCompatActivity(),
                 .addApi(Places.PLACE_DETECTION_API)
                 .enableAutoManage(this, this)
                 .build()
-
 
         sing_out.setOnClickListener {
             openAwayFromProfileDialog({
@@ -171,7 +165,7 @@ class MenuActivity : AppCompatActivity(),
 
                     MY_PROFILE_SCREEN -> return MyProfileFragment()
 
-                    SEARCH_MAP_SCREEN -> return MapFragment()
+                    SEARCH_MAP_SCREEN -> return MapFragment.newInstance(mainUser)
 
                     AIR_SUCCES_SCREEN -> {
                         var name: String = ""
@@ -190,7 +184,7 @@ class MenuActivity : AppCompatActivity(),
                     SIMILAR_TRAVELS_SCREEN -> {
                         SimilarTravelsFragment.newInstance(data as List<User>)
                     }
-                    else -> return SearchFragment()
+                    else -> return MapFragment()
                 }
         }
 
@@ -236,7 +230,9 @@ class MenuActivity : AppCompatActivity(),
         outState?.putSerializable(STATE_SCREEN_NAMES, screenNames as java.io.Serializable)
     }
 
-    override fun onFragmentInteraction() {}
+    override fun onFragmentInteraction(user: User?) {
+        mainUser = user
+    }
 
 
     override fun onResume() {
