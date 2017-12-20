@@ -54,11 +54,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/textFeedback2"
-        android:layout_marginTop="28dp">
+        android:layout_marginTop="28dp"
+        android:state_selected="false">
 
         <android.support.design.widget.TextInputEditText
             android:id="@+id/emailText"
-            android:focusable="false"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/email"
@@ -69,7 +69,8 @@
         android:id="@+id/textInputFeedback"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/textInputEmail">
+        android:layout_below="@+id/textInputEmail"
+        android:state_selected="true">
 
         <android.support.design.widget.TextInputEditText
             android:id="@+id/textFeedback"
@@ -80,7 +81,8 @@
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:hint="@string/feedback_writte"
-            android:nextFocusForward="@id/sendButton" />
+            android:nextFocusForward="@id/sendButton"
+            android:state_selected="true" />
     </android.support.design.widget.TextInputLayout>
 
 </RelativeLayout>

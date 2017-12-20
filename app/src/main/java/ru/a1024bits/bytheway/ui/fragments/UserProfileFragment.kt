@@ -78,6 +78,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
         if (user.cities.size > 0) {
             textCityFrom.text = user.cities.get(Constants.FIRST_INDEX_CITY)
             textCityTo.text = user.cities.get(Constants.LAST_INDEX_CITY)
+
         }
 
         val formatDate = SimpleDateFormat("dd.MM.yyyy")
@@ -112,7 +113,8 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
                 SocialNetwork.FB.link -> {
                     fbcon.setImageResource(R.drawable.ic_fb_color)
                     fbcon.setOnClickListener {
-                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("facebook:/profile/id=${user.socialNetwork.get(name.key)}")))
+                        //  startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("facebook:/profile/id=${user.socialNetwork.get(name.key)}")))
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("${user.socialNetwork.get(name.key)}")))
                     }
                 }
                 SocialNetwork.WHATSAPP.link -> {
@@ -123,7 +125,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
                 }
                 SocialNetwork.TG.link -> {
                     tgIcon.setImageResource(R.drawable.ic_tg_color)
-                    tgIcon.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://telegram.me/${user.socialNetwork.get(name.key)})}"))) }
+                    tgIcon.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://telegram.me/${user.socialNetwork.get(name.key)}"))) }
                 }
             }
         }
@@ -321,4 +323,16 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
         }
     }
 }// Required empty public constructor
+
+private val MAX_LENGTH_FOR_SHORT_STRING = 10
+
+private fun String.lastSymbols(): CharSequence? {
+    val n = if (this.length > MAX_LENGTH_FOR_SHORT_STRING) MAX_LENGTH_FOR_SHORT_STRING else this.length
+    val shortString = this.substring(0, n)
+    if (shortString.length == this.length) {
+        return this
+    } else {
+        return shortString + "..."
+    }
+}
 

@@ -28,6 +28,7 @@ class FeedbackDialog(context: Context) : Dialog(context) {
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         val view = layoutInflater.inflate(R.layout.f2_feedback_dialog, null)
         view.findViewById<TextInputEditText>(R.id.emailText).setText(FirebaseAuth.getInstance().currentUser?.email.toString())
+        view.findViewById<TextInputEditText>(R.id.textFeedback).requestFocus()
         view.findViewById<Button>(R.id.sendButton).setOnClickListener({ v ->
             val emailIntent = Intent(Intent.ACTION_SEND)
             emailIntent.setType("message/rfc822")
