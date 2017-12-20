@@ -5,6 +5,7 @@ import org.junit.Before
 import org.junit.Test
 
 import org.junit.Assert.*
+import ru.a1024bits.bytheway.model.Method
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.util.Constants.END_DATE
@@ -67,8 +68,86 @@ class SearchTravelersTest {
     }
 
     @Test
-    fun getWeightDate_Test() {
+    fun getMethod_equals_all() {
+        filter.method = hashMapOf(Method.BUS.link to true,
+                Method.TRAIN.link to true,
+                Method.PLANE.link to true,
+                Method.CAR.link to true,
+                Method.HITCHHIKING.link to true)
 
+        user.method = hashMapOf(Method.BUS.link to true,
+                Method.TRAIN.link to true,
+                Method.PLANE.link to true,
+                Method.CAR.link to true,
+                Method.HITCHHIKING.link to true)
+        Assert.assertEquals(search.calculateMethod(), 1.0, 0.01)
+    }
+
+    @Test
+    fun getMethod_Not_equals() {
+        filter.method = hashMapOf(Method.BUS.link to false,
+                Method.TRAIN.link to true,
+                Method.PLANE.link to false,
+                Method.CAR.link to false,
+                Method.HITCHHIKING.link to true)
+
+        user.method = hashMapOf(Method.BUS.link to true,
+                Method.TRAIN.link to false,
+                Method.PLANE.link to true,
+                Method.CAR.link to false,
+                Method.HITCHHIKING.link to false)
+
+        Assert.assertEquals(search.calculateMethod(), 0.00, 0.00)
+    }
+
+    @Test
+    fun getMethod_equals_2_from_2() {
+        filter.method = hashMapOf(Method.BUS.link to true,
+                Method.TRAIN.link to true,
+                Method.PLANE.link to false,
+                Method.CAR.link to false,
+                Method.HITCHHIKING.link to false)
+
+        user.method = hashMapOf(Method.BUS.link to true,
+                Method.TRAIN.link to true,
+                Method.PLANE.link to false,
+                Method.CAR.link to false,
+                Method.HITCHHIKING.link to false)
+        Assert.assertEquals(search.calculateMethod(), 1.0, 0.01)
+    }
+
+    @Test
+    fun getMethod_equals_1_from_4() {
+        filter.method = hashMapOf(Method.BUS.link to true,
+                Method.TRAIN.link to true,
+                Method.PLANE.link to false,
+                Method.CAR.link to true,
+                Method.HITCHHIKING.link to true)
+
+        user.method = hashMapOf(Method.BUS.link to true,
+                Method.TRAIN.link to false,
+                Method.PLANE.link to true,
+                Method.CAR.link to false,
+                Method.HITCHHIKING.link to false)
+
+        Assert.assertEquals(search.calculateMethod(), 0.25, 0.01)
+    }
+
+    @Test
+    fun getMethod_equals_3_for_5() {
+        filter.method = hashMapOf(Method.BUS.link to false,
+                Method.TRAIN.link to true,
+                Method.PLANE.link to false,
+                Method.CAR.link to false,
+                Method.HITCHHIKING.link to true)
+
+        user.method = hashMapOf(Method.BUS.link to true,
+                Method.TRAIN.link to false,
+                Method.PLANE.link to true,
+                Method.CAR.link to false,
+                Method.HITCHHIKING.link to true)
+
+        Assert.assertEquals(search.calculateMethod(), 0.33, 0.01)
     }
 
     @Test

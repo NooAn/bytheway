@@ -970,18 +970,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         mapView.onLowMemory()
     }
 
-    fun fibbonaci(n: Int): Long {
-        var prev: Long = 0
-        var next: Long = 1
-        var result: Long = 0
-        for (i in 0 until n) {
-            result = prev + next
-            prev = next
-            next = result
-        }
-        return result
-    }
-
     private var countTrip: Int = 0
 
     fun getHashMapUser(): HashMap<String, Any> {
