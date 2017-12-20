@@ -46,6 +46,7 @@ import ru.a1024bits.bytheway.router.Screens.Companion.MY_PROFILE_SCREEN
 import ru.a1024bits.bytheway.router.Screens.Companion.SEARCH_MAP_SCREEN
 import ru.a1024bits.bytheway.router.Screens.Companion.SIMILAR_TRAVELS_SCREEN
 import ru.a1024bits.bytheway.router.Screens.Companion.USER_SINHRONIZED_SCREEN
+import ru.a1024bits.bytheway.ui.dialogs.FeedbackDialog
 import ru.a1024bits.bytheway.ui.fragments.*
 import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.util.ServiceGenerator
@@ -368,27 +369,8 @@ class MenuActivity : AppCompatActivity(),
     }
 
     private fun openDialogFeedback() {
-        val simpleAlert = AlertDialog.Builder(this).create()
-        val inflater = this.layoutInflater
-        val dialogView = inflater.inflate(R.layout.custom_dialog_feedback, null)
-        val textMail = dialogView.findViewById<EditText>(R.id.textMailAddress)
-        val textFeedback = dialogView.findViewById<EditText>(R.id.textFeedback)
-
-        simpleAlert.setView(dialogView)
-        textMail.setText(FirebaseAuth.getInstance().currentUser?.email.toString())
-
-        simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Отправить", { dialogInterface, i ->
-            val emailIntent = Intent(Intent.ACTION_SEND)
-            emailIntent.setType("message/rfc822")
-            emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, arrayOf("travells2323@gmail.com"))
-            emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Обращение от пользователя")
-            emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, textFeedback.text.toString())
-            this@MenuActivity.startActivity(Intent.createChooser(emailIntent, "Отправка письма. Выберите почтовый клиент"))
-            simpleAlert.hide()
-        })
-        simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, "Отмена", { dialogInterface, i ->
-            simpleAlert.hide()
-        })
-        simpleAlert.show()
+        val dialog = FeedbackDialog(this)
+        dialog.show()
     }
+
 }
