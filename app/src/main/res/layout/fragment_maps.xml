@@ -17,8 +17,8 @@
             android:layout_height="match_parent"
             android:background="@color/white"
             android:fitsSystemWindows="true"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <com.google.android.gms.maps.MapView
                 android:id="@+id/map"
@@ -46,21 +46,30 @@
     </android.support.v4.widget.NestedScrollView>
 
 
-    <LinearLayout
-        android:background="@color/white"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:layout_gravity="bottom"
-        android:baselineAligned="true"
-        android:orientation="horizontal"
-        android:weightSum="1.0">
+        android:paddingTop="20dp"
+        android:layout_marginTop="40dp">
+
+        <View
+            android:layout_width="150dp"
+            android:layout_height="3dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:background="@color/colorPrimaryTeams" />
+
+        <RelativeLayout
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_height="wrap_content">
 
         <Button
             android:id="@+id/buttonSaveTravelInfo"
-            android:layout_width="0dip"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight=".4"
             android:drawableStart="@drawable/ic_add_save"
             android:text="@string/save"
             android:textColor="@color/colorPrimary"
@@ -69,14 +78,17 @@
 
         <Button
             android:id="@+id/buttonSearch"
-            android:layout_width="0dip"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="30dp"
-            android:layout_weight=".6"
+            android:layout_gravity="end"
+            android:layout_marginEnd="10dp"
+            android:layout_alignParentEnd="true"
             android:drawableStart="@drawable/ic_search_black_24dp"
             android:text="@string/name_button_search"
             android:textSize="14sp"
             android:theme="@style/WhiteButton" />
-    </LinearLayout>
+        </RelativeLayout>
+
+    </RelativeLayout>
 
 </android.support.design.widget.CoordinatorLayout>
