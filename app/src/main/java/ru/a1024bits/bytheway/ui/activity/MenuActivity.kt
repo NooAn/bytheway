@@ -309,8 +309,7 @@ class MenuActivity : AppCompatActivity(),
     fun getRefreshToken(): String = preferences.getString(Constants.REFRESH_TOKEN, "")
 
     override fun onBackPressed() {
-        // router.backTo(Screens.MY_PROFILE_SCREEN);
-        navigator.applyCommand(BackTo(Screens.MY_PROFILE_SCREEN))
+        navigator.applyCommand(Back())
         Log.e("LOG", "on back tap")
     }
 

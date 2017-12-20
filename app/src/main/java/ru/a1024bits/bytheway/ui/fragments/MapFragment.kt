@@ -40,6 +40,7 @@ import ru.a1024bits.bytheway.util.createMarker
 import ru.a1024bits.bytheway.util.toJsonString
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
 import ru.a1024bits.bytheway.viewmodel.MapViewModel
+import ru.terrakok.cicerone.commands.Forward
 import ru.terrakok.cicerone.commands.Replace
 import java.util.*
 import javax.inject.Inject
@@ -247,8 +248,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     LatLngInterpolator.CurveBezie(), listPointPath,
                     onAnimationEnd = {
                         viewModel?.similarUsersLiveData?.observe(this@MapFragment, android.arch.lifecycle.Observer<List<User>> { list ->
-                            (activity as MenuActivity).navigator
-                                    .applyCommand(Replace(Screens.SIMILAR_TRAVELS_SCREEN, list))
+                            (activity as MenuActivity).navigator.applyCommand(Forward(Screens.SIMILAR_TRAVELS_SCREEN, list))
 
                         })
                         viewModel?.getUsersWithSimilarTravel(text_from_city.text.toString(), text_to_city.text.toString())
