@@ -12,6 +12,7 @@ import android.support.design.widget.CoordinatorLayout
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v4.util.ArrayMap
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -39,6 +40,7 @@ import ru.a1024bits.bytheway.util.createMarker
 import ru.a1024bits.bytheway.util.toJsonString
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
 import ru.terrakok.cicerone.commands.Forward
+import java.lang.Integer.parseInt
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
@@ -261,12 +263,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                             (activity as MenuActivity).navigator.applyCommand(Forward(Screens.SIMILAR_TRAVELS_SCREEN, list))
 
                         })
-                        // text_from_city.text.toString(), text_to_city.text.toString(
-                        viewModel?.getUsersWithSimilarTravel(Filter())
+                        //  searchFragment?.filter?.endBudget = parseInt(budgetFromValue.toString())
+                        Log.d("LOG", budgetFromValue.toString())
+                        viewModel?.getUsersWithSimilarTravel(searchFragment?.filter ?: Filter())
                     })
     }
 
-    var searchFragment: Fragment? = null
+    var searchFragment: SearchFragment? = null
 
     private fun initBoxInputFragment() {
 

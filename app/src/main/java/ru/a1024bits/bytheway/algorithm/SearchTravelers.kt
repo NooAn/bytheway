@@ -1,5 +1,6 @@
 package ru.a1024bits.bytheway.algorithm
 
+import android.util.Log
 import ru.a1024bits.bytheway.model.Method
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
@@ -11,16 +12,19 @@ import kotlin.math.max
  * Created by Bit on 12/16/2017.
  */
 class SearchTravelers(val filter: Filter = Filter(), val user: User) {
-    val WeightRoute: Int = 75
-    val WeightBudget: Int = 8
-    val WeightMethod: Int = 8
-    val WeightDate: Int = 9
+    val WeightRoute: Int = 73
+    val WeightBudget: Int = 9
+    val WeightMethod: Int = 9
+    val WeightDate: Int = 10
 
     fun getEstimation(): Int {
         val n = calculateRoute() * WeightRoute
         val m = calculateDate() * WeightDate
         val c = calculateMethod() * WeightMethod
         val p = calculateBudget() * WeightBudget
+
+        Log.e("LOG", "${user.name} route:$n date:$m method:$c budget:$p")
+
         return ((calculateRoute() * WeightRoute
                 + calculateDate() * WeightDate
                 + calculateMethod() * WeightMethod
