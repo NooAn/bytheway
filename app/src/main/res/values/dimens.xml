@@ -27,6 +27,6 @@
 
     <dimen name="travelTypeHintTextSize">10sp</dimen>
     <dimen name="travelTypeHintTextMarginBottom">10dp</dimen>
-    <dimen name="chooseDestinationLayoutHeight">185dp</dimen>
+    <dimen name="chooseDestinationLayoutHeight">195dp</dimen>
     <dimen name="sinch_margin_left">16dp</dimen>
 </resources>

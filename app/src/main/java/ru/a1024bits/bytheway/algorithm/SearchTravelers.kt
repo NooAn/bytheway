@@ -17,10 +17,14 @@ class SearchTravelers(val filter: Filter = Filter(), val user: User) {
     val WeightDate: Int = 9
 
     fun getEstimation(): Int {
+        val n = calculateRoute() * WeightRoute
+        val m = calculateDate() * WeightDate
+        val c = calculateMethod() * WeightMethod
+        val p = calculateBudget() * WeightBudget
         return ((calculateRoute() * WeightRoute
                 + calculateDate() * WeightDate
                 + calculateMethod() * WeightMethod
-                + calculateBudget() * WeightBudget) * 100).toInt()
+                + calculateBudget() * WeightBudget)).toInt()
     }
 
     fun calculateBudget(): Double {
@@ -71,23 +75,29 @@ class SearchTravelers(val filter: Filter = Filter(), val user: User) {
     в случае равенства левой и правой частей). Если не выполняется,то пользователь вне окружности и значит расширяем радиус по фибоначчи
     */
     fun calculateRoute(): Double {
+
         val startPoint = (user.cityFromLatLng.latitude - filter.locationStartCity.latitude) * (user.cityFromLatLng.latitude - filter.locationStartCity.latitude)
         +((user.cityFromLatLng.longitude - filter.locationStartCity.longitude) * (user.cityFromLatLng.longitude - filter.locationStartCity.longitude))
+
         val endPoint = (user.cityToLatLng.latitude - filter.locationEndCity.latitude) * (user.cityToLatLng.latitude - filter.locationEndCity.latitude)
         +((user.cityToLatLng.longitude - filter.locationEndCity.longitude) * (user.cityToLatLng.longitude - filter.locationEndCity.longitude))
+
         var R = 0
         var indexFirst = 0.0
-        var indexLast = 0.0
-        for (i in 7..20) {
+        var indexLast = 0.500
+        for (i in 6..20) {
             R = fibbonaci(i)
-            indexFirst = (71.2 - (136.0 * R)) / 0.4
+            indexFirst = Math.abs((0.4 * R - 73.1) / (126 + (R * R * (i - 4)) / 26))
             if (startPoint <= R * R) break
         }
-        for (i in 7..20) {
-            R = fibbonaci(i)
-            indexLast = (71.2 - (136.0 * R)) / 0.4
+        R = 0
+        for (i in 1..20) {
+            R += i
+            indexLast -= 0.0693
             if (endPoint <= R * R) break
         }
+        if (indexFirst < 0) indexFirst = 0.0
+        if (indexLast < 0) indexLast = 0.0
         return indexFirst + indexLast
     }
 }

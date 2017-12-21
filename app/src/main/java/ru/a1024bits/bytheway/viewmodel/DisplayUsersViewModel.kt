@@ -5,7 +5,7 @@ import android.arch.lifecycle.ViewModel
 import android.os.AsyncTask
 import android.util.Log
 import com.google.firebase.firestore.QuerySnapshot
-import kotlinx.android.synthetic.main.fragment_search_block.*
+import ru.a1024bits.bytheway.algorithm.SearchTravelers
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.repository.UserRepository
@@ -47,7 +47,7 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
                 }
     }
 
-    fun getUsersWithSimilarTravel(fromCity: String, toCity: String) {
+    fun getUsersWithSimilarTravel(paramSearch: Filter) {
         userRepository.getReallUsers()
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
@@ -60,12 +60,17 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
                                 This filter;
                                 if user hasn't citi then I don't show him
                                  */
-                                if (user.cities.size > 0 && user.cities.containsValue(fromCity) && user.cities.containsValue(toCity))
+                                if (user.cities.size > 0) {// && user.cities.containsValue(paramSearch.startCity) && user.cities.containsValue(paramSearch.endCity)) {
+                                    // run search algorithm
+                                    val search = SearchTravelers(filter = paramSearch, user = user)
+                                    user.percentsSimilarTravel = search.getEstimation()
                                     result.add(user)
-                                // run search algorithm
+                                }
+
                             } catch (e: Exception) {
                             }
                         }
+                        result.sortByDescending { it.percentsSimilarTravel }
                         similarUsersLiveData.setValue(result)
                     } else {
                         Log.w(TAG, "Error getting documents.", task.exception)

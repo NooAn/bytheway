@@ -1,5 +1,9 @@
 package ru.a1024bits.bytheway.algorithm
 
+import android.location.Location
+import android.util.Log
+import com.google.android.gms.maps.model.LatLng
+import com.google.firebase.firestore.GeoPoint
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -151,8 +155,55 @@ class SearchTravelersTest {
     }
 
     @Test
-    fun getEstimation_Test() {
+    fun getRoute_all_equals() {
+        filter.locationEndCity = LatLng(5.5, 15.0)
+        filter.locationStartCity = LatLng(2.5, 25.00)
+        user.cityFromLatLng = GeoPoint(2.5, 25.00)
+        user.cityToLatLng = GeoPoint(5.5, 15.0)
+        Assert.assertEquals(search.calculateRoute(), 1.0, 0.01)
+    }
 
+    @Test
+    fun getRoute_distance_start_11km_R_0() {
+        // filter
+        var latStart = 5.5
+        val lonStart = 15.00
+        val latEnd = 10.00
+        val lonEnd = 10.00
+        //user location
+        val latStartUser = 5.546454
+        val lonStartUSer = 14.909738
+
+        filter.locationStartCity = LatLng(latStart, lonStart)
+        filter.locationEndCity = LatLng(latEnd, lonEnd)
+
+        user.cityFromLatLng = GeoPoint(latStartUser, lonStartUSer)
+        user.cityToLatLng = GeoPoint(latEnd, lonEnd)
+
+        Assert.assertEquals(search.calculateRoute(), 1.0, 0.01)
+    }
+
+    @Test
+    fun getRoute_distance_start_25km() {
+        // filter
+        var latStart = 5.5
+        val lonStart = 15.00
+        val latEnd = 10.00
+        val lonEnd = 10.00
+        //user location
+        val latStartUser = 5.622129
+        val lonStartUSer = 14.809831
+
+        filter.locationStartCity = LatLng(latStart, lonStart)
+        filter.locationEndCity = LatLng(latEnd, lonEnd)
+        user.cityFromLatLng = GeoPoint(latStartUser, lonStartUSer)
+        user.cityToLatLng = GeoPoint(latEnd, lonEnd)
+        Assert.assertEquals(search.calculateRoute(), 0.920, 0.001)
+    }
+
+    @Test
+    fun getEstimation_Test() {
+        search.getEstimation()
     }
 
 }

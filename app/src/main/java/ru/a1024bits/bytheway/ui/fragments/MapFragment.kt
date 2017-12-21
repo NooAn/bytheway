@@ -12,7 +12,6 @@ import android.support.design.widget.CoordinatorLayout
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v4.util.ArrayMap
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,7 +22,6 @@ import com.google.android.gms.maps.model.*
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.fragment_maps.*
 import kotlinx.android.synthetic.main.fragment_search_block.*
-import kotlinx.android.synthetic.main.searching_parameters_block.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -34,14 +32,13 @@ import ru.a1024bits.bytheway.MapWebService
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.model.map_directions.RoutesList
+import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.a1024bits.bytheway.util.createMarker
 import ru.a1024bits.bytheway.util.toJsonString
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
-import ru.a1024bits.bytheway.viewmodel.MapViewModel
 import ru.terrakok.cicerone.commands.Forward
-import ru.terrakok.cicerone.commands.Replace
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
@@ -145,7 +142,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         params.behavior = behavior
         appBarLayout.layoutParams = params
 
-
         mapFragmentRoot.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 mapFragmentRoot.viewTreeObserver.removeOnGlobalLayoutListener(this)
@@ -181,7 +177,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 error = R.string.fill_all_location
             }
 
-            if (error != 0) {
+            if (error != 0 && points.size < 2) {
                 Toast.makeText(this@MapFragment.context, getString(error), Toast.LENGTH_SHORT).show()
             } else {
                 goFlyPlan()
@@ -193,7 +189,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         this.mMap = googleMap
-        val constLocation = LatLng(50.0, 50.0)
+        var constLocation = LatLng(50.0, 50.0)
+
+        if (points.size > 0) {
+            constLocation = points.valueAt(0).position
+        }
         mMap?.moveCamera(CameraUpdateFactory.newLatLng(constLocation))
         mMap?.animateCamera(CameraUpdateFactory.zoomTo(3F))
     }
@@ -261,12 +261,16 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                             (activity as MenuActivity).navigator.applyCommand(Forward(Screens.SIMILAR_TRAVELS_SCREEN, list))
 
                         })
-                        viewModel?.getUsersWithSimilarTravel(text_from_city.text.toString(), text_to_city.text.toString())
+                        // text_from_city.text.toString(), text_to_city.text.toString(
+                        viewModel?.getUsersWithSimilarTravel(Filter())
                     })
     }
 
+    var searchFragment: Fragment? = null
+
     private fun initBoxInputFragment() {
-        val searchFragment = SearchFragment.newInstance(user)
+
+        searchFragment = SearchFragment.newInstance(user)
         childFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container_box, searchFragment, "SearchFragment")
                 .commitAllowingStateLoss()
