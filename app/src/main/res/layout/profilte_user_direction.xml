@@ -11,12 +11,14 @@
 
     <TextView
         android:id="@+id/textCityFrom"
-        android:layout_width="110dp"
+        android:layout_width="120dp"
         android:layout_height="wrap_content"
-        android:layout_margin="15dp"
-        android:layout_marginStart="24dp"
+        android:layout_margin="12dp"
         android:clickable="false"
+        android:ellipsize="end"
         android:focusableInTouchMode="false"
+        android:maxLength="16"
+        android:maxLines="1"
         android:text="@string/city_fromSmall"
         android:textColor="@color/white"
         android:textSize="20sp"
@@ -25,7 +27,7 @@
 
     <TextView
         android:id="@+id/textDateFrom"
-        android:layout_width="110dp"
+        android:layout_width="120dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="18dp"
         android:clickable="false"
@@ -44,7 +46,7 @@
         android:layout_marginTop="16dp"
         android:src="@drawable/ic_circles_dot"
         app:layout_constraintEnd_toStartOf="@+id/textCityTo"
-        app:layout_constraintHorizontal_bias="0.40"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/textCityFrom"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -53,7 +55,11 @@
         android:layout_width="120dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="12dp"
+        android:ellipsize="end"
+        android:maxLength="16"
+        android:maxLines="1"
         android:text="@string/city_toSmall"
+        android:textAlignment="textEnd"
         android:textColor="@color/textColor"
         android:textSize="20sp"
         app:layout_constraintRight_toRightOf="parent" />
@@ -68,6 +74,7 @@
         android:clickable="false"
         android:focusableInTouchMode="false"
         android:text="@string/date_to"
+        android:textAlignment="textEnd"
         android:textColor="@color/colorTextGrey"
         android:textSize="13sp"
         app:layout_constraintEnd_toEndOf="@+id/textCityTo"

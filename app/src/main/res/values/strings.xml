@@ -105,4 +105,7 @@
     <string name="no">Нет</string>
     <string name="year_born">Год рождения</string>
     <string name="lastname">Фамилия</string>
+    <string name="feedback_text1">Мы будем Вам благодарны  за оставленный отзыв.</string>
+    <string name="feedback_text2">Вместе мы сделаем наше приложение лучше! :)</string>
+    <string name="email">Ваша почта</string>
 </resources>

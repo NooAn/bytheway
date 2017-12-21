@@ -272,8 +272,8 @@ class AllUsersFragment : Fragment() {
                 currentEndDate.get(Calendar.YEAR),
                 currentEndDate.get(Calendar.MONTH),
                 currentEndDate.get(Calendar.DAY_OF_MONTH))
-        dateDialog.setStartTitle("НАЧАЛО")
-        dateDialog.setEndTitle("КОНЕЦ")
+        dateDialog.setStartTitle(resources.getString(R.string.date_start))
+        dateDialog.setEndTitle(resources.getString(R.string.date_end))
     }
 
     private fun updateViewsBeforeSearch() {

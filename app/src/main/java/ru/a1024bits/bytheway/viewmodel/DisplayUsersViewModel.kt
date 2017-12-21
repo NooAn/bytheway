@@ -62,6 +62,7 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
                                  */
                                 if (user.cities.size > 0 && user.cities.containsValue(fromCity) && user.cities.containsValue(toCity))
                                     result.add(user)
+                                // run search algorithm
                             } catch (e: Exception) {
                             }
                         }

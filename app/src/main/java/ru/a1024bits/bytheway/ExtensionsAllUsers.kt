@@ -4,7 +4,7 @@ import android.content.Context
 import java.util.*
 import kotlin.collections.ArrayList
 
-
+// FIXME memory leak
 class ExtensionsAllUsers(val context: Context) {
     var yearsOldUsers = (0..120).mapTo(ArrayList<String>()) { it.toString() }
 
@@ -16,9 +16,9 @@ class ExtensionsAllUsers(val context: Context) {
             toWord = " - "
         }
         val calendarStartDate = Calendar.getInstance()
-        calendarStartDate.timeInMillis = startDate?: 0L
+        calendarStartDate.timeInMillis = startDate ?: 0L
         val calendarEndDate = Calendar.getInstance()
-        calendarEndDate.timeInMillis = endDate?: 0L
+        calendarEndDate.timeInMillis = endDate ?: 0L
         var yearStart = ""
         var yearEnd = ""
         if (calendarStartDate.get(Calendar.YEAR) != calendarEndDate.get(Calendar.YEAR)) {

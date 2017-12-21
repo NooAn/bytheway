@@ -27,6 +27,7 @@
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
                 android:textSize="24sp"
+                android:textColor="@color/black"
                 android:textStyle="bold"
                 tools:text="@string/fullname" />
 
@@ -312,8 +313,8 @@
 
                 <ImageView
                     android:id="@+id/directions_flight"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
                     android:layout_marginEnd="6dp"
                     android:layout_marginStart="6dp"
                     android:src="@drawable/ic_flight"
@@ -322,8 +323,8 @@
 
                 <ImageView
                     android:id="@+id/direction_hitchiking"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
                     android:layout_marginEnd="6dp"
                     android:layout_marginStart="6dp"
                     android:src="@drawable/ic_directions_hitchhiking"
@@ -361,6 +362,7 @@
                 android:drawablePadding="4dp"
                 android:drawableStart="@drawable/ic_ruble_blue"
                 android:textColor="@color/colorPrimary"
+                android:textSize="@dimen/standard_text_size"
                 tools:text="8000" />
 
         </RelativeLayout>
@@ -392,6 +394,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/imageQuoteDescription"
                 android:layout_toEndOf="@+id/imageQuoteDescription"
+                android:textSize="@dimen/standard_text_size"
                 tools:text="Собираюсь провести отпуск в Ижевске. Шутка))) Еду в Карловы Вары" />
         </RelativeLayout>
     </RelativeLayout>
