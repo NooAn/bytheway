@@ -198,7 +198,7 @@ class SearchTravelersTest {
         filter.locationEndCity = LatLng(latEnd, lonEnd)
         user.cityFromLatLng = GeoPoint(latStartUser, lonStartUSer)
         user.cityToLatLng = GeoPoint(latEnd, lonEnd)
-        Assert.assertEquals(search.calculateRoute(), 0.920, 0.001)
+        Assert.assertEquals(0.920, search.calculateRoute(),  0.001)
     }
 
     @Test

@@ -89,19 +89,55 @@ class SearchTravelers(val filter: Filter = Filter(), val user: User) {
         var R = 0
         var indexFirst = 0.0
         var indexLast = 0.500
-        for (i in 6..20) {
-            R = fibbonaci(i)
-            indexFirst = Math.abs((0.4 * R - 73.1) / (126 + (R * R * (i - 4)) / 26))
-            if (startPoint <= R * R) break
-        }
+        val radiusStart = distance(user.cityFromLatLng.latitude, filter.locationStartCity.latitude, user.cityFromLatLng.longitude, filter.locationStartCity.longitude)
+        if (radiusStart < 10) indexFirst = 0.5
+        else if (radiusStart < 100) {
+            indexFirst = (9800 - 90 * radiusStart) / 9000
+        } else if (radiusStart < 1000) {
+            indexFirst = (19500 - 15 * radiusStart) / 8000
+        } else if (radiusStart < 10000) {
+            indexFirst = (5000 - 5 * radiusStart) / 900000
+        } else indexFirst = 0.0
+
+//        for (i in 6..20) {
+//            R = fibbonaci(i)
+//            indexFirst = Math.abs((0.4 * R - 73.1) / (126 + (R * R * (i - 4)) / 26))
+//            if (startPoint <= R * R) break
+//        }
         R = 0
         for (i in 1..20) {
+            if (endPoint <= R * R) break
             R += i
             indexLast -= 0.0693
-            if (endPoint <= R * R) break
         }
         if (indexFirst < 0) indexFirst = 0.0
         if (indexLast < 0) indexLast = 0.0
-        return indexFirst + indexLast
+        return (indexFirst / 2) + indexLast
+    }
+
+    /**
+     * Calculate distance between two points in latitude and longitude taking
+     * into account height difference. If you are not interested in height
+     * difference pass 0.0. Uses Haversine method as its base.
+     *
+     * lat1, lon1 Start point lat2, lon2 End point el1 Start altitude in km
+     * el2 End altitude in meters
+     * @returns Distance in Meters
+     */
+    fun distance(lat1: Double, lat2: Double, lon1: Double,
+                 lon2: Double): Double {
+
+        val R = 6371 // Radius of the earth
+
+        val latDistance = Math.toRadians(lat2 - lat1)
+        val lonDistance = Math.toRadians(lon2 - lon1)
+        val a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2) + (Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2))
+        val c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+        var distance = R.toDouble() * c //
+
+        distance = Math.pow(distance, 2.0)
+
+        return Math.sqrt(distance)
     }
 }

@@ -274,4 +274,4 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     }
 }
 
-private fun Long.getNormallDate(): CharSequence? = SimpleDateFormat("dd.MMMM.yyyy").format(this)
+private fun Long.getNormallDate(): CharSequence? = SimpleDateFormat("dd.MM.yyyy").format(this)

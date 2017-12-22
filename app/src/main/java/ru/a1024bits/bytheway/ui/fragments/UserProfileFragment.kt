@@ -43,6 +43,9 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
             }
         }
     }
+    private val progressBarLoad: Observer<Boolean> = Observer<Boolean> { b ->
+        // fix me after create loader for app
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -178,6 +181,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
         super.onActivityCreated(savedInstanceState)
 
         viewModel?.response?.observe(this, userLoad)
+        viewModel?.loadingStatus?.observe(this, progressBarLoad)
 
         if (arguments != null) {
             val userId: String = arguments.getString(UID_KEY, "")
