@@ -8,7 +8,7 @@ import io.reactivex.Single
 import ru.a1024bits.bytheway.model.User
 
 interface IUsersRepository {
-    fun getReallUsers(): Task<QuerySnapshot>
+    fun getReallUsers(paramSearch: Filter): Single<List<User>>
     fun getAllUsers(): Task<QuerySnapshot>
     fun getSimilarUsersTravels(data: Filter, observer: Observer<List<User>>): Task<QuerySnapshot>
     fun getUserById(userID: String): Task<DocumentSnapshot>

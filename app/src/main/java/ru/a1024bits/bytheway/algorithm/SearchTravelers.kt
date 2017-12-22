@@ -1,5 +1,6 @@
 package ru.a1024bits.bytheway.algorithm
 
+import android.util.Log
 import ru.a1024bits.bytheway.model.Method
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
@@ -11,16 +12,23 @@ import kotlin.math.max
  * Created by Bit on 12/16/2017.
  */
 class SearchTravelers(val filter: Filter = Filter(), val user: User) {
-    val WeightRoute: Int = 75
-    val WeightBudget: Int = 8
-    val WeightMethod: Int = 8
-    val WeightDate: Int = 9
+    val WeightRoute: Int = 73
+    val WeightBudget: Int = 9
+    val WeightMethod: Int = 9
+    val WeightDate: Int = 10
 
     fun getEstimation(): Int {
+        val n = calculateRoute() * WeightRoute
+        val m = calculateDate() * WeightDate
+        val c = calculateMethod() * WeightMethod
+        val p = calculateBudget() * WeightBudget
+
+        Log.e("LOG", "${user.name} route:$n date:$m method:$c budget:$p")
+
         return ((calculateRoute() * WeightRoute
                 + calculateDate() * WeightDate
                 + calculateMethod() * WeightMethod
-                + calculateBudget() * WeightBudget) * 100).toInt()
+                + calculateBudget() * WeightBudget)).toInt()
     }
 
     fun calculateBudget(): Double {
@@ -71,23 +79,65 @@ class SearchTravelers(val filter: Filter = Filter(), val user: User) {
     в случае равенства левой и правой частей). Если не выполняется,то пользователь вне окружности и значит расширяем радиус по фибоначчи
     */
     fun calculateRoute(): Double {
+
         val startPoint = (user.cityFromLatLng.latitude - filter.locationStartCity.latitude) * (user.cityFromLatLng.latitude - filter.locationStartCity.latitude)
         +((user.cityFromLatLng.longitude - filter.locationStartCity.longitude) * (user.cityFromLatLng.longitude - filter.locationStartCity.longitude))
+
         val endPoint = (user.cityToLatLng.latitude - filter.locationEndCity.latitude) * (user.cityToLatLng.latitude - filter.locationEndCity.latitude)
         +((user.cityToLatLng.longitude - filter.locationEndCity.longitude) * (user.cityToLatLng.longitude - filter.locationEndCity.longitude))
+
         var R = 0
         var indexFirst = 0.0
-        var indexLast = 0.0
-        for (i in 7..20) {
-            R = fibbonaci(i)
-            indexFirst = (71.2 - (136.0 * R)) / 0.4
-            if (startPoint <= R * R) break
-        }
-        for (i in 7..20) {
-            R = fibbonaci(i)
-            indexLast = (71.2 - (136.0 * R)) / 0.4
+        var indexLast = 0.500
+        val radiusStart = distance(user.cityFromLatLng.latitude, filter.locationStartCity.latitude, user.cityFromLatLng.longitude, filter.locationStartCity.longitude)
+        if (radiusStart < 10) indexFirst = 0.5
+        else if (radiusStart < 100) {
+            indexFirst = (9800 - 90 * radiusStart) / 9000
+        } else if (radiusStart < 1000) {
+            indexFirst = (19500 - 15 * radiusStart) / 8000
+        } else if (radiusStart < 10000) {
+            indexFirst = (5000 - 5 * radiusStart) / 900000
+        } else indexFirst = 0.0
+
+//        for (i in 6..20) {
+//            R = fibbonaci(i)
+//            indexFirst = Math.abs((0.4 * R - 73.1) / (126 + (R * R * (i - 4)) / 26))
+//            if (startPoint <= R * R) break
+//        }
+        R = 0
+        for (i in 1..20) {
             if (endPoint <= R * R) break
+            R += i
+            indexLast -= 0.0693
         }
-        return indexFirst + indexLast
+        if (indexFirst < 0) indexFirst = 0.0
+        if (indexLast < 0) indexLast = 0.0
+        return (indexFirst / 2) + indexLast
+    }
+
+    /**
+     * Calculate distance between two points in latitude and longitude taking
+     * into account height difference. If you are not interested in height
+     * difference pass 0.0. Uses Haversine method as its base.
+     *
+     * lat1, lon1 Start point lat2, lon2 End point el1 Start altitude in km
+     * el2 End altitude in meters
+     * @returns Distance in Meters
+     */
+    fun distance(lat1: Double, lat2: Double, lon1: Double,
+                 lon2: Double): Double {
+
+        val R = 6371 // Radius of the earth
+
+        val latDistance = Math.toRadians(lat2 - lat1)
+        val lonDistance = Math.toRadians(lon2 - lon1)
+        val a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2) + (Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2))
+        val c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+        var distance = R.toDouble() * c //
+
+        distance = Math.pow(distance, 2.0)
+
+        return Math.sqrt(distance)
     }
 }
