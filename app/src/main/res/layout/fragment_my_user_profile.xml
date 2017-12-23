@@ -1,5 +1,6 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scrollProfile"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -505,14 +506,26 @@
             android:text="@string/add_new_trip_from_app_in_the_air"
             android:textStyle="bold"
             android:visibility="gone"
-            tools:visibility="visible" />
+            tools:visibility="visible"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_below="@id/appinTheAirEnter"
+            android:layout_marginTop="25dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginStart="15dp"
+            android:background="@drawable/back"
+            android:id="@+id/grayLine"
+            android:visibility="gone"
+            tools:visibility="invisible" />
 
         <Button
             android:id="@+id/button_save_travel_info"
             android:layout_width="150dp"
             android:layout_height="match_parent"
             android:layout_alignEnd="@+id/appinTheAirEnter"
-            android:layout_alignParentBottom="true"
+            android:layout_alignTop="@+id/grayLine"
             android:padding="24dp"
             android:text="@string/save"
             android:theme="@style/WhiteButton"
@@ -523,8 +536,7 @@
             android:id="@+id/button_remove_travel_info"
             android:layout_width="150dp"
             android:layout_height="match_parent"
-            android:layout_below="@+id/appinTheAirEnter"
-            android:layout_marginTop="12dp"
+            android:layout_alignTop="@+id/grayLine"
             android:layout_toStartOf="@+id/button_save_travel_info"
             android:padding="24dp"
             android:text="@string/remove"

@@ -11,25 +11,29 @@
 
     <EditText
         android:id="@+id/textCityFrom"
-        android:layout_width="110dp"
+        android:layout_width="160dp"
         android:layout_height="wrap_content"
         android:layout_margin="15dp"
-        android:layout_marginStart="24dp"
+        android:layout_marginLeft="16dp"
         android:backgroundTint="@color/hint"
         android:clickable="false"
         android:cursorVisible="false"
         android:focusableInTouchMode="false"
         android:hint="@string/city_fromSmall"
         android:inputType="text"
+        android:paddingBottom="13dp"
+        android:singleLine="false"
+        android:textAlignment="viewStart"
         android:textColor="@color/textColor"
         android:textColorHint="@color/hint"
         android:textSize="16sp"
         app:layout_constraintLeft_toLeftOf="parent"
-        tools:ignore="MissingConstraints" />
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteY="0dp" />
 
     <EditText
         android:id="@+id/textDateFrom"
-        android:layout_width="110dp"
+        android:layout_width="160dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="18dp"
         android:backgroundTint="@color/hint"
@@ -37,6 +41,7 @@
         android:cursorVisible="false"
         android:focusableInTouchMode="false"
         android:hint="@string/date_from"
+        android:paddingBottom="13dp"
         android:inputType="date"
         android:textColor="@color/textColor"
         android:textColorHint="@color/hint"
@@ -49,7 +54,7 @@
 
     <EditText
         android:id="@+id/textCityTo"
-        android:layout_width="110dp"
+        android:layout_width="160dp"
         android:layout_height="wrap_content"
         android:layout_margin="15dp"
         android:layout_marginEnd="32dp"
@@ -59,6 +64,7 @@
         android:focusableInTouchMode="false"
         android:hint="@string/city_toSmall"
         android:inputType="text"
+        android:paddingBottom="13dp"
         android:textColor="@color/textColor"
         android:textColorHint="@color/hint"
         android:textSize="16sp"
@@ -67,16 +73,15 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="24dp"
         android:src="@drawable/ic_circles_dot"
         app:layout_constraintEnd_toStartOf="@+id/textCityTo"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/textCityFrom"
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/dateArrived"
-        android:layout_width="110dp"
+        android:layout_width="160dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginTop="16dp"
@@ -85,6 +90,7 @@
         android:cursorVisible="false"
         android:focusableInTouchMode="false"
         android:hint="@string/date_to"
+        android:paddingBottom="13dp"
         android:inputType="date"
         android:textColor="@color/textColor"
         android:textColorHint="@color/hint"
