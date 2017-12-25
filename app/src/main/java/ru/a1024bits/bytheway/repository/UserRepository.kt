@@ -39,14 +39,21 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) : IUsersR
     }
 
     override fun getReallUsers(paramSearch: Filter): Single<List<User>> =
-            Single.create<List<User>> { e ->
+            Single.create<List<User>> { stream ->
                 store.collection(COLLECTION_USERS).get().addOnCompleteListener({ task ->
                     if (task.isSuccessful) {
                         val result: MutableList<User> = ArrayList()
                         for (document in task.result) {
+                            Log.d(TAG, document.id + " => " + document.data)
+
+                            var user = User()
                             try {
-                                Log.d(TAG, document.id + " => " + document.data)
-                                val user = document.toObject(User::class.java)
+                                user = document.toObject(User::class.java)
+                            } catch (ex2: Exception) {
+                                Log.e(TAG, "Error!: " + document.id + " => " + document.data, ex2)
+                                ex2.printStackTrace()
+                            }
+                            try {
                                 if (user.cities.size > 0) {
                                     // run search algorithm
                                     val search = SearchTravelers(filter = paramSearch, user = user)
@@ -54,13 +61,13 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) : IUsersR
                                     result.add(user)
                                 }
                             } catch (ex: Exception) {
-                                e.onError(ex)
+                                stream.onError(ex)
                             }
                         }
                         result.sortByDescending { it.percentsSimilarTravel } // перед отправкой сортируем по степени похожести маршрута.
-                        e.onSuccess(result)
+                        stream.onSuccess(result)
                     } else {
-                        e.onError(Exception("Not Successful load users"))
+                        stream.onError(Exception("Not Successful load users"))
                     }
                 })
             }

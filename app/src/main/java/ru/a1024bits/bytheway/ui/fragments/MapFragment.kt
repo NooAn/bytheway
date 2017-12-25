@@ -219,22 +219,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     fun goFlyPlan() {
         if (points.size < 2) return
-
-        val fromLocation = points.valueAt(0).position
-        val endLocation = points.valueAt(1).position
-
-        val markerOptions = MarkerOptions().position(fromLocation).anchor(0.5F, 1.0F).flat(true)
-
-        var t = 0.0
-        while (t < 1.000001) {
-            listPointPath.add(LatLngInterpolator.CurveBezie().calculateBezierFunction(t, fromLocation, endLocation))
-            t += 0.01F
-        }
-        drawPolyLineOnMap(listPointPath)
-        // Changing marker icon
-        markerOptions.icon(bitmapDescriptorFromVector(activity, R.drawable.plane)).rotation(getBearing(listPointPath.first(), listPointPath[1]))
-
-        marker = mMap?.addMarker(markerOptions)
         animateMarker()
     }
 
@@ -272,15 +256,36 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     fun animateMarker() {
         // Whatever destination coordinates
-        if (markerAnimation.flag == false)
+        if (markerAnimation.flag == false) {
+
+            val fromLocation = points.valueAt(0).position
+            val endLocation = points.valueAt(1).position
+
+            val markerOptions = MarkerOptions().position(fromLocation).anchor(0.5F, 1.0F).flat(true)
+
+            var t = 0.0
+            while (t < 1.000001) {
+                listPointPath.add(LatLngInterpolator.CurveBezie().calculateBezierFunction(t, fromLocation, endLocation))
+                t += 0.01F
+            }
+            drawPolyLineOnMap(listPointPath)
+            // Changing marker icon
+            markerOptions.icon(bitmapDescriptorFromVector(activity, R.drawable.plane)).rotation(getBearing(listPointPath.first(), listPointPath[1]))
+
+            marker = mMap?.addMarker(markerOptions)
+            
             markerAnimation.animateMarker(marker, listPointPath.first(), listPointPath.last(),
-                    LatLngInterpolator.CurveBezie(), listPointPath,
+                    LatLngInterpolator.CurveBezie(),
                     onAnimationEnd = {
                         viewModel?.response?.observe(this@MapFragment, listUsers)
                         //  searchFragment?.filter?.endBudget = parseInt(budgetFromValue.toString())
                         Log.d("LOG", budgetFromValue.toString())
                         viewModel?.getUsersWithSimilarTravel(searchFragment?.filter ?: Filter())
+                        mMap?.clear()
+                        listPointPath.clear()
+                        markerAnimation.flag = false
                     })
+        }
     }
 
 
@@ -308,7 +313,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         polyOptions.color(strokeColor)
         polyOptions.pattern(PATTERN_POLYGON_ALPHA)
         mMap?.addPolyline(polyOptions)
-
     }
 
     override fun onResume() {
