@@ -6,9 +6,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
-    android:background="@color/colorFiltersBackground"
     android:orientation="vertical"
     android:theme="@style/AppTheme.NoActionBar">
+
+    <LinearLayout
+        android:background="@color/colorFiltersBackground"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/searchParametersText"
@@ -23,6 +27,7 @@
         android:textAllCaps="true"
         android:textColor="@color/colorPrimaryTeams"
         android:textSize="@dimen/all_users_searchParametersText_text_size" />
+    </LinearLayout>
 
 
     <include
@@ -45,7 +50,6 @@
         android:id="@+id/display_all_users"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
         android:paddingEnd="@dimen/standard_margin"
         android:paddingStart="@dimen/standard_margin"
         app:layoutManager="LinearLayoutManager"
