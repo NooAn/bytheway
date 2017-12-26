@@ -21,6 +21,7 @@ import android.widget.Toast
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.android.synthetic.main.fragment_display_all_users.*
 import kotlinx.android.synthetic.main.fragment_maps.*
 import kotlinx.android.synthetic.main.fragment_search_block.*
 import kotlinx.android.synthetic.main.searching_parameters_block.*
@@ -36,12 +37,15 @@ import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.model.map_directions.RoutesList
 import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
+import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.util.createMarker
 import ru.a1024bits.bytheway.util.toJsonString
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
 import ru.a1024bits.bytheway.viewmodel.MapViewModel
 import ru.terrakok.cicerone.commands.Forward
 import ru.terrakok.cicerone.commands.Replace
+import uk.co.deanwild.materialshowcaseview.IShowcaseListener
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
@@ -187,6 +191,24 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 goFlyPlan()
             }
         }
+
+
+        if ((activity as MenuActivity).preferences.getBoolean("isFirstEnterMapFragment", true))
+            MaterialShowcaseView.Builder(activity)
+                    .setTarget(buttonSaveTravelInfo)
+                    .renderOverNavigationBar()
+                    .setDismissText("КРУТО!")
+                    .setTitleText("Сохраняйте и находите!")
+                    .setContentText("При нажатии на кнопку \"Сохранить\", внесенные изменения изменения о поездке автоматически сохраняються в Вашем провиле.\n\n Вы можете продолжить поиск попутчиков без соххрнения поездки.")
+                    .withCircleShape()
+                    .setListener(object : IShowcaseListener {
+                        override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {
+                        }
+                        override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
+                            (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterMapFragment", false).apply()
+                        }
+                    })
+                    .show()
     }
 
     var marker: Marker? = null

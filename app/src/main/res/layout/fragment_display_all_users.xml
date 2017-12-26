@@ -6,29 +6,37 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:theme="@style/AppTheme.NoActionBar">
 
-    <TextView
-        android:id="@+id/searchParametersText"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:background="@color/colorFiltersBackground"
-        android:gravity="center_vertical|start"
-        android:paddingBottom="@dimen/all_users_searchParametersText_vertical_margin"
-        android:paddingStart="@dimen/standard_margin"
-        android:paddingTop="@dimen/all_users_searchParametersText_vertical_margin"
-        android:text="@string/optionSearch"
-        android:textAllCaps="true"
-        android:textColor="@color/colorPrimaryTeams"
-        android:textSize="@dimen/all_users_searchParametersText_text_size" />
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/searchParametersText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/colorFiltersBackground"
+            android:gravity="center_vertical|start"
+            android:paddingBottom="@dimen/all_users_searchParametersText_vertical_margin"
+            android:paddingStart="@dimen/standard_margin"
+            android:paddingTop="@dimen/all_users_searchParametersText_vertical_margin"
+            android:text="@string/optionSearch"
+            android:textAllCaps="true"
+            android:textColor="@color/colorPrimaryTeams"
+            android:textSize="@dimen/all_users_searchParametersText_text_size" />
+    </LinearLayout>
+
 
     <include
         android:id="@+id/block_search_parameters"
         layout="@layout/searching_parameters_block"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
         android:layout_marginBottom="10dp"
+        android:visibility="gone"
         tools:visibility="visible" />
 
     <include

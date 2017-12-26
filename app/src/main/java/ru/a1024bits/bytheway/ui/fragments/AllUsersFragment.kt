@@ -23,8 +23,12 @@ import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.adapter.DisplayAllUsersAdapter
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
+import ru.a1024bits.bytheway.ui.activity.MenuActivity
+import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.util.DecimalInputFilter
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
+import uk.co.deanwild.materialshowcaseview.IShowcaseListener
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
@@ -166,6 +170,23 @@ class AllUsersFragment : Fragment() {
                 block_search_parameters.visibility = View.GONE
             }
         }
+
+        if ((activity as MenuActivity).preferences.getBoolean("isFirstEnterAllUsersFragment", true))
+            MaterialShowcaseView.Builder(activity)
+                    .setTarget(searchParametersText)
+                    .renderOverNavigationBar()
+                    .setDismissText("КРУТО!")
+                    .setTitleText("все путешественники")
+                    .setContentText("Если вы захотите присоединиться к другим путешествиям, можете использовать этот екран. Фильтр поможет Вам :)")
+                    .withCircleShape()
+                    .setListener(object : IShowcaseListener {
+                        override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {
+                        }
+                        override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
+                            (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterAllUsersFragment", false).apply()
+                        }
+                    })
+                    .show()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

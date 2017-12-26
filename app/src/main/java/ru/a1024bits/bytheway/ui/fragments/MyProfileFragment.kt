@@ -35,6 +35,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.GeoPoint
 import com.google.maps.android.PolyUtil
 import kotlinx.android.synthetic.main.confirm_dialog.view.*
+import kotlinx.android.synthetic.main.fragment_maps.*
 import kotlinx.android.synthetic.main.fragment_my_user_profile.*
 import kotlinx.android.synthetic.main.profile_add_trip.*
 import kotlinx.android.synthetic.main.profile_direction.*
@@ -56,6 +57,8 @@ import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT
 import ru.a1024bits.bytheway.util.Constants.START_DATE
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import ru.terrakok.cicerone.commands.Replace
+import uk.co.deanwild.materialshowcaseview.IShowcaseListener
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -183,6 +186,28 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         viewModel?.load(uid)
     }
 
+    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        if ((activity as MenuActivity).preferences.getBoolean("isFirstEnterMyProfileFragment", true)) {
+//            showBlockAddTrip()
+            MaterialShowcaseView.Builder(activity)
+                    .setTarget(new_trip_text)
+                    .renderOverNavigationBar()
+                    .setDismissText("КРУТО!")
+                    .setTitleText("Создайте поездку!")
+                    .setContentText("Ввкдите максимум информации для эффективного поиска попутчиков, что бы другие пользователи смогли найти Вас :)")
+                    .withCircleShape()
+                    .setListener(object : IShowcaseListener {
+                        override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {
+                        }
+                        override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
+//                            if (countTrip <= 0) hideBlockNewTrip()
+                            (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterMyProfileFragment", false).apply()
+                        }
+                    })
+                    .show()
+        }
+    }
 
     private fun fillProfile(user: User) {
         val navigationView = activity.findViewById<NavigationView>(R.id.nav_view)
