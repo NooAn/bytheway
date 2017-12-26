@@ -196,10 +196,16 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                     .withCircleShape()
                     .setListener(object : IShowcaseListener {
                         override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {
+                            Log.d("tag", "onShowcaseDisplayed " + activity.isDestroyed )
                         }
+
                         override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
 //                            if (countTrip <= 0) hideBlockNewTrip()
-                            (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterMyProfileFragment", false).apply()
+//                            Log.d("tag", "onShowcaseDismissed " + activity?.isDestroyed + "  p0?.hasFired(): " + p0?.hasFired())
+//                            p0?.hide()
+//                            p0?.removeFromWindow()
+                            if (activity != null && !activity.isDestroyed)
+                                (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterMyProfileFragment", false).apply()
                         }
                     })
                     .show()
@@ -495,7 +501,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             e.printStackTrace()
         }
         mapView?.getMapAsync(this)
-        val  scroll = view?.findViewById(R.id.scrollProfile) as ScrollView;
+        val scroll = view?.findViewById(R.id.scrollProfile) as ScrollView;
         scroll.descendantFocusability = ViewGroup.FOCUS_BEFORE_DESCENDANTS
         scroll.setFocusable(true)
         scroll.setFocusableInTouchMode(true)

@@ -182,8 +182,10 @@ class AllUsersFragment : Fragment() {
                     .setListener(object : IShowcaseListener {
                         override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {
                         }
+
                         override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
-                            (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterAllUsersFragment", false).apply()
+                            if (activity != null && !activity.isDestroyed)
+                                (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterAllUsersFragment", false).apply()
                         }
                     })
                     .show()

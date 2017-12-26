@@ -216,8 +216,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     .setListener(object : IShowcaseListener {
                         override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {
                         }
+
                         override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
-                            (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterMapFragment", false).apply()
+                            if (activity != null && !activity.isDestroyed)
+                                (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterMapFragment", false).apply()
                         }
                     })
                     .show()
@@ -292,7 +294,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             markerOptions.icon(bitmapDescriptorFromVector(activity, R.drawable.plane)).rotation(getBearing(listPointPath.first(), listPointPath[1]))
 
             marker = mMap?.addMarker(markerOptions)
-            
+
             markerAnimation.animateMarker(marker, listPointPath.first(), listPointPath.last(),
                     LatLngInterpolator.CurveBezie(),
                     onAnimationEnd = {
