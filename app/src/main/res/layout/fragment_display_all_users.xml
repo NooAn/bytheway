@@ -6,28 +6,23 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
+    android:background="@color/colorFiltersBackground"
     android:orientation="vertical"
     android:theme="@style/AppTheme.NoActionBar">
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/searchParametersText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:background="@color/colorFiltersBackground"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:id="@+id/searchParametersText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@color/colorFiltersBackground"
-            android:gravity="center_vertical|start"
-            android:paddingBottom="@dimen/all_users_searchParametersText_vertical_margin"
-            android:paddingStart="@dimen/standard_margin"
-            android:paddingTop="@dimen/all_users_searchParametersText_vertical_margin"
-            android:text="@string/optionSearch"
-            android:textAllCaps="true"
-            android:textColor="@color/colorPrimaryTeams"
-            android:textSize="@dimen/all_users_searchParametersText_text_size" />
-    </LinearLayout>
+        android:gravity="center_vertical|start"
+        android:paddingBottom="@dimen/all_users_searchParametersText_vertical_margin"
+        android:paddingStart="@dimen/standard_margin"
+        android:paddingTop="@dimen/all_users_searchParametersText_vertical_margin"
+        android:text="@string/optionSearch"
+        android:textAllCaps="true"
+        android:textColor="@color/colorPrimaryTeams"
+        android:textSize="@dimen/all_users_searchParametersText_text_size" />
 
 
     <include
@@ -37,7 +32,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
         android:visibility="gone"
-        tools:visibility="visible" />
+        tools:visibility="gone" />
 
     <include
         android:id="@+id/block_empty_users"
@@ -50,8 +45,9 @@
         android:id="@+id/display_all_users"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/standard_margin"
-        android:layout_marginStart="@dimen/standard_margin"
+        android:background="@color/white"
+        android:paddingEnd="@dimen/standard_margin"
+        android:paddingStart="@dimen/standard_margin"
         app:layoutManager="LinearLayoutManager"
         tools:listitem="@layout/item_content_all_users" />
 
