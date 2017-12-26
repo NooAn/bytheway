@@ -15,7 +15,7 @@ import ru.a1024bits.bytheway.model.Response
  * Created by andrey.gusenkov on 18/09/2017.
  */
 class UserProfileViewModel @Inject constructor(var userRepository: UserRepository) : BaseViewModel() {
-    private var userId: String? = null
+
     var response: MutableLiveData<Response<User>> = MutableLiveData()
 
     val loadingStatus = MutableLiveData<Boolean>()
