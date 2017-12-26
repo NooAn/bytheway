@@ -21,10 +21,8 @@ import android.widget.Toast
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.android.synthetic.main.fragment_display_all_users.*
 import kotlinx.android.synthetic.main.fragment_maps.*
 import kotlinx.android.synthetic.main.fragment_search_block.*
-import kotlinx.android.synthetic.main.searching_parameters_block.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -33,17 +31,16 @@ import ru.a1024bits.aviaanimation.ui.util.MarkerAnimation
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.MapWebService
 import ru.a1024bits.bytheway.R
+import ru.a1024bits.bytheway.model.Status
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.model.map_directions.RoutesList
+import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
-import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.util.createMarker
 import ru.a1024bits.bytheway.util.toJsonString
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
-import ru.a1024bits.bytheway.viewmodel.MapViewModel
 import ru.terrakok.cicerone.commands.Forward
-import ru.terrakok.cicerone.commands.Replace
 import uk.co.deanwild.materialshowcaseview.IShowcaseListener
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView
 import java.util.*
@@ -139,6 +136,22 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         mMapView?.onLowMemory()
     }
 
+    private val listUsers: android.arch.lifecycle.Observer<ru.a1024bits.bytheway.model.Response<List<User>>> = android.arch.lifecycle.Observer { response ->
+
+        when (response?.status) {
+            Status.SUCCESS -> if (response.data == null) showErrorLoading() else (activity as MenuActivity).navigator.applyCommand(Forward(Screens.SIMILAR_TRAVELS_SCREEN, response.data))
+
+            Status.ERROR -> {
+                Log.e("LOG", "log e:" + response.error)
+                showErrorLoading()
+            }
+        }
+    }
+
+    private fun showErrorLoading() {
+        Log.e("LOG", "error in map rx response")
+    }
+
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val params = appBarLayout.layoutParams as CoordinatorLayout.LayoutParams
@@ -148,7 +161,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         })
         params.behavior = behavior
         appBarLayout.layoutParams = params
-
 
         mapFragmentRoot.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
@@ -185,7 +197,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 error = R.string.fill_all_location
             }
 
-            if (error != 0) {
+            if (error != 0 && points.size < 2) {
                 Toast.makeText(this@MapFragment.context, getString(error), Toast.LENGTH_SHORT).show()
             } else {
                 goFlyPlan()
@@ -215,35 +227,24 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         this.mMap = googleMap
-        val constLocation = LatLng(50.0, 50.0)
+        var constLocation = LatLng(50.0, 50.0)
+
+        if (points.size > 0) {
+            constLocation = points.valueAt(0).position
+        }
         mMap?.moveCamera(CameraUpdateFactory.newLatLng(constLocation))
         mMap?.animateCamera(CameraUpdateFactory.zoomTo(3F))
     }
 
     fun goFlyPlan() {
         if (points.size < 2) return
-
-        val fromLocation = points.valueAt(0).position
-        val endLocation = points.valueAt(1).position
-
-        val markerOptions = MarkerOptions().position(fromLocation).anchor(0.5F, 1.0F).flat(true)
-
-        var t = 0.0
-        while (t < 1.000001) {
-            listPointPath.add(LatLngInterpolator.CurveBezie().calculateBezierFunction(t, fromLocation, endLocation))
-            t += 0.01F
-        }
-        drawPolyLineOnMap(listPointPath)
-        // Changing marker icon
-        markerOptions.icon(bitmapDescriptorFromVector(activity, R.drawable.plane)).rotation(getBearing(listPointPath.first(), listPointPath[1]))
-
-        marker = mMap?.addMarker(markerOptions)
         animateMarker()
     }
 
     //lat = y
     //lon = x
-
+    var searchFragment: SearchFragment? = null
+    val markerAnimation = MarkerAnimation()
     var listPointPath: ArrayList<LatLng> = ArrayList()
 
     //Method for finding bearing between two points
@@ -271,24 +272,45 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         return BitmapDescriptorFactory.fromBitmap(bitmap)
     }
 
-    val markerAnimation = MarkerAnimation()
 
     fun animateMarker() {
         // Whatever destination coordinates
-        if (markerAnimation.flag == false)
-            markerAnimation.animateMarker(marker, listPointPath.first(), listPointPath.last(),
-                    LatLngInterpolator.CurveBezie(), listPointPath,
-                    onAnimationEnd = {
-                        viewModel?.similarUsersLiveData?.observe(this@MapFragment, android.arch.lifecycle.Observer<List<User>> { list ->
-                            (activity as MenuActivity).navigator.applyCommand(Forward(Screens.SIMILAR_TRAVELS_SCREEN, list))
+        if (markerAnimation.flag == false) {
 
-                        })
-                        viewModel?.getUsersWithSimilarTravel(text_from_city.text.toString(), text_to_city.text.toString())
+            val fromLocation = points.valueAt(0).position
+            val endLocation = points.valueAt(1).position
+
+            val markerOptions = MarkerOptions().position(fromLocation).anchor(0.5F, 1.0F).flat(true)
+
+            var t = 0.0
+            while (t < 1.000001) {
+                listPointPath.add(LatLngInterpolator.CurveBezie().calculateBezierFunction(t, fromLocation, endLocation))
+                t += 0.01F
+            }
+            drawPolyLineOnMap(listPointPath)
+            // Changing marker icon
+            markerOptions.icon(bitmapDescriptorFromVector(activity, R.drawable.plane)).rotation(getBearing(listPointPath.first(), listPointPath[1]))
+
+            marker = mMap?.addMarker(markerOptions)
+            
+            markerAnimation.animateMarker(marker, listPointPath.first(), listPointPath.last(),
+                    LatLngInterpolator.CurveBezie(),
+                    onAnimationEnd = {
+                        viewModel?.response?.observe(this@MapFragment, listUsers)
+                        //  searchFragment?.filter?.endBudget = parseInt(budgetFromValue.toString())
+                        Log.d("LOG", budgetFromValue.toString())
+                        viewModel?.getUsersWithSimilarTravel(searchFragment?.filter ?: Filter())
+                        mMap?.clear()
+                        listPointPath.clear()
+                        markerAnimation.flag = false
                     })
+        }
     }
 
+
     private fun initBoxInputFragment() {
-        val searchFragment = SearchFragment.newInstance(user)
+
+        searchFragment = SearchFragment.newInstance(user)
         childFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container_box, searchFragment, "SearchFragment")
                 .commitAllowingStateLoss()
@@ -310,7 +332,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         polyOptions.color(strokeColor)
         polyOptions.pattern(PATTERN_POLYGON_ALPHA)
         mMap?.addPolyline(polyOptions)
-
     }
 
     override fun onResume() {

@@ -14,6 +14,7 @@ import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.terrakok.cicerone.commands.Replace
+import android.content.Intent
 
 
 class AirSuccesfullFragment : Fragment() {
@@ -40,6 +41,12 @@ class AirSuccesfullFragment : Fragment() {
         button_miss.setOnClickListener {
             //return in menu // change on the Router
             (activity as MenuActivity).navigator.applyCommand(Replace(Screens.MY_PROFILE_SCREEN, 1))
+        }
+        view?.findViewById<View>(R.id.app_in_the_air_link)?.setOnClickListener {
+            val url = "https://www.appintheair.mobi"
+            val i = Intent(Intent.ACTION_VIEW)
+            i.data = Uri.parse(url)
+            startActivity(i)
         }
         if (arguments != null) {
             city_from_air.text = arguments.getString(NAME);

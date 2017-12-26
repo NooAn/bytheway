@@ -18,7 +18,7 @@ class UserProfileViewModel @Inject constructor(var userRepository: UserRepositor
     private var userId: String? = null
     var response: MutableLiveData<Response<User>> = MutableLiveData()
 
-    private val loadingStatus = MutableLiveData<Boolean>()
+    val loadingStatus = MutableLiveData<Boolean>()
 
     fun load(uid: String) {
         disposables.add(userRepository.getUser(uid)

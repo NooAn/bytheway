@@ -96,6 +96,7 @@
     <string name="optionSearch">+ Параметры поиска</string>
     <string name="to">до</string>
     <string name="from">от</string>
+    <string name="social_text">Добавьте Ваши контактные данные, чтобы другие путешественники смогли найти Вас</string>
     <string name="save_succesfull">Профайл успешно сохранен</string>
     <string name="cancel">Отмена</string>
     <string name="any">Любой</string>

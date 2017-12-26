@@ -5,6 +5,7 @@ import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.*
 import io.reactivex.Single
+import ru.a1024bits.bytheway.algorithm.SearchTravelers
 import ru.a1024bits.bytheway.model.User
 import javax.inject.Inject
 
@@ -37,9 +38,39 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) : IUsersR
         return store.collection(COLLECTION_USERS).get()
     }
 
-    override fun getReallUsers(): Task<QuerySnapshot> {
-        return store.collection(COLLECTION_USERS).get() // need request for (city != null) I don't know for now how do it // fixme for performances
-    }
+    override fun getReallUsers(paramSearch: Filter): Single<List<User>> =
+            Single.create<List<User>> { stream ->
+                store.collection(COLLECTION_USERS).get().addOnCompleteListener({ task ->
+                    if (task.isSuccessful) {
+                        val result: MutableList<User> = ArrayList()
+                        for (document in task.result) {
+                            Log.d(TAG, document.id + " => " + document.data)
+
+                            var user = User()
+                            try {
+                                user = document.toObject(User::class.java)
+                            } catch (ex2: Exception) {
+                                Log.e(TAG, "Error!: " + document.id + " => " + document.data, ex2)
+                                ex2.printStackTrace()
+                            }
+                            try {
+                                if (user.cities.size > 0) {
+                                    // run search algorithm
+                                    val search = SearchTravelers(filter = paramSearch, user = user)
+                                    user.percentsSimilarTravel = search.getEstimation()
+                                    result.add(user)
+                                }
+                            } catch (ex: Exception) {
+                                stream.onError(ex)
+                            }
+                        }
+                        result.sortByDescending { it.percentsSimilarTravel } // перед отправкой сортируем по степени похожести маршрута.
+                        stream.onSuccess(result)
+                    } else {
+                        stream.onError(Exception("Not Successful load users"))
+                    }
+                })
+            }
 
     override fun getUserById(userID: String): Task<DocumentSnapshot> {
         return store.collection(COLLECTION_USERS).document(userID).get()

@@ -13,10 +13,7 @@ import android.support.v7.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
-import android.view.KeyEvent
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.*
 import com.borax12.materialdaterangepicker.date.DatePickerDialog
 import com.bumptech.glide.Glide
@@ -439,6 +436,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     private fun showBlockAddTrip() {
         add_new_trip.visibility = View.VISIBLE
+        grayLine.visibility = View.INVISIBLE
     }
 
     override fun onResume() {
@@ -497,6 +495,10 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             e.printStackTrace()
         }
         mapView?.getMapAsync(this)
+        val  scroll = view?.findViewById(R.id.scrollProfile) as ScrollView;
+        scroll.descendantFocusability = ViewGroup.FOCUS_BEFORE_DESCENDANTS
+        scroll.setFocusable(true)
+        scroll.setFocusableInTouchMode(true)
 
         return view
     }
@@ -590,6 +592,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     private fun hideBlockNewTrip() {
         add_new_trip.visibility = View.GONE
+        grayLine.visibility = View.VISIBLE
     }
 
     private fun openInformationEditDialog() {
@@ -707,7 +710,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     private fun openDialog(socialNetwork: SocialNetwork, errorText: String? = null) {
         var simpleAlert = AlertDialog.Builder(activity).create()
         simpleAlert.setTitle("Ссылки на социальные сети")
-        simpleAlert.setMessage("Здесь вы можете указать ваши контактные данные для того что бы вас смогли найти другие путешественики")
+        simpleAlert.setMessage(getString(R.string.social_text))
         val inflater = this.layoutInflater
         val dialogView = inflater.inflate(R.layout.custom_dialog_profile_soc_network, null)
         simpleAlert.setView(dialogView)
@@ -950,7 +953,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         }
         add_info_user.afterTextChanged({
             profileStateHashMap.set("addInformation", it)
-            profileChanged()
+            profileChanged(null, false)
         })
         textCityFrom.setOnClickListener {
             sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM)
@@ -995,18 +998,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         mapView.onLowMemory()
     }
 
-    fun fibbonaci(n: Int): Long {
-        var prev: Long = 0
-        var next: Long = 1
-        var result: Long = 0
-        for (i in 0 until n) {
-            result = prev + next
-            prev = next
-            next = result
-        }
-        return result
-    }
-
     private var countTrip: Int = 0
 
     fun getHashMapUser(): HashMap<String, Any> {
@@ -1043,7 +1034,11 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         oldProfileState = profileStateHashMap.hashCode()
     }
 
-    fun profileChanged(force: Boolean? = null) {
+    fun profileChanged(force: Boolean? = null, removeFocus: Boolean? = true) {
+
+        if (removeFocus == true) {
+            add_info_user.clearFocus()
+        }
         if (countTrip == 1) {
             val changed: Boolean = if (force != null) force
             else profileStateHashMap.hashCode() != oldProfileState

@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Per the design guidelines, navigation drawers should be between 240dp and 320dp:
          https://developer.android.com/design/patterns/navigation-drawer.html -->
@@ -27,6 +27,10 @@
 
     <dimen name="travelTypeHintTextSize">10sp</dimen>
     <dimen name="travelTypeHintTextMarginBottom">10dp</dimen>
-    <dimen name="chooseDestinationLayoutHeight">185dp</dimen>
+    <dimen name="chooseDestinationLayoutHeight">195dp</dimen>
     <dimen name="sinch_margin_left">16dp</dimen>
+
+    <dimen name="design_navigation_separator_vertical_padding" tools:override="true">16dp</dimen>
+    <dimen name="design_navigation_icon_size" tools:override="true">32dp</dimen>
+    <dimen name="design_navigation_icon_padding" tools:override="true">20dp</dimen>
 </resources>
