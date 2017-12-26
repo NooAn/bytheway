@@ -12,7 +12,7 @@ import kotlin.math.max
  * Created by Bit on 12/16/2017.
  */
 class SearchTravelers(val filter: Filter = Filter(), val user: User) {
-    val WeightRoute: Int = 73
+    val WeightRoute: Int = 72
     val WeightBudget: Int = 9
     val WeightMethod: Int = 9
     val WeightDate: Int = 10
@@ -23,7 +23,7 @@ class SearchTravelers(val filter: Filter = Filter(), val user: User) {
         val c = calculateMethod() * WeightMethod
         val p = calculateBudget() * WeightBudget
 
-        Log.e("LOG", "${user.name} route:$n date:$m method:$c budget:$p")
+        Log.e("LOG", "name:${user.name} -  route:$n  date:$m  method:$c  budget:$p")
 
         return ((calculateRoute() * WeightRoute
                 + calculateDate() * WeightDate
@@ -32,7 +32,7 @@ class SearchTravelers(val filter: Filter = Filter(), val user: User) {
     }
 
     fun calculateBudget(): Double {
-        return ((1 / (Math.abs(user.budget - filter.endBudget) + 1)).toDouble())
+        return ((1.0 / (Math.abs(user.budget - filter.endBudget) + 1.0)))
     }
 
     fun calculateDate(): Double {
@@ -42,7 +42,7 @@ class SearchTravelers(val filter: Filter = Filter(), val user: User) {
         if (filter.startDate > start && filter.startDate > end && filter.endDate > start && filter.startDate > end) return 0.0
         if (filter.startDate < start && filter.endDate < end && filter.endDate < start && filter.startDate < end) return 0.0
         return ((1000.0 / Math.abs(filter.startDate.toDouble() - start.toDouble()))
-                + (1000.0 / Math.abs(filter.endDate.toDouble() - end.toDouble()))) / 2
+                + (1000.0 / Math.abs(filter.endDate.toDouble() - end.toDouble()))) / 2.0
     }
 
     fun calculateMethod(): Double {
@@ -90,7 +90,7 @@ class SearchTravelers(val filter: Filter = Filter(), val user: User) {
         var indexFirst = 0.0
         var indexLast = 0.500
         val radiusStart = distance(user.cityFromLatLng.latitude, filter.locationStartCity.latitude, user.cityFromLatLng.longitude, filter.locationStartCity.longitude)
-        if (radiusStart < 10) indexFirst = 0.5
+        if (radiusStart < 10) indexFirst = 1.0
         else if (radiusStart < 100) {
             indexFirst = (9800 - 90 * radiusStart) / 9000
         } else if (radiusStart < 1000) {
@@ -112,6 +112,9 @@ class SearchTravelers(val filter: Filter = Filter(), val user: User) {
         }
         if (indexFirst < 0) indexFirst = 0.0
         if (indexLast < 0) indexLast = 0.0
+
+        Log.e("LOG", "first: $indexFirst  last: $indexLast startpoint: $startPoint endpoint:$endPoint lastR: $R")
+
         return (indexFirst / 2) + indexLast
     }
 

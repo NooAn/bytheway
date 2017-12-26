@@ -22,6 +22,7 @@
         android:hint="@string/city_start"
         android:paddingBottom="8dp"
         android:paddingTop="16dp"
+        android:saveEnabled="true"
         android:textColor="@color/mdtp_dark_gray"
         android:textSize="16sp" />
 
@@ -51,6 +52,7 @@
         android:hint="@string/city_end"
         android:paddingBottom="8dp"
         android:paddingTop="16dp"
+        android:saveEnabled="true"
         android:textColor="@color/mdtp_dark_gray"
         android:textSize="16sp" />
 
@@ -82,6 +84,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="40dp"
+                android:fontFamily="sans-serif-medium"
                 android:text="@string/date"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/midGrey"
@@ -113,6 +116,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/dateTitle"
                 android:layout_marginTop="30dp"
+                android:fontFamily="sans-serif-medium"
                 android:text="@string/budgetName"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/midGrey"

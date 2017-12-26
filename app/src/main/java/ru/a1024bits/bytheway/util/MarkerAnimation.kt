@@ -19,7 +19,7 @@ import com.google.android.gms.maps.model.Marker
 class MarkerAnimation {
     var flag: Boolean = false
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-    internal fun animateMarker(marker: Marker?, startPosition: LatLng, finalPosition: LatLng, latLngInterpolator: LatLngInterpolator, listLocation: List<LatLng>, onAnimationEnd: () -> Unit = {}) {
+    internal fun animateMarker(marker: Marker?, startPosition: LatLng, finalPosition: LatLng, latLngInterpolator: LatLngInterpolator, onAnimationEnd: () -> Unit = {}) {
         val typeEvaluator = TypeEvaluator<LatLng> { fraction, startValue, endValue ->
             latLngInterpolator.interpolate(fraction, startValue, endValue)
         }
@@ -31,7 +31,6 @@ class MarkerAnimation {
                 val v = animation.animatedFraction
                 val newPosition = latLngInterpolator.interpolate(v, startPosition, finalPosition)
                 marker?.setRotation(getBearing(marker.position, newPosition))
-                Log.e("LOG MARKER", " ${marker?.position} == ${newPosition}")
             } catch (ex: Exception) {
                 ex.printStackTrace()
             }

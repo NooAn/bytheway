@@ -32,13 +32,13 @@
         android:layout_marginTop="18dp"
         android:clickable="false"
         android:focusableInTouchMode="false"
-        android:text="@string/date_from"
         android:textColor="@color/colorTextGrey"
         android:textSize="13sp"
         app:layout_constraintEnd_toEndOf="@+id/textCityFrom"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintStart_toStartOf="@+id/textCityFrom"
-        app:layout_constraintTop_toBottomOf="@+id/textCityFrom" />
+        app:layout_constraintTop_toBottomOf="@+id/textCityFrom"
+        tools:text="@string/date_from" />
 
     <ImageView
         android:layout_width="wrap_content"
@@ -73,12 +73,12 @@
         android:layout_marginTop="16dp"
         android:clickable="false"
         android:focusableInTouchMode="false"
-        android:text="@string/date_to"
         android:textAlignment="textEnd"
         android:textColor="@color/colorTextGrey"
         android:textSize="13sp"
         app:layout_constraintEnd_toEndOf="@+id/textCityTo"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintStart_toStartOf="@+id/textCityTo"
-        app:layout_constraintTop_toBottomOf="@+id/textCityTo" />
+        app:layout_constraintTop_toBottomOf="@+id/textCityTo"
+        tools:text="@string/date_from" />
 </android.support.constraint.ConstraintLayout>
