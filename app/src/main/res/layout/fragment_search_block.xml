@@ -83,6 +83,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="40dp"
                 android:text="@string/date"
+                android:fontFamily="sans-serif-medium"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/midGrey"
                 android:textSize="16sp" />
@@ -112,6 +113,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/dateTitle"
+
                 android:layout_marginTop="30dp"
                 android:text="@string/budgetName"
                 android:textAppearance="?android:attr/textAppearanceLarge"

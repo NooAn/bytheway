@@ -34,10 +34,19 @@ class AppInTheAirSinchronizedFragment : Fragment() {
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         button_miss.setOnClickListener {
             //return in menu
             (activity as MenuActivity).navigator.applyCommand(Replace(Screens.MY_PROFILE_SCREEN, 1))
         }
+
+        view?.findViewById<View>(R.id.app_in_the_air_link)?.setOnClickListener {
+            val url = "https://www.appintheair.mobi"
+            val i = Intent(Intent.ACTION_VIEW)
+            i.data = Uri.parse(url)
+            startActivity(i)
+        }
+
         button_sinch.setOnClickListener {
             //open app_in_the_air
             login()
@@ -47,7 +56,7 @@ class AppInTheAirSinchronizedFragment : Fragment() {
     private fun login() {
         val intent = Intent(
                 Intent.ACTION_VIEW,
-                Uri.parse(API_BASE_URL + "/oauth/authorize" + "?client_id=" + clientId + "&redirect_uri=" + redirectUri +"&response_type=code&scope=user_info%20user_flights%20user_email" ))
+                Uri.parse(API_BASE_URL + "/oauth/authorize" + "?client_id=" + clientId + "&redirect_uri=" + redirectUri + "&response_type=code&scope=user_info%20user_flights%20user_email"))
         startActivity(intent)
     }
 }
