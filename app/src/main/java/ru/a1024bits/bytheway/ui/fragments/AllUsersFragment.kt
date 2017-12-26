@@ -1,5 +1,6 @@
 package ru.a1024bits.bytheway.ui.fragments
 
+import android.animation.Animator
 import android.animation.LayoutTransition
 import android.app.SearchManager
 import android.arch.lifecycle.Observer
@@ -28,6 +29,9 @@ import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
+import ru.a1024bits.bytheway.R.id.view
+import android.animation.AnimatorListenerAdapter
+import android.support.v4.view.ViewCompat.animate
 
 
 class AllUsersFragment : Fragment() {
@@ -108,7 +112,7 @@ class AllUsersFragment : Fragment() {
         })
         updateChoseDateButtons()
 
-        view_contain_block_parameters.layoutTransition.setDuration(700L)
+        // view_contain_block_parameters.layoutTransition.setDuration(700L)
         saveParameters.setOnClickListener {
             filter.startBudget = if (startBudget.text.isNotEmpty()) Integer.parseInt(startBudget.text.toString()) else -1
             filter.endBudget = if (endBudget.text.isNotEmpty()) Integer.parseInt(endBudget.text.toString()) else -1
@@ -157,14 +161,26 @@ class AllUsersFragment : Fragment() {
                 else -> sex_Any.id
             })
         }
-
-        view_contain_block_parameters.layoutTransition.setDuration(700L)
+        block_search_parameters.visibility = View.GONE
+        //view_contain_block_parameters.layoutTransition.setDuration(100L)
         searchParametersText.setOnClickListener {
-            if (block_search_parameters.visibility == View.GONE) {
-                block_search_parameters.visibility = View.VISIBLE
-            } else {
-                block_search_parameters.visibility = View.GONE
-            }
+            //            if (block_search_parameters.visibility == View.GONE) {
+//                block_search_parameters.visibility = View.VISIBLE
+//            } else {
+//                block_search_parameters.visibility = View.GONE
+//            }
+            block_search_parameters.animate()
+                    .setListener(object : AnimatorListenerAdapter() {
+                        override fun onAnimationStart(animation: Animator?) {
+                            view?.setVisibility(View.VISIBLE)
+                        }
+                    })
+                    .translationY(100f)
+                    .setListener(object : AnimatorListenerAdapter() {
+                        override fun onAnimationEnd(animation: Animator) {
+                            super.onAnimationEnd(animation)
+                        }
+                    })
         }
     }
 

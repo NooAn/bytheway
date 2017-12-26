@@ -122,7 +122,7 @@ class MenuActivity : AppCompatActivity(),
                 markFirstEnter()
             } else {
                 if (intent.data != null && intent.data.host.contains("appintheair", true)) {
-                    viewModel?.load(FirebaseAuth.getInstance().currentUser?.uid.toString())
+                    // viewModel?.load(FirebaseAuth.getInstance().currentUser?.uid.toString())
                     navigator.applyCommand(Replace(Screens.AIR_SUCCES_SCREEN, 1))
                 } else {
                     navigator.applyCommand(Replace(Screens.MY_PROFILE_SCREEN, 1))
@@ -130,6 +130,7 @@ class MenuActivity : AppCompatActivity(),
             }
         } else {
             screenNames = savedInstanceState.getSerializable(STATE_SCREEN_NAMES) as ArrayList<String>
+            Log.e("LOGGER", "hash code ${viewModel?.hashCode()}")
         }
 
         mGoogleApiClient = GoogleApiClient.Builder(this)
