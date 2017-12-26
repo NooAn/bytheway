@@ -209,9 +209,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             MaterialShowcaseView.Builder(activity)
                     .setTarget(buttonSaveTravelInfo)
                     .renderOverNavigationBar()
-                    .setDismissText("КРУТО!")
-                    .setTitleText("Сохраняйте и находите!")
-                    .setContentText("При нажатии на кнопку \"Сохранить\", внесенные изменения изменения о поездке автоматически сохраняються в Вашем провиле.\n\n Вы можете продолжить поиск попутчиков без соххрнения поездки.")
+                    .setDismissText(context.resources.getString(R.string.close_hint))
+                    .setTitleText(context.resources.getString(R.string.hint_save_and_search))
+                    .setContentText(context.resources.getString(R.string.hint_save_and_search_description))
                     .withCircleShape()
                     .setListener(object : IShowcaseListener {
                         override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {

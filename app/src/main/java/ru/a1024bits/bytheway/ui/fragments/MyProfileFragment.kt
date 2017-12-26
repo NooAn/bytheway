@@ -13,7 +13,10 @@ import android.support.v7.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
-import android.view.*
+import android.view.KeyEvent
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.*
 import com.borax12.materialdaterangepicker.date.DatePickerDialog
 import com.bumptech.glide.Glide
@@ -32,7 +35,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.GeoPoint
 import com.google.maps.android.PolyUtil
 import kotlinx.android.synthetic.main.confirm_dialog.view.*
-import kotlinx.android.synthetic.main.fragment_maps.*
 import kotlinx.android.synthetic.main.fragment_my_user_profile.*
 import kotlinx.android.synthetic.main.profile_add_trip.*
 import kotlinx.android.synthetic.main.profile_direction.*
@@ -190,20 +192,15 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             MaterialShowcaseView.Builder(activity)
                     .setTarget(new_trip_text)
                     .renderOverNavigationBar()
-                    .setDismissText("КРУТО!")
-                    .setTitleText("Создайте поездку!")
-                    .setContentText("Ввкдите максимум информации для эффективного поиска попутчиков, что бы другие пользователи смогли найти Вас :)")
+                    .setDismissText(context.resources.getString(R.string.close_hint))
+                    .setTitleText(context.resources.getString(R.string.hint_create_travel))
+                    .setContentText(context.resources.getString(R.string.hint_create_travel_description))
                     .withCircleShape()
                     .setListener(object : IShowcaseListener {
                         override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {
-                            Log.d("tag", "onShowcaseDisplayed " + activity.isDestroyed )
                         }
 
                         override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
-//                            if (countTrip <= 0) hideBlockNewTrip()
-//                            Log.d("tag", "onShowcaseDismissed " + activity?.isDestroyed + "  p0?.hasFired(): " + p0?.hasFired())
-//                            p0?.hide()
-//                            p0?.removeFromWindow()
                             if (activity != null && !activity.isDestroyed)
                                 (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterMyProfileFragment", false).apply()
                         }

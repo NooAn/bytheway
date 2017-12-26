@@ -5,6 +5,8 @@ import android.arch.lifecycle.ViewModel
 import android.os.AsyncTask
 import android.util.Log
 import com.google.firebase.firestore.QuerySnapshot
+import ru.a1024bits.bytheway.App
+import ru.a1024bits.bytheway.ExtensionsAllUsers
 import ru.a1024bits.bytheway.algorithm.SearchTravelers
 import ru.a1024bits.bytheway.model.Response
 import ru.a1024bits.bytheway.model.User
@@ -19,8 +21,14 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
     var usersLiveData: MutableLiveData<List<User>> = MutableLiveData<List<User>>()
     val loadingStatus = MutableLiveData<Boolean>()
     var response: MutableLiveData<Response<List<User>>> = MutableLiveData()
+    val extension = ExtensionsAllUsers(App.INSTANCE.applicationContext)
+    val filter = Filter()
 
     val TAG = "showUserViewModel"
+
+    init {
+        filter.endAge = extension.yearsOldUsers.size - 1
+    }
 
     fun getAllUsers(filter: Filter) {
         userRepository.getAllUsers()

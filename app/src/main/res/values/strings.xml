@@ -58,6 +58,8 @@
     <string name="text_sinch_app_air">Для автоматического создания поездок и быстрого поиска попутчиков мы можем добавить ваши рейсы  из приложения App in the Air.</string>
     <string name="sinch_button">СИНХРОНИЗИРОВАТЬ</string>
     <string name="miss">пропустить</string>
+    <string name="hint_all_travelers_description">Если вы захотите присоединиться к другим путешествиям, можете использовать этот екран. Фильтр поможет Вам :)</string>
+    <string name="close_hint">КРУТО!</string>
 
     <string-array name="months_array">
         <item>янв</item>
@@ -109,4 +111,9 @@
     <string name="feedback_text1">Мы будем Вам благодарны  за оставленный отзыв.</string>
     <string name="feedback_text2">Вместе мы сделаем наше приложение лучше! :)</string>
     <string name="email">Ваша почта</string>
+    <string name="hint_all_travelers">все путешественники</string>
+    <string name="hint_create_travel">Создайте поездку!</string>
+    <string name="hint_create_travel_description">Ввкдите максимум информации для эффективного поиска попутчиков, что бы другие пользователи смогли найти Вас :)</string>
+    <string name="hint_save_and_search">Сохраняйте и находите!</string>
+    <string name="hint_save_and_search_description">При нажатии на кнопку \"Сохранить\", внесенные изменения о поездке автоматически сохраняються в Вашем провиле.\n\n Вы можете продолжить поиск попутчиков без соххрнения поездки.</string>
 </resources>
