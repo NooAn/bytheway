@@ -188,13 +188,12 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if ((activity as MenuActivity).preferences.getBoolean("isFirstEnterMyProfileFragment", true)) {
-//            showBlockAddTrip()
             MaterialShowcaseView.Builder(activity)
                     .setTarget(new_trip_text)
                     .renderOverNavigationBar()
-                    .setDismissText(context.resources.getString(R.string.close_hint))
-                    .setTitleText(context.resources.getString(R.string.hint_create_travel))
-                    .setContentText(context.resources.getString(R.string.hint_create_travel_description))
+                    .setDismissText(getString(R.string.close_hint))
+                    .setTitleText(getString(R.string.hint_create_travel))
+                    .setContentText(getString(R.string.hint_create_travel_description))
                     .withCircleShape()
                     .setListener(object : IShowcaseListener {
                         override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {

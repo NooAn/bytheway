@@ -17,6 +17,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
+import android.widget.TextView
 import android.widget.Toast
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
@@ -204,14 +205,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             }
         }
 
-
         if ((activity as MenuActivity).preferences.getBoolean("isFirstEnterMapFragment", true))
             MaterialShowcaseView.Builder(activity)
                     .setTarget(buttonSaveTravelInfo)
                     .renderOverNavigationBar()
-                    .setDismissText(context.resources.getString(R.string.close_hint))
-                    .setTitleText(context.resources.getString(R.string.hint_save_and_search))
-                    .setContentText(context.resources.getString(R.string.hint_save_and_search_description))
+                    .setDismissText(getString(R.string.close_hint))
+                    .setTitleText(getString(R.string.hint_save_and_search))
+                    .setContentText(getString(R.string.hint_save_and_search_description))
                     .withCircleShape()
                     .setListener(object : IShowcaseListener {
                         override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {
