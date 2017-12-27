@@ -6,11 +6,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:theme="@style/AppTheme.NoActionBar">
+
+    <LinearLayout
+        android:background="@color/colorFiltersBackground"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/searchParametersText"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@color/colorFiltersBackground"
         android:gravity="center_vertical|start"
@@ -21,15 +27,17 @@
         android:textAllCaps="true"
         android:textColor="@color/colorPrimaryTeams"
         android:textSize="@dimen/all_users_searchParametersText_text_size" />
+    </LinearLayout>
+
 
     <include
         android:id="@+id/block_search_parameters"
         layout="@layout/searching_parameters_block"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
         android:layout_marginBottom="10dp"
-        tools:visibility="visible" />
+        android:visibility="gone"
+        tools:visibility="gone" />
 
     <include
         android:id="@+id/block_empty_users"
@@ -42,8 +50,8 @@
         android:id="@+id/display_all_users"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/standard_margin"
-        android:layout_marginStart="@dimen/standard_margin"
+        android:paddingEnd="@dimen/standard_margin"
+        android:paddingStart="@dimen/standard_margin"
         app:layoutManager="LinearLayoutManager"
         tools:listitem="@layout/item_content_all_users" />
 

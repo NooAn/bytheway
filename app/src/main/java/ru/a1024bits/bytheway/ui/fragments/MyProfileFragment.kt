@@ -13,7 +13,10 @@ import android.support.v7.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
-import android.view.*
+import android.view.KeyEvent
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.*
 import com.borax12.materialdaterangepicker.date.DatePickerDialog
 import com.bumptech.glide.Glide
@@ -53,6 +56,8 @@ import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT
 import ru.a1024bits.bytheway.util.Constants.START_DATE
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import ru.terrakok.cicerone.commands.Replace
+import uk.co.deanwild.materialshowcaseview.IShowcaseListener
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -164,7 +169,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-
         App.component.inject(this)
         glide = Glide.with(this)
 
@@ -180,6 +184,28 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         viewModel?.load(uid)
     }
 
+    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        if ((activity as MenuActivity).preferences.getBoolean("isFirstEnterMyProfileFragment", true)) {
+            MaterialShowcaseView.Builder(activity)
+                    .setTarget(new_trip_text)
+                    .renderOverNavigationBar()
+                    .setDismissText(getString(R.string.close_hint))
+                    .setTitleText(getString(R.string.hint_create_travel))
+                    .setContentText(getString(R.string.hint_create_travel_description))
+                    .withCircleShape()
+                    .setListener(object : IShowcaseListener {
+                        override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {
+                        }
+
+                        override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
+                            if (activity != null && !activity.isDestroyed)
+                                (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterMyProfileFragment", false).apply()
+                        }
+                    })
+                    .show()
+        }
+    }
 
     private fun fillProfile(user: User) {
         val navigationView = activity.findViewById<NavigationView>(R.id.nav_view)
@@ -470,7 +496,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             e.printStackTrace()
         }
         mapView?.getMapAsync(this)
-        val  scroll = view?.findViewById(R.id.scrollProfile) as ScrollView;
+        val scroll = view?.findViewById(R.id.scrollProfile) as ScrollView;
         scroll.descendantFocusability = ViewGroup.FOCUS_BEFORE_DESCENDANTS
         scroll.setFocusable(true)
         scroll.setFocusableInTouchMode(true)
@@ -944,7 +970,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             openAlertDialog(this::removeTrip)
         }
 
-        mapView.onStart()
+       // mapView.onStart()
     }
 
     private fun removeTrip() {
