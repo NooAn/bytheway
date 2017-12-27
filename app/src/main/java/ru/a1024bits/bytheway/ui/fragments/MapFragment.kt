@@ -17,6 +17,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
+import android.widget.TextView
 import android.widget.Toast
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
@@ -41,7 +42,8 @@ import ru.a1024bits.bytheway.util.createMarker
 import ru.a1024bits.bytheway.util.toJsonString
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
 import ru.terrakok.cicerone.commands.Forward
-import java.lang.Integer.parseInt
+import uk.co.deanwild.materialshowcaseview.IShowcaseListener
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
@@ -202,6 +204,25 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 goFlyPlan()
             }
         }
+
+        if ((activity as MenuActivity).preferences.getBoolean("isFirstEnterMapFragment", true))
+            MaterialShowcaseView.Builder(activity)
+                    .setTarget(buttonSaveTravelInfo)
+                    .renderOverNavigationBar()
+                    .setDismissText(getString(R.string.close_hint))
+                    .setTitleText(getString(R.string.hint_save_and_search))
+                    .setContentText(getString(R.string.hint_save_and_search_description))
+                    .withCircleShape()
+                    .setListener(object : IShowcaseListener {
+                        override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {
+                        }
+
+                        override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
+                            if (activity != null && !activity.isDestroyed)
+                                (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterMapFragment", false).apply()
+                        }
+                    })
+                    .show()
     }
 
     var marker: Marker? = null
@@ -273,7 +294,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             markerOptions.icon(bitmapDescriptorFromVector(activity, R.drawable.plane)).rotation(getBearing(listPointPath.first(), listPointPath[1]))
 
             marker = mMap?.addMarker(markerOptions)
-            
+
             markerAnimation.animateMarker(marker, listPointPath.first(), listPointPath.last(),
                     LatLngInterpolator.CurveBezie(),
                     onAnimationEnd = {

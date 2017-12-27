@@ -24,8 +24,11 @@ import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.adapter.DisplayAllUsersAdapter
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
+import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.a1024bits.bytheway.util.DecimalInputFilter
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
+import uk.co.deanwild.materialshowcaseview.IShowcaseListener
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
@@ -37,8 +40,8 @@ import android.support.v4.view.ViewCompat.animate
 class AllUsersFragment : Fragment() {
     private val SIZE_INITIAL_ELEMENTS = 2
     private lateinit var filter: Filter
-    private lateinit var viewModel: DisplayUsersViewModel
     private lateinit var extension: ExtensionsAllUsers
+    private lateinit var viewModel: DisplayUsersViewModel
     private lateinit var dateDialog: DatePickerDialog
     private lateinit var displayUsersAdapter: DisplayAllUsersAdapter
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -48,27 +51,76 @@ class AllUsersFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        extension = ExtensionsAllUsers(context)
-
-        filter = if (savedInstanceState != null) {
-            savedInstanceState.getSerializable("filter") as Filter
-        } else {
-            val result = Filter()
-            result.endAge = extension.yearsOldUsers.size - 1
-            result
-        }
-        updateDateDialog()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
             inflater.inflate(R.layout.fragment_display_all_users, container, false)
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        App.component.inject(this)
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(DisplayUsersViewModel::class.java)
+        filter = viewModel.filter
+        extension = viewModel.extension
 
-        startCity.setText(filter.startCity)
-        endCity.setText(filter.endCity)
+        installLogicToUI()
 
+        displayUsersAdapter = DisplayAllUsersAdapter(this.context, extension)
+        display_all_users.adapter = displayUsersAdapter
+
+        viewModel.usersLiveData.observe(this, Observer<List<User>> { list ->
+            Log.e("LOG", "onChanged $list")
+            if (list != null) {
+                if (list.isNotEmpty())
+                    displayUsersAdapter.setItems(list)
+                updateViewsAfterSearch(list.isNotEmpty())
+            }
+        })
+        loadingWhereLoadUsers.visibility = View.VISIBLE
+        viewModel.getAllUsers(filter)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.all_users_menu, menu)
+
+        val searchView = menu.findItem(R.id.search_all_users_item).actionView as SearchView
+        searchView.setSearchableInfo(
+                (context.getSystemService(Context.SEARCH_SERVICE) as SearchManager).getSearchableInfo(activity.componentName))
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            var isNotStartSearch = false
+            override fun onQueryTextSubmit(queryCustomRegister: String): Boolean {
+                val query = queryCustomRegister.toLowerCase()
+                val result = ArrayList<User>()
+                displayUsersAdapter.users.filterTo(result) {
+                    it.cities.containsValue(queryCustomRegister) || it.name.toLowerCase().contains(query) || it.email.toLowerCase().contains(query) ||
+                            it.age.toString().contains(query) || it.budget.toString().contains(query) ||
+                            it.city.toLowerCase().contains(query) || it.lastName.toLowerCase().contains(query) ||
+                            it.phone.contains(query) || it.route.contains(query)
+                }
+                displayUsersAdapter.setItems(result)
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                if ("" == newText && isNotStartSearch) {
+                    updateViewsBeforeSearch()
+                    viewModel.getAllUsers(filter)
+                }
+                isNotStartSearch = true
+                return false
+            }
+        })
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
+        R.id.search_all_users_item -> {
+            true
+        }
+        else -> super.onOptionsItemSelected(item)
+    }
+
+    private fun installLogicToUI() {
         startBudget.filters = arrayOf(DecimalInputFilter())
         endBudget.filters = arrayOf(DecimalInputFilter())
 
@@ -95,6 +147,7 @@ class AllUsersFragment : Fragment() {
                     filter.endAge = position
             }
         }
+        updateDateDialog()
         choseDate.setOnClickListener {
             dateDialog.show(activity.fragmentManager, "")
         }
@@ -170,77 +223,25 @@ class AllUsersFragment : Fragment() {
                 block_search_parameters.visibility = View.GONE
             }
         }
-    }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.all_users_menu, menu)
+        if ((activity as MenuActivity).preferences.getBoolean("isFirstEnterAllUsersFragment", true))
+            MaterialShowcaseView.Builder(activity)
+                    .setTarget(searchParametersText)
+                    .renderOverNavigationBar()
+                    .setDismissText(context.resources.getString(R.string.close_hint))
+                    .setTitleText(context.resources.getString(R.string.hint_all_travelers))
+                    .setContentText(context.resources.getString(R.string.hint_all_travelers_description))
+                    .withCircleShape()
+                    .setListener(object : IShowcaseListener {
+                        override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {
+                        }
 
-        val searchView = menu.findItem(R.id.search_all_users_item).actionView as SearchView
-        searchView.setSearchableInfo(
-                (context.getSystemService(Context.SEARCH_SERVICE) as SearchManager).getSearchableInfo(activity.componentName))
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            var isNotStartSearch = false
-            override fun onQueryTextSubmit(queryCustomRegister: String): Boolean {
-                val query = queryCustomRegister.toLowerCase()
-                val result = ArrayList<User>()
-                displayUsersAdapter.users.filterTo(result) {
-                    it.cities.containsValue(queryCustomRegister) || it.name.toLowerCase().contains(query) || it.email.toLowerCase().contains(query) ||
-                            it.age.toString().contains(query) || it.budget.toString().contains(query) ||
-                            it.city.toLowerCase().contains(query) || it.lastName.toLowerCase().contains(query) ||
-                            it.phone.contains(query) || it.route.contains(query)
-                }
-                displayUsersAdapter.setItems(result)
-                return true
-            }
-
-            override fun onQueryTextChange(newText: String): Boolean {
-                if ("" == newText && isNotStartSearch) {
-                    updateViewsBeforeSearch()
-                    viewModel.getAllUsers(filter)
-                }
-                isNotStartSearch = true
-                return false
-            }
-        })
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.search_all_users_item -> {
-            true
-        }
-        else -> super.onOptionsItemSelected(item)
-    }
-
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        App.component.inject(this)
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(DisplayUsersViewModel::class.java)
-        displayUsersAdapter = DisplayAllUsersAdapter(this.context, extension)
-        display_all_users.adapter = displayUsersAdapter
-
-        viewModel.usersLiveData.observe(this, Observer<List<User>> { list ->
-            Log.e("LOG", "onChanged $list")
-            if (list != null) {
-                if (list.isNotEmpty())
-                    displayUsersAdapter.setItems(list)
-                updateViewsAfterSearch(list.isNotEmpty())
-            }
-        })
-        loadingWhereLoadUsers.visibility = View.VISIBLE
-        viewModel.getAllUsers(filter)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        try {
-            filter.startBudget = if (startBudget.text.isNotEmpty()) Integer.parseInt(startBudget.text.toString()) else -1
-            filter.endBudget = if (endBudget.text.isNotEmpty()) Integer.parseInt(endBudget.text.toString()) else -1
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        outState.putSerializable("filter", filter)
+                        override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
+                            if (activity != null && !activity.isDestroyed)
+                                (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterAllUsersFragment", false).apply()
+                        }
+                    })
+                    .show()
     }
 
     private fun updateDateDialog() {
