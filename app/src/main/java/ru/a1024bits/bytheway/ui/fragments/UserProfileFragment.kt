@@ -195,7 +195,6 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
     private fun showErrorLoading() {
         Log.e("LOg", "ERROR")
         Toast.makeText(activity, "Ошибка загрузки", Toast.LENGTH_SHORT).show()
-
     }
 
     override fun getViewFactoryClass(): ViewModelProvider.Factory = viewModelFactory
