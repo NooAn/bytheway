@@ -166,21 +166,17 @@ class AllUsersFragment : Fragment() {
         updateChoseDateButtons()
 
         view_contain_block_parameters.layoutTransition.setDuration(700L)
+        cancelParameters.setOnClickListener {
+            animationSlide()
+            block_search_parameters.visibility = View.GONE
+        }
         saveParameters.setOnClickListener {
             filter.startBudget = if (startBudget.text.isNotEmpty()) Integer.parseInt(startBudget.text.toString()) else -1
             filter.endBudget = if (endBudget.text.isNotEmpty()) Integer.parseInt(endBudget.text.toString()) else -1
             filter.startCity = startCity.text.toString()
             filter.endCity = endCity.text.toString()
 
-            view_contain_block_parameters.layoutTransition.addTransitionListener(object : LayoutTransition.TransitionListener {
-                override fun startTransition(p0: LayoutTransition?, p1: ViewGroup?, p2: View?, p3: Int) {}
-                override fun endTransition(p0: LayoutTransition?, p1: ViewGroup?, view: View, p3: Int) {
-                    if ((view.id == block_search_parameters.id) && (block_search_parameters.visibility == View.GONE)) {
-                        updateViewsBeforeSearch()
-                        view_contain_block_parameters.layoutTransition.removeTransitionListener(this)
-                    }
-                }
-            })
+            animationSlide()
             block_search_parameters.visibility = View.GONE
             viewModel.getAllUsers(filter)
         }
@@ -242,6 +238,18 @@ class AllUsersFragment : Fragment() {
                         }
                     })
                     .show()
+    }
+
+    private fun animationSlide() {
+        view_contain_block_parameters.layoutTransition.addTransitionListener(object : LayoutTransition.TransitionListener {
+            override fun startTransition(p0: LayoutTransition?, p1: ViewGroup?, p2: View?, p3: Int) {}
+            override fun endTransition(p0: LayoutTransition?, p1: ViewGroup?, view: View, p3: Int) {
+                if ((view.id == block_search_parameters.id) && (block_search_parameters.visibility == View.GONE)) {
+                    updateViewsBeforeSearch()
+                    view_contain_block_parameters.layoutTransition.removeTransitionListener(this)
+                }
+            }
+        })
     }
 
     private fun updateDateDialog() {

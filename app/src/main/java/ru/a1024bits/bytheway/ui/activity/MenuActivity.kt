@@ -240,6 +240,7 @@ class MenuActivity : AppCompatActivity(),
 
     override fun onResume() {
         super.onResume()
+        Log.e("LOG", "onResume")
         // the intent filter defined in AndroidManifest will handle the return from ACTION_VIEW intent
         val uri = intent.data
         if (uri != null && uri.toString().startsWith(redirectUri)) {
@@ -315,6 +316,19 @@ class MenuActivity : AppCompatActivity(),
     override fun onPause() {
         super.onPause()
         navigatorHolder.removeNavigator()
+        Log.e("LOG", "onPause")
+
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.e("LOG", "onStop")
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        Log.e("LOG", "onRestart")
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

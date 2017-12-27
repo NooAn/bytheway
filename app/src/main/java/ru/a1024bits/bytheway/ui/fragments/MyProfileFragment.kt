@@ -169,7 +169,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-
         App.component.inject(this)
         glide = Glide.with(this)
 
@@ -971,7 +970,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             openAlertDialog(this::removeTrip)
         }
 
-        mapView.onStart()
+       // mapView.onStart()
     }
 
     private fun removeTrip() {
