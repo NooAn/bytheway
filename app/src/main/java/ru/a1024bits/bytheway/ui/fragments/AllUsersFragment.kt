@@ -99,7 +99,7 @@ class AllUsersFragment : Fragment() {
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-                if ("" == newText && isNotStartSearch) {
+                if (newText.isEmpty() && isNotStartSearch && this@AllUsersFragment.view != null) {
                     updateViewsBeforeSearch()
                     viewModel.getAllUsers(filter)
                 }
