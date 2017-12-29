@@ -15,7 +15,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_marginStart="34dp"
-        android:layout_marginTop="6dp"
         android:layout_toEndOf="@+id/startMarkerView"
         android:layout_toStartOf="@+id/swap_cities"
         android:background="@drawable/textlines"

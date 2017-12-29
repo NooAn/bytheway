@@ -338,7 +338,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     override fun onResume() {
         super.onResume()
-        mMapView?.onResume()
+        try {
+            mMapView?.onResume()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     fun setMarker(point: LatLng, position: Int) {

@@ -109,6 +109,9 @@ class MenuActivity : AppCompatActivity(),
         val navigationView = findViewById<NavigationView>(R.id.nav_view)
         navigationView.setNavigationItemSelectedListener(this)
         val hView = navigationView.getHeaderView(0)
+        hView.setOnClickListener {
+            openProfile()
+        }
         val cityName = hView.findViewById<TextView>(R.id.menu_city_name)
         val image = hView.findViewById<ImageView>(R.id.menu_image_avatar)
 
@@ -149,6 +152,11 @@ class MenuActivity : AppCompatActivity(),
             })
         }
         feedback.setOnClickListener { openDialogFeedback() }
+    }
+
+    private fun openProfile() {
+        navigator.applyCommand(Replace(Screens.MY_PROFILE_SCREEN, 1))
+        close()
     }
 
     private fun markFirstEnter() = preferences.edit()
@@ -236,8 +244,7 @@ class MenuActivity : AppCompatActivity(),
     override fun onFragmentInteraction(user: User?) {
         mainUser = user
     }
-
-
+    
     override fun onResume() {
         super.onResume()
         Log.e("LOG", "onResume")
@@ -349,10 +356,14 @@ class MenuActivity : AppCompatActivity(),
                 R.id.search_item -> navigator.applyCommand(Forward(Screens.SEARCH_MAP_SCREEN, 1))
                 R.id.all_users_item -> navigator.applyCommand(Forward(Screens.ALL_USERS_SCREEN, 1))
             }
-            val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
-            drawer.closeDrawer(GravityCompat.START)
+            close()
             return true
         }
+    }
+
+    private fun close() {
+        val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
+        drawer.closeDrawer(GravityCompat.START)
     }
 
     private fun openAwayFromProfileDialog(callback: () -> Unit) {
@@ -371,7 +382,6 @@ class MenuActivity : AppCompatActivity(),
                 Toast.makeText(this, resources.getString(R.string.save_succesfull), Toast.LENGTH_SHORT).show()
                 callback()
             })
-
         })
         simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.no), { dialogInterface, i ->
             Log.e("LOG", " refused")

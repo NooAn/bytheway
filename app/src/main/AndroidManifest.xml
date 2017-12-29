@@ -13,7 +13,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
         <activity android:name=".ui.activity.RegistrationActivity" />
-        <activity android:name=".ui.activity.MenuActivity">
+        <activity
+            android:name=".ui.activity.MenuActivity"
+            android:hardwareAccelerated="true">
+
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
