@@ -1,5 +1,6 @@
 package ru.a1024bits.bytheway.ui.activity
 
+import android.app.Activity
 import android.arch.lifecycle.LifecycleActivity
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
@@ -68,12 +69,14 @@ class RegistrationActivity : LifecycleActivity(), GoogleApiClient.OnConnectionFa
         super.onStart()
     }
 
-
+//fixme Status{statusCode=NETWORK_ERROR, resolution=null}
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
         super.onActivityResult(requestCode, resultCode, data)
+        Log.e("LOG", "result activity registration")
         if (requestCode == RC_SIGN_IN) {
             val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
-            handleSignInResult(result)
+            if (result != null)
+                handleSignInResult(result)
         }
     }
 

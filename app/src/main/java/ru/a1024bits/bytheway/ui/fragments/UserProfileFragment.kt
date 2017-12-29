@@ -56,7 +56,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
 
         showRouteOnMap(user.route)
 
-        username.text = StringBuilder().append(user.name).append(user.lastName)
+        username.text = StringBuilder().append(user.name).append(" ").append(user.lastName)
 
         travelledStatistics.visibility = if (user.flightHours == 0L) View.GONE else View.VISIBLE
 
@@ -195,7 +195,6 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
     private fun showErrorLoading() {
         Log.e("LOg", "ERROR")
         Toast.makeText(activity, "Ошибка загрузки", Toast.LENGTH_SHORT).show()
-
     }
 
     override fun getViewFactoryClass(): ViewModelProvider.Factory = viewModelFactory

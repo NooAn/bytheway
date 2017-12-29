@@ -9,7 +9,7 @@
     <View
         android:id="@+id/view"
         android:layout_width="match_parent"
-        android:layout_height="155dp"
+        android:layout_height="148dp"
         android:background="@color/colorPrimary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -18,10 +18,10 @@
     <ImageView
         android:id="@+id/image_avatar"
         android:layout_width="match_parent"
-        android:layout_height="210dp"
+        android:layout_height="200dp"
         android:layout_gravity="center"
         android:layout_marginTop="25dp"
-        android:contentDescription="Ava"
+        android:contentDescription="Avatarca"
         android:foregroundGravity="center"
         android:paddingTop="40dp"
         android:scaleType="fitCenter"

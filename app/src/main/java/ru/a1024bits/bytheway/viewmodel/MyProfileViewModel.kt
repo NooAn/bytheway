@@ -9,6 +9,9 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import io.reactivex.CompletableObserver
+import io.reactivex.disposables.Disposable
+import io.reactivex.functions.Action
 import ru.a1024bits.bytheway.model.*
 import ru.a1024bits.bytheway.repository.COLLECTION_USERS
 import ru.a1024bits.bytheway.repository.UserRepository
@@ -24,7 +27,7 @@ import javax.inject.Inject
 /**
  * Created by andrey.gusenkov on 25/09/2017.
  */
-class MyProfileViewModel @Inject constructor(var userRepository: UserRepository) : ViewModel() {
+class MyProfileViewModel @Inject constructor(var userRepository: UserRepository) : BaseViewModel() {
     val user: MutableLiveData<User> = MutableLiveData<User>()
     val load: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
     val error: MutableLiveData<Int> = MutableLiveData<Int>()
@@ -40,21 +43,19 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                 }
     }
 
+    var response: MutableLiveData<Response<User>> = MutableLiveData()
+
+    val loadingStatus = MutableLiveData<Boolean>()
     fun saveLinks(arraySocNetwork: HashMap<String, String>, id: String) {
         val map: HashMap<String, Any> = hashMapOf()
         map.put("socialNetwork", arraySocNetwork) // fixme
-        userRepository.changeUserProfile(map, id)
-                .addOnFailureListener {
-                    error.value = ERROR
-                    Log.e("LOG", "fail link change ${it.message}", it)
-                }
-                .addOnSuccessListener {
-                    Log.e("LOG", "success link change")
-                    error.value = SUCCESS
-                }
-                .addOnCompleteListener {
-                    Log.e("LOG", "oncomplete link change")
-                }
+        disposables.add(userRepository.changeUserProfile(map, id)
+                .subscribeOn(getBackgroundScheduler())
+                .observeOn(getMainThreadScheduler())
+                .doOnSubscribe({ s -> loadingStatus.setValue(true) })
+                .doAfterTerminate({ loadingStatus.setValue(false) })
+                .subscribe())
+
     }
 
 
@@ -78,9 +79,9 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                             currentUser?.getUid()
                         }).addOnCompleteListener {
                             load.value = true
-                        }.addOnFailureListener({
+                        }.addOnFailureListener {
                             load.value = false
-                        })
+                        }
                         Log.d("LOG", "No such document and create new doc");
                     } else {
                         // Пользователь уже существует и не нужно тогда добавлять его
@@ -98,19 +99,11 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
     fun sendUserData(map: HashMap<String, Any>, id: String, success: () -> Unit = {}) {
         Log.e("LOG map:", id + " " + map.toString())
         userRepository.changeUserProfile(map, id)
-                .addOnCompleteListener {
-                    //fixme
-                    Log.e("LOG", "complete сhange profile user")
-                    success()
-                }
-                .addOnFailureListener {
-                    Log.e("LOG", "fail change user")
-                    //fixme Здесь обработка лоадера и показь пользователю ошибку загрузки ну не здеь а во вью. пример как эт осделать смотри в вью моделаър
-                }
-                .addOnSuccessListener {
-                    Log.e("LOG", "ok send user")
-                    //fixme
-                }
+                .subscribeOn(getBackgroundScheduler())
+                .observeOn(getMainThreadScheduler())
+                .doOnComplete(success) // FIXME THIS IS NOT CORRECT
+                .subscribe()
+
     }
 
     fun updateStaticalInfo(airUser: AirUser?, id: String) {

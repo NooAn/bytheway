@@ -32,12 +32,16 @@ import ru.a1024bits.aviaanimation.ui.util.MarkerAnimation
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.MapWebService
 import ru.a1024bits.bytheway.R
+import ru.a1024bits.bytheway.model.Method
 import ru.a1024bits.bytheway.model.Status
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.model.map_directions.RoutesList
 import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
+import ru.a1024bits.bytheway.util.Constants
+import ru.a1024bits.bytheway.util.Constants.END_DATE
+import ru.a1024bits.bytheway.util.Constants.START_DATE
 import ru.a1024bits.bytheway.util.createMarker
 import ru.a1024bits.bytheway.util.toJsonString
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
@@ -47,6 +51,7 @@ import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 
 /**
@@ -179,7 +184,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         buttonSaveTravelInfo.setOnClickListener {
             //send data to Firebase
-            routeString?.let { route -> viewModel?.sendUserData(getHashMapUser(route), uid) }
+            viewModel?.sendUserData(getHashMapUser(), uid)
+            // routeString?.let { route -> viewModel?.sendUserData(getHashMapRoute(route), uid) }
         }
 
         buttonSearch.setOnClickListener {
@@ -223,6 +229,23 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                         }
                     })
                     .show()
+    }
+
+    private fun getHashMapUser(): HashMap<String, Any> {
+        val hashMap = HashMap<String, Any>()
+        val cities: HashMap<String, String> = hashMapOf()
+        cities.put(Constants.FIRST_INDEX_CITY, searchFragment?.filter?.startCity.toString())
+        cities.put(Constants.LAST_INDEX_CITY, searchFragment?.filter?.endCity.toString())
+        hashMap.set("cities", cities)
+        val hashMethod = searchFragment?.filter?.method
+        if (hashMethod != null)
+            hashMap.set("method", hashMethod)
+        hashMap.set("route", routeString ?: "")
+        val dates: HashMap<String, Long> = hashMapOf()
+        dates.put(START_DATE, searchFragment?.filter?.startDate ?: 0)
+        dates.put(END_DATE, searchFragment?.filter?.endDate ?: 0)
+        hashMap.set("dates", dates)
+        return hashMap
     }
 
     var marker: Marker? = null
@@ -338,7 +361,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     override fun onResume() {
         super.onResume()
-        mMapView?.onResume()
+        try {
+            mMapView?.onResume()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     fun setMarker(point: LatLng, position: Int) {
@@ -371,7 +398,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         return builder.build()
     }
 
-    fun getHashMapUser(route: String): HashMap<String, Any> {
+    fun getHashMapRoute(route: String): HashMap<String, Any> {
         val hashMap = HashMap<String, Any>()
         hashMap.put("route", route)
         return hashMap

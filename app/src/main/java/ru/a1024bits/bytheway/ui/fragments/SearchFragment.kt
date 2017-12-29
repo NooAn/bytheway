@@ -132,8 +132,11 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         text_to_city.setOnClickListener {
             sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO)
         }
-        dateFromValue.text = user.dates.get(START_DATE)?.getNormallDate()
-        dateToValue.text = user.dates.get(END_DATE)?.getNormallDate()
+
+        if (user.dates.size > 0) {
+            dateFromValue.text = user.dates.get(START_DATE)?.getNormallDate()
+            dateToValue.text = user.dates.get(END_DATE)?.getNormallDate()
+        }
 
         swap_cities.setOnClickListener {
             val tempString = text_from_city.text

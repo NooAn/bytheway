@@ -27,8 +27,8 @@
                 android:id="@+id/username"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAlignment="center"
                 android:fontFamily="sans-serif-medium"
+                android:textAlignment="center"
                 android:textColor="@color/black"
                 android:textSize="24sp"
                 tools:text="@string/fullname" />
@@ -280,10 +280,9 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="@string/method_move"
-                android:textSize="16sp"
                 android:fontFamily="sans-serif-medium"
-                />
+                android:text="@string/method_move"
+                android:textSize="16sp" />
         </LinearLayout>
         <!-- Travel types -->
         <LinearLayout
@@ -435,9 +434,9 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:fontFamily="sans-serif-medium"
                 android:text="@string/money"
-                android:textSize="16sp"
-                android:fontFamily="sans-serif-medium" />
+                android:textSize="16sp" />
 
             <SeekBar
                 android:id="@+id/choose_price_travel"
@@ -491,7 +490,7 @@
                 android:backgroundTint="@color/colorPrimary"
                 android:hint="@string/description"
                 android:inputType="textMultiLine"
-                android:textSize="14sp" />
+                android:textSize="16sp" />
         </LinearLayout>
 
         <TextView
@@ -501,23 +500,23 @@
             android:layout_below="@id/descriptionprofile"
             android:layout_marginEnd="16dp"
             android:layout_marginStart="16dp"
-            android:fontFamily="sans-serif-medium"
             android:layout_marginTop="24dp"
             android:drawablePadding="10dp"
             android:drawableStart="@drawable/app_pic"
+            android:fontFamily="sans-serif-medium"
             android:text="@string/add_new_trip_from_app_in_the_air"
             android:visibility="gone"
-            tools:visibility="visible"/>
+            tools:visibility="visible" />
 
         <View
+            android:id="@+id/grayLine"
             android:layout_width="match_parent"
             android:layout_height="2dp"
             android:layout_below="@id/appinTheAirEnter"
-            android:layout_marginTop="25dp"
             android:layout_marginEnd="15dp"
             android:layout_marginStart="15dp"
+            android:layout_marginTop="25dp"
             android:background="@drawable/back"
-            android:id="@+id/grayLine"
             android:visibility="gone"
             tools:visibility="invisible" />
 
@@ -525,10 +524,12 @@
             android:id="@+id/button_save_travel_info"
             android:layout_width="150dp"
             android:layout_height="match_parent"
-            android:layout_alignEnd="@+id/appinTheAirEnter"
-            android:layout_alignTop="@+id/grayLine"
+            android:layout_alignEnd="@+id/grayLine"
+            android:layout_alignParentBottom="true"
+            android:fontFamily="sans-serif-medium"
             android:padding="24dp"
             android:text="@string/save"
+            android:textSize="16sp"
             android:theme="@style/WhiteButton"
             android:visibility="gone"
             tools:visibility="visible" />
@@ -539,8 +540,10 @@
             android:layout_height="match_parent"
             android:layout_alignTop="@+id/grayLine"
             android:layout_toStartOf="@+id/button_save_travel_info"
+            android:fontFamily="sans-serif-medium"
             android:padding="24dp"
             android:text="@string/remove"
+            android:textSize="16sp"
             android:theme="@style/WhiteButton"
             android:visibility="gone"
             tools:visibility="visible" />

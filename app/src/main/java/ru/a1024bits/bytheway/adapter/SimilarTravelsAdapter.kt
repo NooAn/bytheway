@@ -38,11 +38,12 @@ class SimilarTravelsAdapter(val context: Context) : RecyclerView.Adapter<Similar
         Log.d("LOG", "onBindViewHolder on position: " + position)
         val currentUser = users[position]
 
-        holder.cities.text = StringBuilder().append(getShortCity(currentUser.cities.get(FIRST_INDEX_CITY)?:""))
+        holder.cities.text = StringBuilder().append(getShortCity(currentUser.cities.get(FIRST_INDEX_CITY) ?: ""))
                 .append(" - ")
-                .append(getShortCity(currentUser.cities.get(LAST_INDEX_CITY)?:""))
+                .append(getShortCity(currentUser.cities.get(LAST_INDEX_CITY) ?: ""))
 
         holder.name.text = StringBuilder().append(currentUser.name)
+                .append(" ")
                 .append(currentUser.lastName)
                 .append(", ")
                 .append(currentUser.age)
@@ -70,7 +71,7 @@ class SimilarTravelsAdapter(val context: Context) : RecyclerView.Adapter<Similar
 
     private fun getShortCity(city: String): String? {
         val n = if (city?.length > 14) 14 else city.length
-        val shortCity = city?.substring(0, n )
+        val shortCity = city?.substring(0, n)
         if (shortCity?.length == city?.length) {
             return city
         } else {

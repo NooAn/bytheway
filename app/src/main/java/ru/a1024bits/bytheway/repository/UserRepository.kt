@@ -4,6 +4,8 @@ import android.arch.lifecycle.Observer
 import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.*
+import io.reactivex.Completable
+import io.reactivex.CompletableObserver
 import io.reactivex.Single
 import ru.a1024bits.bytheway.algorithm.SearchTravelers
 import ru.a1024bits.bytheway.model.User
@@ -81,16 +83,22 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) : IUsersR
         return store.collection(COLLECTION_USERS).document(user.id).set(user)
     }
 
-    override fun changeUserProfile(map: HashMap<String, Any>, id: String): Task<Void> {
-        Log.d("LOG", "change user profile send....")
-        val documentRef = store.collection(COLLECTION_USERS).document(id)
-        return store.runTransaction(object : Transaction.Function<Void> {
-            override fun apply(transaction: Transaction): Void? {
-                map.put("timestamp", FieldValue.serverTimestamp());
-                documentRef.update(map)
-                return null
+    override fun changeUserProfile(map: HashMap<String, Any>, id: String) =
+            Completable.create { stream ->
+                Log.d("LOG", "change user profile send....")
+                val documentRef = store.collection(COLLECTION_USERS).document(id)
+                store.runTransaction(object : Transaction.Function<Void> {
+                    override fun apply(transaction: Transaction): Void? {
+                        map.put("timestamp", FieldValue.serverTimestamp());
+                        documentRef.update(map)
+                        return null
+                    }
+                }).addOnCompleteListener {
+                    Log.e("LOG", "finish update user profile")
+                }.addOnFailureListener {
+                    stream.onError(it)
+                }.addOnSuccessListener {
+                    stream.onComplete()
+                }
             }
-        })
-    }
-
 }
