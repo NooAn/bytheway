@@ -5,6 +5,8 @@ import android.arch.lifecycle.ViewModel
 import android.os.AsyncTask
 import android.util.Log
 import com.google.firebase.firestore.QuerySnapshot
+import io.reactivex.CompletableObserver
+import io.reactivex.disposables.Disposable
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.ExtensionsAllUsers
 import ru.a1024bits.bytheway.algorithm.SearchTravelers
@@ -41,19 +43,9 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
 
 
     fun sendUserData(map: HashMap<String, Any>, id: String) {
-        userRepository.changeUserProfile(map, id)
-                .addOnCompleteListener {
-                    //fixme
-                    Log.e("LOG", "${this::class.java.simpleName}: complete user: complete? ${it.isComplete}; successful? ${it.isSuccessful}")
-                }
-                .addOnFailureListener {
-                    Log.e("LOG", "${this::class.java.simpleName}: fail user")
-                    //fixme Здесь обработка лоадера и показь пользователю ошибку загрузки ну не здеь а во вью. пример как эт осделать смотри в вью моделаър
-                }
-                .addOnSuccessListener {
-                    Log.e("LOG", "${this::class.java.simpleName}: ok send user")
-                    //fixme
-                }
+        loadingStatus.setValue(true)
+        //fixme
+        userRepository.changeUserProfile(map, id).subscribe()
     }
 
     fun getUsersWithSimilarTravel(paramSearch: Filter) {
