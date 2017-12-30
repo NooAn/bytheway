@@ -49,6 +49,7 @@ import ru.a1024bits.bytheway.router.Screens.Companion.USER_SINHRONIZED_SCREEN
 import ru.a1024bits.bytheway.ui.dialogs.FeedbackDialog
 import ru.a1024bits.bytheway.ui.fragments.*
 import ru.a1024bits.bytheway.util.Constants
+import ru.a1024bits.bytheway.util.ProgressCustom
 import ru.a1024bits.bytheway.util.ServiceGenerator
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import ru.terrakok.cicerone.NavigatorHolder
@@ -67,6 +68,7 @@ class MenuActivity : AppCompatActivity(),
     val preferences: SharedPreferences by lazy { getSharedPreferences(Constants.APP_PREFERENCES, Context.MODE_PRIVATE) }
 
     private var mGoogleApiClient: GoogleApiClient? = null
+    public var pLoader: ProgressCustom? = null
 
     override fun onSetPoint(l: LatLng, pos: Int) {
         val mapFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as MapFragment
@@ -112,7 +114,6 @@ class MenuActivity : AppCompatActivity(),
         hView.setOnClickListener {
             openProfile()
         }
-        val cityName = hView.findViewById<TextView>(R.id.menu_city_name)
         val image = hView.findViewById<ImageView>(R.id.menu_image_avatar)
 
         glide?.load(FirebaseAuth.getInstance().currentUser?.photoUrl)
@@ -152,6 +153,7 @@ class MenuActivity : AppCompatActivity(),
             })
         }
         feedback.setOnClickListener { openDialogFeedback() }
+        pLoader = this.findViewById(R.id.pLoaderRes) as ProgressCustom
     }
 
     private fun openProfile() {

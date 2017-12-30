@@ -32,7 +32,7 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
     val load: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
     val error: MutableLiveData<Int> = MutableLiveData<Int>()
 
-    fun load(userId: String) {
+    fun load(userId: String, success: () -> Unit = {}) {
         userRepository.getUserById(userId)
                 .addOnFailureListener {
                     Log.e("LOG", "error ${it.message}")
@@ -40,6 +40,7 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                 .addOnSuccessListener { document ->
                     val profile = document.toObject(User::class.java)
                     user.setValue(profile)
+                    success()
                 }
     }
 

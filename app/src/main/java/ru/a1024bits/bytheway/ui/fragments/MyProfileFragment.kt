@@ -1,6 +1,5 @@
 package ru.a1024bits.bytheway.ui.fragments
 
-import android.app.SearchManager
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
@@ -105,6 +104,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        (activity as MenuActivity).pLoader?.show()
     }
 
     private var uid = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
@@ -182,7 +182,9 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             }
         })
 
-        viewModel?.load(uid)
+        viewModel?.load(uid, {
+            if (activity != null) (activity as MenuActivity).pLoader?.hide()
+        })
     }
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
@@ -570,11 +572,12 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             Toast.makeText(this@MyProfileFragment.context, errorString, Toast.LENGTH_LONG).show()
             return
         }
-
+        (activity as MenuActivity).pLoader?.show()
         countTrip = 1
         viewModel?.sendUserData(getHashMapUser(), uid, {
             Toast.makeText(this@MyProfileFragment.context, resources.getString(R.string.save_succesfull), Toast.LENGTH_SHORT).show()
             profileChanged(false)
+            if (activity != null) (activity as MenuActivity).pLoader?.hide()
         })
     }
 
