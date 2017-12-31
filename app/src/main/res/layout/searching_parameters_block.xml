@@ -29,7 +29,7 @@
         android:textSize="@dimen/standard_text_size" />
 
     <TextView
-        android:id="@+id/date_text"
+        android:id="@+id/dateText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/endCity"
@@ -44,15 +44,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/endCity"
-        android:layout_toEndOf="@id/date_text"
+        android:layout_toEndOf="@id/dateText"
         android:text="@string/filters_all_users_empty_date"
         android:textSize="@dimen/standard_text_size" />
 
     <TextView
-        android:id="@+id/sex_text"
+        android:id="@+id/sexText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/date_text"
+        android:layout_below="@id/dateText"
         android:layout_marginBottom="26dp"
         android:layout_marginEnd="62dp"
         android:fontFamily="sans-serif-medium"
@@ -63,15 +63,14 @@
         android:id="@+id/sexButtons"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/sex_text"
-        android:layout_alignTop="@id/sex_text"
-        android:layout_toRightOf="@id/sex_text"
+        android:layout_alignBottom="@id/sexText"
+        android:layout_alignTop="@id/sexText"
+        android:layout_toEndOf="@id/sexText"
         android:backgroundTint="@color/colorPrimary"
         android:orientation="horizontal">
-        <!--android:layout_alignStart="@id/choseDate"-->
 
         <RadioButton
-            android:id="@+id/sex_M"
+            android:id="@+id/sexM"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="22dp"
@@ -81,7 +80,7 @@
             android:textSize="@dimen/standard_text_size" />
 
         <RadioButton
-            android:id="@+id/sex_W"
+            android:id="@+id/sexW"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="22dp"
@@ -91,7 +90,7 @@
             android:textSize="@dimen/standard_text_size" />
 
         <RadioButton
-            android:id="@+id/sex_Any"
+            android:id="@+id/sexAny"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/colorPrimary"
@@ -103,21 +102,21 @@
 
 
     <TextView
-        android:id="@+id/age_text"
+        android:id="@+id/ageText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/sex_text"
+        android:layout_below="@id/sexText"
         android:layout_marginBottom="26dp"
         android:fontFamily="sans-serif-medium"
         android:text="@string/age"
         android:textSize="@dimen/standard_text_size" />
 
     <TextView
-        android:id="@+id/from_age_text"
+        android:id="@+id/fromAgeText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignStart="@id/choseDate"
-        android:layout_below="@id/sex_text"
+        android:layout_below="@id/sexText"
         android:text="@string/from"
         android:textSize="@dimen/standard_text_size" />
 
@@ -125,17 +124,17 @@
         android:id="@+id/startAge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/age_text"
-        android:layout_alignTop="@id/age_text"
+        android:layout_alignBottom="@id/ageText"
+        android:layout_alignTop="@id/ageText"
         android:layout_marginStart="@dimen/standard_margin"
-        android:layout_toEndOf="@id/from_age_text"
+        android:layout_toEndOf="@id/fromAgeText"
         android:theme="@style/UsersTextInFilters" />
 
     <TextView
-        android:id="@+id/by_age_text"
+        android:id="@+id/byAgeText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/sex_text"
+        android:layout_below="@id/sexText"
         android:layout_marginStart="@dimen/standard_margin"
         android:layout_toEndOf="@id/startAge"
         android:text="@string/to"
@@ -145,29 +144,29 @@
         android:id="@+id/endAge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/age_text"
-        android:layout_alignTop="@id/age_text"
+        android:layout_alignBottom="@id/ageText"
+        android:layout_alignTop="@id/ageText"
         android:layout_marginStart="@dimen/standard_margin"
-        android:layout_toEndOf="@id/by_age_text"
+        android:layout_toEndOf="@id/byAgeText"
         android:theme="@style/UsersTextInFilters" />
 
 
     <TextView
-        android:id="@+id/budget_text"
+        android:id="@+id/budgetText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/age_text"
+        android:layout_below="@id/ageText"
         android:layout_marginBottom="26dp"
         android:fontFamily="sans-serif-medium"
         android:text="@string/budgetName"
         android:textSize="@dimen/standard_text_size" />
 
     <TextView
-        android:id="@+id/from_budget_text"
+        android:id="@+id/fromBudgetText"
         android:layout_width="wrap_content"
         android:layout_height="35dp"
         android:layout_alignStart="@id/choseDate"
-        android:layout_below="@id/age_text"
+        android:layout_below="@id/ageText"
         android:gravity="top"
         android:text="@string/from"
         android:textSize="@dimen/standard_text_size" />
@@ -176,20 +175,20 @@
         android:id="@+id/startBudget"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/from_budget_text"
+        android:layout_alignBottom="@id/fromBudgetText"
         android:layout_alignEnd="@id/startAge"
         android:layout_alignStart="@id/startAge"
-        android:layout_toEndOf="@id/from_budget_text"
+        android:layout_toEndOf="@id/fromBudgetText"
         android:inputType="number"
         android:saveEnabled="true"
         android:theme="@style/UsersTextInFilters" />
 
     <TextView
-        android:id="@+id/by_budget_text"
+        android:id="@+id/byBudgetText"
         android:layout_width="wrap_content"
         android:layout_height="35dp"
-        android:layout_alignStart="@id/by_age_text"
-        android:layout_below="@id/age_text"
+        android:layout_alignStart="@id/byAgeText"
+        android:layout_below="@id/ageText"
         android:gravity="top"
         android:text="@string/to"
         android:textSize="@dimen/standard_text_size" />
@@ -198,7 +197,7 @@
         android:id="@+id/endBudget"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/by_budget_text"
+        android:layout_alignBottom="@id/byBudgetText"
         android:layout_alignEnd="@id/endAge"
         android:layout_alignStart="@id/endAge"
         android:saveEnabled="true"
@@ -210,7 +209,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:layout_below="@id/budget_text"
+        android:layout_below="@id/budgetText"
         android:layout_marginStart="10dp"
         android:drawablePadding="10dp"
         android:drawableStart="@drawable/ic_search_black_24dp"
@@ -223,7 +222,7 @@
         android:id="@+id/cancelParameters"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/budget_text"
+        android:layout_below="@id/budgetText"
         android:layout_toStartOf="@id/saveParameters"
         android:stateListAnimator="@null"
         android:text="@string/cancel"

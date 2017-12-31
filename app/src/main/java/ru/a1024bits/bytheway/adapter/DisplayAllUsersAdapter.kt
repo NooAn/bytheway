@@ -2,7 +2,6 @@ package ru.a1024bits.bytheway.adapter;
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +10,6 @@ import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.request.RequestOptions
-import com.google.firebase.auth.FirebaseAuth
 import ru.a1024bits.bytheway.ExtensionsAllUsers
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.User
@@ -57,10 +55,10 @@ class DisplayAllUsersAdapter(val context: Context, val extensions: ExtensionsAll
                     (context as? MenuActivity)?.showUserSimpleProfile(users[adapterPosition])
             })
         }
-        var name = view.findViewById<TextView>(R.id.name_content_user)
-        var avatar = view.findViewById<ImageView>(R.id.user_avatar)
-        var dates = view.findViewById<TextView>(R.id.users_dates)
-        var age = view.findViewById<TextView>(R.id.age_content_user)
-        var cities = view.findViewById<TextView>(R.id.users_cities)
+        var name = view.findViewById<TextView>(R.id.nameContentUser)
+        var avatar = view.findViewById<ImageView>(R.id.userAvatar)
+        var dates = view.findViewById<TextView>(R.id.usersDates)
+        var age = view.findViewById<TextView>(R.id.ageContentUser)
+        var cities = view.findViewById<TextView>(R.id.usersCities)
     }
 }

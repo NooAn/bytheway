@@ -12,7 +12,7 @@
         android:paddingTop="@dimen/standard_margin">
 
         <ImageView
-            android:id="@+id/user_avatar"
+            android:id="@+id/userAvatar"
             android:layout_width="@dimen/size_user_avatar"
             android:layout_height="@dimen/size_user_avatar"
             android:layout_centerHorizontal="true"
@@ -20,48 +20,48 @@
             android:src="@mipmap/ic_launcher_round" />
 
         <TextView
-            android:id="@+id/name_content_user"
+            android:id="@+id/nameContentUser"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/standard_margin"
             android:textColor="@color/black"
             android:textSize="@dimen/item_all_users_main_text"
-            app:layout_constraintStart_toEndOf="@id/user_avatar"
+            app:layout_constraintStart_toEndOf="@id/userAvatar"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Николаев Алексей" />
 
         <TextView
-            android:id="@+id/age_content_user"
+            android:id="@+id/ageContentUser"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:textColor="@color/black"
             android:textSize="@dimen/item_all_users_main_text"
-            app:layout_constraintBottom_toTopOf="@+id/users_cities"
-            app:layout_constraintStart_toEndOf="@id/name_content_user"
-            app:layout_constraintTop_toTopOf="@+id/name_content_user"
+            app:layout_constraintBottom_toTopOf="@+id/usersCities"
+            app:layout_constraintStart_toEndOf="@id/nameContentUser"
+            app:layout_constraintTop_toTopOf="@+id/nameContentUser"
             tools:text=", 16" />
 
         <TextView
-            android:id="@+id/users_cities"
+            android:id="@+id/usersCities"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/not_cities"
             android:textColor="@color/black"
             android:textSize="@dimen/item_all_users_subsidiary_text"
-            app:layout_constraintBottom_toBottomOf="@+id/user_avatar"
-            app:layout_constraintStart_toStartOf="@id/name_content_user"
-            app:layout_constraintTop_toBottomOf="@+id/name_content_user" />
+            app:layout_constraintBottom_toBottomOf="@+id/userAvatar"
+            app:layout_constraintStart_toStartOf="@id/nameContentUser"
+            app:layout_constraintTop_toBottomOf="@+id/nameContentUser" />
 
         <TextView
-            android:id="@+id/users_dates"
+            android:id="@+id/usersDates"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/item_all_users_empty_date"
             android:textColor="@color/colorPrimaryTeams"
             android:textSize="@dimen/item_all_users_subsidiary_text"
-            app:layout_constraintStart_toStartOf="@id/name_content_user"
-            app:layout_constraintTop_toBottomOf="@+id/users_cities"
+            app:layout_constraintStart_toStartOf="@id/nameContentUser"
+            app:layout_constraintTop_toBottomOf="@+id/usersCities"
             tools:text="@string/date" />
 
     </android.support.constraint.ConstraintLayout>
