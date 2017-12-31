@@ -62,7 +62,7 @@ class AllUsersFragment : Fragment() {
         installLogicToUI()
 
         displayUsersAdapter = DisplayAllUsersAdapter(this.context, extension)
-        display_all_users.adapter = displayUsersAdapter
+        displayAllUsers.adapter = displayUsersAdapter
 
         viewModel.usersLiveData.observe(this, Observer<List<User>> { list ->
             Log.e("LOG", "onChanged $list")
@@ -149,15 +149,15 @@ class AllUsersFragment : Fragment() {
         }
         sexButtons.setOnCheckedChangeListener { _, id ->
             filter.sex = when (id) {
-                sex_M.id -> 1
-                sex_W.id -> 2
+                sexM.id -> 1
+                sexW.id -> 2
                 else -> 0
             }
         }
         sexButtons.check(when (filter.sex) {
-            1 -> sex_M.id
-            2 -> sex_W.id
-            else -> sex_Any.id
+            1 -> sexM.id
+            2 -> sexW.id
+            else -> sexAny.id
         })
         updateChoseDateButtons()
 
@@ -197,9 +197,9 @@ class AllUsersFragment : Fragment() {
             updateChoseDateButtons()
 
             sexButtons.check(when (filter.sex) {
-                1 -> sex_M.id
-                2 -> sex_W.id
-                else -> sex_Any.id
+                1 -> sexM.id
+                2 -> sexW.id
+                else -> sexAny.id
             })
         }
 
@@ -264,7 +264,7 @@ class AllUsersFragment : Fragment() {
                     calendarEndDate.set(Calendar.DAY_OF_MONTH, dayOfMonthEnd)
 
                     if (calendarStartDate.timeInMillis >= calendarEndDate.timeInMillis) {
-                        Snackbar.make(activity.findViewById(android.R.id.content), "даты оказались некорректными, попробуйте ввести их снова", Snackbar.LENGTH_LONG).show()
+                        Snackbar.make(activity.findViewById(android.R.id.content), context.getString(R.string.dates_has_been_incorrect), Snackbar.LENGTH_LONG).show()
                         return@newInstance
                     }
                     filter.startDate = calendarStartDate.timeInMillis
@@ -282,7 +282,7 @@ class AllUsersFragment : Fragment() {
     }
 
     private fun updateViewsBeforeSearch() {
-        display_all_users.visibility = View.GONE
+        displayAllUsers.visibility = View.GONE
         block_empty_users.visibility = View.GONE
         loadingWhereLoadUsers.visibility = View.VISIBLE
     }
@@ -290,7 +290,7 @@ class AllUsersFragment : Fragment() {
     private fun updateViewsAfterSearch(isNotEmptyListUsers: Boolean) {
         loadingWhereLoadUsers.visibility = View.GONE
         if (isNotEmptyListUsers)
-            display_all_users.visibility = View.VISIBLE
+            displayAllUsers.visibility = View.VISIBLE
         else
             block_empty_users.visibility = View.VISIBLE
     }

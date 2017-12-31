@@ -47,7 +47,7 @@
         android:visibility="gone" />
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/display_all_users"
+        android:id="@+id/displayAllUsers"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingEnd="@dimen/standard_margin"
