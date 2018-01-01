@@ -1,19 +1,18 @@
 package ru.a1024bits.bytheway.viewmodel
 
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
 import android.os.AsyncTask
-import android.util.Log
+import com.borax12.materialdaterangepicker.date.DatePickerDialog
 import com.google.firebase.firestore.QuerySnapshot
-import io.reactivex.CompletableObserver
-import io.reactivex.disposables.Disposable
 import ru.a1024bits.bytheway.App
-import ru.a1024bits.bytheway.ExtensionsAllUsers
-import ru.a1024bits.bytheway.algorithm.SearchTravelers
+import ru.a1024bits.bytheway.R
+import ru.a1024bits.bytheway.extensions.ExtensionsAllUsers
 import ru.a1024bits.bytheway.model.Response
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.repository.UserRepository
+import ru.a1024bits.bytheway.ui.fragments.AllUsersFragment
+import java.util.*
 import javax.inject.Inject
 
 /**
@@ -93,5 +92,44 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
             super.onPostExecute(result)
             (result[1] as MutableLiveData<List<User>>).setValue(result[0] as List<User>)
         }
+    }
+
+
+    fun updateDateDialog(fragment: AllUsersFragment): DatePickerDialog {
+        val currentStartDate = Calendar.getInstance()
+        if (filter.startDate > 0L) currentStartDate.timeInMillis = filter.startDate
+        val currentEndDate = Calendar.getInstance()
+        currentEndDate.timeInMillis = currentEndDate.timeInMillis + 1000L * 60 * 60 * 24
+        if (filter.endDate > 0L) currentEndDate.timeInMillis = filter.endDate
+
+        val dateDialog = DatePickerDialog.newInstance(
+                { _, year, monthOfYear, dayOfMonth, yearEnd, monthOfYearEnd, dayOfMonthEnd ->
+                    val calendarStartDate = Calendar.getInstance()
+                    calendarStartDate.set(Calendar.YEAR, year)
+                    calendarStartDate.set(Calendar.MONTH, monthOfYear)
+                    calendarStartDate.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+
+                    val calendarEndDate = Calendar.getInstance()
+                    calendarEndDate.set(Calendar.YEAR, yearEnd)
+                    calendarEndDate.set(Calendar.MONTH, monthOfYearEnd)
+                    calendarEndDate.set(Calendar.DAY_OF_MONTH, dayOfMonthEnd)
+
+                    if (calendarStartDate.timeInMillis >= calendarEndDate.timeInMillis) {
+                        fragment.nonSuchSetDate()
+                        return@newInstance
+                    }
+                    filter.startDate = calendarStartDate.timeInMillis
+                    filter.endDate = calendarEndDate.timeInMillis
+                    fragment.suchSetDate()
+                },
+                currentStartDate.get(Calendar.YEAR),
+                currentStartDate.get(Calendar.MONTH),
+                currentStartDate.get(Calendar.DAY_OF_MONTH),
+                currentEndDate.get(Calendar.YEAR),
+                currentEndDate.get(Calendar.MONTH),
+                currentEndDate.get(Calendar.DAY_OF_MONTH))
+        dateDialog.setStartTitle(App.INSTANCE.applicationContext.resources.getString(R.string.date_start))
+        dateDialog.setEndTitle(App.INSTANCE.applicationContext.resources.getString(R.string.date_end))
+        return dateDialog
     }
 }
