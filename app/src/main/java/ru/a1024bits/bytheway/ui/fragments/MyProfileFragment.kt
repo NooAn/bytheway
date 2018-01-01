@@ -949,8 +949,15 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     }
 
     override fun onDestroy() {
-        super.onDestroy()
+
         mapView.onDestroy()
+        //Clean up resources from google map to prevent memory leaks.
+        //Stop tracking current location
+        if (googleMap != null) {
+//            googleMap?.setMyLocationEnabled(false)
+            googleMap?.clear()
+        }
+        super.onDestroy()
     }
 
     override fun onLowMemory() {
