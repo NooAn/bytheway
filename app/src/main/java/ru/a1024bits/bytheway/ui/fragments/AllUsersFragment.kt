@@ -18,19 +18,19 @@ import com.borax12.materialdaterangepicker.date.DatePickerDialog
 import kotlinx.android.synthetic.main.fragment_display_all_users.*
 import kotlinx.android.synthetic.main.searching_parameters_block.*
 import ru.a1024bits.bytheway.App
-import ru.a1024bits.bytheway.ExtensionsAllUsers
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.adapter.DisplayAllUsersAdapter
+import ru.a1024bits.bytheway.extensions.ExtensionsAllUsers
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
+import ru.a1024bits.bytheway.repository.M_SEX
+import ru.a1024bits.bytheway.repository.W_SEX
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.a1024bits.bytheway.util.DecimalInputFilter
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
 import uk.co.deanwild.materialshowcaseview.IShowcaseListener
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView
-import java.util.*
 import javax.inject.Inject
-import kotlin.collections.ArrayList
 
 
 class AllUsersFragment : Fragment() {
@@ -47,6 +47,7 @@ class AllUsersFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+//        System.gc()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
@@ -85,16 +86,8 @@ class AllUsersFragment : Fragment() {
                 (context.getSystemService(Context.SEARCH_SERVICE) as SearchManager).getSearchableInfo(activity.componentName))
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             var isNotStartSearch = false
-            override fun onQueryTextSubmit(queryCustomRegister: String): Boolean {
-                val query = queryCustomRegister.toLowerCase()
-                val result = ArrayList<User>()
-                displayUsersAdapter.users.filterTo(result) {
-                    it.cities.containsValue(queryCustomRegister) || it.name.toLowerCase().contains(query) || it.email.toLowerCase().contains(query) ||
-                            it.age.toString().contains(query) || it.budget.toString().contains(query) ||
-                            it.city.toLowerCase().contains(query) || it.lastName.toLowerCase().contains(query) ||
-                            it.phone.contains(query) || it.route.contains(query)
-                }
-                displayUsersAdapter.setItems(result)
+            override fun onQueryTextSubmit(query: String): Boolean {
+                displayUsersAdapter.setItems(extension.filterUsersInAdapterByString(query.toLowerCase(), query, displayUsersAdapter.users))
                 return true
             }
 
@@ -114,6 +107,14 @@ class AllUsersFragment : Fragment() {
             true
         }
         else -> super.onOptionsItemSelected(item)
+    }
+
+    fun nonSuchSetDate() {
+        Snackbar.make(activity.findViewById(android.R.id.content), context.getString(R.string.dates_has_been_incorrect), Snackbar.LENGTH_LONG).show()
+    }
+
+    fun suchSetDate() {
+        updateChoseDateButtons()
     }
 
     private fun installLogicToUI() {
@@ -143,20 +144,21 @@ class AllUsersFragment : Fragment() {
                     filter.endAge = position
             }
         }
-        updateDateDialog()
+        dateDialog = viewModel.updateDateDialog(this)
+//        updateDateDialog()
         choseDate.setOnClickListener {
             dateDialog.show(activity.fragmentManager, "")
         }
         sexButtons.setOnCheckedChangeListener { _, id ->
             filter.sex = when (id) {
-                sexM.id -> 1
-                sexW.id -> 2
+                sexM.id -> M_SEX
+                sexW.id -> W_SEX
                 else -> 0
             }
         }
         sexButtons.check(when (filter.sex) {
-            1 -> sexM.id
-            2 -> sexW.id
+            M_SEX -> sexM.id
+            W_SEX -> sexW.id
             else -> sexAny.id
         })
         updateChoseDateButtons()
@@ -193,14 +195,10 @@ class AllUsersFragment : Fragment() {
             startCity.setText("")
             endCity.setText("")
 
-            updateDateDialog()
+            dateDialog = viewModel.updateDateDialog(this)
             updateChoseDateButtons()
 
-            sexButtons.check(when (filter.sex) {
-                1 -> sexM.id
-                2 -> sexW.id
-                else -> sexAny.id
-            })
+            sexButtons.check(sexAny.id)
         }
 
         view_contain_block_parameters.layoutTransition.setDuration(700L)
@@ -242,43 +240,6 @@ class AllUsersFragment : Fragment() {
                 }
             }
         })
-    }
-
-    private fun updateDateDialog() {
-        val currentStartDate = Calendar.getInstance()
-        if (filter.startDate > 0L) currentStartDate.timeInMillis = filter.startDate
-        val currentEndDate = Calendar.getInstance()
-        currentEndDate.timeInMillis = currentEndDate.timeInMillis + 1000L * 60 * 60 * 24
-        if (filter.endDate > 0L) currentEndDate.timeInMillis = filter.endDate
-
-        dateDialog = DatePickerDialog.newInstance(
-                { _, year, monthOfYear, dayOfMonth, yearEnd, monthOfYearEnd, dayOfMonthEnd ->
-                    val calendarStartDate = Calendar.getInstance()
-                    calendarStartDate.set(Calendar.YEAR, year)
-                    calendarStartDate.set(Calendar.MONTH, monthOfYear)
-                    calendarStartDate.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-
-                    val calendarEndDate = Calendar.getInstance()
-                    calendarEndDate.set(Calendar.YEAR, yearEnd)
-                    calendarEndDate.set(Calendar.MONTH, monthOfYearEnd)
-                    calendarEndDate.set(Calendar.DAY_OF_MONTH, dayOfMonthEnd)
-
-                    if (calendarStartDate.timeInMillis >= calendarEndDate.timeInMillis) {
-                        Snackbar.make(activity.findViewById(android.R.id.content), context.getString(R.string.dates_has_been_incorrect), Snackbar.LENGTH_LONG).show()
-                        return@newInstance
-                    }
-                    filter.startDate = calendarStartDate.timeInMillis
-                    filter.endDate = calendarEndDate.timeInMillis
-                    updateChoseDateButtons()
-                },
-                currentStartDate.get(Calendar.YEAR),
-                currentStartDate.get(Calendar.MONTH),
-                currentStartDate.get(Calendar.DAY_OF_MONTH),
-                currentEndDate.get(Calendar.YEAR),
-                currentEndDate.get(Calendar.MONTH),
-                currentEndDate.get(Calendar.DAY_OF_MONTH))
-        dateDialog.setStartTitle(resources.getString(R.string.date_start))
-        dateDialog.setEndTitle(resources.getString(R.string.date_end))
     }
 
     private fun updateViewsBeforeSearch() {

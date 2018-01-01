@@ -16,3 +16,6 @@ data class Filter(var startAge: Int = 0,
                   var sex: Int = 0,
                   var startDate: Long = 0L,
                   var endDate: Long = 0L) : Serializable
+
+val M_SEX = 1
+val W_SEX = 2

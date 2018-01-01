@@ -1,6 +1,8 @@
-package ru.a1024bits.bytheway
+package ru.a1024bits.bytheway.extensions
 
 import android.content.Context
+import ru.a1024bits.bytheway.R
+import ru.a1024bits.bytheway.model.User
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -27,6 +29,15 @@ class ExtensionsAllUsers(val context: Context) {
         }
         return getTextStartEndDates(fromWord, calendarStartDate, yearStart, toWord, calendarEndDate, yearEnd)
     }
+
+    fun filterUsersInAdapterByString(queryCustomRegister: String, primaryQuery: String, primaryList: MutableList<User>): MutableList<User> =
+            primaryList.filterTo(ArrayList()) {
+                it.cities.containsValue(primaryQuery) || it.name.toLowerCase().contains(queryCustomRegister) || it.email.toLowerCase().contains(queryCustomRegister) ||
+                        it.age.toString().contains(queryCustomRegister) || it.budget.toString().contains(queryCustomRegister) ||
+                        it.city.toLowerCase().contains(queryCustomRegister) || it.lastName.toLowerCase().contains(queryCustomRegister) ||
+                        it.phone.contains(queryCustomRegister) || it.route.contains(queryCustomRegister)
+
+            }
 
     private fun getTextStartEndDates(fromWord: String?, calendarStartDate: Calendar, yearStart: String, toWord: String?, calendarEndDate: Calendar, yearEnd: String): String {
         return StringBuilder(fromWord).append(calendarStartDate.get(Calendar.DAY_OF_MONTH)).append(" ")
