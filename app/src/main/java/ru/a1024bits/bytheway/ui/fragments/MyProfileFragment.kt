@@ -8,6 +8,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.text.Editable
@@ -41,9 +42,7 @@ import kotlinx.android.synthetic.main.profile_direction.*
 import kotlinx.android.synthetic.main.profile_main_image.*
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
-import ru.a1024bits.bytheway.model.Method
-import ru.a1024bits.bytheway.model.SocialNetwork
-import ru.a1024bits.bytheway.model.User
+import ru.a1024bits.bytheway.model.*
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
@@ -85,7 +84,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
         dates.put(START_DATE, getLongFromDate(dayOfMonth, monthOfYear, year))
         dates.put(END_DATE, getLongFromDate(dayOfMonthEnd, monthOfYearEnd, yearEnd))
-        profileStateHashMap.set("dates", dates.toString())
+        profileStateHashMap[DATES] = dates.toString()
         profileChanged()
     }
 
@@ -93,8 +92,29 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         val dateString = "$day $month $year"
         val dateFormat = SimpleDateFormat("dd MM yyyy")
         val date = dateFormat.parse(dateString)
-        val unixTime = date.time.toLong()
-        return unixTime
+        return date.time
+    }
+
+    companion object {
+        val BUDGET = "budget"
+        val BUDGET_POSITION = "budgetPosition"
+        val CITIES = "cities"
+        val METHOD = "method"
+        val METHODS = "methods"
+        val DATES = "dates"
+        val CITY_FROM = "cityFromLatLng"
+        val CITY_TO = "cityToLatLng"
+        val ADD_INFO = "addInformation"
+        val COUNT_TRIP = "countTrip"
+        val SEX = "sex"
+        val AGE = "age"
+        val NAME = "name"
+        val LASTNAME = "lastName"
+        val CITY = "city"
+        val VKLINK: String = "https://www.vk.com/"
+        val TGLINK = "@"
+        val CSLINK = "https://www.couchsurfing.com/people/"
+        val FBLINK = "https://www.facebook.com/"
     }
 
     private var viewModel: MyProfileViewModel? = null
@@ -119,12 +139,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     private lateinit var dateDialog: DatePickerDialog
 
-    val APPNUMBER: String = "+7"
-    val VKLINK: String = "https://www.vk.com/"
-    val TGLINK = "@"
-    val CSLINK = "https://www.couchsurfing.com/people/"
-    val FBLINK = "https://www.facebook.com/"
-
     private var numberPhone: String = "+7"
     private var whatsAppNumber: String = "+7"
     private var vkLink: String = "https://www.vk.com/"
@@ -139,30 +153,18 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             Method.PLANE.link to false,
             Method.HITCHHIKING.link to false
     )
+    private var methodIcons: HashMap<String, RelativeLayout> = hashMapOf()
+    private var methodTextViews: HashMap<String, TextView?> = hashMapOf()
 
     private var socNet: HashMap<String, String> = hashMapOf()
-
     private var dates: HashMap<String, Long> = hashMapOf()
-
     private var sex: Int = 0
-
     private var age: Int = 0
-
-    private var countries: Long = 0
-
-    private var hours: Long = 0
-
-    private var kilometers: Long = 0
-
     private var cities: HashMap<String, String> = hashMapOf()
-
     private var budget: Long = 0
     private var budgetPosition: Int = 0
-
     private var glide: RequestManager? = null
-
     private var yearNow: Int = 0
-
     private var yearsArr: ArrayList<Int> = arrayListOf()
 
     private var profileStateHashMap: HashMap<String, String> = hashMapOf()
@@ -173,40 +175,58 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         App.component.inject(this)
         glide = Glide.with(this)
 
+        methodIcons.put(Method.CAR.link, iconCar)
+        methodIcons.put(Method.TRAIN.link, iconTrain)
+        methodIcons.put(Method.BUS.link, iconBus)
+        methodIcons.put(Method.PLANE.link, iconPlane)
+        methodIcons.put(Method.HITCHHIKING.link, iconHitchHicking)
+
+        methodTextViews.put(Method.CAR.link, travelCarText)
+        methodTextViews.put(Method.TRAIN.link, travelTrainText)
+        methodTextViews.put(Method.BUS.link, travelBusText)
+        methodTextViews.put(Method.PLANE.link, travelPlaneText)
+        methodTextViews.put(Method.HITCHHIKING.link, travelHitchHikingText)
+
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
 
-        viewModel?.user?.observe(this, Observer<User> { user ->
-            if (user != null) {
-                fillProfile(user)
-                mListener?.onFragmentInteraction(user)
+        viewModel?.response?.observe(this, Observer<Response<User>> { response ->
+            when (response?.status) {
+                Status.SUCCESS -> {
+                    if (response.data != null) {
+                        if (activity != null) {
+                            (activity as MenuActivity).pLoader?.hide()
+                        }
+                        fillProfile(response.data)
+                        mListener?.onFragmentInteraction(response.data)
+                    }
+                }
+
+                Status.ERROR -> {
+                    Log.e("LOG", "log e:" + response.error)
+                }
             }
         })
 
-        viewModel?.load(uid, {
-            if (activity != null) (activity as MenuActivity).pLoader?.hide()
-        })
+        viewModel?.load(uid)
     }
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if ((activity as MenuActivity).preferences.getBoolean("isFirstEnterMyProfileFragment", true)) {
             MaterialShowcaseView.Builder(activity)
-                    .setTarget(new_trip_text)
+                    .setTarget(newTripText)
                     .renderOverNavigationBar()
                     .setDismissText(getString(R.string.close_hint))
                     .setTitleText(getString(R.string.hint_create_travel))
                     .setContentText(getString(R.string.hint_create_travel_description))
                     .withCircleShape()
                     .setListener(object : IShowcaseListener {
-                        override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {
-                        }
-
+                        override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {}
                         override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
                             if (activity != null && !activity.isDestroyed)
                                 (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterMyProfileFragment", false).apply()
                         }
-                    })
-                    .show()
+                    }).show()
         }
     }
 
@@ -228,18 +248,18 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         name = user.name
         numberPhone = user.phone
 
-        whatsAppNumber = user.socialNetwork.get(SocialNetwork.WHATSAPP.link) ?: whatsAppNumber
-        vkLink = user.socialNetwork.get(SocialNetwork.VK.link) ?: vkLink
-        fbLink = user.socialNetwork.get(SocialNetwork.FB.link) ?: fbLink
-        csLink = user.socialNetwork.get(SocialNetwork.CS.link) ?: csLink
-        tgNick = user.socialNetwork.get(SocialNetwork.TG.link) ?: tgNick
+        whatsAppNumber = user.socialNetwork[SocialNetwork.WHATSAPP.link] ?: whatsAppNumber
+        vkLink = user.socialNetwork[SocialNetwork.VK.link] ?: vkLink
+        fbLink = user.socialNetwork[SocialNetwork.FB.link] ?: fbLink
+        csLink = user.socialNetwork[SocialNetwork.CS.link] ?: csLink
+        tgNick = user.socialNetwork[SocialNetwork.TG.link] ?: tgNick
         travelledStatistics.visibility = if (user.flightHours == 0L) View.GONE else View.VISIBLE
 
         travelledCountries.text = user.countries.toString()
         flightHours.text = user.flightHours.toString()
         flightDistance.text = user.kilometers.toString()
 
-        if (user.city.length > 0) {
+        if (user.city.isNotEmpty()) {
             cityview.text = user.city
             city = user.city
         }
@@ -253,16 +273,16 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         }
 
         if (user.cities.size > 0) {
-            textCityFrom.setText(user.cities.get(FIRST_INDEX_CITY))
-            textCityTo.setText(user.cities.get(LAST_INDEX_CITY))
+            textCityFrom.setText(user.cities[FIRST_INDEX_CITY])
+            textCityTo.setText(user.cities[LAST_INDEX_CITY])
             cities = user.cities
         }
 
         val formatDate = SimpleDateFormat("dd.MM.yyyy")
 
         if (user.dates.size > 0) {
-            val dayBegin = formatDate.format(Date(user.dates.get(START_DATE) ?: 0))
-            val dayArrival = formatDate.format(Date(user.dates.get(END_DATE) ?: 0))
+            val dayBegin = formatDate.format(Date(user.dates[START_DATE] ?: 0))
+            val dayArrival = formatDate.format(Date(user.dates[END_DATE] ?: 0))
             textDateFrom.setText(dayBegin)
             dateArrived.setText(dayArrival)
             dates = user.dates
@@ -287,76 +307,52 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             }
         }
         methods.putAll(user.method)
-        profileStateHashMap.set("methods", methods.hashCode().toString())
-        for (method in user.method.keys) {
-            when (method) {
-                Method.CAR.link -> {
-                    if (user.method.get(method) == true) {
-                        iconCar.isActivated = true
-                    }
-                }
-                Method.TRAIN.link -> {
-                    if (user.method.get(method) == true) {
-                        iconTrain.isActivated = true
-                    }
-                }
-                Method.BUS.link -> {
-                    if (user.method.get(method) == true) {
-                        iconBus.isActivated = true
-                    }
-                }
-                Method.PLANE.link -> {
-                    if (user.method.get(method) == true) {
-                        iconPlane.isActivated = true
-                    }
-                }
-                Method.HITCHHIKING.link -> {
-                    if (user.method.get(method) == true) {
-                        iconHitchHicking.isActivated = true
-                    }
-                }
-            }
-        }
+        profileStateHashMap[METHODS] = methods.hashCode().toString()
 
+        user.method.keys.map {
+            methodIcons[it]?.isActivated = user.method[it] == true
+        }
         if (user.budget > 0) {
             budget = user.budget
             displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(budget)
             budgetPosition = user.budgetPosition
-            choose_price_travel.setProgress(budgetPosition)
+            choosePriceTravel.progress = budgetPosition
         }
 
-        profileStateHashMap.set("addInformation", user.addInformation)
+        profileStateHashMap[ADD_INFO] = user.addInformation
         saveProfileState()
-        add_info_user.setText(user.addInformation)
-        add_info_user.clearFocus()
+        addInfoUser.setText(user.addInformation)
+        addInfoUser.clearFocus()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        Log.e("LOG code:", requestCode.toString() + " " + resultCode + " " + PlaceAutocomplete.getPlace(activity, data))
+        Log.e("LOG code:", requestCode.toString() + " " +
+                resultCode + " " + PlaceAutocomplete.getPlace(activity, data))
 
         // FIXME refactoring in viewModel
 
         when (requestCode) {
             PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM -> when (resultCode) {
                 AppCompatActivity.RESULT_OK -> {
-                    val place = PlaceAutocomplete.getPlace(activity, data);
+                    val place = PlaceAutocomplete.getPlace(activity, data)
                     textCityFrom.setText(place.name)
                     textCityFrom.error = null
                     cityFromLatLng = GeoPoint(place.latLng.latitude, place.latLng.longitude)
                     if (cityToLatLng.hashCode() == cityFromLatLng.hashCode()) {
                         textCityFrom.error = "true"
-                        Toast.makeText(this@MyProfileFragment.context, getString(R.string.fill_diff_cities), Toast.LENGTH_LONG).show();
+                        Toast.makeText(this@MyProfileFragment.context,
+                                getString(R.string.fill_diff_cities), Toast.LENGTH_LONG).show()
                     } else {
                         cities.put(FIRST_INDEX_CITY, place.name.toString())
-                        profileStateHashMap.set("cityFromLatLng", cityFromLatLng.hashCode().toString())
+                        profileStateHashMap[CITY_FROM] = cityFromLatLng.hashCode().toString()
                         profileChanged()
                     }
                 }
                 else -> {
-                    val status = PlaceAutocomplete.getStatus(activity, data);
-                    Log.i("LOG", status.getStatusMessage() + " ");
-                    if (textCityFrom.text.toString().length == 0)
+                    val status = PlaceAutocomplete.getStatus(activity, data)
+                    Log.i("LOG", status.statusMessage + " ")
+                    if (textCityFrom.text.isEmpty())
                         textCityFrom.setText("")
                 }
             }
@@ -369,27 +365,28 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                     cityToLatLng = GeoPoint(place.latLng.latitude, place.latLng.longitude)
                     if (cityToLatLng.hashCode() == cityFromLatLng.hashCode()) {
                         textCityTo.error = "true"
-                        Toast.makeText(this@MyProfileFragment.context, getString(R.string.fill_diff_cities), Toast.LENGTH_LONG).show();
+                        Toast.makeText(this@MyProfileFragment.context,
+                                getString(R.string.fill_diff_cities), Toast.LENGTH_LONG).show();
                     } else {
                         cities.put(LAST_INDEX_CITY, place.name.toString())
-                        profileStateHashMap.set("cityToLatLng", cityToLatLng.hashCode().toString())
+                        profileStateHashMap[CITY_TO] = cityToLatLng.hashCode().toString()
                         profileChanged()
                     }
                 }
                 else -> {
                     val status = PlaceAutocomplete.getStatus(activity, data);
-                    Log.i("LOG", status.statusMessage + " ");
-                    if (textCityTo.text.toString().length == 0)
+                    Log.i("LOG", status.statusMessage + " ")
+                    if (textCityTo.text.isEmpty())
                         textCityTo.setText("")
                 }
             }
         }
     }
 
-    fun fillAgeSex(userAge: Int, userSex: Int) {
+    private fun fillAgeSex(userAge: Int, userSex: Int) {
         val gender = when (userSex) {
-            1 -> "М"
-            2 -> "Ж"
+            1 -> getString(R.string.gender_male)
+            2 -> getString(R.string.gender_female)
             else -> {
                 ""
             }
@@ -398,18 +395,19 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         if (userSex != 0) {
             sex = userSex
             if (userAge > 0) {
-                sex_and_age.text = StringBuilder(gender).append(", ").append(userAge)
+                sexAndAge.text = StringBuilder(gender).append(", ").append(userAge)
             } else {
-                sex_and_age.text = StringBuilder(gender).append(", Возраст ").append(userAge)
+                sexAndAge.text = StringBuilder(gender).append(", " +
+                        getString(R.string.age) + " ").append(userAge)
             }
         }
 
         if (userAge > 0) {
             age = userAge
             if (userSex != 0) {
-                sex_and_age.text = StringBuilder(gender).append(", ").append(userAge)
+                sexAndAge.text = StringBuilder(gender).append(", ").append(userAge)
             } else {
-                sex_and_age.text = StringBuilder("Пол, ").append(userAge)
+                sexAndAge.text = StringBuilder(getString(R.string.sex) + ", ").append(userAge)
             }
         }
     }
@@ -420,26 +418,25 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         textCityTo.setText("")
         dateArrived.setText("")
         textDateFrom.setText("")
-        add_info_user.setText("")
+        addInfoUser.setText("")
         maplayout.visibility = View.GONE
-        method_moving.visibility = View.GONE
-        with(travelBusText) { isActivated = false }
-        with(travelHitchHikingText) { isActivated = false }
-        with(travelCarText) { isActivated = false }
-        with(travelPlaneText) { isActivated = false }
-        with(travelTrainText) { isActivated = false }
+        methodMoving.visibility = View.GONE
+
+        methodTextViews.values.map {
+            it?.isActivated = false
+        }
 
         appinTheAirEnter.visibility = View.GONE
         layoutTravelMethod.visibility = View.GONE
         moneyfortrip.visibility = View.GONE
         displayPriceTravel.text = ""
         descriptionprofile.visibility = View.GONE
-        button_remove_travel_info.visibility = View.GONE
-        button_save_travel_info.visibility = View.GONE
+        buttonRemoveTravelInfo.visibility = View.GONE
+        buttonSaveTravelInfo.visibility = View.GONE
     }
 
     private fun showBlockAddTrip() {
-        add_new_trip.visibility = View.VISIBLE
+        addNewTrip.visibility = View.VISIBLE
         grayLine.visibility = View.INVISIBLE
     }
 
@@ -457,7 +454,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         val midPointLat = (coordFrom.latitude + coordTo.latitude) / 2
         val midPointLong = (coordFrom.longitude + coordTo.longitude) / 2
         val blueMarker = BitmapDescriptorFactory.fromResource(R.drawable.pin_blue)
-        val orangeColor = activity.resources.getColor(R.color.orangeLine)
+        val orangeColor = ContextCompat.getColor(context, R.color.orangeLine)
         googleMap?.addMarker(MarkerOptions()
                 .icon(blueMarker)
                 .position(coordFrom)
@@ -472,24 +469,20 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         options.width(5f)
 
         if (routes != "") {
-            var polyPts: List<LatLng>
-            polyPts = PolyUtil.decode(routes)
-
-            for (pts in polyPts) {
-                options.add(pts)
-            }
+            options.addAll(PolyUtil.decode(routes))
             googleMap?.addPolyline(options)
         }
         googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(midPointLat, midPointLong), 3.0f))
     }
 
     private var routes: String = ""
-
     private var googleMap: GoogleMap? = null
     private lateinit var mapView: MapView
+    private var countTrip: Int = 0
+
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater?.inflate(R.layout.fragment_my_user_profile, container, false)
-        mapView = view?.findViewById<MapView>(R.id.mapView)!!
+        mapView = view?.findViewById(R.id.mapView)!!
 
         try {
             mapView.onCreate(savedInstanceState)
@@ -498,23 +491,18 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        mapView?.getMapAsync(this)
+        mapView.getMapAsync(this)
         val scroll = view?.findViewById(R.id.scrollProfile) as ScrollView;
         scroll.descendantFocusability = ViewGroup.FOCUS_BEFORE_DESCENDANTS
         scroll.setFocusable(true)
         scroll.setFocusableInTouchMode(true)
-
         return view
     }
 
-    fun TextView.afterTextChanged(afterTextChanged: (String) -> Unit) {
+    private fun TextView.afterTextChanged(afterTextChanged: (String) -> Unit) {
         this.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-            }
-
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-            }
-
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun afterTextChanged(editable: Editable?) {
                 afterTextChanged.invoke(editable.toString())
             }
@@ -540,7 +528,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     private fun openDateDialog() {
         dateDialog.setStartTitle(resources.getString(R.string.date_start))
         dateDialog.setEndTitle(resources.getString(R.string.date_end))
-        dateDialog.accentColor = resources.getColor(R.color.colorPrimary)
+        dateDialog.accentColor = ContextCompat.getColor(context, R.color.colorPrimary)
         dateDialog.show(activity.fragmentManager, "")
     }
 
@@ -561,12 +549,11 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             } else {
                 textCityTo.error = null
             }
-            textCityFrom.getParent().requestChildFocus(textCityFrom, textCityFrom)
+            textCityFrom.parent.requestChildFocus(textCityFrom, textCityFrom)
         }
         if (cityToLatLng.hashCode() == cityFromLatLng.hashCode()) {
             errorString += " " + getString(R.string.fill_diff_cities)
         }
-
 
         if (errorString.isNotEmpty()) {
             Toast.makeText(this@MyProfileFragment.context, errorString, Toast.LENGTH_LONG).show()
@@ -574,31 +561,34 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         }
         (activity as MenuActivity).pLoader?.show()
         countTrip = 1
+
         viewModel?.sendUserData(getHashMapUser(), uid, {
-            Toast.makeText(this@MyProfileFragment.context, resources.getString(R.string.save_succesfull), Toast.LENGTH_SHORT).show()
-            profileChanged(false)
-            if (activity != null) (activity as MenuActivity).pLoader?.hide()
+            if (activity != null) {
+                Toast.makeText(this@MyProfileFragment.context, resources.getString(R.string.save_succesfull), Toast.LENGTH_SHORT).show()
+                profileChanged(false)
+                (activity as MenuActivity).pLoader?.hide()
+            }
         })
     }
 
-    fun validCellPhone(number: String): Boolean {
+    private fun validCellPhone(number: String): Boolean {
         return number.matches(Regex("^([0-9]|\\+[0-9]){11,13}\$"))
     }
 
     private fun showBlockTravelInformation() {
         direction.visibility = View.VISIBLE
         maplayout.visibility = View.VISIBLE
-        method_moving.visibility = View.VISIBLE
+        methodMoving.visibility = View.VISIBLE
         layoutTravelMethod.visibility = View.VISIBLE
         moneyfortrip.visibility = View.VISIBLE
         appinTheAirEnter.visibility = View.VISIBLE
         descriptionprofile.visibility = View.VISIBLE
-        button_remove_travel_info.visibility = View.VISIBLE
-        button_save_travel_info.visibility = View.VISIBLE
+        buttonRemoveTravelInfo.visibility = View.VISIBLE
+        buttonSaveTravelInfo.visibility = View.VISIBLE
     }
 
     private fun hideBlockNewTrip() {
-        add_new_trip.visibility = View.GONE
+        addNewTrip.visibility = View.GONE
         grayLine.visibility = View.VISIBLE
     }
 
@@ -618,12 +608,11 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         val spinnerYearsView = dialogView.findViewById<View>(R.id.spinnerYearsView) as Spinner
 
         val man = dialogView.findViewById<RadioButton>(R.id.man)
-
         val woman = dialogView.findViewById<RadioButton>(R.id.woman)
+
         val sexChoose = dialogView.findViewById<RadioGroup>(R.id.sex)
         if (sex == 1) {
             sexChoose.check(man.id)
-
         } else if (sex == 2) {
             sexChoose.check(woman.id)
         }
@@ -631,16 +620,13 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         val calendar = Calendar.getInstance()
         yearNow = calendar.get(Calendar.YEAR)
 
-        for (i in 1920..yearNow) {
-            yearsArr.add(i)
-        }
+        for (i in 1920..yearNow) yearsArr.add(i)
 
-
-        val yearsAdapter = ArrayAdapter<Int>(this.context, android.R.layout.simple_spinner_item, yearsArr);
+        val yearsAdapter = ArrayAdapter<Int>(this.context, android.R.layout.simple_spinner_item, yearsArr)
 
         yearsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerYearsView.adapter = yearsAdapter
-        spinnerYearsView.prompt = "Дата"
+        spinnerYearsView.prompt = getString(R.string.date)
 
         spinnerYearsView.setSelection(yearsArr.size - age - 1)
         spinnerYearsView.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -653,7 +639,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                 Log.e("LOG", "Nothing 2")
             }
         }
-        simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Сохранить", { dialogInterface, i ->
+        simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.save), { _, _ ->
             sex = if (man.isChecked) 1 else if (woman.isChecked) 2 else 0
             fillAgeSex(age, sex)
             name = (nameChoose.text.toString()).capitalize()
@@ -661,46 +647,36 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             city = (cityChoose.text.toString()).capitalize()
             savingUserData(name, lastName, city)
         })
-        simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, "Отмена", { dialogInterface, i ->
+        simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.cancel), { _, _ ->
             simpleAlert.hide()
         })
 
-        var enterCounter = 0
-
-        nameChoose.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
+        nameChoose.setOnKeyListener(View.OnKeyListener { _, keyCode, _ ->
             if (keyCode == KeyEvent.KEYCODE_ENTER) {
                 Log.d("LOG", "ENTER is Pressed on EditName")
                 lastNameChoose.requestFocus()
-                enterCounter = 1
                 return@OnKeyListener true
             }
             false
         })
 
-        lastNameChoose.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
-
+        lastNameChoose.setOnKeyListener(View.OnKeyListener { _, keyCode, _ ->
             if (keyCode == KeyEvent.KEYCODE_ENTER) {
                 Log.d("LOG", "ENTER is Pressed on LastName")
-                if (enterCounter == 0) {
-                    cityChoose.requestFocus()
-                    enterCounter = 1
-                } else enterCounter = 0
+                cityChoose.requestFocus()
                 return@OnKeyListener true
             }
             false
         })
 
-        cityChoose.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
-
+        cityChoose.setOnKeyListener(View.OnKeyListener { _, keyCode, _ ->
             if (keyCode == KeyEvent.KEYCODE_ENTER) {
                 Log.d("LOG", "ENTER is Pressed on city")
-                if (enterCounter == 0) {
-                    name = (nameChoose.text.toString()).capitalize()
-                    lastName = (lastNameChoose.text.toString()).capitalize()
-                    city = (cityChoose.text.toString()).capitalize()
-                    savingUserData(name, lastName, city)
-                    simpleAlert.hide()
-                } else enterCounter = 0
+                name = (nameChoose.text.toString()).capitalize()
+                lastName = (lastNameChoose.text.toString()).capitalize()
+                city = (cityChoose.text.toString()).capitalize()
+                savingUserData(name, lastName, city)
+                simpleAlert.hide()
                 return@OnKeyListener true
             }
             false
@@ -715,8 +691,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     }
 
     private fun openDialog(socialNetwork: SocialNetwork, errorText: String? = null) {
-        var simpleAlert = AlertDialog.Builder(activity).create()
-        simpleAlert.setTitle("Ссылки на социальные сети")
+        val simpleAlert = AlertDialog.Builder(activity).create()
+        simpleAlert.setTitle(getString(R.string.social_links))
         simpleAlert.setMessage(getString(R.string.social_text))
         val inflater = this.layoutInflater
         val dialogView = inflater.inflate(R.layout.custom_dialog_profile_soc_network, null)
@@ -734,18 +710,19 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             dialogView.findViewById<EditText>(R.id.socLinkText).error = errorText
         }
 
-        simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.remove), { dialog, i ->
+        simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.remove), { _, _ ->
             viewModel?.error?.observe(this@MyProfileFragment, Observer<Int> { error ->
                 socNet.remove(socialNetwork.link)
                 when (error) {
                     Constants.ERROR -> {
-                        Toast.makeText(this@MyProfileFragment.context, " Ошибка обновления", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@MyProfileFragment.context,
+                                getString(R.string.error_update), Toast.LENGTH_SHORT).show()
                     }
                     Constants.SUCCESS -> {
                         changeSocIconsDisActive(socialNetwork)
                         when (socialNetwork) {
                             SocialNetwork.VK -> vkLink = VKLINK
-                            SocialNetwork.WHATSAPP -> whatsAppNumber = APPNUMBER
+                            SocialNetwork.WHATSAPP -> whatsAppNumber = getString(R.string.default_phone_code)
                             SocialNetwork.CS -> csLink = CSLINK
                             SocialNetwork.FB -> fbLink = FBLINK
                             SocialNetwork.TG -> tgNick = TGLINK
@@ -756,14 +733,15 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             viewModel?.saveLinks(socNet, uid)
 
         })
-        simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.save), { dialogInterface, i ->
+        simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.save), { _, _ ->
             val newLink = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString()
 
             socNet.put(socialNetwork.link, newLink)
             viewModel?.error?.observe(this@MyProfileFragment, Observer<Int> { error ->
                 when (error) {
                     Constants.ERROR -> {
-                        Toast.makeText(this@MyProfileFragment.context, " Ошибка сохранения", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@MyProfileFragment.context,
+                                getString(R.string.error_update), Toast.LENGTH_SHORT).show()
                     }
                     Constants.SUCCESS -> {
                         changeSocIconsActive(socialNetwork)
@@ -787,7 +765,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                     dialogView.findViewById<EditText>(R.id.socLinkText).error =
                             getString(R.string.fill_phone_invalid)
                 }
-                simpleAlert.getButton(AlertDialog.BUTTON_POSITIVE)?.setEnabled(valid)
+                simpleAlert.getButton(AlertDialog.BUTTON_POSITIVE)?.isEnabled = valid
             }
         }
         simpleAlert.show()
@@ -799,10 +777,10 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         val dialogView = inflater.inflate(R.layout.confirm_dialog, null)
         simpleAlert.setView(dialogView)
         dialogView.textMessage.text = getString(R.string.text_confirm_remove_trip)
-        simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.yes), { dialogInterface, i ->
+        simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.yes), { _, _ ->
             callback()
         })
-        simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.no), { dialogInterface, i ->
+        simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.no), { _, _ ->
         })
         simpleAlert.show()
     }
@@ -814,7 +792,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             SocialNetwork.FB -> fbcon.setImageResource(R.drawable.ic_fb_color)
             SocialNetwork.WHATSAPP -> whatsAppIcon.setImageResource(R.drawable.ic_whats_icon_color)
             SocialNetwork.TG -> tgIcon.setImageResource(R.drawable.ic_tg_color)
-
         }
     }
 
@@ -870,96 +847,71 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             openInformationEditDialog()
         })
 
-        choose_price_travel.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        choosePriceTravel.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, number: Int, p2: Boolean) {
-                budget = (150 * number).toLong()// = fibbonaci(number)
+                budget = (150 * number).toLong()
                 displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(budget)
                 if (number != budgetPosition) {
                     budgetPosition = number
-                    profileStateHashMap.set("budget", budget.toString())
-                    profileStateHashMap.set("budgetPosition", number.toString())
+                    profileStateHashMap[BUDGET] = budget.toString()
+                    profileStateHashMap[BUDGET_POSITION] = number.toString()
                     profileChanged()
                 }
             }
 
-            override fun onStartTrackingTouch(p0: SeekBar?) {
+            override fun onStartTrackingTouch(p0: SeekBar?) {}
+
+            override fun onStopTrackingTouch(p0: SeekBar?) {}
+        })
+        for ((key, me) in methodIcons) {
+            me.setOnClickListener {
+                val textView = methodTextViews[key]
+                textView?.let {
+                    me.isActivated = !it.isActivated
+                    methods.put(key, it.isActivated)
+                }
+                profileStateHashMap[METHODS] = methods.hashCode().toString()
+                profileChanged()
             }
+        }
 
-            override fun onStopTrackingTouch(p0: SeekBar?) {
-            }
-        })
-
-        iconCar.setOnClickListener({
-            with(travelCarText) { isActivated = !isActivated }
-            methods.put(Method.CAR.link, travelCarText.isActivated)
-            profileStateHashMap.set("methods", methods.hashCode().toString())
-            profileChanged()
-        })
-
-        iconTrain.setOnClickListener({
-            with(travelTrainText) { isActivated = !isActivated }
-            methods.put(Method.TRAIN.link, travelTrainText.isActivated)
-            profileStateHashMap.set("methods", methods.hashCode().toString())
-            profileChanged()
-        })
-
-        iconBus.setOnClickListener({
-            with(travelBusText) { isActivated = !isActivated }
-            methods.put(Method.BUS.link, travelBusText.isActivated)
-            profileStateHashMap.set("methods", methods.hashCode().toString())
-            profileChanged()
-        })
-
-        iconPlane.setOnClickListener({
-            with(travelPlaneText) { isActivated = !isActivated }
-            methods.put(Method.PLANE.link, travelPlaneText.isActivated)
-            profileStateHashMap.set("methods", methods.hashCode().toString())
-            profileChanged()
-        })
-
-        iconHitchHicking.setOnClickListener({
-            with(travelHitchHikingText) { isActivated = !isActivated }
-            methods.put(Method.HITCHHIKING.link, travelHitchHikingText.isActivated)
-            profileStateHashMap.set("methods", methods.hashCode().toString())
-            profileChanged()
-        })
-
-        new_trip_text.setOnClickListener {
+        newTripText.setOnClickListener {
             hideBlockNewTrip()
             showBlockTravelInformation()
         }
         vkIcon.setOnClickListener {
             /*
              Если контакты еще не добавлены, тогда открываем диалоговое окно.
-             Если были какие-то изменения в линках то сохраняем в бд. И меняем цвет иконки соответсвенно значениям.
+             Если были какие-то изменения в линках то сохраняем в бд.
+             И меняем цвет иконки соответсвенно значениям.
              */
             openDialog(SocialNetwork.VK)
         }
-        csIcon.setOnClickListener() {
+        csIcon.setOnClickListener {
             openDialog(SocialNetwork.CS)
         }
-        whatsAppIcon.setOnClickListener({
+        whatsAppIcon.setOnClickListener {
             openDialog(SocialNetwork.WHATSAPP)
-        })
-        fbcon.setOnClickListener({
+        }
+        fbcon.setOnClickListener {
             openDialog(SocialNetwork.FB)
-        })
-        tgIcon.setOnClickListener({
+        }
+        tgIcon.setOnClickListener {
             openDialog(SocialNetwork.TG)
-        })
+        }
 
-        button_save_travel_info.setOnClickListener({
+        buttonSaveTravelInfo.setOnClickListener {
             Log.e("LOG", "save travel")
             sendUserInfoToServer()
-        })
+        }
         dateArrived.setOnClickListener {
             openDateDialog()
         }
         textDateFrom.setOnClickListener {
             openDateDialog()
         }
-        add_info_user.afterTextChanged({
-            profileStateHashMap.set("addInformation", it)
+        addInfoUser.afterTextChanged({
+            profileStateHashMap[ADD_INFO] = it
             profileChanged(null, false)
         })
         textCityFrom.setOnClickListener {
@@ -970,9 +922,10 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO)
         }
         appinTheAirEnter.setOnClickListener {
-            (activity as MenuActivity).navigator.applyCommand(Replace(Screens.USER_SINHRONIZED_SCREEN, 1))
+            (activity as MenuActivity).navigator
+                    .applyCommand(Replace(Screens.USER_SINHRONIZED_SCREEN, 1))
         }
-        button_remove_travel_info.setOnClickListener {
+        buttonRemoveTravelInfo.setOnClickListener {
             openAlertDialog(this::removeTrip)
         }
 
@@ -1005,52 +958,43 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         mapView.onLowMemory()
     }
 
-    private var countTrip: Int = 0
-
     fun getHashMapUser(): HashMap<String, Any> {
         val hashMap = HashMap<String, Any>()
-        hashMap.set("cities", cities)
-        hashMap.set("method", methods)
-        hashMap.set("dates", dates)
-        hashMap.set("budget", budget)
-        hashMap.set("budgetPosition", budgetPosition)
-        hashMap.set("cityFromLatLng", cityFromLatLng)
-        hashMap.set("cityToLatLng", cityToLatLng)
-        hashMap.set("addInformation", add_info_user.text.toString())
-        hashMap.put("countTrip", countTrip)
-        hashMap.set("sex", sex)
-        hashMap.set("age", age)
-        hashMap.set("name", name)
-        hashMap.set("lastName", lastName)
-        hashMap.set("city", city)
+        hashMap[CITIES] = cities
+        hashMap[METHOD] = methods
+        hashMap[DATES] = dates
+        hashMap[BUDGET] = budget
+        hashMap[BUDGET_POSITION] = budgetPosition
+        hashMap[CITY_FROM] = cityFromLatLng
+        hashMap[CITY_TO] = cityToLatLng
+        hashMap[ADD_INFO] = addInfoUser.text.toString()
+        hashMap.put(COUNT_TRIP, countTrip)
+        hashMap[SEX] = sex
+        hashMap[AGE] = age
+        hashMap[NAME] = name
+        hashMap[LASTNAME] = lastName
+        hashMap[CITY] = city
         return hashMap
     }
 
-    fun getHashMapInfoUser(): HashMap<String, Any> {
-        val hashMap = HashMap<String, Any>()
-
-        return hashMap
-    }
-
-    fun saveProfileState() {
-        profileStateHashMap.set("dates", dates.toString())
-        profileStateHashMap.set("budget", budget.toString())
-        profileStateHashMap.set("budgetPosition", budgetPosition.toString())
-        profileStateHashMap.set("cityFromLatLng", cityFromLatLng.hashCode().toString())
-        profileStateHashMap.set("cityToLatLng", cityToLatLng.hashCode().toString())
+    private fun saveProfileState() {
+        profileStateHashMap[DATES] = dates.toString()
+        profileStateHashMap[BUDGET] = budget.toString()
+        profileStateHashMap[BUDGET_POSITION] = budgetPosition.toString()
+        profileStateHashMap[CITY_FROM] = cityFromLatLng.hashCode().toString()
+        profileStateHashMap[CITY_TO] = cityToLatLng.hashCode().toString()
         oldProfileState = profileStateHashMap.hashCode()
     }
 
     fun profileChanged(force: Boolean? = null, removeFocus: Boolean? = true) {
 
         if (removeFocus == true) {
-            add_info_user.clearFocus()
+            addInfoUser.clearFocus()
         }
         if (countTrip == 1) {
-            val changed: Boolean = if (force != null) force
-            else profileStateHashMap.hashCode() != oldProfileState
-
-            (activity as MenuActivity).profileChanged = changed
+            var changed: Boolean = profileStateHashMap.hashCode() != oldProfileState
+            force?.let { changed = it }
+            if (activity != null) (activity as MenuActivity).profileChanged = changed
         }
     }
 }

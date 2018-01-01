@@ -45,7 +45,7 @@
                 tools:text="Москва, Россия" />
 
             <TextView
-                android:id="@+id/sex_and_age"
+                android:id="@+id/sexAndAge"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
@@ -394,7 +394,7 @@
                 android:src="@drawable/ic_quote" />
 
             <TextView
-                android:id="@+id/add_info_user"
+                android:id="@+id/addInfoUser"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/imageQuoteDescription"

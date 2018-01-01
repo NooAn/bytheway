@@ -38,6 +38,9 @@
     <string name="save_filter">Сохранить фильтры</string>
     <string name="sex">Пол</string>
     <string name="name">Имя</string>
+    <string name="default_phone_code">+7</string>
+    <string name="gender_male">М</string>
+    <string name="gender_female">Ж</string>
     <string name="save">Сохранить</string>
     <string name="exit">Выйти</string>
     <string name="search_users_text">Поиск</string>
@@ -48,6 +51,8 @@
     <string name="fill_all_location">Не выбраны пункты</string>
     <string name="fill_from_location">Не выбран пункт отправления</string>
     <string name="fill_to_location">Не выбран пункт назначения</string>
+    <string name="social_links">Ссылки на социальные сети</string>
+    <string name="error_update">Ошибка обновления</string>
     <string name="text_confirm_remove_trip">Все изменения будет потеряны. \n Вы действительно хотите удалить поездку?</string>
     <string name="sex_and_age">Пол, возраст</string>
     <string name="age">Возраст</string>

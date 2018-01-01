@@ -3,6 +3,7 @@ package ru.a1024bits.bytheway.ui.activity
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.support.design.widget.NavigationView
@@ -96,6 +97,10 @@ class MenuActivity : AppCompatActivity(),
         super.onCreate(savedInstanceState)
         App.component.inject(this)
         glide = Glide.with(this)
+        if(FirebaseAuth.getInstance().currentUser == null ||
+                FirebaseAuth.getInstance().currentUser?.uid!!.isEmpty()){
+            startActivity(Intent(this, RegistrationActivity::class.java))
+        }
         FirebaseFirestore.setLoggingEnabled(true)
 
         setContentView(R.layout.activity_menu)
@@ -337,7 +342,6 @@ class MenuActivity : AppCompatActivity(),
     override fun onRestart() {
         super.onRestart()
         Log.e("LOG", "onRestart")
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

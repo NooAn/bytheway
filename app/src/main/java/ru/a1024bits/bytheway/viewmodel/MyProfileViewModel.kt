@@ -32,16 +32,15 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
     val load: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
     val error: MutableLiveData<Int> = MutableLiveData<Int>()
 
-    fun load(userId: String, success: () -> Unit = {}) {
-        userRepository.getUserById(userId)
-                .addOnFailureListener {
-                    Log.e("LOG", "error ${it.message}")
-                }
-                .addOnSuccessListener { document ->
-                    val profile = document.toObject(User::class.java)
-                    user.setValue(profile)
-                    success()
-                }
+    fun load(userId: String) {
+        disposables.add(userRepository.getUser(userId)
+                .subscribeOn(getBackgroundScheduler())
+                .observeOn(getMainThreadScheduler())
+                .subscribe(
+                        { user -> response.setValue(Response.success(user)) },
+                        { throwable -> response.setValue(Response.error(throwable)) }
+                )
+        )
     }
 
     var response: MutableLiveData<Response<User>> = MutableLiveData()

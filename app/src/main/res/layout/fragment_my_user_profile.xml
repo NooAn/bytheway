@@ -45,7 +45,7 @@
                 tools:text="Москва, Россия" />
 
             <TextView
-                android:id="@+id/sex_and_age"
+                android:id="@+id/sexAndAge"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
@@ -236,7 +236,7 @@
         </LinearLayout>
 
         <include
-            android:id="@+id/add_new_trip"
+            android:id="@+id/addNewTrip"
             layout="@layout/profile_add_trip"
             android:visibility="gone"
             tools:visibility="visible" />
@@ -266,7 +266,7 @@
 
 
         <LinearLayout
-            android:id="@+id/method_moving"
+            android:id="@+id/methodMoving"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@+id/maplayout"
@@ -289,7 +289,7 @@
             android:id="@+id/layoutTravelMethod"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/method_moving"
+            android:layout_below="@id/methodMoving"
             android:gravity="bottom"
             android:orientation="horizontal"
             android:visibility="gone"
@@ -439,7 +439,7 @@
                 android:textSize="16sp" />
 
             <SeekBar
-                android:id="@+id/choose_price_travel"
+                android:id="@+id/choosePriceTravel"
                 style="@style/Widget.AppCompat.SeekBar"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
@@ -483,7 +483,7 @@
                 android:textSize="16sp" />
 
             <EditText
-                android:id="@+id/add_info_user"
+                android:id="@+id/addInfoUser"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="18dp"
@@ -521,7 +521,7 @@
             tools:visibility="invisible" />
 
         <Button
-            android:id="@+id/button_save_travel_info"
+            android:id="@+id/buttonSaveTravelInfo"
             android:layout_width="150dp"
             android:layout_height="match_parent"
             android:layout_alignEnd="@+id/grayLine"
@@ -535,11 +535,11 @@
             tools:visibility="visible" />
 
         <Button
-            android:id="@+id/button_remove_travel_info"
+            android:id="@+id/buttonRemoveTravelInfo"
             android:layout_width="150dp"
             android:layout_height="match_parent"
             android:layout_alignTop="@+id/grayLine"
-            android:layout_toStartOf="@+id/button_save_travel_info"
+            android:layout_toStartOf="@+id/buttonSaveTravelInfo"
             android:fontFamily="sans-serif-medium"
             android:padding="24dp"
             android:text="@string/remove"
