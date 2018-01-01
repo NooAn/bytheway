@@ -1,27 +1,19 @@
 package ru.a1024bits.bytheway.viewmodel
 
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
-import android.text.Editable
 import android.util.Log
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import io.reactivex.CompletableObserver
-import io.reactivex.disposables.Disposable
-import io.reactivex.functions.Action
 import ru.a1024bits.bytheway.model.*
 import ru.a1024bits.bytheway.repository.COLLECTION_USERS
 import ru.a1024bits.bytheway.repository.UserRepository
-import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.util.Constants.END_DATE
-import ru.a1024bits.bytheway.util.Constants.ERROR
 import ru.a1024bits.bytheway.util.Constants.FIRST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.START_DATE
-import ru.a1024bits.bytheway.util.Constants.SUCCESS
 import javax.inject.Inject
 
 /**
@@ -31,6 +23,8 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
     val user: MutableLiveData<User> = MutableLiveData<User>()
     val load: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
     val error: MutableLiveData<Int> = MutableLiveData<Int>()
+    var response: MutableLiveData<Response<User>> = MutableLiveData()
+    val loadingStatus = MutableLiveData<Boolean>()
 
     fun load(userId: String) {
         disposables.add(userRepository.getUser(userId)
@@ -43,9 +37,7 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
         )
     }
 
-    var response: MutableLiveData<Response<User>> = MutableLiveData()
 
-    val loadingStatus = MutableLiveData<Boolean>()
     fun saveLinks(arraySocNetwork: HashMap<String, String>, id: String) {
         val map: HashMap<String, Any> = hashMapOf()
         map.put("socialNetwork", arraySocNetwork) // fixme

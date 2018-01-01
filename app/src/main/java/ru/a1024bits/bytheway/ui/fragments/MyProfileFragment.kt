@@ -58,8 +58,7 @@ import ru.terrakok.cicerone.commands.Replace
 import uk.co.deanwild.materialshowcaseview.IShowcaseListener
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView
 import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
+import java.util.*
 import javax.inject.Inject
 import kotlin.collections.HashMap
 
@@ -90,7 +89,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     private fun getLongFromDate(day: Int, month: Int, year: Int): Long {
         val dateString = "$day $month $year"
-        val dateFormat = SimpleDateFormat("dd MM yyyy")
+        val dateFormat = SimpleDateFormat("dd MM yyyy", Locale.US)
         val date = dateFormat.parse(dateString)
         return date.time
     }
@@ -223,8 +222,9 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                     .setListener(object : IShowcaseListener {
                         override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {}
                         override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
-                            if (activity != null && !activity.isDestroyed)
+                            if (activity != null && !activity.isDestroyed) {
                                 (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterMyProfileFragment", false).apply()
+                            }
                         }
                     }).show()
         }
@@ -278,7 +278,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             cities = user.cities
         }
 
-        val formatDate = SimpleDateFormat("dd.MM.yyyy")
+        val formatDate = SimpleDateFormat("dd.MM.yyyy", Locale.US)
 
         if (user.dates.size > 0) {
             val dayBegin = formatDate.format(Date(user.dates[START_DATE] ?: 0))
@@ -359,14 +359,14 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
             PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO -> when (resultCode) {
                 AppCompatActivity.RESULT_OK -> {
-                    val place = PlaceAutocomplete.getPlace(activity, data);
+                    val place = PlaceAutocomplete.getPlace(activity, data)
                     textCityTo.setText(place.name)
                     textCityTo.error = null
                     cityToLatLng = GeoPoint(place.latLng.latitude, place.latLng.longitude)
                     if (cityToLatLng.hashCode() == cityFromLatLng.hashCode()) {
                         textCityTo.error = "true"
                         Toast.makeText(this@MyProfileFragment.context,
-                                getString(R.string.fill_diff_cities), Toast.LENGTH_LONG).show();
+                                getString(R.string.fill_diff_cities), Toast.LENGTH_LONG).show()
                     } else {
                         cities.put(LAST_INDEX_CITY, place.name.toString())
                         profileStateHashMap[CITY_TO] = cityToLatLng.hashCode().toString()
@@ -374,7 +374,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                     }
                 }
                 else -> {
-                    val status = PlaceAutocomplete.getStatus(activity, data);
+                    val status = PlaceAutocomplete.getStatus(activity, data)
                     Log.i("LOG", status.statusMessage + " ")
                     if (textCityTo.text.isEmpty())
                         textCityTo.setText("")
@@ -492,10 +492,10 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             e.printStackTrace()
         }
         mapView.getMapAsync(this)
-        val scroll = view?.findViewById(R.id.scrollProfile) as ScrollView;
+        val scroll = view.findViewById(R.id.scrollProfile) as ScrollView
         scroll.descendantFocusability = ViewGroup.FOCUS_BEFORE_DESCENDANTS
-        scroll.setFocusable(true)
-        scroll.setFocusableInTouchMode(true)
+        scroll.isFocusable = true
+        scroll.isFocusableInTouchMode = true
         return view
     }
 
@@ -594,8 +594,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     private fun openInformationEditDialog() {
         val simpleAlert = AlertDialog.Builder(activity).create()
-        val inflater = this.layoutInflater
-        val dialogView = inflater.inflate(R.layout.custom_dialog_profile_inforamtion, null)
+        val dialogView = View.inflate(context, R.layout.custom_dialog_profile_inforamtion, null)
 
         simpleAlert.setView(dialogView)
         val nameChoose = dialogView.findViewById<View>(R.id.dialog_name) as EditText
@@ -694,8 +693,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         val simpleAlert = AlertDialog.Builder(activity).create()
         simpleAlert.setTitle(getString(R.string.social_links))
         simpleAlert.setMessage(getString(R.string.social_text))
-        val inflater = this.layoutInflater
-        val dialogView = inflater.inflate(R.layout.custom_dialog_profile_soc_network, null)
+        val dialogView = View.inflate(context, R.layout.custom_dialog_profile_soc_network, null)
+
         simpleAlert.setView(dialogView)
 
         dialogView.findViewById<EditText>(R.id.socLinkText).setText(
@@ -773,8 +772,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     private fun openAlertDialog(callback: () -> Unit) {
         val simpleAlert = AlertDialog.Builder(activity).create()
-        val inflater = this.layoutInflater
-        val dialogView = inflater.inflate(R.layout.confirm_dialog, null)
+        val dialogView = View.inflate(context, R.layout.confirm_dialog, null)
+
         simpleAlert.setView(dialogView)
         dialogView.textMessage.text = getString(R.string.text_confirm_remove_trip)
         simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.yes), { _, _ ->
@@ -843,9 +842,9 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                 now.get(Calendar.DAY_OF_MONTH)
         )
 
-        headerprofile.setOnClickListener({
+        headerprofile.setOnClickListener {
             openInformationEditDialog()
-        })
+        }
 
         choosePriceTravel.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, number: Int, p2: Boolean) {
@@ -954,7 +953,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         //Clean up resources from google map to prevent memory leaks.
         //Stop tracking current location
         if (googleMap != null) {
-//            googleMap?.setMyLocationEnabled(false)
+            googleMap?.setMyLocationEnabled(false)
             googleMap?.clear()
         }
         super.onDestroy()
@@ -994,14 +993,14 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     }
 
     fun profileChanged(force: Boolean? = null, removeFocus: Boolean? = true) {
-
+        if (activity == null) return
         if (removeFocus == true) {
             addInfoUser.clearFocus()
         }
         if (countTrip == 1) {
             var changed: Boolean = profileStateHashMap.hashCode() != oldProfileState
             force?.let { changed = it }
-            if (activity != null) (activity as MenuActivity).profileChanged = changed
+            (activity as MenuActivity).profileChanged = changed
         }
     }
 }
