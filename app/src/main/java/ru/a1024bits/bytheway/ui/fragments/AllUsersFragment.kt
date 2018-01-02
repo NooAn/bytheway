@@ -142,7 +142,6 @@ class AllUsersFragment : Fragment() {
             }
         }
         dateDialog = viewModel.updateDateDialog(this)
-//        updateDateDialog()
         choseDate.setOnClickListener {
             dateDialog.show(activity.fragmentManager, "")
         }
@@ -169,7 +168,7 @@ class AllUsersFragment : Fragment() {
 
             animationSlide()
             block_search_parameters.visibility = View.GONE
-            viewModel.getAllUsers(filter)
+//            viewModel.getAllUsers(filter)
         }
 
         cancelParameters.setOnClickListener {
@@ -232,6 +231,7 @@ class AllUsersFragment : Fragment() {
             override fun endTransition(p0: LayoutTransition?, p1: ViewGroup?, view: View, p3: Int) {
                 if ((view.id == block_search_parameters.id) && (block_search_parameters.visibility == View.GONE)) {
                     updateViewsBeforeSearch()
+                    viewModel.getAllUsers(filter)
                     view_contain_block_parameters.layoutTransition.removeTransitionListener(this)
                 }
             }
