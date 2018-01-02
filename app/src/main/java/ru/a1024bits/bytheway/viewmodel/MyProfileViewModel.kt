@@ -26,6 +26,9 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
     var response: MutableLiveData<Response<User>> = MutableLiveData()
     val loadingStatus = MutableLiveData<Boolean>()
 
+    val saveStatus: MutableLiveData<Response<Boolean>> = MutableLiveData()
+    val saveProfile: MutableLiveData<Response<Boolean>> = MutableLiveData()
+
     fun load(userId: String) {
         disposables.add(userRepository.getUser(userId)
                 .subscribeOn(getBackgroundScheduler())
@@ -46,7 +49,10 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                 .observeOn(getMainThreadScheduler())
                 .doOnSubscribe({ s -> loadingStatus.setValue(true) })
                 .doAfterTerminate({ loadingStatus.setValue(false) })
-                .subscribe())
+                .subscribe(
+                        { r -> saveStatus.setValue(Response.success(r)) },
+                        { throwable -> saveStatus.setValue(Response.error(throwable)) }
+                ))
 
     }
 
@@ -88,13 +94,14 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
         })
     }
 
-    fun sendUserData(map: HashMap<String, Any>, id: String, success: () -> Unit = {}) {
+    fun sendUserData(map: HashMap<String, Any>, id: String) {
         Log.e("LOG map:", id + " " + map.toString())
         userRepository.changeUserProfile(map, id)
                 .subscribeOn(getBackgroundScheduler())
                 .observeOn(getMainThreadScheduler())
-                .doOnComplete(success) // FIXME THIS IS NOT CORRECT
-                .subscribe()
+                .subscribe(
+                        { user -> saveProfile.setValue(Response.success(user)) },
+                        { throwable -> saveProfile.setValue(Response.error(throwable)) })
 
     }
 

@@ -4,7 +4,6 @@ import android.arch.lifecycle.Observer
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.QuerySnapshot
-import io.reactivex.Completable
 import io.reactivex.Single
 import ru.a1024bits.bytheway.model.User
 
@@ -18,5 +17,5 @@ interface IUsersRepository {
     // RX Wrapper
     fun getUser(id: String): Single<User>
 
-    fun changeUserProfile(map: HashMap<String, Any>, id: String): Completable?
+    fun changeUserProfile(map: HashMap<String, Any>, id: String): Single<Boolean>
 }

@@ -46,7 +46,6 @@ import ru.a1024bits.bytheway.model.*
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
-import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.util.Constants.END_DATE
 import ru.a1024bits.bytheway.util.Constants.FIRST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
@@ -171,12 +170,11 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                     if (response.data != null) {
                         if (activity != null) {
                             (activity as MenuActivity).pLoader?.hide()
+                            fillProfile(response.data)
+                            mListener?.onFragmentInteraction(response.data)
                         }
-                        fillProfile(response.data)
-                        mListener?.onFragmentInteraction(response.data)
                     }
                 }
-
                 Status.ERROR -> {
                     Log.e("LOG", "log e:" + response.error)
                 }
@@ -308,9 +306,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         mapView = view?.findViewById(R.id.mapView)!!
 
         try {
-            mapView.onCreate(savedInstanceState)
-            mapView.onResume()// needed to get the map to display immediately
-            MapsInitializer.initialize(activity.applicationContext)
+            mapView.onCreate(null)
+            MapsInitializer.initialize(context)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -563,17 +560,36 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         (activity as MenuActivity).pLoader?.show()
         countTrip = 1
 
-        viewModel?.sendUserData(getHashMapUser(), uid, {
-            if (activity != null) {
-                Toast.makeText(this@MyProfileFragment.context, resources.getString(R.string.save_succesfull), Toast.LENGTH_SHORT).show()
-                profileChanged(false)
-                (activity as MenuActivity).pLoader?.hide()
+        viewModel?.saveProfile?.observe(this, Observer<Response<Boolean>> { response ->
+            when (response?.status) {
+                Status.SUCCESS -> {
+                    if (response.data == true) {
+                        if (activity != null) {
+                            Toast.makeText(this@MyProfileFragment.context, resources.getString(R.string.save_succesfull), Toast.LENGTH_SHORT).show()
+                            profileChanged(false)
+                            (activity as MenuActivity).pLoader?.hide()
+                        }
+                    } else {
+                        showErrorOnSave()
+                    }
+                }
+                Status.ERROR -> {
+                    showErrorOnSave()
+                    Log.e("LOG", "log e:" + response.error)
+                }
             }
         })
+        viewModel?.sendUserData(getHashMapUser(), uid)
+    }
+
+    private fun showErrorOnSave() {
+        Toast.makeText(this@MyProfileFragment.context,
+                getString(R.string.error_update), Toast.LENGTH_SHORT).show()
     }
 
     private fun validCellPhone(number: String): Boolean {
-        return number.matches(Regex("^([0-9]|\\+[0-9]){11,13}\$"))
+        return number.matches(Regex("^([0-9]|\\+[0-9]){11,13}\$")) &&
+                number != getString(R.string.default_phone_code)
     }
 
     private fun showBlockTravelInformation() {
@@ -711,51 +727,70 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         }
 
         simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.remove), { _, _ ->
-            viewModel?.error?.observe(this@MyProfileFragment, Observer<Int> { error ->
+            viewModel?.saveStatus?.observe(this, Observer<Response<Boolean>> { response ->
                 socNet.remove(socialNetwork.link)
-                when (error) {
-                    Constants.ERROR -> {
-                        Toast.makeText(this@MyProfileFragment.context,
-                                getString(R.string.error_update), Toast.LENGTH_SHORT).show()
-                    }
-                    Constants.SUCCESS -> {
-                        changeSocIconsDisActive(socialNetwork)
-                        when (socialNetwork) {
-                            SocialNetwork.VK -> vkLink = VKLINK
-                            SocialNetwork.WHATSAPP -> whatsAppNumber = getString(R.string.default_phone_code)
-                            SocialNetwork.CS -> csLink = CSLINK
-                            SocialNetwork.FB -> fbLink = FBLINK
-                            SocialNetwork.TG -> tgNick = TGLINK
+                when (response?.status) {
+                    Status.SUCCESS -> {
+                        if (response.data == true) {
+                            changeSocIconsDisActive(socialNetwork)
+                            when (socialNetwork) {
+                                SocialNetwork.VK -> vkLink = VKLINK
+                                SocialNetwork.WHATSAPP -> whatsAppNumber = getString(R.string.default_phone_code)
+                                SocialNetwork.CS -> csLink = CSLINK
+                                SocialNetwork.FB -> fbLink = FBLINK
+                                SocialNetwork.TG -> tgNick = TGLINK
+                            }
+                        } else {
+                            showErrorOnSave()
                         }
+                    }
+                    Status.ERROR -> {
+                        showErrorOnSave()
+                        Log.e("LOG", "log e:" + response.error)
                     }
                 }
             })
             viewModel?.saveLinks(socNet, uid)
-
         })
         simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.save), { _, _ ->
             val newLink = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString()
 
-            socNet.put(socialNetwork.link, newLink)
-            viewModel?.error?.observe(this@MyProfileFragment, Observer<Int> { error ->
-                when (error) {
-                    Constants.ERROR -> {
-                        Toast.makeText(this@MyProfileFragment.context,
-                                getString(R.string.error_update), Toast.LENGTH_SHORT).show()
-                    }
-                    Constants.SUCCESS -> {
-                        changeSocIconsActive(socialNetwork)
-                        when (socialNetwork) {
-                            SocialNetwork.VK -> vkLink = newLink
-                            SocialNetwork.WHATSAPP -> whatsAppNumber = newLink
-                            SocialNetwork.CS -> csLink = newLink
-                            SocialNetwork.FB -> fbLink = newLink
-                            SocialNetwork.TG -> tgNick = newLink
+            var valid = true
+            var errorText = ""
+
+            if (socialNetwork == SocialNetwork.WHATSAPP) {
+                valid = validCellPhone(newLink)
+                if (!valid) errorText = getString(R.string.fill_phone_invalid)
+            }
+
+            if (!valid) {
+                openDialog(socialNetwork, errorText)
+            } else {
+                socNet.put(socialNetwork.link, newLink)
+                viewModel?.saveStatus?.observe(this, Observer<Response<Boolean>> { response ->
+                    when (response?.status) {
+                        Status.SUCCESS -> {
+                            if (response.data == true) {
+                                changeSocIconsActive(socialNetwork)
+                                when (socialNetwork) {
+                                    SocialNetwork.VK -> vkLink = newLink
+                                    SocialNetwork.WHATSAPP -> whatsAppNumber = newLink
+                                    SocialNetwork.CS -> csLink = newLink
+                                    SocialNetwork.FB -> fbLink = newLink
+                                    SocialNetwork.TG -> tgNick = newLink
+                                }
+                            } else {
+                                showErrorOnSave()
+                            }
+                        }
+                        Status.ERROR -> {
+                            showErrorOnSave()
+                            Log.e("LOG", "log e:" + response.error)
                         }
                     }
-                }
-            })
-            viewModel?.saveLinks(socNet, uid)
+                })
+                viewModel?.saveLinks(socNet, uid)
+            }
         })
 
         dialogView.findViewById<EditText>(R.id.socLinkText).afterTextChanged {
