@@ -20,7 +20,6 @@ import kotlinx.android.synthetic.main.searching_parameters_block.*
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.adapter.DisplayAllUsersAdapter
-import ru.a1024bits.bytheway.extensions.ExtensionsAllUsers
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.repository.M_SEX
@@ -36,7 +35,6 @@ import javax.inject.Inject
 class AllUsersFragment : Fragment() {
     private val SIZE_INITIAL_ELEMENTS = 2
     private lateinit var filter: Filter
-    private lateinit var extension: ExtensionsAllUsers
     private lateinit var viewModel: DisplayUsersViewModel
     private lateinit var dateDialog: DatePickerDialog
     private lateinit var displayUsersAdapter: DisplayAllUsersAdapter
@@ -58,11 +56,10 @@ class AllUsersFragment : Fragment() {
         App.component.inject(this)
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(DisplayUsersViewModel::class.java)
         filter = viewModel.filter
-        extension = viewModel.extension
 
         installLogicToUI()
 
-        displayUsersAdapter = DisplayAllUsersAdapter(this.context, extension)
+        displayUsersAdapter = DisplayAllUsersAdapter(this.context, viewModel)
         displayAllUsers.adapter = displayUsersAdapter
 
         viewModel.usersLiveData.observe(this, Observer<List<User>> { list ->
@@ -87,7 +84,7 @@ class AllUsersFragment : Fragment() {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             var isNotStartSearch = false
             override fun onQueryTextSubmit(query: String): Boolean {
-                displayUsersAdapter.setItems(extension.filterUsersInAdapterByString(query.toLowerCase(), query, displayUsersAdapter.users))
+                displayUsersAdapter.setItems(viewModel.filterUsersInAdapterByString(query.toLowerCase(), query, displayUsersAdapter.users))
                 return true
             }
 
@@ -122,7 +119,7 @@ class AllUsersFragment : Fragment() {
         endBudget.filters = arrayOf(DecimalInputFilter())
 
         startAge.adapter = ArrayAdapter<String>(context, android.R.layout.simple_spinner_item,
-                extension.yearsOldUsers)
+                viewModel.yearsOldUsers)
         startAge.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(p0: AdapterView<*>?) {}
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, p3: Long) {
@@ -134,7 +131,7 @@ class AllUsersFragment : Fragment() {
         }
 
         endAge.adapter = ArrayAdapter<String>(context, android.R.layout.simple_spinner_item,
-                extension.yearsOldUsers)
+                viewModel.yearsOldUsers)
         endAge.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(p0: AdapterView<*>?) {}
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, p3: Long) {
@@ -178,9 +175,8 @@ class AllUsersFragment : Fragment() {
         cancelParameters.setOnClickListener {
             filter.sex = 0
             filter.startAge = -1
-            filter.endAge = -1
             filter.startAge = 0
-            filter.endAge = extension.yearsOldUsers.size - 1
+            filter.endAge = viewModel.yearsOldUsers.size - 1
             filter.startCity = ""
             filter.endCity = ""
             filter.startBudget = -1
@@ -258,7 +254,7 @@ class AllUsersFragment : Fragment() {
 
     private fun updateChoseDateButtons() {
         choseDate.text = if (filter.startDate > 0L && filter.endDate > 0L)
-            extension.getTextFromDates(filter.startDate, filter.endDate, 0)
+            viewModel.getTextFromDates(filter.startDate, filter.endDate, 0)
         else context.getString(R.string.filters_all_users_empty_date)
     }
 
