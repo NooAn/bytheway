@@ -32,20 +32,9 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
                 .doOnSubscribe({ loadingStatus.setValue(true) })
                 .doAfterTerminate({ loadingStatus.setValue(false) })
                 .observeOn(getBackgroundScheduler())
-                .doAfterSuccess { resultUsers ->
-                    resultUsers.retainAll {
-                        (!((filter.startBudget >= 0) && (filter.endBudget > 0)) || (it.budget >= filter.startBudget && it.budget <= filter.endBudget)) &&
-                                (!((filter.startDate > 0L) && (filter.endDate > 0L)) || ((it.dates["start_date"] as Long) >= filter.startDate && (it.dates["end_date"] as Long) <= filter.endDate)) &&
-                                ((it.age >= filter.startAge && it.age <= filter.endAge)) &&
-                                ((filter.sex == 0) || (it.sex == filter.sex)) &&
-                                ((filter.startCity.isEmpty()) || (it.cities.contains(filter.startCity))) &&
-                                ((filter.endCity.isEmpty()) || (it.cities.contains(filter.endCity)))
-                    }
-                }
+                .doAfterSuccess { resultUsers -> filterUsersByFilter(resultUsers, filter) }
                 .observeOn(getMainThreadScheduler())
-                .subscribe(
-                        { resultUsers -> usersLiveData.setValue(resultUsers) }
-                )
+                .subscribe({ resultUsers -> usersLiveData.setValue(resultUsers) })
         )
     }
 
@@ -126,13 +115,12 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
         return getTextStartEndDates(fromWord, calendarStartDate, yearStart, toWord, calendarEndDate, yearEnd)
     }
 
-    fun filterUsersInAdapterByString(queryCustomRegister: String, primaryQuery: String, primaryList: MutableList<User>): MutableList<User> =
+    fun filterUsersByString(queryCustomRegister: String, primaryQuery: String, primaryList: MutableList<User>): MutableList<User> =
             primaryList.filterTo(ArrayList()) {
-                it.cities.containsValue(primaryQuery) || it.name.toLowerCase().contains(queryCustomRegister) || it.email.toLowerCase().contains(queryCustomRegister) ||
-                        it.age.toString().contains(queryCustomRegister) || it.budget.toString().contains(queryCustomRegister) ||
-                        it.lastName.toLowerCase().contains(queryCustomRegister) || it.phone.contains(primaryQuery) ||
-                        it.route.contains(queryCustomRegister)
-
+                it.cities.filterValues { it1 -> it1.toLowerCase().contains(queryCustomRegister) }.isNotEmpty() || it.name.toLowerCase().contains(queryCustomRegister) ||
+                        it.email.toLowerCase().contains(queryCustomRegister) || it.age.toString().contains(queryCustomRegister) ||
+                        it.budget.toString().contains(queryCustomRegister) || it.lastName.toLowerCase().contains(queryCustomRegister) ||
+                        it.phone.contains(primaryQuery) || it.route.contains(queryCustomRegister)
             }
 
     private fun getTextStartEndDates(fromWord: String?, calendarStartDate: Calendar, yearStart: String, toWord: String?, calendarEndDate: Calendar, yearEnd: String): String {
@@ -141,5 +129,16 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
                 .append(yearStart).append(toWord).append(calendarEndDate.get(Calendar.DAY_OF_MONTH)).append(" ")
                 .append(INSTANCE.applicationContext.resources.getStringArray(R.array.months_array)[calendarEndDate.get(Calendar.MONTH)]).append(" ")
                 .append(yearEnd).toString()
+    }
+
+    private fun filterUsersByFilter(resultUsers: MutableList<User>, filter: Filter) {
+        resultUsers.retainAll {
+            (!((filter.startBudget >= 0) && (filter.endBudget > 0)) || (it.budget >= filter.startBudget && it.budget <= filter.endBudget)) &&
+                    (!((filter.startDate > 0L) && (filter.endDate > 0L)) || ((it.dates["start_date"] as Long) >= filter.startDate && (it.dates["end_date"] as Long) <= filter.endDate)) &&
+                    ((it.age >= filter.startAge && it.age <= filter.endAge)) &&
+                    ((filter.sex == 0) || (it.sex == filter.sex)) &&
+                    ((filter.startCity.isEmpty()) || (it.cities.contains(filter.startCity))) &&
+                    ((filter.endCity.isEmpty()) || (it.cities.contains(filter.endCity)))
+        }
     }
 }
