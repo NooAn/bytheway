@@ -236,15 +236,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val cities: HashMap<String, String> = hashMapOf()
         cities.put(Constants.FIRST_INDEX_CITY, searchFragment?.filter?.startCity.toString())
         cities.put(Constants.LAST_INDEX_CITY, searchFragment?.filter?.endCity.toString())
-        hashMap.set("cities", cities)
-        val hashMethod = searchFragment?.filter?.method
-        if (hashMethod != null)
-            hashMap.set("method", hashMethod)
-        hashMap.set("route", routeString ?: "")
+        hashMap.put("cities", cities)
+        val method = searchFragment?.filter?.method
+        if (method != null)
+            hashMap.set("method", method)
+        hashMap.put("route", routeString ?: "")
         val dates: HashMap<String, Long> = hashMapOf()
         dates.put(START_DATE, searchFragment?.filter?.startDate ?: 0)
         dates.put(END_DATE, searchFragment?.filter?.endDate ?: 0)
-        hashMap.set("dates", dates)
+        hashMap.put("dates", dates)
         return hashMap
     }
 
