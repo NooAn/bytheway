@@ -10,12 +10,12 @@ import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.request.RequestOptions
-import ru.a1024bits.bytheway.extensions.ExtensionsAllUsers
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
+import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
 
-class DisplayAllUsersAdapter(val context: Context, val extensions: ExtensionsAllUsers) : RecyclerView.Adapter<DisplayAllUsersAdapter.UserViewHolder>() {
+class DisplayAllUsersAdapter(val context: Context, val viewModel: DisplayUsersViewModel) : RecyclerView.Adapter<DisplayAllUsersAdapter.UserViewHolder>() {
     private var glide: RequestManager = Glide.with(this.context)
     var users: MutableList<User> = ArrayList()
 
@@ -26,13 +26,13 @@ class DisplayAllUsersAdapter(val context: Context, val extensions: ExtensionsAll
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder =
-         UserViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_content_all_users, parent, false))
+            UserViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_content_all_users, parent, false))
 
     override fun onBindViewHolder(holder: UserViewHolder?, position: Int) {
         val currentUser = users[position]
         holder?.name?.text = currentUser.name
         holder?.dates?.text = if (currentUser.dates["start_date"] != null && currentUser.dates["end_date"] != null)
-            extensions.getTextFromDates(currentUser.dates["start_date"], currentUser.dates["end_date"], 1)
+            viewModel.getTextFromDates(currentUser.dates["start_date"], currentUser.dates["end_date"], 1)
         else
             context.getString(R.string.item_all_users_empty_date)
         if (currentUser.age > 0)
@@ -55,6 +55,7 @@ class DisplayAllUsersAdapter(val context: Context, val extensions: ExtensionsAll
                     (context as? MenuActivity)?.showUserSimpleProfile(users[adapterPosition])
             })
         }
+
         var name = view.findViewById<TextView>(R.id.nameContentUser)
         var avatar = view.findViewById<ImageView>(R.id.userAvatar)
         var dates = view.findViewById<TextView>(R.id.usersDates)
