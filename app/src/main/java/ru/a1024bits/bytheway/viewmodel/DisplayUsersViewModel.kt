@@ -1,9 +1,7 @@
 package ru.a1024bits.bytheway.viewmodel
 
 import android.arch.lifecycle.MutableLiveData
-import android.os.AsyncTask
 import com.borax12.materialdaterangepicker.date.DatePickerDialog
-import com.google.firebase.firestore.QuerySnapshot
 import ru.a1024bits.bytheway.App.Companion.INSTANCE
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.Response
@@ -28,14 +26,28 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
     val TAG = "showUserViewModel"
 
     fun getAllUsers(filter: Filter) {
-        userRepository.getAllUsers()
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        InstallUsers().execute(task.result, filter, usersLiveData)
+        disposables.add(userRepository.getAllUsers()
+                .subscribeOn(getBackgroundScheduler())
+                .observeOn(getMainThreadScheduler())
+                .doOnSubscribe({ loadingStatus.setValue(true) })
+                .doAfterTerminate({ loadingStatus.setValue(false) })
+                .observeOn(getBackgroundScheduler())
+                .doAfterSuccess { resultUsers ->
+                    resultUsers.retainAll {
+                        (!((filter.startBudget >= 0) && (filter.endBudget > 0)) || (it.budget >= filter.startBudget && it.budget <= filter.endBudget)) &&
+                                (!((filter.startDate > 0L) && (filter.endDate > 0L)) || ((it.dates["start_date"] as Long) >= filter.startDate && (it.dates["end_date"] as Long) <= filter.endDate)) &&
+                                ((it.age >= filter.startAge && it.age <= filter.endAge)) &&
+                                ((filter.sex == 0) || (it.sex == filter.sex)) &&
+                                ((filter.startCity.isEmpty()) || (it.cities.contains(filter.startCity))) &&
+                                ((filter.endCity.isEmpty()) || (it.cities.contains(filter.endCity)))
                     }
                 }
+                .observeOn(getMainThreadScheduler())
+                .subscribe(
+                        { resultUsers -> usersLiveData.setValue(resultUsers) }
+                )
+        )
     }
-
 
     fun sendUserData(map: HashMap<String, Any>, id: String) {
         loadingStatus.setValue(true)
@@ -55,41 +67,6 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
                 )
         )
     }
-
-    class InstallUsers : AsyncTask<Any, Void, Array<Any>>() {
-        override fun doInBackground(vararg dataQuery: Any): Array<Any> {
-            Thread.sleep(700)
-            val filter = dataQuery[1] as Filter
-            val result: MutableList<User> = ArrayList()
-            for (document in dataQuery[0] as QuerySnapshot) {
-                try {
-                    val user = document.toObject(User::class.java)
-
-                    if ((filter.startBudget >= 0) && (filter.endBudget > 0))
-                        if (user.budget < filter.startBudget || user.budget > filter.endBudget) continue
-                    if ((filter.startDate > 0L) && (filter.endDate > 0L))
-                        if ((user.dates["start_date"] as Long) < filter.startDate || (user.dates["end_date"] as Long) > filter.endDate) continue
-                    if (user.age < filter.startAge || user.age > filter.endAge) continue
-                    if (filter.sex != 0)
-                        if (user.sex != filter.sex) continue
-                    if ("" != filter.startCity)
-                        if (!user.cities.contains(filter.startCity)) continue
-                    if ("" != filter.endCity)
-                        if (!user.cities.contains(filter.endCity)) continue
-
-                    result.add(user)
-                } catch (e: Exception) {
-                }
-            }
-            return arrayOf(result, dataQuery[2])
-        }
-
-        override fun onPostExecute(result: Array<Any>) {
-            super.onPostExecute(result)
-            (result[1] as MutableLiveData<List<User>>).setValue(result[0] as List<User>)
-        }
-    }
-
 
     fun updateDateDialog(fragment: AllUsersFragment): DatePickerDialog {
         val currentStartDate = Calendar.getInstance()
@@ -153,8 +130,8 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
             primaryList.filterTo(ArrayList()) {
                 it.cities.containsValue(primaryQuery) || it.name.toLowerCase().contains(queryCustomRegister) || it.email.toLowerCase().contains(queryCustomRegister) ||
                         it.age.toString().contains(queryCustomRegister) || it.budget.toString().contains(queryCustomRegister) ||
-                        it.city.toLowerCase().contains(queryCustomRegister) || it.lastName.toLowerCase().contains(queryCustomRegister) ||
-                        it.phone.contains(queryCustomRegister) || it.route.contains(queryCustomRegister)
+                        it.lastName.toLowerCase().contains(queryCustomRegister) || it.phone.contains(primaryQuery) ||
+                        it.route.contains(queryCustomRegister)
 
             }
 
