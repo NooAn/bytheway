@@ -100,6 +100,8 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                 .observeOn(getMainThreadScheduler())
                 .subscribe({
                     saveProfile.setValue(Response.success(true))
+                }, { throwable ->
+                    response.setValue(Response.error(throwable))
                 })
         )
     }
