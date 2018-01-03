@@ -17,6 +17,7 @@ import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import com.borax12.materialdaterangepicker.date.DatePickerDialog
 import com.bumptech.glide.Glide
@@ -27,10 +28,7 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException
 import com.google.android.gms.location.places.AutocompleteFilter
 import com.google.android.gms.location.places.ui.PlaceAutocomplete
 import com.google.android.gms.maps.*
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.PolylineOptions
+import com.google.android.gms.maps.model.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.GeoPoint
 import com.google.maps.android.PolyUtil
@@ -39,11 +37,16 @@ import kotlinx.android.synthetic.main.fragment_my_user_profile.*
 import kotlinx.android.synthetic.main.profile_add_trip.*
 import kotlinx.android.synthetic.main.profile_direction.*
 import kotlinx.android.synthetic.main.profile_main_image.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import ru.a1024bits.bytheway.App
+import ru.a1024bits.bytheway.MapWebService
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.Method
 import ru.a1024bits.bytheway.model.SocialNetwork
 import ru.a1024bits.bytheway.model.User
+import ru.a1024bits.bytheway.model.map_directions.RoutesList
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
@@ -54,6 +57,7 @@ import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM
 import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO
 import ru.a1024bits.bytheway.util.Constants.START_DATE
+import ru.a1024bits.bytheway.util.toJsonString
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import ru.terrakok.cicerone.commands.Replace
 import java.text.SimpleDateFormat
@@ -105,15 +109,11 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     }
 
     private var uid = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
-
     private var name = ""
     private var cityFromLatLng = GeoPoint(0.0, 0.0)
     private var cityToLatLng = GeoPoint(0.0, 0.0)
-
     private var lastName = ""
-
     private var city = ""
-
     private lateinit var dateDialog: DatePickerDialog
 
     val APPNUMBER: String = "+7"
@@ -138,32 +138,19 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     )
 
     private var socNet: HashMap<String, String> = hashMapOf()
-
     private var dates: HashMap<String, Long> = hashMapOf()
-
     private var sex: Int = 0
-
     private var age: Int = 0
-
-    private var countries: Long = 0
-
-    private var hours: Long = 0
-
-    private var kilometers: Long = 0
-
     private var cities: HashMap<String, String> = hashMapOf()
-
     private var budget: Long = 0
     private var budgetPosition: Int = 0
-
     private var glide: RequestManager? = null
-
     private var yearNow: Int = 0
-
     private var yearsArr: ArrayList<Int> = arrayListOf()
-
     private var profileStateHashMap: HashMap<String, String> = hashMapOf()
     private var oldProfileState: Int = 0
+    private var routeString: String = ""
+    @Inject lateinit var mapService: MapWebService
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -176,7 +163,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         viewModel?.user?.observe(this, Observer<User> { user ->
             if (user != null) fillProfile(user)
         })
-
         viewModel?.load(uid)
     }
 
@@ -189,12 +175,12 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         val fullName = hView.findViewById<TextView>(R.id.menu_fullname)
         fullName.text = StringBuilder().append(user.name).append(" ").append(user.lastName)
         username.text = StringBuilder(user.name).append(" ").append(user.lastName)
+        profileStateHashMap.clear()
 
-        routes = user.route
         cityFromLatLng = user.cityFromLatLng
         cityToLatLng = user.cityToLatLng
+        routeString = user.route
 
-        profileStateHashMap.clear()
         lastName = user.lastName
         name = user.name
         numberPhone = user.phone
@@ -204,8 +190,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         fbLink = user.socialNetwork.get(SocialNetwork.FB.link) ?: fbLink
         csLink = user.socialNetwork.get(SocialNetwork.CS.link) ?: csLink
         tgNick = user.socialNetwork.get(SocialNetwork.TG.link) ?: tgNick
-        cityFromLatLng = user.cityFromLatLng
-        cityToLatLng = user.cityToLatLng
+
         travelledStatistics.visibility = if (user.flightHours == 0L) View.GONE else View.VISIBLE
 
         travelledCountries.text = user.countries.toString()
@@ -240,9 +225,9 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             dateArrived.setText(dayArrival)
             dates = user.dates
         }
-
         fillAgeSex(user.age, user.sex)
-
+        setMarkers(2)
+        drawPolyline()
         age = user.age
 
         glide?.load(user.urlPhoto)
@@ -319,10 +304,12 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                     cityFromLatLng = GeoPoint(place.latLng.latitude, place.latLng.longitude)
                     if (cityToLatLng.hashCode() == cityFromLatLng.hashCode()) {
                         textCityFrom.error = "true"
-                        Toast.makeText(this@MyProfileFragment.context, getString(R.string.fill_diff_cities), Toast.LENGTH_LONG).show();
+                        Toast.makeText(this@MyProfileFragment.context, getString(R.string.fill_diff_cities), Toast.LENGTH_LONG).show()
                     } else {
                         cities.put(FIRST_INDEX_CITY, place.name.toString())
                         profileStateHashMap.set("cityFromLatLng", cityFromLatLng.hashCode().toString())
+                        obtainDirection()
+                        setMarkers(1)
                         profileChanged()
                     }
                 }
@@ -336,16 +323,18 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
             PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO -> when (resultCode) {
                 AppCompatActivity.RESULT_OK -> {
-                    val place = PlaceAutocomplete.getPlace(activity, data);
+                    val place = PlaceAutocomplete.getPlace(activity, data)
                     textCityTo.setText(place.name)
                     textCityTo.error = null
                     cityToLatLng = GeoPoint(place.latLng.latitude, place.latLng.longitude)
                     if (cityToLatLng.hashCode() == cityFromLatLng.hashCode()) {
                         textCityTo.error = "true"
-                        Toast.makeText(this@MyProfileFragment.context, getString(R.string.fill_diff_cities), Toast.LENGTH_LONG).show();
+                        Toast.makeText(this@MyProfileFragment.context, getString(R.string.fill_diff_cities), Toast.LENGTH_LONG).show()
                     } else {
                         cities.put(LAST_INDEX_CITY, place.name.toString())
                         profileStateHashMap.set("cityToLatLng", cityToLatLng.hashCode().toString())
+                        obtainDirection()
+                        setMarkers(2)
                         profileChanged()
                     }
                 }
@@ -401,7 +390,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         with(travelCarText) { isActivated = false }
         with(travelPlaneText) { isActivated = false }
         with(travelTrainText) { isActivated = false }
-
         appinTheAirEnter.visibility = View.GONE
         layoutTravelMethod.visibility = View.GONE
         moneyfortrip.visibility = View.GONE
@@ -414,55 +402,89 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     private fun showBlockAddTrip() {
         add_new_trip.visibility = View.VISIBLE
     }
-
     override fun onResume() {
         super.onResume()
         mapView.onResume()
     }
-
     override fun onMapReady(map: GoogleMap?) {
         this.googleMap = map
+    }
 
-
-
+    private fun setMarkers(position: Int) {
+        googleMap?.clear()
         val coordFrom = LatLng(cityFromLatLng.latitude, cityFromLatLng.longitude)
         val coordTo = LatLng(cityToLatLng.latitude, cityToLatLng.longitude)
+        var markerTitleStart: String? = ""
+        var markerTitleFinal: String? = ""
+        var markerPositionStart = LatLng(0.0, 0.0)
+        var markerPositionFinal = LatLng(0.0, 0.0)
+        val cityFrom = cities.get(FIRST_INDEX_CITY)
+        val cityTo = cities.get(LAST_INDEX_CITY)
+        if (position == 1) {
+            markerTitleStart = cityTo
+            markerTitleFinal = cityFrom
+            markerPositionStart = coordTo
+            markerPositionFinal = coordFrom
 
 
+        } else if (position == 2) {
+            markerTitleFinal = cityTo
+            markerTitleStart = cityFrom
+            markerPositionFinal = coordTo
+            markerPositionStart = coordFrom
+        }
         val midPointLat = (coordFrom.latitude + coordTo.latitude) / 2
         val midPointLong = (coordFrom.longitude + coordTo.longitude) / 2
         val blueMarker = BitmapDescriptorFactory.fromResource(R.drawable.pin_blue)
+
+        googleMap?.addMarker(MarkerOptions()
+                .icon(blueMarker)
+                .position(markerPositionStart)
+                .title(markerTitleStart)
+                .anchor(0.5F, 1.0F)
+                .flat(true))
+
+        googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(markerPositionFinal, 6.0f))
+        googleMap?.addMarker(MarkerOptions()
+                .icon(blueMarker)
+                .position(markerPositionFinal)
+                .title(markerTitleFinal)
+                .anchor(0.5F, 1.0F)
+                .flat(true))
+
+        var perfectZoom = 190 / getBearing(coordFrom, coordTo)
+        googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(midPointLat, midPointLong), perfectZoom))
+    }
+
+    fun drawPolyline() {
         val orangeColor = activity.resources.getColor(R.color.orangeLine)
-        googleMap?.addMarker(MarkerOptions()
-                .icon(blueMarker)
-                .position(coordFrom)
-                .title("First Point"))
-        googleMap?.addMarker(MarkerOptions()
-                .icon(blueMarker)
-                .position(coordTo)
-                .title("Final Point"))
-
+        var polyPts: List<LatLng>
         val options = PolylineOptions()
-        options.color(orangeColor )
+        options.color(orangeColor)
         options.width(5f)
-
-
-        if (routes != "") {
-            var polyPts: List<LatLng>
-            polyPts = PolyUtil.decode(routes)
-
+        if (routeString != "") {
+            polyPts = PolyUtil.decode(routeString)
             for (pts in polyPts) {
                 options.add(pts)
             }
-            googleMap?.addPolyline(options)
         }
-
-
-        googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(midPointLat, midPointLong), 3.0f))
-
+        googleMap?.addPolyline(options)
     }
 
-    private var routes: String = ""
+
+    fun getBearing(begin: LatLng, end: LatLng): Float {
+        val lat = Math.abs(begin.latitude - end.latitude)
+        val lng = Math.abs(begin.longitude - end.longitude)
+        if (begin.latitude < end.latitude && begin.longitude < end.longitude)
+            return Math.toDegrees(Math.atan(lng / lat)).toFloat()
+        else if (begin.latitude >= end.latitude && begin.longitude < end.longitude)
+            return (90 - Math.toDegrees(Math.atan(lng / lat)) + 90).toFloat()
+        else if (begin.latitude >= end.latitude && begin.longitude >= end.longitude)
+            return (Math.toDegrees(Math.atan(lng / lat)) + 180).toFloat()
+        else if (begin.latitude < end.latitude && begin.longitude >= end.longitude)
+            return (90 - Math.toDegrees(Math.atan(lng / lat)) + 270).toFloat()
+        return -1f
+    }
 
     private var googleMap: GoogleMap? = null
     private lateinit var mapView: MapView
@@ -478,7 +500,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             e.printStackTrace()
         }
         mapView?.getMapAsync(this)
-
         return view
     }
 
@@ -486,10 +507,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         this.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
             }
-
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
             }
-
             override fun afterTextChanged(editable: Editable?) {
                 afterTextChanged.invoke(editable.toString())
             }
@@ -607,8 +626,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         }
 
 
-        val yearsAdapter = ArrayAdapter<Int>(this.context, android.R.layout.simple_spinner_item, yearsArr);
-
+        val yearsAdapter = ArrayAdapter<Int>(this.context, android.R.layout.simple_spinner_item, yearsArr)
         yearsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerYearsView.adapter = yearsAdapter
         spinnerYearsView.prompt = "Дата"
@@ -632,7 +650,9 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             name = (nameChoose.text.toString()).capitalize()
             lastName = (lastNameChoose.text.toString()).capitalize()
             city = (cityChoose.text.toString()).capitalize()
-           savingUserData(name,lastName,city)
+            username.text = StringBuilder(name).append(" ").append(lastName)
+            cityview.text = if (city.isNotEmpty()) city else getString(R.string.native_city)
+            viewModel?.sendUserData(getHashMapUser(), uid)
 
 
         })
@@ -641,67 +661,39 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         })
 
 
-var enterCounter=0
-
+        var enterCounter = 0
         nameChoose.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
             if (keyCode == KeyEvent.KEYCODE_ENTER) {
-                Log.d("LOG", "ENTER is Pressed on EditName")
                 lastNameChoose.requestFocus()
-                enterCounter=1
-
+                enterCounter = 1
                 return@OnKeyListener true
-
             }
             false
         })
 
         lastNameChoose.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
-
-            if (keyCode == KeyEvent.KEYCODE_ENTER ) {
-                Log.d("LOG", "ENTER is Pressed on LastName")
-
-               if (enterCounter==0){
-                   cityChoose.requestFocus()
-                   enterCounter=1
-               }else enterCounter=0
+            if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                if (enterCounter == 0) {
+                    cityChoose.requestFocus()
+                    enterCounter = 1
+                } else enterCounter = 0
                 return@OnKeyListener true
             }
             false
         })
 
         cityChoose.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
-
-            if (keyCode == KeyEvent.KEYCODE_ENTER ) {
-                Log.d("LOG", "ENTER is Pressed on city")
-
-                if (enterCounter==0){
-                    name = (nameChoose.text.toString()).capitalize()
-                    lastName = (lastNameChoose.text.toString()).capitalize()
-                    city = (cityChoose.text.toString()).capitalize()
-                    savingUserData(name,lastName,city)
-                    simpleAlert.hide()
-                }else enterCounter=0
+            if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                if (enterCounter == 0) {
+                    val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.hideSoftInputFromWindow(cityChoose.windowToken, 0)
+                } else enterCounter = 0
                 return@OnKeyListener true
             }
             false
         })
-
-
-
-
         simpleAlert.show()
-
     }
-
-private fun savingUserData(name:String,lastName:String,city:String){
-    username.text = StringBuilder(name).append(" ").append(lastName)
-    cityview.text = if (city.isNotEmpty()) city else getString(R.string.native_city)
-    viewModel?.sendUserData(getHashMapUser(), uid)
-
-}
-
-
-
 
 
     private fun openDialog(socialNetwork: SocialNetwork, errorText: String? = null) {
@@ -866,7 +858,7 @@ private fun savingUserData(name:String,lastName:String,city:String){
 
         choose_price_travel.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, number: Int, p2: Boolean) {
-                budget = (150 * number).toLong()// = fibbonaci(number)
+                budget = (150 * number).toLong()
                 displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(budget)
                 if (number != budgetPosition) {
                     budgetPosition = number
@@ -999,18 +991,6 @@ private fun savingUserData(name:String,lastName:String,city:String){
         mapView.onLowMemory()
     }
 
-    fun fibbonaci(n: Int): Long {
-        var prev: Long = 0
-        var next: Long = 1
-        var result: Long = 0
-        for (i in 0 until n) {
-            result = prev + next
-            prev = next
-            next = result
-        }
-        return result
-    }
-
     private var countTrip: Int = 0
 
     fun getHashMapUser(): HashMap<String, Any> {
@@ -1029,14 +1009,10 @@ private fun savingUserData(name:String,lastName:String,city:String){
         hashMap.set("name", name)
         hashMap.set("lastName", lastName)
         hashMap.set("city", city)
+        hashMap.set("route", routeString)
         return hashMap
     }
 
-    fun getHashMapInfoUser(): HashMap<String, Any> {
-        val hashMap = HashMap<String, Any>()
-
-        return hashMap
-    }
 
     fun saveProfileState() {
         profileStateHashMap.set("dates", dates.toString())
@@ -1044,6 +1020,7 @@ private fun savingUserData(name:String,lastName:String,city:String){
         profileStateHashMap.set("budgetPosition", budgetPosition.toString())
         profileStateHashMap.set("cityFromLatLng", cityFromLatLng.hashCode().toString())
         profileStateHashMap.set("cityToLatLng", cityToLatLng.hashCode().toString())
+        profileStateHashMap.set("route", routeString)
         oldProfileState = profileStateHashMap.hashCode()
     }
 
@@ -1051,8 +1028,29 @@ private fun savingUserData(name:String,lastName:String,city:String){
         if (countTrip == 1) {
             val changed: Boolean = if (force != null) force
             else profileStateHashMap.hashCode() != oldProfileState
-
             (activity as MenuActivity).profileChanged = changed
         }
+    }
+
+
+    private fun obtainDirection() {
+        mapService.getDirections(hashMapOf(
+                "origin" to LatLng(cityFromLatLng.latitude, cityFromLatLng.longitude).toJsonString(),
+                "destination" to LatLng(cityToLatLng.latitude, cityToLatLng.longitude).toJsonString(),
+                "sensor" to "false")).enqueue(object : Callback<RoutesList?> {
+            override fun onResponse(call: Call<RoutesList?>?, response: Response<RoutesList?>?) {
+                response?.body()?.routes?.map {
+                    it.overviewPolyline?.encodedData?.let { routeString ->
+                        this@MyProfileFragment.routeString = routeString
+                        drawPolyline()
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<RoutesList?>?, t: Throwable?) {
+                t?.printStackTrace()
+                //todo show error
+            }
+        })
     }
 }
