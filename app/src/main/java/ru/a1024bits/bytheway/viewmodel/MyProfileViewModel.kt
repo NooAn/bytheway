@@ -26,7 +26,9 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
     var response: MutableLiveData<Response<User>> = MutableLiveData()
     val loadingStatus = MutableLiveData<Boolean>()
 
-    val saveStatus: MutableLiveData<Response<Boolean>> = MutableLiveData()
+    val saveSocial: MutableLiveData<String> = MutableLiveData()
+    val clearSocial: MutableLiveData<String> = MutableLiveData()
+
     val saveProfile: MutableLiveData<Response<Boolean>> = MutableLiveData()
 
     fun load(userId: String) {
@@ -40,8 +42,7 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
         )
     }
 
-
-    fun saveLinks(arraySocNetwork: HashMap<String, String>, id: String) {
+    fun saveLinks(arraySocNetwork: HashMap<String, String>, id: String, onSuccess: () -> Unit = {}) {
         val map: HashMap<String, Any> = hashMapOf()
         map.put("socialNetwork", arraySocNetwork) // fixme
         disposables.add(userRepository.changeUserProfile(map, id)
@@ -49,11 +50,9 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                 .observeOn(getMainThreadScheduler())
                 .doOnSubscribe({ s -> loadingStatus.setValue(true) })
                 .doAfterTerminate({ loadingStatus.setValue(false) })
-                .subscribe(
-                        { r -> saveStatus.setValue(Response.success(r)) },
-                        { throwable -> saveStatus.setValue(Response.error(throwable)) }
-                ))
-
+                .subscribe(onSuccess, { throwable ->
+                    response.setValue(Response.error(throwable))
+                }))
     }
 
 
@@ -96,13 +95,13 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
 
     fun sendUserData(map: HashMap<String, Any>, id: String) {
         Log.e("LOG map:", id + " " + map.toString())
-        userRepository.changeUserProfile(map, id)
+        disposables.add(userRepository.changeUserProfile(map, id)
                 .subscribeOn(getBackgroundScheduler())
                 .observeOn(getMainThreadScheduler())
-                .subscribe(
-                        { user -> saveProfile.setValue(Response.success(user)) },
-                        { throwable -> saveProfile.setValue(Response.error(throwable)) })
-
+                .subscribe({
+                    saveProfile.setValue(Response.success(true))
+                })
+        )
     }
 
     fun updateStaticalInfo(airUser: AirUser?, id: String) {

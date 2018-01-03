@@ -83,8 +83,8 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) : IUsersR
         return store.collection(COLLECTION_USERS).document(user.id).set(user)
     }
 
-    override fun changeUserProfile(map: HashMap<String, Any>, id: String):Single<Boolean> =
-            Single.create<Boolean> { stream ->
+    override fun changeUserProfile(map: HashMap<String, Any>, id: String):Completable =
+            Completable.create { stream ->
                 Log.d("LOG", "change user profile send....")
                 val documentRef = store.collection(COLLECTION_USERS).document(id)
                 store.runTransaction(object : Transaction.Function<Void> {
@@ -98,7 +98,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) : IUsersR
                 }.addOnFailureListener {
                     stream.onError(it)
                 }.addOnSuccessListener { _ ->
-                    stream.onSuccess(true)
+                    stream.onComplete()
                 }
             }
 }

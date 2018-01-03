@@ -176,6 +176,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                     }
                 }
                 Status.ERROR -> {
+                    showErrorResponse()
                     Log.e("LOG", "log e:" + response.error)
                 }
             }
@@ -557,32 +558,34 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             Toast.makeText(this@MyProfileFragment.context, errorString, Toast.LENGTH_LONG).show()
             return
         }
+        if (viewModel?.saveProfile?.hasObservers() == false) {
+            viewModel?.saveProfile?.observe(this, Observer<Response<Boolean>> { response ->
+                when (response?.status) {
+                    Status.SUCCESS -> {
+                        if (response.data == true) {
+                            if (activity != null) {
+                                Toast.makeText(this@MyProfileFragment.context, resources.getString(R.string.save_succesfull), Toast.LENGTH_SHORT).show()
+                                profileChanged(false)
+                                (activity as MenuActivity).pLoader?.hide()
+                            }
+                        } else {
+                            showErrorResponse()
+                        }
+                    }
+                    Status.ERROR -> {
+                        showErrorResponse()
+                        Log.e("LOG", "log e:" + response.error)
+                    }
+                }
+            })
+        }
         (activity as MenuActivity).pLoader?.show()
         countTrip = 1
 
-        viewModel?.saveProfile?.observe(this, Observer<Response<Boolean>> { response ->
-            when (response?.status) {
-                Status.SUCCESS -> {
-                    if (response.data == true) {
-                        if (activity != null) {
-                            Toast.makeText(this@MyProfileFragment.context, resources.getString(R.string.save_succesfull), Toast.LENGTH_SHORT).show()
-                            profileChanged(false)
-                            (activity as MenuActivity).pLoader?.hide()
-                        }
-                    } else {
-                        showErrorOnSave()
-                    }
-                }
-                Status.ERROR -> {
-                    showErrorOnSave()
-                    Log.e("LOG", "log e:" + response.error)
-                }
-            }
-        })
         viewModel?.sendUserData(getHashMapUser(), uid)
     }
 
-    private fun showErrorOnSave() {
+    private fun showErrorResponse() {
         Toast.makeText(this@MyProfileFragment.context,
                 getString(R.string.error_update), Toast.LENGTH_SHORT).show()
     }
@@ -725,32 +728,41 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         if (errorText != null) {
             dialogView.findViewById<EditText>(R.id.socLinkText).error = errorText
         }
-
-        simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.remove), { _, _ ->
-            viewModel?.saveStatus?.observe(this, Observer<Response<Boolean>> { response ->
-                socNet.remove(socialNetwork.link)
-                when (response?.status) {
-                    Status.SUCCESS -> {
-                        if (response.data == true) {
-                            changeSocIconsDisActive(socialNetwork)
-                            when (socialNetwork) {
-                                SocialNetwork.VK -> vkLink = VKLINK
-                                SocialNetwork.WHATSAPP -> whatsAppNumber = getString(R.string.default_phone_code)
-                                SocialNetwork.CS -> csLink = CSLINK
-                                SocialNetwork.FB -> fbLink = FBLINK
-                                SocialNetwork.TG -> tgNick = TGLINK
-                            }
-                        } else {
-                            showErrorOnSave()
-                        }
-                    }
-                    Status.ERROR -> {
-                        showErrorOnSave()
-                        Log.e("LOG", "log e:" + response.error)
+        if (viewModel?.saveSocial?.hasObservers() == false) {
+            viewModel?.saveSocial?.observe(this, Observer<String> { link ->
+                link?.let {
+                    val newLink = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString()
+                    changeSocIconsActive(link)
+                    when (link) {
+                        SocialNetwork.VK.link -> vkLink = newLink
+                        SocialNetwork.WHATSAPP.link -> whatsAppNumber = newLink
+                        SocialNetwork.CS.link -> csLink = newLink
+                        SocialNetwork.FB.link -> fbLink = newLink
+                        SocialNetwork.TG.link -> tgNick = newLink
                     }
                 }
             })
-            viewModel?.saveLinks(socNet, uid)
+        }
+        if (viewModel?.clearSocial?.hasObservers() == false) {
+            viewModel?.clearSocial?.observe(this, Observer<String> { link ->
+                link?.let {
+                    socNet.remove(link)
+                    changeSocIconsDisActive(link)
+                    when (link) {
+                        SocialNetwork.VK.link -> vkLink = VKLINK
+                        SocialNetwork.WHATSAPP.link -> whatsAppNumber = getString(R.string.default_phone_code)
+                        SocialNetwork.CS.link -> csLink = CSLINK
+                        SocialNetwork.FB.link -> fbLink = FBLINK
+                        SocialNetwork.TG.link -> tgNick = TGLINK
+                    }
+                }
+
+            })
+        }
+        simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.remove), { _, _ ->
+            viewModel?.saveLinks(socNet, uid, {
+                viewModel?.clearSocial?.setValue(socialNetwork.link)
+            })
         })
         simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.save), { _, _ ->
             val newLink = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString()
@@ -767,29 +779,9 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                 openDialog(socialNetwork, errorText)
             } else {
                 socNet.put(socialNetwork.link, newLink)
-                viewModel?.saveStatus?.observe(this, Observer<Response<Boolean>> { response ->
-                    when (response?.status) {
-                        Status.SUCCESS -> {
-                            if (response.data == true) {
-                                changeSocIconsActive(socialNetwork)
-                                when (socialNetwork) {
-                                    SocialNetwork.VK -> vkLink = newLink
-                                    SocialNetwork.WHATSAPP -> whatsAppNumber = newLink
-                                    SocialNetwork.CS -> csLink = newLink
-                                    SocialNetwork.FB -> fbLink = newLink
-                                    SocialNetwork.TG -> tgNick = newLink
-                                }
-                            } else {
-                                showErrorOnSave()
-                            }
-                        }
-                        Status.ERROR -> {
-                            showErrorOnSave()
-                            Log.e("LOG", "log e:" + response.error)
-                        }
-                    }
+                viewModel?.saveLinks(socNet, uid, {
+                    viewModel?.saveSocial?.setValue(socialNetwork.link)
                 })
-                viewModel?.saveLinks(socNet, uid)
             }
         })
 
@@ -820,23 +812,23 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         simpleAlert.show()
     }
 
-    private fun changeSocIconsActive(socialNetwork: SocialNetwork) {
+    private fun changeSocIconsActive(socialNetwork: String) {
         when (socialNetwork) {
-            SocialNetwork.VK -> vkIcon.setImageResource(R.drawable.ic_vk_color)
-            SocialNetwork.CS -> csIcon.setImageResource(R.drawable.ic_cs_color)
-            SocialNetwork.FB -> fbcon.setImageResource(R.drawable.ic_fb_color)
-            SocialNetwork.WHATSAPP -> whatsAppIcon.setImageResource(R.drawable.ic_whats_icon_color)
-            SocialNetwork.TG -> tgIcon.setImageResource(R.drawable.ic_tg_color)
+            SocialNetwork.VK.link -> vkIcon.setImageResource(R.drawable.ic_vk_color)
+            SocialNetwork.CS.link -> csIcon.setImageResource(R.drawable.ic_cs_color)
+            SocialNetwork.FB.link -> fbcon.setImageResource(R.drawable.ic_fb_color)
+            SocialNetwork.WHATSAPP.link -> whatsAppIcon.setImageResource(R.drawable.ic_whats_icon_color)
+            SocialNetwork.TG.link -> tgIcon.setImageResource(R.drawable.ic_tg_color)
         }
     }
 
-    private fun changeSocIconsDisActive(socialNetwork: SocialNetwork) {
+    private fun changeSocIconsDisActive(socialNetwork: String) {
         when (socialNetwork) {
-            SocialNetwork.VK -> vkIcon.setImageResource(R.drawable.ic_vk_gray)
-            SocialNetwork.CS -> csIcon.setImageResource(R.drawable.ic_cs_grey)
-            SocialNetwork.FB -> fbcon.setImageResource(R.drawable.ic_fb_grey)
-            SocialNetwork.WHATSAPP -> whatsAppIcon.setImageResource(R.drawable.ic_whats_icon_grey)
-            SocialNetwork.TG -> tgIcon.setImageResource(R.drawable.tg_grey)
+            SocialNetwork.VK.link -> vkIcon.setImageResource(R.drawable.ic_vk_gray)
+            SocialNetwork.CS.link -> csIcon.setImageResource(R.drawable.ic_cs_grey)
+            SocialNetwork.FB.link -> fbcon.setImageResource(R.drawable.ic_fb_grey)
+            SocialNetwork.WHATSAPP.link -> whatsAppIcon.setImageResource(R.drawable.ic_whats_icon_grey)
+            SocialNetwork.TG.link -> tgIcon.setImageResource(R.drawable.tg_grey)
         }
     }
 
