@@ -39,7 +39,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) : IUsersR
             Single.create<MutableList<User>> { e ->
                 store.collection(COLLECTION_USERS).get()
                         .addOnCompleteListener({ task ->
-                            val result: MutableList<User> = Collections.synchronizedList(ArrayList<User>())
+                            val result: MutableList<User> = ArrayList()
                             for (document in task.result) {
                                 try {
                                     result.add(document.toObject(User::class.java))
