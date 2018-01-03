@@ -9,6 +9,7 @@ import io.reactivex.Single
 import ru.a1024bits.bytheway.algorithm.SearchTravelers
 import ru.a1024bits.bytheway.model.User
 import java.util.*
+import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 
 
@@ -39,7 +40,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) : IUsersR
             Single.create<MutableList<User>> { e ->
                 store.collection(COLLECTION_USERS).get()
                         .addOnCompleteListener({ task ->
-                            val result: MutableList<User> = ArrayList()
+                            val result: MutableList<User> = CopyOnWriteArrayList()
                             for (document in task.result) {
                                 try {
                                     result.add(document.toObject(User::class.java))

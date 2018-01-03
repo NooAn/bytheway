@@ -4,11 +4,9 @@ import android.animation.LayoutTransition
 import android.app.SearchManager
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
 import android.support.design.widget.Snackbar
-import android.support.v4.app.Fragment
 import android.support.v7.widget.SearchView
 import android.util.Log
 import android.view.*
@@ -24,18 +22,14 @@ import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.repository.M_SEX
 import ru.a1024bits.bytheway.repository.W_SEX
-import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.a1024bits.bytheway.util.DecimalInputFilter
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
-import uk.co.deanwild.materialshowcaseview.IShowcaseListener
-import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView
 import javax.inject.Inject
 
 
-class AllUsersFragment : Fragment() {
+class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
     private val SIZE_INITIAL_ELEMENTS = 2
     private lateinit var filter: Filter
-    private lateinit var viewModel: DisplayUsersViewModel
     private lateinit var dateDialog: DatePickerDialog
     private lateinit var displayUsersAdapter: DisplayAllUsersAdapter
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -45,24 +39,22 @@ class AllUsersFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-//        System.gc()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
             inflater.inflate(R.layout.fragment_display_all_users, container, false)
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
         App.component.inject(this)
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(DisplayUsersViewModel::class.java)
-        filter = viewModel.filter
+        super.onActivityCreated(savedInstanceState)
+        filter = viewModel!!.filter
 
         installLogicToUI()
 
-        displayUsersAdapter = DisplayAllUsersAdapter(this.context, viewModel)
+        displayUsersAdapter = DisplayAllUsersAdapter(this.context, viewModel!!)
         displayAllUsers.adapter = displayUsersAdapter
 
-        viewModel.usersLiveData.observe(this, Observer<List<User>> { list ->
+        viewModel!!.usersLiveData.observe(this, Observer<List<User>> { list ->
             Log.e("LOG", "onChanged $list")
             if (list != null) {
                 if (list.isNotEmpty())
@@ -71,7 +63,10 @@ class AllUsersFragment : Fragment() {
             }
         })
         loadingWhereLoadUsers.visibility = View.VISIBLE
-        viewModel.getAllUsers(filter)
+        viewModel?.getAllUsers(filter)
+
+        showPrompt("isFirstEnterAllUsersFragment", context.resources.getString(R.string.close_hint),
+                context.resources.getString(R.string.hint_all_travelers), context.resources.getString(R.string.hint_all_travelers_description))
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -84,14 +79,14 @@ class AllUsersFragment : Fragment() {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             var isNotStartSearch = false
             override fun onQueryTextSubmit(query: String): Boolean {
-                displayUsersAdapter.setItems(viewModel.filterUsersByString(query.toLowerCase(), query, displayUsersAdapter.users))
+                displayUsersAdapter.setItems(viewModel!!.filterUsersByString(query.toLowerCase(), query, displayUsersAdapter.users))
                 return true
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
                 if (newText.isEmpty() && isNotStartSearch && this@AllUsersFragment.view != null) {
                     updateViewsBeforeSearch()
-                    viewModel.getAllUsers(filter)
+                    viewModel?.getAllUsers(filter)
                 }
                 isNotStartSearch = true
                 return false
@@ -106,6 +101,12 @@ class AllUsersFragment : Fragment() {
         else -> super.onOptionsItemSelected(item)
     }
 
+    override fun getViewFactoryClass() = viewModelFactory
+
+    override fun getLayoutRes() = R.layout.fragment_display_all_users
+
+    override fun getViewModelClass(): Class<DisplayUsersViewModel> = DisplayUsersViewModel::class.java
+
     fun nonSuchSetDate() {
         Snackbar.make(activity.findViewById(android.R.id.content), context.getString(R.string.dates_has_been_incorrect), Snackbar.LENGTH_LONG).show()
     }
@@ -119,7 +120,7 @@ class AllUsersFragment : Fragment() {
         endBudget.filters = arrayOf(DecimalInputFilter())
 
         startAge.adapter = ArrayAdapter<String>(context, android.R.layout.simple_spinner_item,
-                viewModel.yearsOldUsers)
+                viewModel!!.yearsOldUsers)
         startAge.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(p0: AdapterView<*>?) {}
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, p3: Long) {
@@ -131,7 +132,7 @@ class AllUsersFragment : Fragment() {
         }
 
         endAge.adapter = ArrayAdapter<String>(context, android.R.layout.simple_spinner_item,
-                viewModel.yearsOldUsers)
+                viewModel!!.yearsOldUsers)
         endAge.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(p0: AdapterView<*>?) {}
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, p3: Long) {
@@ -141,7 +142,7 @@ class AllUsersFragment : Fragment() {
                     filter.endAge = position
             }
         }
-        dateDialog = viewModel.updateDateDialog(this)
+        dateDialog = viewModel!!.updateDateDialog(this)
         choseDate.setOnClickListener {
             dateDialog.show(activity.fragmentManager, "")
         }
@@ -168,14 +169,13 @@ class AllUsersFragment : Fragment() {
 
             animationSlide()
             block_search_parameters.visibility = View.GONE
-//            viewModel.getAllUsers(filter)
         }
 
         cancelParameters.setOnClickListener {
             filter.sex = 0
             filter.startAge = -1
             filter.startAge = 0
-            filter.endAge = viewModel.yearsOldUsers.size - 1
+            filter.endAge = viewModel!!.yearsOldUsers.size - 1
             filter.startCity = ""
             filter.endCity = ""
             filter.startBudget = -1
@@ -190,7 +190,7 @@ class AllUsersFragment : Fragment() {
             startCity.setText("")
             endCity.setText("")
 
-            dateDialog = viewModel.updateDateDialog(this)
+            dateDialog = viewModel!!.updateDateDialog(this)
             updateChoseDateButtons()
 
             sexButtons.check(sexAny.id)
@@ -205,24 +205,24 @@ class AllUsersFragment : Fragment() {
             }
         }
 
-        if ((activity as MenuActivity).preferences.getBoolean("isFirstEnterAllUsersFragment", true))
-            MaterialShowcaseView.Builder(activity)
-                    .setTarget(searchParametersText)
-                    .renderOverNavigationBar()
-                    .setDismissText(context.resources.getString(R.string.close_hint))
-                    .setTitleText(context.resources.getString(R.string.hint_all_travelers))
-                    .setContentText(context.resources.getString(R.string.hint_all_travelers_description))
-                    .withCircleShape()
-                    .setListener(object : IShowcaseListener {
-                        override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {
-                        }
-
-                        override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
-                            if (activity != null && !activity.isDestroyed)
-                                (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterAllUsersFragment", false).apply()
-                        }
-                    })
-                    .show()
+//        if ((activity as MenuActivity).preferences.getBoolean("isFirstEnterAllUsersFragment", true))
+//            MaterialShowcaseView.Builder(activity)
+//                    .setTarget(searchParametersText)
+//                    .renderOverNavigationBar()
+//                    .setDismissText(context.resources.getString(R.string.close_hint))
+//                    .setTitleText(context.resources.getString(R.string.hint_all_travelers))
+//                    .setContentText(context.resources.getString(R.string.hint_all_travelers_description))
+//                    .withCircleShape()
+//                    .setListener(object : IShowcaseListener {
+//                        override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {
+//                        }
+//
+//                        override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
+//                            if (activity != null && !activity.isDestroyed)
+//                                (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterAllUsersFragment", false).apply()
+//                        }
+//                    })
+//                    .show()
     }
 
     private fun animationSlide() {
@@ -231,7 +231,7 @@ class AllUsersFragment : Fragment() {
             override fun endTransition(p0: LayoutTransition?, p1: ViewGroup?, view: View, p3: Int) {
                 if ((view.id == block_search_parameters.id) && (block_search_parameters.visibility == View.GONE)) {
                     updateViewsBeforeSearch()
-                    viewModel.getAllUsers(filter)
+                    viewModel?.getAllUsers(filter)
                     view_contain_block_parameters.layoutTransition.removeTransitionListener(this)
                 }
             }
@@ -254,7 +254,7 @@ class AllUsersFragment : Fragment() {
 
     private fun updateChoseDateButtons() {
         choseDate.text = if (filter.startDate > 0L && filter.endDate > 0L)
-            viewModel.getTextFromDates(filter.startDate, filter.endDate, 0)
+            viewModel!!.getTextFromDates(filter.startDate, filter.endDate, 0)
         else context.getString(R.string.filters_all_users_empty_date)
     }
 
