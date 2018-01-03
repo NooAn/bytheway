@@ -1,6 +1,5 @@
 package ru.a1024bits.bytheway.ui.fragments
 
-import android.app.SearchManager
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
@@ -487,7 +486,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     }
 
     fun drawPolyline() {
-        val orangeColor = activity.resources.getColor(R.color.orangeLine)
+        val orangeColor = activity.resources.getColor(R.color.blueRouteLine)
         var polyPts: List<LatLng>
         val options = PolylineOptions()
         options.color(orangeColor)
@@ -711,6 +710,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             if (keyCode == KeyEvent.KEYCODE_ENTER) {
                 lastNameChoose.requestFocus()
                 enterCounter = 1
+                Log.d("LOG","enter pressed on name")
                 return@OnKeyListener true
             }
             false
