@@ -224,8 +224,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                         }
 
                         override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
-                            if (activity != null && !activity.isDestroyed)
-                                (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterMapFragment", false).apply()
+                            viewModel?.markPromptIsShowing("isFirstEnterMapFragment")
                         }
                     })
                     .show()
