@@ -1,5 +1,6 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/profile"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -25,9 +26,10 @@
                 android:id="@+id/username"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
                 android:textAlignment="center"
+                android:textColor="@color/black"
                 android:textSize="24sp"
-                android:textStyle="bold"
                 tools:text="@string/fullname" />
 
             <TextView
@@ -35,6 +37,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
+                android:fontFamily="sans-serif"
                 android:freezesText="true"
                 android:text="@string/city"
                 android:textAlignment="center"
@@ -46,6 +49,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
+                android:fontFamily="sans-serif"
                 android:freezesText="true"
                 android:text="@string/sex_and_age"
                 android:textAlignment="center"
@@ -64,15 +68,15 @@
             android:orientation="horizontal">
 
             <ImageView
-                tools:ignore="ContentDescription"
                 android:id="@+id/vkIcon"
-                android:scaleType="center"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
+                android:scaleType="center"
                 android:src="@drawable/ic_vk_gray"
+                tools:ignore="ContentDescription"
                 tools:src="@drawable/ic_vk_gray" />
 
             <View
@@ -81,15 +85,15 @@
                 android:background="@color/greyTravelTypeDivider" />
 
             <ImageView
-                tools:ignore="ContentDescription"
                 android:id="@+id/whatsAppIcon"
-                android:scaleType="center"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
+                android:scaleType="center"
                 android:src="@drawable/ic_whats_icon_grey"
+                tools:ignore="ContentDescription"
                 tools:src="@drawable/ic_whats_icon_color" />
 
             <View
@@ -98,16 +102,16 @@
                 android:background="@color/greyTravelTypeDivider" />
 
             <ImageView
-                tools:ignore="ContentDescription"
                 android:id="@+id/tgIcon"
-                android:scaleType="center"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
+                android:scaleType="center"
                 android:src="@drawable/tg_grey"
                 android:visibility="visible"
+                tools:ignore="ContentDescription"
                 tools:src="@drawable/ic_tg_color" />
 
             <View
@@ -116,15 +120,15 @@
                 android:background="@color/greyTravelTypeDivider" />
 
             <ImageView
-                tools:ignore="ContentDescription"
                 android:id="@+id/fbcon"
-                android:scaleType="center"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
+                android:scaleType="center"
                 android:src="@drawable/ic_fb_grey"
+                tools:ignore="ContentDescription"
                 tools:src="@drawable/ic_fb_color" />
 
             <View
@@ -133,106 +137,107 @@
                 android:background="@color/greyTravelTypeDivider" />
 
             <ImageView
-                tools:ignore="ContentDescription"
                 android:id="@+id/csIcon"
-                android:scaleType="center"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
+                android:scaleType="center"
                 android:src="@drawable/ic_cs_grey"
+                tools:ignore="ContentDescription"
                 tools:src="@drawable/ic_cs_color" />
 
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/travelledStatistics"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_below="@+id/socnetwork"
             android:layout_marginBottom="25dp"
             android:visibility="gone"
-            tools:visibility="visible"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            tools:visibility="visible">
+
             <RelativeLayout
-                android:layout_weight="1"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
                 <TextView
-                    tools:text="60"
                     android:id="@+id/travelledCountries"
-                    android:textSize="20sp"
-                    android:textColor="@color/mdtp_dark_gray"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
                     android:drawablePadding="6dp"
                     android:drawableStart="@drawable/ic_country"
-                    android:layout_centerHorizontal="true"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:textColor="@color/mdtp_dark_gray"
+                    android:textSize="20sp"
+                    tools:text="60" />
+
                 <TextView
-                    android:text="стран"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_below="@+id/travelledCountries"
                     android:layout_centerHorizontal="true"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:text="стран" />
             </RelativeLayout>
 
             <!-- FliflightHoursours -->
             <RelativeLayout
-                android:layout_weight="1"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
                 <TextView
-                    tools:text="45"
                     android:id="@+id/flightHours"
-                    android:textSize="20sp"
-                    android:textColor="@color/mdtp_dark_gray"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
                     android:drawablePadding="6dp"
                     android:drawableStart="@drawable/ic_flight_time"
-                    android:layout_centerHorizontal="true"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:textColor="@color/mdtp_dark_gray"
+                    android:textSize="20sp"
+                    tools:text="45" />
+
                 <TextView
-                    android:text="часов в полете"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_below="@+id/flightHours"
                     android:layout_centerHorizontal="true"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:text="часов в полете" />
             </RelativeLayout>
 
             <!-- FliflightHoursours -->
             <RelativeLayout
-                android:layout_weight="1"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
                 <TextView
-                    tools:text="1480"
                     android:id="@+id/flightDistance"
-                    android:textSize="20sp"
-                    android:textColor="@color/mdtp_dark_gray"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
                     android:drawablePadding="6dp"
                     android:drawableStart="@drawable/ic_flight_distance"
-                    android:layout_centerHorizontal="true"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:textColor="@color/mdtp_dark_gray"
+                    android:textSize="20sp"
+                    tools:text="1480" />
+
                 <TextView
-                    android:text="км над землей"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_below="@+id/flightDistance"
                     android:layout_centerHorizontal="true"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:text="км над землей" />
             </RelativeLayout>
         </LinearLayout>
 
         <include
-            android:id="@+id/add_new_trip"
-            layout="@layout/profile_add_trip"
-            android:visibility="visible"
-            tools:visibility="visible" />
-
-        <include
             android:id="@+id/direction"
-            layout="@layout/profile_direction"
-            android:visibility="gone"
+            layout="@layout/profilte_user_direction"
+            android:visibility="visible"
             tools:visibility="visible" />
 
         <LinearLayout
@@ -241,7 +246,7 @@
             android:layout_height="150dp"
             android:layout_below="@+id/direction"
             android:orientation="vertical"
-            android:visibility="gone"
+            android:visibility="visible"
             tools:visibility="visible">
 
             <com.google.android.gms.maps.MapView
@@ -261,70 +266,74 @@
             android:layout_marginStart="@dimen/margin_left_profile"
             android:layout_marginTop="24dp"
             android:orientation="vertical"
-            android:visibility="gone"
+            android:visibility="visible"
             tools:visibility="visible">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_toStartOf="@+id/travelWayImagesContainer"
+                android:fontFamily="sans-serif-medium"
                 android:text="@string/method_move"
                 android:textSize="16sp" />
 
             <LinearLayout
                 android:id="@+id/travelWayImagesContainer"
-                android:orientation="horizontal"
-                android:layout_alignParentEnd="true"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:orientation="horizontal">
+
                 <ImageView
-                    tools:ignore="ContentDescription"
                     android:id="@+id/directions_car"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="6dp"
                     android:layout_marginStart="6dp"
-                    android:src="@drawable/ic_directions_car_grey"
+                    android:src="@drawable/ic_directions_car"
                     android:visibility="gone"
-                    tools:src="@drawable/ic_directions_car" />
+                    tools:ignore="ContentDescription" />
+
                 <ImageView
-                    tools:ignore="ContentDescription"
                     android:id="@+id/directions_railway"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="6dp"
                     android:layout_marginStart="6dp"
-                    android:src="@drawable/ic_directions_railway_grey"
-                    tools:src="@drawable/ic_directions_railway" />
-                <ImageView
+                    android:src="@drawable/ic_directions_railway"
+                    android:visibility="gone"
                     tools:ignore="ContentDescription"
+                    tools:visibility="visible" />
+
+                <ImageView
                     android:id="@+id/directions_bus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="6dp"
                     android:layout_marginStart="6dp"
-                    android:src="@drawable/ic_directions_bus_grey"
+                    android:src="@drawable/ic_directions_bus"
                     android:visibility="gone"
-                    tools:src="@drawable/ic_directions_bus" />
+                    tools:ignore="ContentDescription" />
+
                 <ImageView
-                    tools:ignore="ContentDescription"
                     android:id="@+id/directions_flight"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
                     android:layout_marginEnd="6dp"
                     android:layout_marginStart="6dp"
-                    android:src="@drawable/ic_flight_grey"
-                    tools:src="@drawable/ic_flight" />
-                <ImageView
-                    tools:ignore="ContentDescription"
-                    android:id="@+id/csIcon1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="6dp"
-                    android:layout_marginStart="6dp"
-                    android:src="@drawable/ic_directions_hitchhiking_grey"
+                    android:src="@drawable/ic_flight"
                     android:visibility="gone"
-                    tools:src="@drawable/ic_directions_hitchhiking" />
+                    tools:ignore="ContentDescription" />
+
+                <ImageView
+                    android:id="@+id/direction_hitchiking"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="6dp"
+                    android:layout_marginStart="6dp"
+                    android:src="@drawable/ic_directions_hitchhiking"
+                    android:visibility="gone"
+                    tools:ignore="ContentDescription" />
 
             </LinearLayout>
         </RelativeLayout>
@@ -339,55 +348,60 @@
             android:layout_marginTop="24dp"
             android:gravity="center_vertical"
             android:orientation="vertical"
-            android:visibility="gone"
+            android:visibility="visible"
             tools:visibility="visible">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_toStartOf="@+id/travelBudget"
+                android:layout_toStartOf="@+id/displayPriceTravel"
+                android:fontFamily="sans-serif-medium"
                 android:text="@string/money"
                 android:textSize="16sp" />
 
             <TextView
-                tools:text="8000"
-                android:id="@+id/travelBudget"
-                android:layout_alignParentEnd="true"
-                android:drawableStart="@drawable/ic_ruble_blue"
-                android:drawablePadding="4dp"
-                android:textColor="@color/colorPrimary"
+                android:id="@+id/displayPriceTravel"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:drawablePadding="4dp"
+                android:drawableStart="@drawable/ic_ruble_blue"
+                android:textColor="@color/colorPrimary"
+                android:textSize="@dimen/standard_text_size"
+                tools:text="8000" />
 
         </RelativeLayout>
 
         <RelativeLayout
-            android:id="@+id/descriptionprofile"
+            android:id="@+id/descriptionProfile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/moneyForTrip"
+            android:layout_marginBottom="@dimen/margin_left_profile"
             android:layout_marginEnd="@dimen/margin_left_profile"
             android:layout_marginStart="@dimen/margin_left_profile"
-            android:layout_marginBottom="@dimen/margin_left_profile"
             android:layout_marginTop="24dp"
             android:orientation="vertical"
-            android:visibility="gone"
+            android:visibility="visible"
             tools:visibility="visible">
 
             <ImageView
                 android:id="@+id/imageQuoteDescription"
-                android:scaleType="center"
-                android:src="@drawable/ic_quote"
-                android:contentDescription="@null"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:contentDescription="@null"
+                android:scaleType="center"
+                android:src="@drawable/ic_quote" />
 
             <TextView
-                tools:text="Собираюсь провести отпуск в Ижевске. Шутка))) Еду в Карловы Вары"
-                android:layout_toEndOf="@+id/imageQuoteDescription"
-                android:layout_below="@+id/imageQuoteDescription"
+                android:id="@+id/add_info_user"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/imageQuoteDescription"
+                android:layout_toEndOf="@+id/imageQuoteDescription"
+                android:textColor="@color/black"
+                android:textSize="@dimen/standard_text_size"
+                tools:text="Собираюсь провести отпуск в Ижевске. Шутка))) Еду в Карловы Вары" />
         </RelativeLayout>
     </RelativeLayout>
 

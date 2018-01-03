@@ -1,5 +1,6 @@
 package ru.a1024bits.bytheway.ui.fragments
 
+import android.app.SearchManager
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
@@ -60,6 +61,8 @@ import ru.a1024bits.bytheway.util.Constants.START_DATE
 import ru.a1024bits.bytheway.util.toJsonString
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import ru.terrakok.cicerone.commands.Replace
+import uk.co.deanwild.materialshowcaseview.IShowcaseListener
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -154,18 +157,42 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-
         App.component.inject(this)
         glide = Glide.with(this)
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
 
         viewModel?.user?.observe(this, Observer<User> { user ->
-            if (user != null) fillProfile(user)
+            if (user != null) {
+                fillProfile(user)
+                mListener?.onFragmentInteraction(user)
+            }
         })
         viewModel?.load(uid)
     }
 
+    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        if ((activity as MenuActivity).preferences.getBoolean("isFirstEnterMyProfileFragment", true)) {
+            MaterialShowcaseView.Builder(activity)
+                    .setTarget(new_trip_text)
+                    .renderOverNavigationBar()
+                    .setDismissText(getString(R.string.close_hint))
+                    .setTitleText(getString(R.string.hint_create_travel))
+                    .setContentText(getString(R.string.hint_create_travel_description))
+                    .withCircleShape()
+                    .setListener(object : IShowcaseListener {
+                        override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {
+                        }
+
+                        override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
+                            if (activity != null && !activity.isDestroyed)
+                                (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterMyProfileFragment", false).apply()
+                        }
+                    })
+                    .show()
+        }
+    }
 
     private fun fillProfile(user: User) {
         val navigationView = activity.findViewById<NavigationView>(R.id.nav_view)
@@ -401,6 +428,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     private fun showBlockAddTrip() {
         add_new_trip.visibility = View.VISIBLE
+        grayLine.visibility = View.INVISIBLE
     }
     override fun onResume() {
         super.onResume()
@@ -409,6 +437,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     override fun onMapReady(map: GoogleMap?) {
         this.googleMap = map
     }
+
 
     private fun setMarkers(position: Int) {
         googleMap?.clear()
@@ -433,6 +462,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             markerPositionFinal = coordTo
             markerPositionStart = coordFrom
         }
+
         val midPointLat = (coordFrom.latitude + coordTo.latitude) / 2
         val midPointLong = (coordFrom.longitude + coordTo.longitude) / 2
         val blueMarker = BitmapDescriptorFactory.fromResource(R.drawable.pin_blue)
@@ -462,12 +492,15 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         val options = PolylineOptions()
         options.color(orangeColor)
         options.width(5f)
+
         if (routeString != "") {
             polyPts = PolyUtil.decode(routeString)
+
             for (pts in polyPts) {
                 options.add(pts)
             }
         }
+
         googleMap?.addPolyline(options)
     }
 
@@ -484,6 +517,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         else if (begin.latitude < end.latitude && begin.longitude >= end.longitude)
             return (90 - Math.toDegrees(Math.atan(lng / lat)) + 270).toFloat()
         return -1f
+
     }
 
     private var googleMap: GoogleMap? = null
@@ -500,6 +534,13 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             e.printStackTrace()
         }
         mapView?.getMapAsync(this)
+
+        val scroll = view?.findViewById(R.id.scrollProfile) as ScrollView;
+        scroll.descendantFocusability = ViewGroup.FOCUS_BEFORE_DESCENDANTS
+        scroll.setFocusable(true)
+        scroll.setFocusableInTouchMode(true)
+
+
         return view
     }
 
@@ -519,8 +560,10 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         try {
             val typeFilter = AutocompleteFilter.Builder()
                     .setTypeFilter(AutocompleteFilter.TYPE_FILTER_CITIES)
+                    .setTypeFilter(AutocompleteFilter.TYPE_FILTER_REGIONS)
                     .build()
             val intent = PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY).setFilter(typeFilter).build(activity)
+
             startActivityForResult(intent, code)
         } catch (e: GooglePlayServicesRepairableException) {
             e.printStackTrace()
@@ -530,8 +573,8 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     }
 
     private fun openDateDialog() {
-        dateDialog.setStartTitle("НАЧАЛО")
-        dateDialog.setEndTitle("КОНЕЦ")
+        dateDialog.setStartTitle(resources.getString(R.string.date_start))
+        dateDialog.setEndTitle(resources.getString(R.string.date_end))
         dateDialog.accentColor = resources.getColor(R.color.colorPrimary)
         dateDialog.show(activity.fragmentManager, "")
     }
@@ -590,6 +633,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     private fun hideBlockNewTrip() {
         add_new_trip.visibility = View.GONE
+        grayLine.visibility = View.VISIBLE
     }
 
     private fun openInformationEditDialog() {
@@ -642,24 +686,25 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                 Log.e("LOG", "Nothing 2")
             }
         }
-
-
         simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Сохранить", { dialogInterface, i ->
             sex = if (man.isChecked) 1 else if (woman.isChecked) 2 else 0
             fillAgeSex(age, sex)
             name = (nameChoose.text.toString()).capitalize()
             lastName = (lastNameChoose.text.toString()).capitalize()
             city = (cityChoose.text.toString()).capitalize()
+
             username.text = StringBuilder(name).append(" ").append(lastName)
             cityview.text = if (city.isNotEmpty()) city else getString(R.string.native_city)
             viewModel?.sendUserData(getHashMapUser(), uid)
 
 
+
+            savingUserData(name, lastName, city)
+
         })
         simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, "Отмена", { dialogInterface, i ->
             simpleAlert.hide()
         })
-
 
         var enterCounter = 0
         nameChoose.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
@@ -672,7 +717,9 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         })
 
         lastNameChoose.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
+
             if (keyCode == KeyEvent.KEYCODE_ENTER) {
+
                 if (enterCounter == 0) {
                     cityChoose.requestFocus()
                     enterCounter = 1
@@ -683,10 +730,12 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         })
 
         cityChoose.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
+
             if (keyCode == KeyEvent.KEYCODE_ENTER) {
                 if (enterCounter == 0) {
                     val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                     imm.hideSoftInputFromWindow(cityChoose.windowToken, 0)
+
                 } else enterCounter = 0
                 return@OnKeyListener true
             }
@@ -696,10 +745,16 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     }
 
 
+    private fun savingUserData(name: String, lastName: String, city: String) {
+        username.text = StringBuilder(name).append(" ").append(lastName)
+        cityview.text = if (city.isNotEmpty()) city else getString(R.string.native_city)
+        viewModel?.sendUserData(getHashMapUser(), uid)
+    }
+
     private fun openDialog(socialNetwork: SocialNetwork, errorText: String? = null) {
         var simpleAlert = AlertDialog.Builder(activity).create()
         simpleAlert.setTitle("Ссылки на социальные сети")
-        simpleAlert.setMessage("Здесь вы можете указать ваши контактные данные для того что бы вас смогли найти другие путешественики")
+        simpleAlert.setMessage(getString(R.string.social_text))
         val inflater = this.layoutInflater
         val dialogView = inflater.inflate(R.layout.custom_dialog_profile_soc_network, null)
         simpleAlert.setView(dialogView)
@@ -808,10 +863,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             SocialNetwork.WHATSAPP -> whatsAppIcon.setImageResource(R.drawable.ic_whats_icon_grey)
             SocialNetwork.TG -> tgIcon.setImageResource(R.drawable.tg_grey)
         }
-    }
-
-    fun onButtonPressed() {
-        mListener?.onFragmentInteraction()
     }
 
     override fun onAttach(context: Context?) {
@@ -946,7 +997,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         }
         add_info_user.afterTextChanged({
             profileStateHashMap.set("addInformation", it)
-            profileChanged()
+            profileChanged(null, false)
         })
         textCityFrom.setOnClickListener {
             sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM)
@@ -962,7 +1013,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             openAlertDialog(this::removeTrip)
         }
 
-        mapView.onStart()
+        // mapView.onStart()
     }
 
     private fun removeTrip() {
@@ -1024,7 +1075,11 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         oldProfileState = profileStateHashMap.hashCode()
     }
 
-    fun profileChanged(force: Boolean? = null) {
+    fun profileChanged(force: Boolean? = null, removeFocus: Boolean? = true) {
+
+        if (removeFocus == true) {
+            add_info_user.clearFocus()
+        }
         if (countTrip == 1) {
             val changed: Boolean = if (force != null) force
             else profileStateHashMap.hashCode() != oldProfileState

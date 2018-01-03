@@ -20,6 +20,7 @@ class SimilarTravelsFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setRetainInstance(true);
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -39,10 +40,6 @@ class SimilarTravelsFragment : Fragment() {
         showUsersAdapter = SimilarTravelsAdapter(this.context)
         recyclerView.adapter = showUsersAdapter
         if (listUser != null) {
-            val random = Random()
-            for (user in listUser!!) {
-                user.percentsSimilarTravel = random.nextInt(100)
-            }
             if (listUser?.isNotEmpty() == true) {
                 block_empty_users.visibility = View.GONE
                 showUsersAdapter.addItems(listUser ?: arrayListOf())

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:android.support.design="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -14,13 +15,13 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_marginStart="34dp"
-        android:layout_marginTop="6dp"
         android:layout_toEndOf="@+id/startMarkerView"
         android:layout_toStartOf="@+id/swap_cities"
         android:background="@drawable/textlines"
         android:hint="@string/city_start"
         android:paddingBottom="8dp"
         android:paddingTop="16dp"
+        android:saveEnabled="true"
         android:textColor="@color/mdtp_dark_gray"
         android:textSize="16sp" />
 
@@ -50,6 +51,7 @@
         android:hint="@string/city_end"
         android:paddingBottom="8dp"
         android:paddingTop="16dp"
+        android:saveEnabled="true"
         android:textColor="@color/mdtp_dark_gray"
         android:textSize="16sp" />
 
@@ -68,6 +70,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/text_to_city"
+        android:layout_marginTop="8dp"
         android:orientation="vertical">
 
         <!-- Budget -->
@@ -79,7 +82,8 @@
                 android:id="@+id/dateTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="22dp"
+                android:layout_marginTop="40dp"
+                android:fontFamily="sans-serif-medium"
                 android:text="@string/date"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/midGrey"
@@ -90,20 +94,20 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignStart="@+id/budgetFromLayout"
-                android:layout_marginTop="18dp"
-                android:drawableStart="@android:drawable/ic_menu_my_calendar"
+                android:layout_marginTop="40dp"
                 android:gravity="center_vertical"
-                android:text="-" />
+                android:text="с   ___________" />
 
             <TextView
                 android:id="@+id/dateToValue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignStart="@+id/budgetToLayout"
-                android:layout_marginTop="18dp"
-                android:drawableStart="@android:drawable/ic_menu_my_calendar"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="40dp"
                 android:gravity="center_vertical"
-                android:text="-" />
+                android:text="по   ___________" />
 
             <TextView
                 android:id="@+id/budgetTitle"
@@ -111,6 +115,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/dateTitle"
                 android:layout_marginTop="30dp"
+                android:fontFamily="sans-serif-medium"
                 android:text="@string/budgetName"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/midGrey"
@@ -121,14 +126,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/dateFromValue"
-                android:layout_marginEnd="25dp"
-                android:layout_toStartOf="@+id/budgetToLayout">
+                android:layout_marginEnd="5dp"
+                android:layout_marginTop="10dp"
+                android:layout_toStartOf="@+id/budgetToLayout"
+                android.support.design:hintAnimationEnabled="true"
+                android.support.design:hintEnabled="true">
 
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/budgetFromValue"
-                    android:layout_width="105dp"
+                    android:layout_width="115dp"
                     android:layout_height="wrap_content"
-                    android:hint="@string/from"
                     android:imeOptions="actionNext"
                     android:inputType="number"
                     android:maxEms="4"
@@ -140,7 +147,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:layout_below="@+id/dateToValue">
+                android:layout_below="@+id/dateToValue"
+                android:visibility="invisible"
+                android.support.design:hintAnimationEnabled="true"
+                android.support.design:hintEnabled="true">
 
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/budgetToValue"
@@ -158,7 +168,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="26dp"
+            android:layout_marginTop="16dp"
             android:gravity="bottom"
             android:orientation="horizontal">
             <!-- Car -->

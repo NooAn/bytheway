@@ -3,7 +3,7 @@ package ru.a1024bits.bytheway.ui.activity
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
-import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.app.Fragment
@@ -46,11 +46,11 @@ import ru.a1024bits.bytheway.router.Screens.Companion.MY_PROFILE_SCREEN
 import ru.a1024bits.bytheway.router.Screens.Companion.SEARCH_MAP_SCREEN
 import ru.a1024bits.bytheway.router.Screens.Companion.SIMILAR_TRAVELS_SCREEN
 import ru.a1024bits.bytheway.router.Screens.Companion.USER_SINHRONIZED_SCREEN
+import ru.a1024bits.bytheway.ui.dialogs.FeedbackDialog
 import ru.a1024bits.bytheway.ui.fragments.*
 import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.util.ServiceGenerator
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
-import ru.a1024bits.bytheway.viewmodel.ViewModelFeedback
 import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.Router
 import ru.terrakok.cicerone.android.SupportFragmentNavigator
@@ -64,7 +64,7 @@ class MenuActivity : AppCompatActivity(),
         OnFragmentInteractionListener,
         GoogleApiClient.OnConnectionFailedListener {
 
-    private val preferences by lazy { getSharedPreferences(Constants.APP_PREFERENCES, Context.MODE_PRIVATE) }
+    val preferences: SharedPreferences by lazy { getSharedPreferences(Constants.APP_PREFERENCES, Context.MODE_PRIVATE) }
 
     private var mGoogleApiClient: GoogleApiClient? = null
 
@@ -88,7 +88,6 @@ class MenuActivity : AppCompatActivity(),
     var profileChanged: Boolean? = false
 
     private var viewModel: MyProfileViewModel? = null
-    private var viewModelFeedback: ViewModelFeedback? = null
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -99,12 +98,9 @@ class MenuActivity : AppCompatActivity(),
 
         setContentView(R.layout.activity_menu)
 
-
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
-
         val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
-
         val toggle = ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.optionSearch, R.string.remove)
         drawer.addDrawerListener(toggle)
@@ -113,6 +109,9 @@ class MenuActivity : AppCompatActivity(),
         val navigationView = findViewById<NavigationView>(R.id.nav_view)
         navigationView.setNavigationItemSelectedListener(this)
         val hView = navigationView.getHeaderView(0)
+        hView.setOnClickListener {
+            openProfile()
+        }
         val cityName = hView.findViewById<TextView>(R.id.menu_city_name)
         val image = hView.findViewById<ImageView>(R.id.menu_image_avatar)
 
@@ -120,13 +119,14 @@ class MenuActivity : AppCompatActivity(),
                 ?.apply(RequestOptions.circleCropTransform())
                 ?.into(image)
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
+
         if (savedInstanceState == null) {
             if (preferences.getBoolean(Constants.FIRST_ENTER, true)) {
                 navigator.applyCommand(Replace(Screens.USER_SINHRONIZED_SCREEN, 1))
                 markFirstEnter()
             } else {
                 if (intent.data != null && intent.data.host.contains("appintheair", true)) {
-                    viewModel?.load(FirebaseAuth.getInstance().currentUser?.uid.toString())
+                    // viewModel?.load(FirebaseAuth.getInstance().currentUser?.uid.toString())
                     navigator.applyCommand(Replace(Screens.AIR_SUCCES_SCREEN, 1))
                 } else {
                     navigator.applyCommand(Replace(Screens.MY_PROFILE_SCREEN, 1))
@@ -134,6 +134,7 @@ class MenuActivity : AppCompatActivity(),
             }
         } else {
             screenNames = savedInstanceState.getSerializable(STATE_SCREEN_NAMES) as ArrayList<String>
+            Log.e("LOGGER", "hash code ${viewModel?.hashCode()}")
         }
 
         mGoogleApiClient = GoogleApiClient.Builder(this)
@@ -142,15 +143,20 @@ class MenuActivity : AppCompatActivity(),
                 .enableAutoManage(this, this)
                 .build()
 
-
         sing_out.setOnClickListener {
             openAwayFromProfileDialog({
                 preferences.edit().putBoolean(Constants.FIRST_ENTER, true).apply()
+                Log.d("tag", "FIRST_ENTERsign_iut: " + preferences.getBoolean(Constants.FIRST_ENTER, true))
                 FirebaseAuth.getInstance().signOut()
                 finishAffinity()
             })
         }
         feedback.setOnClickListener { openDialogFeedback() }
+    }
+
+    private fun openProfile() {
+        navigator.applyCommand(Replace(Screens.MY_PROFILE_SCREEN, 1))
+        close()
     }
 
     private fun markFirstEnter() = preferences.edit()
@@ -170,7 +176,7 @@ class MenuActivity : AppCompatActivity(),
 
                     MY_PROFILE_SCREEN -> return MyProfileFragment()
 
-                    SEARCH_MAP_SCREEN -> return MapFragment()
+                    SEARCH_MAP_SCREEN -> return MapFragment.newInstance(mainUser)
 
                     AIR_SUCCES_SCREEN -> {
                         var name: String = ""
@@ -189,7 +195,7 @@ class MenuActivity : AppCompatActivity(),
                     SIMILAR_TRAVELS_SCREEN -> {
                         SimilarTravelsFragment.newInstance(data as List<User>)
                     }
-                    else -> return SearchFragment()
+                    else -> return MapFragment()
                 }
         }
 
@@ -235,11 +241,13 @@ class MenuActivity : AppCompatActivity(),
         outState?.putSerializable(STATE_SCREEN_NAMES, screenNames as java.io.Serializable)
     }
 
-    override fun onFragmentInteraction() {}
-
-
+    override fun onFragmentInteraction(user: User?) {
+        mainUser = user
+    }
+    
     override fun onResume() {
         super.onResume()
+        Log.e("LOG", "onResume")
         // the intent filter defined in AndroidManifest will handle the return from ACTION_VIEW intent
         val uri = intent.data
         if (uri != null && uri.toString().startsWith(redirectUri)) {
@@ -308,14 +316,26 @@ class MenuActivity : AppCompatActivity(),
     fun getRefreshToken(): String = preferences.getString(Constants.REFRESH_TOKEN, "")
 
     override fun onBackPressed() {
-        // router.backTo(Screens.MY_PROFILE_SCREEN);
-        navigator.applyCommand(BackTo(Screens.MY_PROFILE_SCREEN))
+        navigator.applyCommand(Back())
         Log.e("LOG", "on back tap")
     }
 
     override fun onPause() {
         super.onPause()
         navigatorHolder.removeNavigator()
+        Log.e("LOG", "onPause")
+
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.e("LOG", "onStop")
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        Log.e("LOG", "onRestart")
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -336,10 +356,14 @@ class MenuActivity : AppCompatActivity(),
                 R.id.search_item -> navigator.applyCommand(Forward(Screens.SEARCH_MAP_SCREEN, 1))
                 R.id.all_users_item -> navigator.applyCommand(Forward(Screens.ALL_USERS_SCREEN, 1))
             }
-            val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
-            drawer.closeDrawer(GravityCompat.START)
+            close()
             return true
         }
+    }
+
+    private fun close() {
+        val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
+        drawer.closeDrawer(GravityCompat.START)
     }
 
     private fun openAwayFromProfileDialog(callback: () -> Unit) {
@@ -358,7 +382,6 @@ class MenuActivity : AppCompatActivity(),
                 Toast.makeText(this, resources.getString(R.string.save_succesfull), Toast.LENGTH_SHORT).show()
                 callback()
             })
-
         })
         simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.no), { dialogInterface, i ->
             Log.e("LOG", " refused")
@@ -368,27 +391,8 @@ class MenuActivity : AppCompatActivity(),
     }
 
     private fun openDialogFeedback() {
-        val simpleAlert = AlertDialog.Builder(this).create()
-        val inflater = this.layoutInflater
-        val dialogView = inflater.inflate(R.layout.custom_dialog_feedback, null)
-        val textMail = dialogView.findViewById<EditText>(R.id.textMailAddress)
-        val textFeedback = dialogView.findViewById<EditText>(R.id.textFeedback)
-
-        simpleAlert.setView(dialogView)
-        textMail.setText(FirebaseAuth.getInstance().currentUser?.email.toString())
-
-        simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, "Отправить", { dialogInterface, i ->
-            val emailIntent = Intent(Intent.ACTION_SEND)
-            emailIntent.setType("message/rfc822")
-            emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, arrayOf("travells2323@gmail.com"))
-            emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Обращение от пользователя")
-            emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, textFeedback.text.toString())
-            this@MenuActivity.startActivity(Intent.createChooser(emailIntent, "Отправка письма. Выберите почтовый клиент"))
-            simpleAlert.hide()
-        })
-        simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, "Отмена", { dialogInterface, i ->
-            simpleAlert.hide()
-        })
-        simpleAlert.show()
+        val dialog = FeedbackDialog(this)
+        dialog.show()
     }
+
 }

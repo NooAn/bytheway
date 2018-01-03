@@ -1,5 +1,6 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scrollProfile"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -26,9 +27,10 @@
                 android:id="@+id/username"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
                 android:textAlignment="center"
+                android:textColor="@color/black"
                 android:textSize="24sp"
-                android:textStyle="bold"
                 tools:text="@string/fullname" />
 
             <TextView
@@ -278,9 +280,9 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:fontFamily="sans-serif-medium"
                 android:text="@string/method_move"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textSize="16sp" />
         </LinearLayout>
         <!-- Travel types -->
         <LinearLayout
@@ -432,9 +434,9 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:fontFamily="sans-serif-medium"
                 android:text="@string/money"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textSize="16sp" />
 
             <SeekBar
                 android:id="@+id/choose_price_travel"
@@ -476,9 +478,9 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:fontFamily="sans-serif-medium"
                 android:text="@string/add_info_profile"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textSize="16sp" />
 
             <EditText
                 android:id="@+id/add_info_user"
@@ -488,7 +490,7 @@
                 android:backgroundTint="@color/colorPrimary"
                 android:hint="@string/description"
                 android:inputType="textMultiLine"
-                android:textSize="14sp" />
+                android:textSize="16sp" />
         </LinearLayout>
 
         <TextView
@@ -501,19 +503,33 @@
             android:layout_marginTop="24dp"
             android:drawablePadding="10dp"
             android:drawableStart="@drawable/app_pic"
+            android:fontFamily="sans-serif-medium"
             android:text="@string/add_new_trip_from_app_in_the_air"
-            android:textStyle="bold"
             android:visibility="gone"
             tools:visibility="visible" />
+
+        <View
+            android:id="@+id/grayLine"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_below="@id/appinTheAirEnter"
+            android:layout_marginEnd="15dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="25dp"
+            android:background="@drawable/back"
+            android:visibility="gone"
+            tools:visibility="invisible" />
 
         <Button
             android:id="@+id/button_save_travel_info"
             android:layout_width="150dp"
             android:layout_height="match_parent"
-            android:layout_alignEnd="@+id/appinTheAirEnter"
+            android:layout_alignEnd="@+id/grayLine"
             android:layout_alignParentBottom="true"
+            android:fontFamily="sans-serif-medium"
             android:padding="24dp"
             android:text="@string/save"
+            android:textSize="16sp"
             android:theme="@style/WhiteButton"
             android:visibility="gone"
             tools:visibility="visible" />
@@ -522,11 +538,12 @@
             android:id="@+id/button_remove_travel_info"
             android:layout_width="150dp"
             android:layout_height="match_parent"
-            android:layout_below="@+id/appinTheAirEnter"
-            android:layout_marginTop="12dp"
+            android:layout_alignTop="@+id/grayLine"
             android:layout_toStartOf="@+id/button_save_travel_info"
+            android:fontFamily="sans-serif-medium"
             android:padding="24dp"
             android:text="@string/remove"
+            android:textSize="16sp"
             android:theme="@style/WhiteButton"
             android:visibility="gone"
             tools:visibility="visible" />

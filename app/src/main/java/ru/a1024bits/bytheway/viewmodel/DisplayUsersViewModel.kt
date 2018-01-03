@@ -5,7 +5,12 @@ import android.arch.lifecycle.ViewModel
 import android.os.AsyncTask
 import android.util.Log
 import com.google.firebase.firestore.QuerySnapshot
-import kotlinx.android.synthetic.main.fragment_search_block.*
+import io.reactivex.CompletableObserver
+import io.reactivex.disposables.Disposable
+import ru.a1024bits.bytheway.App
+import ru.a1024bits.bytheway.ExtensionsAllUsers
+import ru.a1024bits.bytheway.algorithm.SearchTravelers
+import ru.a1024bits.bytheway.model.Response
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.repository.UserRepository
@@ -14,15 +19,21 @@ import javax.inject.Inject
 /**
  * Created by andrey.gusenkov on 25/09/2017.
  */
-class DisplayUsersViewModel @Inject constructor(var userRepository: UserRepository) : ViewModel() {
-
-    var listUser: MutableLiveData<List<User>> = MutableLiveData<List<User>>()
+class DisplayUsersViewModel @Inject constructor(var userRepository: UserRepository) : BaseViewModel() {
     var usersLiveData: MutableLiveData<List<User>> = MutableLiveData<List<User>>()
-    var similarUsersLiveData: MutableLiveData<List<User>> = MutableLiveData<List<User>>()
+    val loadingStatus = MutableLiveData<Boolean>()
+    var response: MutableLiveData<Response<List<User>>> = MutableLiveData()
+    val extension = ExtensionsAllUsers(App.INSTANCE.applicationContext)
+    val filter = Filter()
+
     val TAG = "showUserViewModel"
 
+    init {
+        filter.endAge = extension.yearsOldUsers.size - 1
+    }
+
     fun getAllUsers(filter: Filter) {
-        userRepository.getReallUsers()
+        userRepository.getAllUsers()
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         InstallUsers().execute(task.result, filter, usersLiveData)
@@ -32,44 +43,22 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
 
 
     fun sendUserData(map: HashMap<String, Any>, id: String) {
-        userRepository.changeUserProfile(map, id)
-                .addOnCompleteListener {
-                    //fixme
-                    Log.e("LOG", "${this::class.java.simpleName}: complete user: complete? ${it.isComplete}; successful? ${it.isSuccessful}")
-                }
-                .addOnFailureListener {
-                    Log.e("LOG", "${this::class.java.simpleName}: fail user")
-                    //fixme Здесь обработка лоадера и показь пользователю ошибку загрузки ну не здеь а во вью. пример как эт осделать смотри в вью моделаър
-                }
-                .addOnSuccessListener {
-                    Log.e("LOG", "${this::class.java.simpleName}: ok send user")
-                    //fixme
-                }
+        loadingStatus.setValue(true)
+        //fixme
+        userRepository.changeUserProfile(map, id).subscribe()
     }
 
-    fun getUsersWithSimilarTravel(fromCity: String, toCity: String) {
-        userRepository.getReallUsers()
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        val result: MutableList<User> = ArrayList()
-                        for (document in task.result) {
-                            try {
-                                Log.d(TAG, document.id + " => " + document.data)
-                                val user = document.toObject(User::class.java)
-                                /*
-                                This filter;
-                                if user hasn't citi then I don't show him
-                                 */
-                                if (user.cities.size > 0 && user.cities.containsValue(fromCity) && user.cities.containsValue(toCity))
-                                    result.add(user)
-                            } catch (e: Exception) {
-                            }
-                        }
-                        similarUsersLiveData.setValue(result)
-                    } else {
-                        Log.w(TAG, "Error getting documents.", task.exception)
-                    }
-                }
+    fun getUsersWithSimilarTravel(paramSearch: Filter) {
+        loadingStatus.setValue(true)
+        disposables.add(userRepository.getReallUsers(paramSearch)
+                .subscribeOn(getBackgroundScheduler())
+                .observeOn(getMainThreadScheduler())
+                .doAfterTerminate({ loadingStatus.setValue(false) })
+                .subscribe(
+                        { list -> response.setValue(Response.success(list)) },
+                        { throwable -> response.setValue(Response.error(throwable)) }
+                )
+        )
     }
 
     class InstallUsers : AsyncTask<Any, Void, Array<Any>>() {

@@ -22,6 +22,7 @@
         android:background="@color/white"
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/nav_header_main"
+        app:itemTextColor="@color/all_level"
         app:menu="@menu/activity_main_drawer">
 
         <LinearLayout
@@ -39,10 +40,12 @@
                 android:drawablePadding="30dp"
                 android:drawableStart="@drawable/ic_feedback"
                 android:gravity="center_vertical|start"
-                android:paddingStart="16dp"
+                android:paddingStart="25dp"
                 android:stateListAnimator="@null"
                 android:text="@string/feedback"
-                android:textAllCaps="false" />
+                android:textAllCaps="false"
+                android:textColor="@color/all_level"
+                android:textColorHint="@color/all_level" />
 
             <Button
                 android:id="@+id/sing_out"
@@ -50,12 +53,13 @@
                 android:layout_height="wrap_content"
                 android:background="@color/white"
                 android:drawablePadding="30dp"
+                android:paddingStart="25dp"
                 android:drawableStart="@drawable/ic_exit_to_app"
                 android:gravity="center_vertical|start"
-                android:paddingStart="16dp"
                 android:stateListAnimator="@null"
                 android:text="@string/exit"
-                android:textAllCaps="false" />
+                android:textAllCaps="false"
+                android:textColor="@color/all_level" />
 
         </LinearLayout>
     </android.support.design.widget.NavigationView>
