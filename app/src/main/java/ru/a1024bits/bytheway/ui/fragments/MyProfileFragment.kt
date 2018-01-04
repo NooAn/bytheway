@@ -49,6 +49,7 @@ import ru.a1024bits.bytheway.model.map_directions.RoutesList
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
+import ru.a1024bits.bytheway.model.Response as ResponseBtw
 import ru.a1024bits.bytheway.util.Constants.END_DATE
 import ru.a1024bits.bytheway.util.Constants.FIRST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
@@ -158,7 +159,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
 
-        viewModel?.response?.observe(this, Observer<Response<User>> { response ->
+        viewModel?.response?.observe(this, Observer<ResponseBtw<User>> { response ->
             when (response?.status) {
                 Status.SUCCESS -> {
                     if (response.data != null) {
@@ -615,7 +616,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             return
         }
         if (viewModel?.saveProfile?.hasObservers() == false) {
-            viewModel?.saveProfile?.observe(this, Observer<Response<Boolean>> { response ->
+            viewModel?.saveProfile?.observe(this, Observer<ResponseBtw<Boolean>> { response ->
                 when (response?.status) {
                     Status.SUCCESS -> {
                         if (response.data == true) {
