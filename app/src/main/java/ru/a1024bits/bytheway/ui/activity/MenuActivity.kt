@@ -3,6 +3,7 @@ package ru.a1024bits.bytheway.ui.activity
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.support.design.widget.NavigationView
@@ -34,10 +35,7 @@ import retrofit2.Response
 import ru.a1024bits.bytheway.AirWebService
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
-import ru.a1024bits.bytheway.model.AccessToken
-import ru.a1024bits.bytheway.model.AirUser
-import ru.a1024bits.bytheway.model.Fligths
-import ru.a1024bits.bytheway.model.User
+import ru.a1024bits.bytheway.model.*
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.router.Screens.Companion.AIR_SUCCES_SCREEN
@@ -49,6 +47,7 @@ import ru.a1024bits.bytheway.router.Screens.Companion.USER_SINHRONIZED_SCREEN
 import ru.a1024bits.bytheway.ui.dialogs.FeedbackDialog
 import ru.a1024bits.bytheway.ui.fragments.*
 import ru.a1024bits.bytheway.util.Constants
+import ru.a1024bits.bytheway.util.ProgressCustom
 import ru.a1024bits.bytheway.util.ServiceGenerator
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import ru.terrakok.cicerone.NavigatorHolder
@@ -67,6 +66,7 @@ class MenuActivity : AppCompatActivity(),
     val preferences: SharedPreferences by lazy { getSharedPreferences(Constants.APP_PREFERENCES, Context.MODE_PRIVATE) }
 
     private var mGoogleApiClient: GoogleApiClient? = null
+    public var pLoader: ProgressCustom? = null
 
     override fun onSetPoint(l: LatLng, pos: Int) {
         val mapFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as MapFragment
@@ -94,6 +94,9 @@ class MenuActivity : AppCompatActivity(),
         super.onCreate(savedInstanceState)
         App.component.inject(this)
         glide = Glide.with(this)
+        if (FirebaseAuth.getInstance().currentUser == null) {
+            startActivity(Intent(this, RegistrationActivity::class.java))
+        }
         FirebaseFirestore.setLoggingEnabled(true)
 
         setContentView(R.layout.activity_menu)
@@ -112,7 +115,6 @@ class MenuActivity : AppCompatActivity(),
         hView.setOnClickListener {
             openProfile()
         }
-        val cityName = hView.findViewById<TextView>(R.id.menu_city_name)
         val image = hView.findViewById<ImageView>(R.id.menu_image_avatar)
 
         glide?.load(FirebaseAuth.getInstance().currentUser?.photoUrl)
@@ -152,6 +154,7 @@ class MenuActivity : AppCompatActivity(),
             })
         }
         feedback.setOnClickListener { openDialogFeedback() }
+        pLoader = this.findViewById(R.id.pLoaderRes) as ProgressCustom
     }
 
     private fun openProfile() {
@@ -244,7 +247,7 @@ class MenuActivity : AppCompatActivity(),
     override fun onFragmentInteraction(user: User?) {
         mainUser = user
     }
-    
+
     override fun onResume() {
         super.onResume()
         Log.e("LOG", "onResume")
@@ -335,7 +338,6 @@ class MenuActivity : AppCompatActivity(),
     override fun onRestart() {
         super.onRestart()
         Log.e("LOG", "onRestart")
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -378,16 +380,34 @@ class MenuActivity : AppCompatActivity(),
         dialogView.textMessage.text = getString(R.string.text_away_from_profile)
         simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.yes), { dialogInterface, i ->
             val myProfile = supportFragmentManager.findFragmentById(R.id.fragment_container) as MyProfileFragment
-            viewModel?.sendUserData(myProfile.getHashMapUser(), FirebaseAuth.getInstance().currentUser?.uid.toString(), {
-                Toast.makeText(this, resources.getString(R.string.save_succesfull), Toast.LENGTH_SHORT).show()
-                callback()
+
+            viewModel?.saveProfile?.observe(this, android.arch.lifecycle.Observer<ru.a1024bits.bytheway.model.Response<Boolean>> { response ->
+                when (response?.status) {
+                    Status.SUCCESS -> {
+                        if (response.data == true) {
+                            Toast.makeText(this, resources.getString(R.string.save_succesfull), Toast.LENGTH_SHORT).show()
+                            callback()
+                        } else {
+                            showErrorOnSave()
+                        }
+                    }
+                    Status.ERROR -> {
+                        showErrorOnSave()
+                        Log.e("LOG", "log e:" + response.error)
+                    }
+                }
             })
+            viewModel?.sendUserData(myProfile.getHashMapUser(), FirebaseAuth.getInstance().currentUser?.uid.toString())
         })
         simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.no), { dialogInterface, i ->
             Log.e("LOG", " refused")
             callback()
         })
         simpleAlert.show()
+    }
+
+    private fun showErrorOnSave() {
+        Toast.makeText(this, getString(R.string.error_update), Toast.LENGTH_SHORT).show()
     }
 
     private fun openDialogFeedback() {

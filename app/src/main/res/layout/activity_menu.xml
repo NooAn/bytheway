@@ -63,4 +63,11 @@
 
         </LinearLayout>
     </android.support.design.widget.NavigationView>
+
+    <ru.a1024bits.bytheway.util.ProgressCustom
+        android:id="@+id/pLoaderRes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
 </android.support.v4.widget.DrawerLayout>

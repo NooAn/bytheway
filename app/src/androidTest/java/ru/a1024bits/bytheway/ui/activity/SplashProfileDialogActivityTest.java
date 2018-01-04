@@ -173,7 +173,7 @@ public class SplashProfileDialogActivityTest {
         textView2.check(matches(withText("Moscow")));
 
         ViewInteraction textView3 = onView(
-                allOf(withId(R.id.sex_and_age), withText("М, 27"),
+                allOf(withId(R.id.sexAndAge), withText("М, 27"),
                         childAtPosition(
                                 allOf(withId(R.id.headerprofile),
                                         childAtPosition(

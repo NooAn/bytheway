@@ -83,13 +83,13 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) : IUsersR
         return store.collection(COLLECTION_USERS).document(user.id).set(user)
     }
 
-    override fun changeUserProfile(map: HashMap<String, Any>, id: String) =
+    override fun changeUserProfile(map: HashMap<String, Any>, id: String):Completable =
             Completable.create { stream ->
                 Log.d("LOG", "change user profile send....")
                 val documentRef = store.collection(COLLECTION_USERS).document(id)
                 store.runTransaction(object : Transaction.Function<Void> {
                     override fun apply(transaction: Transaction): Void? {
-                        map.put("timestamp", FieldValue.serverTimestamp());
+                        map.put("timestamp", FieldValue.serverTimestamp())
                         documentRef.update(map)
                         return null
                     }
@@ -97,7 +97,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) : IUsersR
                     Log.e("LOG", "finish update user profile")
                 }.addOnFailureListener {
                     stream.onError(it)
-                }.addOnSuccessListener {
+                }.addOnSuccessListener { _ ->
                     stream.onComplete()
                 }
             }

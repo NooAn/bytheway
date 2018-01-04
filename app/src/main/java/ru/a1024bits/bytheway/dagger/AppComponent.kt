@@ -6,6 +6,7 @@ import ru.a1024bits.bytheway.ui.activity.RegistrationActivity
 import ru.a1024bits.bytheway.ui.fragments.*
 import ru.a1024bits.bytheway.viewmodel.BaseViewModel
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
+import ru.a1024bits.bytheway.viewmodel.RegistrationViewModel
 import javax.inject.Singleton
 
 /**
@@ -25,6 +26,7 @@ interface AppComponent {
     fun inject(fragment: SimilarTravelsFragment)
     fun inject(mainViewModel: DisplayUsersViewModel)
     fun inject(myProfileFragment: MyProfileFragment)
+    fun inject(fragment: RegistrationViewModel)
     fun inject(fragment: SearchFragment)
     fun inject(registrationActivity: RegistrationActivity)
     fun inject(mapFragment: MapFragment)

@@ -7,6 +7,7 @@ import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.Toast
 import com.google.android.gms.auth.api.Auth
@@ -16,33 +17,36 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.GoogleApiClient
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.android.synthetic.main.activity_registration.*
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
+import ru.a1024bits.bytheway.viewmodel.RegistrationViewModel
 import javax.inject.Inject
 
 
-class RegistrationActivity : LifecycleActivity(), GoogleApiClient.OnConnectionFailedListener {
+class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener {
+
     override fun onConnectionFailed(p0: ConnectionResult) {
 
     }
 
-
-    private var viewModel: MyProfileViewModel? = null
+    private var viewModel: RegistrationViewModel? = null
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
 
     private val RC_SIGN_IN = 9001
-    private val mAuth = FirebaseAuth.getInstance();
+    private val mAuth = FirebaseAuth.getInstance()
     private var mGoogleApiClient: GoogleApiClient? = null
+    lateinit var mFirebaseAnalytics: FirebaseAnalytics
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
         App.component.inject(this)
-
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(resources.getString(R.string.default_web_client_id))
                 .requestId()
@@ -55,9 +59,23 @@ class RegistrationActivity : LifecycleActivity(), GoogleApiClient.OnConnectionFa
                 .build()
 
         Log.e("LOG", mAuth?.currentUser.toString())
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
-        signIn()
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(RegistrationViewModel::class.java)
+        mFirebaseAnalytics.setUserId(mAuth?.currentUser.toString())
+        mFirebaseAnalytics.setCurrentScreen(this, "Registration", this.javaClass.getSimpleName())
+        mFirebaseAnalytics.logEvent("RegistrationScreen_Enter", null)
 
+        viewModel?.load?.observe(this, object : Observer<Boolean> {
+            override fun onChanged(upload: Boolean?) {
+                if (upload == true) {
+                    mFirebaseAnalytics.logEvent("RegistrationScreen_Success", null)
+                    startActivity(Intent(this@RegistrationActivity, MenuActivity::class.java))
+                } else {
+                    mFirebaseAnalytics.logEvent("RegistrationScreen_Error_Checkin", null)
+                    Toast.makeText(this@RegistrationActivity, "Error for registration", Toast.LENGTH_SHORT).show()
+                }
+            }
+        })
+        signIn()
     }
 
     private fun signIn() {
@@ -69,7 +87,7 @@ class RegistrationActivity : LifecycleActivity(), GoogleApiClient.OnConnectionFa
         super.onStart()
     }
 
-//fixme Status{statusCode=NETWORK_ERROR, resolution=null}
+    //fixme Status{statusCode=NETWORK_ERROR, resolution=null}
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
         super.onActivityResult(requestCode, resultCode, data)
         Log.e("LOG", "result activity registration")
@@ -88,7 +106,10 @@ class RegistrationActivity : LifecycleActivity(), GoogleApiClient.OnConnectionFa
         } else {
             // Signed out, show unauthenticated UI.
             if (result.status.statusCode != 200) {
+                mFirebaseAnalytics.logEvent("RegistrationScreen_Error_Not200", null)
                 Log.d("LOG", "Problems with enternet ${result.status.statusCode} and ${result.status.toString()}")
+            } else {
+                mFirebaseAnalytics.logEvent("RegistrationScreen_Error_NotKnow", null)
             }
             updateUI(false)
         }
@@ -110,27 +131,17 @@ class RegistrationActivity : LifecycleActivity(), GoogleApiClient.OnConnectionFa
                         Log.w("LOG", "signInWithCredential:failure", task.exception)
                         Toast.makeText(this, "Authentication failed.",
                                 Toast.LENGTH_SHORT).show()
+                        mFirebaseAnalytics.logEvent("RegistrationScreen_Error_Login", null)
                     }
                 }
     }
 
     private fun updateUI(signedIn: Boolean) {
         if (signedIn) {
-            Log.e("LOG2", mAuth?.currentUser?.photoUrl.toString())
-            viewModel?.load?.observe(this, object : Observer<Boolean> {
-                override fun onChanged(upload: Boolean?) {
-                    if (upload?.equals(true)!!) {
-                        startActivity(Intent(this@RegistrationActivity, MenuActivity::class.java))
-                    } else {
-                        Toast.makeText(this@RegistrationActivity, "Error for registration", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            })
+            mFirebaseAnalytics.logEvent("RegistrationScreen_Success_Login", null)
             viewModel?.ifUserNotExistThenSave(mAuth.currentUser)
         } else {
             Toast.makeText(this, "Not allowed Google", Toast.LENGTH_SHORT).show()
         }
     }
-
-
 }

@@ -144,7 +144,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
         if (user.budget > 0) {
             displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(user.budget)
         }
-        add_info_user.text = user.addInformation
+        addInfoUser.text = user.addInformation
     }
 
     fun fillAgeSex(userAge: Int, userSex: Int) {
@@ -158,17 +158,17 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
 
         if (userSex != 0) {
             if (userAge > 0) {
-                sex_and_age.text = StringBuilder(gender).append(", ").append(userAge)
+                sexAndAge.text = StringBuilder(gender).append(", ").append(userAge)
             } else {
-                sex_and_age.text = StringBuilder(gender).append(", Возраст ").append(userAge)
+                sexAndAge.text = StringBuilder(gender).append(", Возраст ").append(userAge)
             }
         }
 
         if (userAge > 0) {
             if (userSex != 0) {
-                sex_and_age.text = StringBuilder(gender).append(", ").append(userAge)
+                sexAndAge.text = StringBuilder(gender).append(", ").append(userAge)
             } else {
-                sex_and_age.text = StringBuilder("Пол, ").append(userAge)
+                sexAndAge.text = StringBuilder("Пол, ").append(userAge)
             }
         }
     }
