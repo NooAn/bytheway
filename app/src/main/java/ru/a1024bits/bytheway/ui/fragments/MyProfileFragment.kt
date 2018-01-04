@@ -319,7 +319,9 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     }
 
     fun drawPolyline() {
+
         val blueColor = activity.resources.getColor(R.color.blueRouteLine)
+
         var polyPts: List<LatLng>
         val options = PolylineOptions()
         options.color(blueColor)
@@ -737,6 +739,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
             if (keyCode == KeyEvent.KEYCODE_ENTER) {
                 lastNameChoose.requestFocus()
+
                 return@OnKeyListener true
             }
             false
