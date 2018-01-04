@@ -13,6 +13,8 @@ import android.view.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import com.borax12.materialdaterangepicker.date.DatePickerDialog
+import com.google.firebase.FirebaseApp
+import com.google.firebase.crash.FirebaseCrash
 import kotlinx.android.synthetic.main.fragment_display_all_users.*
 import kotlinx.android.synthetic.main.searching_parameters_block.*
 import ru.a1024bits.bytheway.App
@@ -24,6 +26,7 @@ import ru.a1024bits.bytheway.repository.M_SEX
 import ru.a1024bits.bytheway.repository.W_SEX
 import ru.a1024bits.bytheway.util.DecimalInputFilter
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
+import java.lang.Exception
 import javax.inject.Inject
 
 
@@ -47,26 +50,32 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         App.component.inject(this)
         super.onActivityCreated(savedInstanceState)
-        filter = viewModel!!.filter
 
-        installLogicToUI()
+        try {
+            filter = viewModel!!.filter
 
-        displayUsersAdapter = DisplayAllUsersAdapter(this.context, viewModel!!)
-        displayAllUsers.adapter = displayUsersAdapter
+            installLogicToUI()
 
-        viewModel!!.usersLiveData.observe(this, Observer<List<User>> { list ->
-            Log.e("LOG", "onChanged $list")
-            if (list != null) {
-                if (list.isNotEmpty())
-                    displayUsersAdapter.setItems(list)
-                updateViewsAfterSearch(list.isNotEmpty())
-            }
-        })
-        loadingWhereLoadUsers.visibility = View.VISIBLE
-        viewModel?.getAllUsers(filter)
+            displayUsersAdapter = DisplayAllUsersAdapter(this.context, viewModel!!)
+            displayAllUsers.adapter = displayUsersAdapter
 
-        showPrompt("isFirstEnterAllUsersFragment", context.resources.getString(R.string.close_hint),
-                context.resources.getString(R.string.hint_all_travelers), context.resources.getString(R.string.hint_all_travelers_description))
+            viewModel!!.usersLiveData.observe(this, Observer<List<User>> { list ->
+                Log.e("LOG", "onChanged $list")
+                if (list != null) {
+                    if (list.isNotEmpty())
+                        displayUsersAdapter.setItems(list)
+                    updateViewsAfterSearch(list.isNotEmpty())
+                }
+            })
+            loadingWhereLoadUsers.visibility = View.VISIBLE
+            viewModel?.getAllUsers(filter)
+
+            showPrompt("isFirstEnterAllUsersFragment", context.resources.getString(R.string.close_hint),
+                    context.resources.getString(R.string.hint_all_travelers), context.resources.getString(R.string.hint_all_travelers_description))
+        } catch (e: Throwable) {
+            Log.e("LOG_AUF", e.toString())
+            FirebaseCrash.report(e)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -204,25 +213,6 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
                 block_search_parameters.visibility = View.GONE
             }
         }
-
-//        if ((activity as MenuActivity).preferences.getBoolean("isFirstEnterAllUsersFragment", true))
-//            MaterialShowcaseView.Builder(activity)
-//                    .setTarget(searchParametersText)
-//                    .renderOverNavigationBar()
-//                    .setDismissText(context.resources.getString(R.string.close_hint))
-//                    .setTitleText(context.resources.getString(R.string.hint_all_travelers))
-//                    .setContentText(context.resources.getString(R.string.hint_all_travelers_description))
-//                    .withCircleShape()
-//                    .setListener(object : IShowcaseListener {
-//                        override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {
-//                        }
-//
-//                        override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
-//                            if (activity != null && !activity.isDestroyed)
-//                                (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterAllUsersFragment", false).apply()
-//                        }
-//                    })
-//                    .show()
     }
 
     private fun animationSlide() {
