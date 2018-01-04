@@ -56,7 +56,7 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
     }
 
 
-    fun ifUserNotExistThenSave(currentUser: FirebaseUser?) {
+    fun ifUserNotExistThenSave(currentUser: FirebaseUser?) { // not used.Remove after merg!
         val store = FirebaseFirestore.getInstance()
         val docRef = store.collection(COLLECTION_USERS).document(currentUser?.uid.toString());
         docRef.get().addOnCompleteListener(object : OnCompleteListener<DocumentSnapshot> {

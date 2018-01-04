@@ -15,6 +15,7 @@ import ru.terrakok.cicerone.commands.Replace
 import ru.a1024bits.bytheway.util.ServiceGenerator
 import android.content.Intent
 import android.net.Uri
+import com.google.firebase.analytics.FirebaseAnalytics
 import ru.a1024bits.bytheway.util.API_BASE_URL
 
 
@@ -32,15 +33,21 @@ class AppInTheAirSinchronizedFragment : Fragment() {
         return view;
     }
 
+    lateinit var mFirebaseAnalytics: FirebaseAnalytics
+
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this.context)
+        mFirebaseAnalytics.setCurrentScreen(this.activity, "AppInTheAir_sinch", this.javaClass.simpleName)
 
         button_miss.setOnClickListener {
             //return in menu
+            mFirebaseAnalytics.logEvent("AppInTheAir_sinch_button_miss", null)
             (activity as MenuActivity).navigator.applyCommand(Replace(Screens.MY_PROFILE_SCREEN, 1))
         }
 
         view?.findViewById<View>(R.id.app_in_the_air_link)?.setOnClickListener {
+            mFirebaseAnalytics.logEvent("AppInTheAir_sinch_look_link", null)
             val url = "https://www.appintheair.mobi"
             val i = Intent(Intent.ACTION_VIEW)
             i.data = Uri.parse(url)
@@ -49,6 +56,7 @@ class AppInTheAirSinchronizedFragment : Fragment() {
 
         button_sinch.setOnClickListener {
             //open app_in_the_air
+            mFirebaseAnalytics.logEvent("AppInTheAir_sinch_login", null)
             login()
         }
     }
