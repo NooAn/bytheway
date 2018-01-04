@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
-        tools:context="ru.a1024bits.bytheway.ui.fragments.UserProfileFragment">
+        tools:context="ru.a1024bits.bytheway.ui.fragments.MyProfileFragment">
 
         <include layout="@layout/profile_main_image" />
 

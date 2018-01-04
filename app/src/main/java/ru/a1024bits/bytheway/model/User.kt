@@ -18,7 +18,7 @@ enum class SocialNetwork(var link: String) {
     FB("FB"),
     TG("TG")
 }
-
+class SocialResponse(var link: String = "", var value: String = "")
 /**
  *
  */

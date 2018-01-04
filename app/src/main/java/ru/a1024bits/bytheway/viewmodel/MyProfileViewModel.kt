@@ -14,16 +14,16 @@ import javax.inject.Inject
  * Created by andrey.gusenkov on 25/09/2017.
  */
 class MyProfileViewModel @Inject constructor(var userRepository: UserRepository) : BaseViewModel() {
-    val user: MutableLiveData<User> = MutableLiveData<User>()
-    val load: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
-    val error: MutableLiveData<Int> = MutableLiveData<Int>()
-    var response: MutableLiveData<Response<User>> = MutableLiveData()
+    val user = MutableLiveData<User>()
+    val load = MutableLiveData<Boolean>()
+    val error = MutableLiveData<Int>()
+    var response = MutableLiveData<Response<User>>()
     val loadingStatus = MutableLiveData<Boolean>()
 
-    val saveSocial: MutableLiveData<String> = MutableLiveData()
-    val clearSocial: MutableLiveData<String> = MutableLiveData()
+    val saveSocial = MutableLiveData<SocialResponse>()
+    val clearSocial = MutableLiveData<SocialResponse>()
 
-    val saveProfile: MutableLiveData<Response<Boolean>> = MutableLiveData()
+    val saveProfile = MutableLiveData<Response<Boolean>>()
 
     fun load(userId: String) {
         disposables.add(userRepository.getUser(userId)
