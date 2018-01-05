@@ -12,9 +12,7 @@ import java.util.ArrayList
 import android.view.LayoutInflater
 import android.widget.ImageView
 import android.util.TypedValue
-import android.view.animation.Animation
-import android.view.animation.LinearInterpolator
-import android.view.animation.AlphaAnimation
+import android.view.animation.*
 
 class ProgressCustom : ViewGroup {
     private val mData = ArrayList<ImageView?>()
@@ -90,29 +88,30 @@ class ProgressCustom : ViewGroup {
         mLoadTitle!!.layout(mBoundsHelper.left.toInt() + 50, mBoundsHelper.top.toInt() - 200,
                 centerHorizont + (Tw / 2), mBoundsHelper.bottom.toInt())
 
-        var iconOffset = 50
+        val iconOffset = 110
         for (i in 0 until mData.size) {
-            mData.get(i)!!.layout(mBoundsHelper.left.toInt() - 50,
+            mData.get(i)!!.layout(mBoundsHelper.left.toInt() + (iconOffset * i),
                     mBoundsHelper.top.toInt(),
-                    mBoundsHelper.right.toInt() + iconOffset,
+                    mBoundsHelper.right.toInt(),
                     mBoundsHelper.bottom.toInt())
-            iconOffset += 100
         }
     }
 
     fun startAnimation() {
         var delay = 0L
+        var fromAlpha = 0.0F
+        var toAlpha = 0.1F
 
         for (it in mData) {
             delay += 350L
-            it?.visibility = View.VISIBLE
-            val animation = AlphaAnimation(1f, 0f)
+            val animation = AlphaAnimation(fromAlpha, toAlpha)
             animation.duration = 300
-            animation.interpolator = LinearInterpolator()
-            animation.repeatCount = Animation.INFINITE
-            animation.repeatMode = Animation.REVERSE
-            animation.startOffset = delay
-            it?.startAnimation(animation)
+            animation.fillAfter = true //HERE
+            val mAnimationSet = AnimationSet(true)
+            mAnimationSet.addAnimation(animation)
+            mAnimationSet.startOffset = delay
+            it?.visibility = View.VISIBLE
+            it?.startAnimation(mAnimationSet)
         }
     }
 

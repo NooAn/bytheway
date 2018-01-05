@@ -1,19 +1,27 @@
 package ru.a1024bits.bytheway.viewmodel
 
 import android.arch.lifecycle.MutableLiveData
+import android.arch.lifecycle.ViewModel
+import android.text.Editable
 import android.util.Log
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import io.reactivex.CompletableObserver
+import io.reactivex.disposables.Disposable
+import io.reactivex.functions.Action
 import ru.a1024bits.bytheway.model.*
 import ru.a1024bits.bytheway.repository.COLLECTION_USERS
 import ru.a1024bits.bytheway.repository.UserRepository
+import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.util.Constants.END_DATE
+import ru.a1024bits.bytheway.util.Constants.ERROR
 import ru.a1024bits.bytheway.util.Constants.FIRST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.START_DATE
+import ru.a1024bits.bytheway.util.Constants.SUCCESS
 import javax.inject.Inject
 
 /**
@@ -23,26 +31,22 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
     val user: MutableLiveData<User> = MutableLiveData<User>()
     val load: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
     val error: MutableLiveData<Int> = MutableLiveData<Int>()
-    var response: MutableLiveData<Response<User>> = MutableLiveData()
-    val loadingStatus = MutableLiveData<Boolean>()
-
-    val saveSocial: MutableLiveData<String> = MutableLiveData()
-    val clearSocial: MutableLiveData<String> = MutableLiveData()
-
-    val saveProfile: MutableLiveData<Response<Boolean>> = MutableLiveData()
 
     fun load(userId: String) {
-        disposables.add(userRepository.getUser(userId)
-                .subscribeOn(getBackgroundScheduler())
-                .observeOn(getMainThreadScheduler())
-                .subscribe(
-                        { user -> response.setValue(Response.success(user)) },
-                        { throwable -> response.setValue(Response.error(throwable)) }
-                )
-        )
+        userRepository.getUserById(userId)
+                .addOnFailureListener {
+                    Log.e("LOG", "error ${it.message}")
+                }
+                .addOnSuccessListener { document ->
+                    val profile = document.toObject(User::class.java)
+                    user.setValue(profile)
+                }
     }
 
-    fun saveLinks(arraySocNetwork: HashMap<String, String>, id: String, onSuccess: () -> Unit = {}) {
+    var response: MutableLiveData<Response<User>> = MutableLiveData()
+
+    val loadingStatus = MutableLiveData<Boolean>()
+    fun saveLinks(arraySocNetwork: HashMap<String, String>, id: String) {
         val map: HashMap<String, Any> = hashMapOf()
         map.put("socialNetwork", arraySocNetwork) // fixme
         disposables.add(userRepository.changeUserProfile(map, id)
@@ -50,13 +54,12 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                 .observeOn(getMainThreadScheduler())
                 .doOnSubscribe({ s -> loadingStatus.setValue(true) })
                 .doAfterTerminate({ loadingStatus.setValue(false) })
-                .subscribe(onSuccess, { throwable ->
-                    response.setValue(Response.error(throwable))
-                }))
+                .subscribe())
+
     }
 
 
-    fun ifUserNotExistThenSave(currentUser: FirebaseUser?) { // not used.Remove after merg!
+    fun ifUserNotExistThenSave(currentUser: FirebaseUser?) {
         val store = FirebaseFirestore.getInstance()
         val docRef = store.collection(COLLECTION_USERS).document(currentUser?.uid.toString());
         docRef.get().addOnCompleteListener(object : OnCompleteListener<DocumentSnapshot> {
@@ -93,17 +96,14 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
         })
     }
 
-    fun sendUserData(map: HashMap<String, Any>, id: String) {
+    fun sendUserData(map: HashMap<String, Any>, id: String, success: () -> Unit = {}) {
         Log.e("LOG map:", id + " " + map.toString())
-        disposables.add(userRepository.changeUserProfile(map, id)
+        userRepository.changeUserProfile(map, id)
                 .subscribeOn(getBackgroundScheduler())
                 .observeOn(getMainThreadScheduler())
-                .subscribe({
-                    saveProfile.setValue(Response.success(true))
-                }, { throwable ->
-                    response.setValue(Response.error(throwable))
-                })
-        )
+                .doOnComplete(success) // FIXME THIS IS NOT CORRECT
+                .subscribe()
+
     }
 
     fun updateStaticalInfo(airUser: AirUser?, id: String) {

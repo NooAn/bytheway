@@ -10,7 +10,7 @@ import ru.a1024bits.bytheway.model.User
 
 interface IUsersRepository {
     fun getReallUsers(paramSearch: Filter): Single<List<User>>
-    fun getAllUsers(): Task<QuerySnapshot>
+    fun getAllUsers(): Single<MutableList<User>>
     fun getSimilarUsersTravels(data: Filter, observer: Observer<List<User>>): Task<QuerySnapshot>
     fun getUserById(userID: String): Task<DocumentSnapshot>
     fun addUser(user: User): Task<Void>

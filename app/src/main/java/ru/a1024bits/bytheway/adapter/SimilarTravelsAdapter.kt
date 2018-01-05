@@ -84,9 +84,9 @@ class SimilarTravelsAdapter(val context: Context) : RecyclerView.Adapter<Similar
     }
 
     inner class UserViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        var cities = view.findViewById<TextView>(R.id.users_cities)
-        var name = view.findViewById<TextView>(R.id.name_content_user)
-        var avatar = view.findViewById<ImageView>(R.id.user_avatar)
+        var cities = view.findViewById<TextView>(R.id.usersCities)
+        var name = view.findViewById<TextView>(R.id.nameContentUser)
+        var avatar = view.findViewById<ImageView>(R.id.userAvatar)
         var percentSimilarTravel = view.findViewById<TextView>(R.id.percent_similar_travel)
     }
 }

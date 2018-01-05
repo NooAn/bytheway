@@ -5,10 +5,11 @@ import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.*
 import io.reactivex.Completable
-import io.reactivex.CompletableObserver
 import io.reactivex.Single
 import ru.a1024bits.bytheway.algorithm.SearchTravelers
 import ru.a1024bits.bytheway.model.User
+import java.util.*
+import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 
 
@@ -31,14 +32,24 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) : IUsersR
                 })
             }
 
-
     override fun getSimilarUsersTravels(data: Filter, observer: Observer<List<User>>): Task<QuerySnapshot> {
         return store.collection(COLLECTION_USERS).get()
     }
 
-    override fun getAllUsers(): Task<QuerySnapshot> {
-        return store.collection(COLLECTION_USERS).get()
-    }
+    override fun getAllUsers(): Single<MutableList<User>> =
+            Single.create<MutableList<User>> { e ->
+                store.collection(COLLECTION_USERS).get()
+                        .addOnCompleteListener({ task ->
+                            val result: MutableList<User> = CopyOnWriteArrayList()
+                            for (document in task.result) {
+                                try {
+                                    result.add(document.toObject(User::class.java))
+                                } catch (e: Exception) {
+                                }
+                            }
+                            e.onSuccess(result)
+                        }).addOnFailureListener({ exception -> e.onError(exception) })
+            }
 
     override fun getReallUsers(paramSearch: Filter): Single<List<User>> =
             Single.create<List<User>> { stream ->

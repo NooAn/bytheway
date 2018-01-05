@@ -5,7 +5,7 @@ import java.io.Serializable
 
 
 data class Filter(var startAge: Int = 0,
-                  var endAge: Int = -1,
+                  var endAge: Int = MAX_AGE,
                   var startBudget: Int = -1,
                   var endBudget: Int = -1,
                   var startCity: String = "",
@@ -16,3 +16,7 @@ data class Filter(var startAge: Int = 0,
                   var sex: Int = 0,
                   var startDate: Long = 0L,
                   var endDate: Long = 0L) : Serializable
+
+val M_SEX = 1
+val W_SEX = 2
+val MAX_AGE = 120
