@@ -198,9 +198,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
                     .setListener(object : IShowcaseListener {
                         override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {}
                         override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
-                            if (activity != null && !activity.isDestroyed) {
-                                (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterMyProfileFragment", false).apply()
-                            }
+                            viewModel?.markPromptIsShowing("isFirstEnterMyProfileFragment")
                         }
                     }).show()
         }
