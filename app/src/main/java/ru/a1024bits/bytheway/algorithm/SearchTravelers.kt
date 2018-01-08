@@ -7,7 +7,6 @@ import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.util.Constants.END_DATE
 import ru.a1024bits.bytheway.util.Constants.START_DATE
 import java.lang.Math.max
-import kotlin.math.max
 
 /**
  * Created by Bit on 12/16/2017.
