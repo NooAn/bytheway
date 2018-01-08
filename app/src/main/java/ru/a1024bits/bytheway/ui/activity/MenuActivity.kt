@@ -49,6 +49,7 @@ import ru.a1024bits.bytheway.ui.fragments.*
 import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.util.ProgressCustom
 import ru.a1024bits.bytheway.util.ServiceGenerator
+import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.Router
 import ru.terrakok.cicerone.android.SupportFragmentNavigator
