@@ -82,7 +82,7 @@ class AirSuccesfullFragment : Fragment() {
 
     override fun onDetach() {
         super.onDetach()
-        mListener = null
+        mListener = null//////
     }
 
 

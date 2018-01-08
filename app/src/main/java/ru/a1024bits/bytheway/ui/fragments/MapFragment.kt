@@ -17,6 +17,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
+import android.widget.TextView
 import android.widget.Toast
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
@@ -31,6 +32,7 @@ import ru.a1024bits.aviaanimation.ui.util.MarkerAnimation
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.MapWebService
 import ru.a1024bits.bytheway.R
+import ru.a1024bits.bytheway.model.Method
 import ru.a1024bits.bytheway.model.Status
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.model.map_directions.RoutesList
@@ -53,7 +55,7 @@ import kotlin.collections.HashMap
 
 
 /**
- * Created by andrey.gusenkov on 30/09/2017
+ * Created by andrey.gusenkov on 30/09/2017//
  */
 class MapFragment : Fragment(), OnMapReadyCallback {
 
@@ -222,7 +224,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                         }
 
                         override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
-                            viewModel?.markPromptIsShowing("isFirstEnterMapFragment")
+                            if (activity != null && !activity.isDestroyed)
+                                (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterMapFragment", false).apply()
                         }
                     })
                     .show()

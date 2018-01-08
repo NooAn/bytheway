@@ -2,6 +2,7 @@ package ru.a1024bits.bytheway.ui.fragments
 
 
 import android.content.Intent
+import android.location.Location
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
@@ -13,14 +14,19 @@ import android.view.WindowManager
 import android.widget.Toast
 import com.borax12.materialdaterangepicker.date.DatePickerDialog
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException
+import com.google.android.gms.common.GooglePlayServicesRepairableException
 import com.google.android.gms.location.places.AutocompleteFilter
 import com.google.android.gms.location.places.ui.PlaceAutocomplete
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.android.synthetic.main.fragment_search_block.*
+import kotlinx.android.synthetic.main.fragment_user_profile.*
+import kotlinx.android.synthetic.main.profile_direction.*
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.Method
 import ru.a1024bits.bytheway.model.User
+import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
+import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.util.Constants.END_DATE
 import ru.a1024bits.bytheway.util.Constants.FIRST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
