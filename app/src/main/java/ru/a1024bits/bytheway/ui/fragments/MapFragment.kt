@@ -17,7 +17,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
-import android.widget.TextView
 import android.widget.Toast
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
@@ -32,7 +31,6 @@ import ru.a1024bits.aviaanimation.ui.util.MarkerAnimation
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.MapWebService
 import ru.a1024bits.bytheway.R
-import ru.a1024bits.bytheway.model.Method
 import ru.a1024bits.bytheway.model.Status
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.model.map_directions.RoutesList

@@ -13,7 +13,7 @@ import android.view.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import com.borax12.materialdaterangepicker.date.DatePickerDialog
-import com.google.firebase.FirebaseApp
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crash.FirebaseCrash
 import kotlinx.android.synthetic.main.fragment_display_all_users.*
 import kotlinx.android.synthetic.main.searching_parameters_block.*
@@ -26,22 +26,23 @@ import ru.a1024bits.bytheway.repository.M_SEX
 import ru.a1024bits.bytheway.repository.W_SEX
 import ru.a1024bits.bytheway.util.DecimalInputFilter
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
-import java.lang.Exception
 import javax.inject.Inject
 
 
 class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
     private val SIZE_INITIAL_ELEMENTS = 2
+    private val TAG_ANALYTICS = "AllUsersFragment_"
     private lateinit var filter: Filter
     private lateinit var dateDialog: DatePickerDialog
     private lateinit var displayUsersAdapter: DisplayAllUsersAdapter
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
     private var countInitialElements = 0
-
+    private lateinit var analytics: FirebaseAnalytics
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        analytics = FirebaseAnalytics.getInstance(this.context)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
@@ -50,6 +51,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         App.component.inject(this)
         super.onActivityCreated(savedInstanceState)
+        analytics.setCurrentScreen(this.activity, "AllUsersFragment", this.javaClass.simpleName)
 
         try {
             filter = viewModel!!.filter
@@ -171,6 +173,8 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
 
         view_contain_block_parameters.layoutTransition.setDuration(700L)
         saveParameters.setOnClickListener {
+            analytics.logEvent(TAG_ANALYTICS + "CLICK_ON_SEARCH", null)
+
             filter.startBudget = if (startBudget.text.isNotEmpty()) Integer.parseInt(startBudget.text.toString()) else -1
             filter.endBudget = if (endBudget.text.isNotEmpty()) Integer.parseInt(endBudget.text.toString()) else -1
             filter.startCity = startCity.text.toString()
@@ -181,6 +185,8 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
         }
 
         cancelParameters.setOnClickListener {
+            analytics.logEvent(TAG_ANALYTICS + "CLICK_ON_CANCEL", null)
+
             filter.sex = 0
             filter.startAge = -1
             filter.startAge = 0

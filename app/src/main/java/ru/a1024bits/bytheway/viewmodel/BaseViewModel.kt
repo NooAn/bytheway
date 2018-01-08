@@ -41,7 +41,7 @@ open class BaseViewModel : ViewModel(), LifecycleObserver {
     }
 
     fun promptNotShowing(nameScreenPrompt: String): Boolean =
-        App.INSTANCE.getSharedPreferences(Constants.APP_PREFERENCES, Context.MODE_PRIVATE).getBoolean(nameScreenPrompt, true)
+            App.INSTANCE.getSharedPreferences(Constants.APP_PREFERENCES, Context.MODE_PRIVATE).getBoolean(nameScreenPrompt, true)
 
 
     override fun onCleared() {

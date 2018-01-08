@@ -10,6 +10,7 @@ import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.request.RequestOptions
+import com.google.firebase.analytics.FirebaseAnalytics
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
@@ -51,8 +52,10 @@ class DisplayAllUsersAdapter(val context: Context, val viewModel: DisplayUsersVi
     inner class UserViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         init {
             view.setOnClickListener({ _ ->
-                if (adapterPosition != RecyclerView.NO_POSITION)
-                    (context as? MenuActivity)?.showUserSimpleProfile(users[adapterPosition])
+                if (adapterPosition != RecyclerView.NO_POSITION && context is MenuActivity) {
+                    FirebaseAnalytics.getInstance(context.applicationContext).logEvent("AllUsersFragment_SELECT_USER_" + adapterPosition, null)
+                    context.showUserSimpleProfile(users[adapterPosition])
+                }
             })
         }
 

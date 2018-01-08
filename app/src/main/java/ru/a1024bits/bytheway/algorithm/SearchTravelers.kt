@@ -3,7 +3,6 @@ package ru.a1024bits.bytheway.algorithm
 import android.util.Log
 import ru.a1024bits.bytheway.model.Method
 import ru.a1024bits.bytheway.model.User
-import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.util.Constants.END_DATE
 import ru.a1024bits.bytheway.util.Constants.START_DATE
 import kotlin.math.max
