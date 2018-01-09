@@ -17,6 +17,7 @@ import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import com.borax12.materialdaterangepicker.date.DatePickerDialog
 import com.bumptech.glide.Glide
@@ -26,10 +27,7 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException
 import com.google.android.gms.location.places.AutocompleteFilter
 import com.google.android.gms.location.places.ui.PlaceAutocomplete
 import com.google.android.gms.maps.*
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.PolylineOptions
+import com.google.android.gms.maps.model.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.GeoPoint
 import com.google.maps.android.PolyUtil
@@ -38,18 +36,25 @@ import kotlinx.android.synthetic.main.fragment_my_user_profile.*
 import kotlinx.android.synthetic.main.profile_add_trip.*
 import kotlinx.android.synthetic.main.profile_direction.*
 import kotlinx.android.synthetic.main.profile_main_image.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import ru.a1024bits.bytheway.App
+import ru.a1024bits.bytheway.MapWebService
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.*
+import ru.a1024bits.bytheway.model.map_directions.RoutesList
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
+import ru.a1024bits.bytheway.model.Response as ResponseBtw
 import ru.a1024bits.bytheway.util.Constants.END_DATE
 import ru.a1024bits.bytheway.util.Constants.FIRST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM
 import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO
 import ru.a1024bits.bytheway.util.Constants.START_DATE
+import ru.a1024bits.bytheway.util.toJsonString
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import ru.terrakok.cicerone.commands.Replace
 import uk.co.deanwild.materialshowcaseview.IShowcaseListener
@@ -79,22 +84,18 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         val LASTNAME = "lastName"
         val CITY = "city"
     }
+
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
 
     private var mListener: OnFragmentInteractionListener? = null
 
     private var uid = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
-
     private var name = ""
     private var cityFromLatLng = GeoPoint(0.0, 0.0)
     private var cityToLatLng = GeoPoint(0.0, 0.0)
-
     private var lastName = ""
-
     private var city = ""
-
     private lateinit var dateDialog: DatePickerDialog
-
     private var numberPhone: String = "+7"
 
     private var socialValues: HashMap<String, String> = hashMapOf(
@@ -120,7 +121,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     )
     private var methodIcons: HashMap<String, RelativeLayout> = hashMapOf()
     private var methodTextViews: HashMap<String, TextView?> = hashMapOf()
-
     private var socNet: HashMap<String, String> = hashMapOf()
     private var dates: HashMap<String, Long> = hashMapOf()
     private var sex: Int = 0
@@ -130,10 +130,10 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     private var budgetPosition: Int = 0
     private var yearNow: Int = 0
     private var yearsArr: ArrayList<Int> = arrayListOf()
-
     private var profileStateHashMap: HashMap<String, String> = hashMapOf()
     private var oldProfileState: Int = 0
-
+    private var routeString: String = ""
+    @Inject lateinit var mapService: MapWebService
     private var routes: String = ""
     private var googleMap: GoogleMap? = null
     private lateinit var mapView: MapView
@@ -162,7 +162,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         methodTextViews.put(Method.PLANE.link, travelPlaneText)
         methodTextViews.put(Method.HITCHHIKING.link, travelHitchHikingText)
 
-        viewModel?.response?.observe(this, Observer<Response<User>> { response ->
+        viewModel?.response?.observe(this, Observer<ru.a1024bits.bytheway.model.Response<User>> { response ->
             when (response?.status) {
                 Status.SUCCESS -> {
                     if (response.data != null) {
@@ -179,7 +179,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                 }
             }
         })
-
         viewModel?.load(uid)
     }
 
@@ -213,7 +212,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         }
     }
 
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         Log.e("LOG code:", requestCode.toString() + " " +
@@ -230,11 +228,15 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                     cityFromLatLng = GeoPoint(place.latLng.latitude, place.latLng.longitude)
                     if (cityToLatLng.hashCode() == cityFromLatLng.hashCode()) {
                         textCityFrom.error = "true"
+
                         Toast.makeText(this@MyProfileFragment.context,
                                 getString(R.string.fill_diff_cities), Toast.LENGTH_LONG).show()
                     } else {
                         cities.put(FIRST_INDEX_CITY, place.name.toString())
                         profileStateHashMap[CITY_FROM] = cityFromLatLng.hashCode().toString()
+
+                        obtainDirection()
+                        setMarkers(1)
                         profileChanged()
                     }
                 }
@@ -259,6 +261,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                     } else {
                         cities.put(LAST_INDEX_CITY, place.name.toString())
                         profileStateHashMap[CITY_TO] = cityToLatLng.hashCode().toString()
+                        obtainDirection()
+                        setMarkers(2)
                         profileChanged()
                     }
                 }
@@ -272,7 +276,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         }
     }
 
-
     override fun onResume() {
         super.onResume()
         mapView.onResume()
@@ -280,34 +283,91 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     override fun onMapReady(map: GoogleMap?) {
         this.googleMap = map
+    }
 
+    private fun setMarkers(position: Int) {
+        googleMap?.clear()
         val coordFrom = LatLng(cityFromLatLng.latitude, cityFromLatLng.longitude)
         val coordTo = LatLng(cityToLatLng.latitude, cityToLatLng.longitude)
+        var markerTitleStart: String? = ""
+        var markerTitleFinal: String? = ""
+        var markerPositionStart = LatLng(0.0, 0.0)
+        var markerPositionFinal = LatLng(0.0, 0.0)
+        val cityFrom = cities.get(FIRST_INDEX_CITY)
+        val cityTo = cities.get(LAST_INDEX_CITY)
+        if (position == 1) {
+            markerTitleStart = cityTo
+            markerTitleFinal = cityFrom
+            markerPositionStart = coordTo
+            markerPositionFinal = coordFrom
+
+
+        } else if (position == 2) {
+            markerTitleFinal = cityTo
+            markerTitleStart = cityFrom
+            markerPositionFinal = coordTo
+            markerPositionStart = coordFrom
+        }
 
         val midPointLat = (coordFrom.latitude + coordTo.latitude) / 2
         val midPointLong = (coordFrom.longitude + coordTo.longitude) / 2
         val blueMarker = BitmapDescriptorFactory.fromResource(R.drawable.pin_blue)
-        val orangeColor = ContextCompat.getColor(context, R.color.orangeLine)
+
         googleMap?.addMarker(MarkerOptions()
                 .icon(blueMarker)
-                .position(coordFrom)
-                .title("First Point"))
+                .position(markerPositionStart)
+                .title(markerTitleStart)
+                .anchor(0.5F, 1.0F)
+                .flat(true))
+
+        googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(markerPositionFinal, 6.0f))
         googleMap?.addMarker(MarkerOptions()
                 .icon(blueMarker)
-                .position(coordTo)
-                .title("Final Point"))
+                .position(markerPositionFinal)
+                .title(markerTitleFinal)
+                .anchor(0.5F, 1.0F)
+                .flat(true))
 
-        val options = PolylineOptions()
-        options.color(orangeColor)
-        options.width(5f)
-
-        if (routes != "") {
-            options.addAll(PolyUtil.decode(routes))
-            googleMap?.addPolyline(options)
-        }
-        googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(midPointLat, midPointLong), 3.0f))
+        var perfectZoom = 190 / getBearing(coordFrom, coordTo)
+        googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(midPointLat, midPointLong), perfectZoom))
     }
 
+    fun drawPolyline() {
+
+        val blueColor = activity.resources.getColor(R.color.blueRouteLine)
+
+        var polyPts: List<LatLng>
+        val options = PolylineOptions()
+        options.color(blueColor)
+
+        options.width(5f)
+
+
+        if (routeString != "") {
+            polyPts = PolyUtil.decode(routeString)
+
+            for (pts in polyPts) {
+                options.add(pts)
+            }
+        }
+
+        googleMap?.addPolyline(options)
+    }
+
+    fun getBearing(begin: LatLng, end: LatLng): Float {
+        val lat = Math.abs(begin.latitude - end.latitude)
+        val lng = Math.abs(begin.longitude - end.longitude)
+        if (begin.latitude < end.latitude && begin.longitude < end.longitude)
+            return Math.toDegrees(Math.atan(lng / lat)).toFloat()
+        else if (begin.latitude >= end.latitude && begin.longitude < end.longitude)
+            return (90 - Math.toDegrees(Math.atan(lng / lat)) + 90).toFloat()
+        else if (begin.latitude >= end.latitude && begin.longitude >= end.longitude)
+            return (Math.toDegrees(Math.atan(lng / lat)) + 180).toFloat()
+        else if (begin.latitude < end.latitude && begin.longitude >= end.longitude)
+            return (90 - Math.toDegrees(Math.atan(lng / lat)) + 270).toFloat()
+        return -1f
+
+    }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater?.inflate(R.layout.fragment_my_user_profile, container, false)
@@ -465,7 +525,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         //Clean up resources from google map to prevent memory leaks.
         //Stop tracking current location
         if (googleMap != null) {
-            googleMap?.setMyLocationEnabled(false)
             googleMap?.clear()
         }
         super.onDestroy()
@@ -492,6 +551,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                 .append(" ")
                 .append(yearEnd).toString())
 
+
         dates.put(START_DATE, getLongFromDate(dayOfMonth, monthOfYear, year))
         dates.put(END_DATE, getLongFromDate(dayOfMonthEnd, monthOfYearEnd, yearEnd))
         profileStateHashMap[DATES] = dates.toString()
@@ -503,10 +563,12 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         val dateFormat = SimpleDateFormat("dd MM yyyy", Locale.US)
         val date = dateFormat.parse(dateString)
         return date.time
+
     }
 
     private fun TextView.afterTextChanged(afterTextChanged: (String) -> Unit) {
         this.addTextChangedListener(object : TextWatcher {
+
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun afterTextChanged(editable: Editable?) {
@@ -566,7 +628,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             return
         }
         if (viewModel?.saveProfile?.hasObservers() == false) {
-            viewModel?.saveProfile?.observe(this, Observer<Response<Boolean>> { response ->
+            viewModel?.saveProfile?.observe(this, Observer<ResponseBtw<Boolean>> { response ->
                 when (response?.status) {
                     Status.SUCCESS -> {
                         if (response.data == true) {
@@ -671,16 +733,26 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             name = (nameChoose.text.toString()).capitalize()
             lastName = (lastNameChoose.text.toString()).capitalize()
             city = (cityChoose.text.toString()).capitalize()
+
+            username.text = StringBuilder(name).append(" ").append(lastName)
+            cityview.text = if (city.isNotEmpty()) city else getString(R.string.native_city)
+            viewModel?.sendUserData(getHashMapUser(), uid)
+
+
+
             savingUserData(name, lastName, city)
+
         })
         simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.cancel), { _, _ ->
             simpleAlert.hide()
         })
 
+
         nameChoose.setOnKeyListener(View.OnKeyListener { _, keyCode, _ ->
+
             if (keyCode == KeyEvent.KEYCODE_ENTER) {
-                Log.d("LOG", "ENTER is Pressed on EditName")
                 lastNameChoose.requestFocus()
+
                 return@OnKeyListener true
             }
             false
@@ -688,6 +760,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
         lastNameChoose.setOnKeyListener(View.OnKeyListener { _, keyCode, _ ->
             if (keyCode == KeyEvent.KEYCODE_ENTER) {
+
                 Log.d("LOG", "ENTER is Pressed on LastName")
                 cityChoose.requestFocus()
                 return@OnKeyListener true
@@ -697,12 +770,13 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
         cityChoose.setOnKeyListener(View.OnKeyListener { _, keyCode, _ ->
             if (keyCode == KeyEvent.KEYCODE_ENTER) {
-                Log.d("LOG", "ENTER is Pressed on city")
-                name = (nameChoose.text.toString()).capitalize()
-                lastName = (lastNameChoose.text.toString()).capitalize()
-                city = (cityChoose.text.toString()).capitalize()
-                savingUserData(name, lastName, city)
-                simpleAlert.hide()
+
+
+                val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(cityChoose.windowToken, 0)
+
+
+
                 return@OnKeyListener true
             }
             false
@@ -827,7 +901,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         }
     }
 
-
     private fun hideBlockTravelInforamtion() {
         direction.visibility = View.GONE
         textCityFrom.setText("")
@@ -862,6 +935,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             2 -> getString(R.string.gender_female)
             else -> {
                 ""
+
             }
         }
 
@@ -946,7 +1020,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         }
 
         fillAgeSex(user.age, user.sex)
-
+        setMarkers(2)
+        drawPolyline()
         age = user.age
 
         glide?.load(user.urlPhoto)
@@ -1004,6 +1079,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     fun getHashMapUser(): HashMap<String, Any> {
         val hashMap = HashMap<String, Any>()
+
         hashMap[CITIES] = cities
         hashMap[METHOD] = methods
         hashMap[DATES] = dates
@@ -1021,16 +1097,38 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         return hashMap
     }
 
-
     fun profileChanged(force: Boolean? = null, removeFocus: Boolean? = true) {
         if (activity == null) return
         if (removeFocus == true) {
             addInfoUser.clearFocus()
         }
         if (countTrip == 1) {
+
             var changed: Boolean = profileStateHashMap.hashCode() != oldProfileState
             force?.let { changed = it }
+
             (activity as MenuActivity).profileChanged = changed
         }
+    }
+
+    private fun obtainDirection() {
+        mapService.getDirections(hashMapOf(
+                "origin" to LatLng(cityFromLatLng.latitude, cityFromLatLng.longitude).toJsonString(),
+                "destination" to LatLng(cityToLatLng.latitude, cityToLatLng.longitude).toJsonString(),
+                "sensor" to "false")).enqueue(object : Callback<RoutesList?> {
+            override fun onResponse(call: Call<RoutesList?>?, response: Response<RoutesList?>?) {
+                response?.body()?.routes?.map {
+                    it.overviewPolyline?.encodedData?.let { routeString ->
+                        this@MyProfileFragment.routeString = routeString
+                        drawPolyline()
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<RoutesList?>?, t: Throwable?) {
+                t?.printStackTrace()
+                showErrorResponse()
+            }
+        })
     }
 }
