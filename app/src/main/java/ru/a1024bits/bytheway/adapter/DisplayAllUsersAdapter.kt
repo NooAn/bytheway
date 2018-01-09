@@ -21,7 +21,7 @@ class DisplayAllUsersAdapter(val context: Context, val viewModel: DisplayUsersVi
     var users: MutableList<User> = ArrayList()
 
 
-    fun setItems(users: List<User>) {
+    fun setItems(users: List<User>?) {
         this.users = users as MutableList<User>
         notifyDataSetChanged()
     }

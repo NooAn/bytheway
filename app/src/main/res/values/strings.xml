@@ -64,7 +64,7 @@
     <string name="sinch_button">СИНХРОНИЗИРОВАТЬ</string>
     <string name="miss">пропустить</string>
     <string name="hint_all_travelers_description">Если Вы захотите присоединиться к другим путешествиям, можете использовать этот экран. Фильтр поможет Вам :)</string>
-    <string name="close_hint">ПОНЯТНО</string>
+    <string name="close_hint">ДАЛЕЕ</string>
 
     <string-array name="months_array">
         <item>янв</item>

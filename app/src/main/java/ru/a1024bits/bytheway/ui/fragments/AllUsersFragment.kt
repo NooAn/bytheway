@@ -33,7 +33,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
     private val SIZE_INITIAL_ELEMENTS = 2
     private val TAG_ANALYTICS = "AllUsersFragment_"
     private lateinit var filter: Filter
-    private lateinit var dateDialog: DatePickerDialog
+    private var dateDialog: DatePickerDialog? = null
     private lateinit var displayUsersAdapter: DisplayAllUsersAdapter
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
     private var countInitialElements = 0
@@ -54,14 +54,14 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
         analytics.setCurrentScreen(this.activity, "AllUsersFragment", this.javaClass.simpleName)
 
         try {
-            filter = viewModel!!.filter
+            filter = viewModel?.filter ?: Filter()
 
             installLogicToUI()
 
             displayUsersAdapter = DisplayAllUsersAdapter(this.context, viewModel!!)
             displayAllUsers.adapter = displayUsersAdapter
 
-            viewModel!!.usersLiveData.observe(this, Observer<List<User>> { list ->
+            viewModel?.usersLiveData?.observe(this, Observer<List<User>> { list ->
                 Log.e("LOG", "onChanged $list")
                 if (list != null) {
                     if (list.isNotEmpty())
@@ -90,7 +90,8 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             var isNotStartSearch = false
             override fun onQueryTextSubmit(query: String): Boolean {
-                displayUsersAdapter.setItems(viewModel!!.filterUsersByString(query.toLowerCase(), query, displayUsersAdapter.users))
+                displayUsersAdapter.setItems(viewModel?.filterUsersByString(query.toLowerCase(), query, displayUsersAdapter.users))
+                analytics.logEvent(TAG_ANALYTICS + "SEARCH_QUERY", null)
                 return true
             }
 
@@ -131,7 +132,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
         endBudget.filters = arrayOf(DecimalInputFilter())
 
         startAge.adapter = ArrayAdapter<String>(context, android.R.layout.simple_spinner_item,
-                viewModel!!.yearsOldUsers)
+                viewModel?.yearsOldUsers)
         startAge.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(p0: AdapterView<*>?) {}
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, p3: Long) {
@@ -143,7 +144,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
         }
 
         endAge.adapter = ArrayAdapter<String>(context, android.R.layout.simple_spinner_item,
-                viewModel!!.yearsOldUsers)
+                viewModel?.yearsOldUsers)
         endAge.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(p0: AdapterView<*>?) {}
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, p3: Long) {
@@ -153,9 +154,9 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
                     filter.endAge = position
             }
         }
-        dateDialog = viewModel!!.updateDateDialog(this)
+        dateDialog = viewModel?.updateDateDialog(this)
         choseDate.setOnClickListener {
-            dateDialog.show(activity.fragmentManager, "")
+            dateDialog?.show(activity.fragmentManager, "")
         }
         sexButtons.setOnCheckedChangeListener { _, id ->
             filter.sex = when (id) {
@@ -182,6 +183,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
 
             animationSlide()
             block_search_parameters.visibility = View.GONE
+            setLogEventForSearch()
         }
 
         cancelParameters.setOnClickListener {
@@ -189,8 +191,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
 
             filter.sex = 0
             filter.startAge = -1
-            filter.startAge = 0
-            filter.endAge = viewModel!!.yearsOldUsers.size - 1
+            filter.endAge = viewModel?.yearsOldUsers?.size?.minus(1) ?: -1
             filter.startCity = ""
             filter.endCity = ""
             filter.startBudget = -1
@@ -205,7 +206,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             startCity.setText("")
             endCity.setText("")
 
-            dateDialog = viewModel!!.updateDateDialog(this)
+            dateDialog = viewModel?.updateDateDialog(this)
             updateChoseDateButtons()
 
             sexButtons.check(sexAny.id)
@@ -220,6 +221,21 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             }
         }
     }
+
+    private fun setLogEventForSearch() {
+        if (filter.endDate != 0L) analytics.logEvent(TAG_ANALYTICS + "END_DATE", null)
+        if (filter.startDate != 0L) analytics.logEvent(TAG_ANALYTICS + "START_DATE", null)
+        if (filter.endAge != -1) analytics.logEvent(TAG_ANALYTICS + "END_AGE", null)
+        if (filter.startAge != -1) analytics.logEvent(TAG_ANALYTICS + "START_AGE", null)
+        if (filter.endCity.isNotBlank()) analytics.logEvent(TAG_ANALYTICS + "END_CITY", null)
+        if (filter.startCity.isNotBlank()) analytics.logEvent(TAG_ANALYTICS + "START_CITY", null)
+        if (filter.endBudget != -1) analytics.logEvent(TAG_ANALYTICS + "START_BUDGET", null)
+        if (filter.startBudget != -1) analytics.logEvent(TAG_ANALYTICS + "END_BUDGET", null)
+        if (filter.sex != 0) analytics.logEvent(TAG_ANALYTICS + "SEX_ANY", null)
+        if (filter.sex != W_SEX) analytics.logEvent(TAG_ANALYTICS + "SEX_FEMALE", null)
+        if (filter.sex != M_SEX) analytics.logEvent(TAG_ANALYTICS + "SEX_MALE", null)
+    }
+
 
     private fun animationSlide() {
         view_contain_block_parameters.layoutTransition.addTransitionListener(object : LayoutTransition.TransitionListener {
@@ -250,7 +266,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
 
     private fun updateChoseDateButtons() {
         choseDate.text = if (filter.startDate > 0L && filter.endDate > 0L)
-            viewModel!!.getTextFromDates(filter.startDate, filter.endDate, 0)
+            viewModel?.getTextFromDates(filter.startDate, filter.endDate, 0)
         else context.getString(R.string.filters_all_users_empty_date)
     }
 

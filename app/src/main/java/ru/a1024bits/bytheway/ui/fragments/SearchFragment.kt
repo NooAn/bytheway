@@ -18,6 +18,7 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException
 import com.google.android.gms.location.places.AutocompleteFilter
 import com.google.android.gms.location.places.ui.PlaceAutocomplete
 import com.google.android.gms.maps.model.LatLng
+import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.android.synthetic.main.fragment_search_block.*
 import kotlinx.android.synthetic.main.fragment_user_profile.*
 import kotlinx.android.synthetic.main.profile_direction.*
@@ -43,6 +44,7 @@ import java.util.*
  */
 class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
 
+    private lateinit var mFirebaseAnalytics: FirebaseAnalytics
     private lateinit var dateDialog: DatePickerDialog
     var firstPoint: LatLng? = null
     var secondPoint: LatLng? = null
@@ -61,6 +63,7 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater?.inflate(R.layout.fragment_search_block, container, false)
         activity.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(context)
         filter.startDate = user.dates.get(START_DATE) ?: 0
         filter.endDate = user.dates.get(END_DATE) ?: 0
         filter.endBudget = user.budget.toInt()
@@ -142,18 +145,27 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             val tempString = text_from_city.text
             text_from_city.text = text_to_city.text
             text_to_city.text = tempString
-            //fixme
+
+            val tempLng = filter.locationStartCity
+            filter.locationStartCity = filter.locationEndCity
+            filter.locationEndCity = tempLng
+
+            updatePoints()
         }
 
         budgetFromValue.setText(user.budget.toString())
         budgetFromValue.filters = arrayOf(DecimalInputFilter())
         budgetToValue.filters = arrayOf(DecimalInputFilter()) //fixme textWatcher
         if (user.cityFromLatLng.latitude != 0.0 && user.cityToLatLng.latitude != 0.0 && user.cityToLatLng.longitude != 0.0) {
-            firstPoint = LatLng(user.cityFromLatLng.latitude, user.cityFromLatLng.longitude)
-            secondPoint = LatLng(user.cityToLatLng.latitude, user.cityToLatLng.longitude)
-            firstPoint?.let { latLng -> (activity as OnFragmentInteractionListener).onSetPoint(latLng, 1) }
-            secondPoint?.let { latLng -> (activity as OnFragmentInteractionListener).onSetPoint(latLng, 2) }
+            updatePoints()
         }
+    }
+
+    private fun updatePoints() {
+        firstPoint = LatLng(user.cityFromLatLng.latitude, user.cityFromLatLng.longitude)
+        secondPoint = LatLng(user.cityToLatLng.latitude, user.cityToLatLng.longitude)
+        firstPoint?.let { latLng -> (activity as OnFragmentInteractionListener).onSetPoint(latLng, 1) }
+        secondPoint?.let { latLng -> (activity as OnFragmentInteractionListener).onSetPoint(latLng, 2) }
     }
 
     private fun openDateDialog() {
@@ -184,7 +196,7 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
 
     private fun getLongFromDate(day: Int, month: Int, year: Int): Long {
         val dateString = "$day $month $year"
-        val dateFormat = SimpleDateFormat("dd MM yyyy")
+        val dateFormat = SimpleDateFormat("dd MM yyyy", Locale.US)
         val date = dateFormat.parse(dateString)
         val unixTime = date.time.toLong()
         return unixTime
@@ -202,9 +214,12 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         )
         dateFromValue.setOnClickListener {
             openDateDialog()
+            mFirebaseAnalytics.logEvent("Search_fragment_str_date_dialog", null)
+
         }
         dateToValue.setOnClickListener {
             openDateDialog()
+            mFirebaseAnalytics.logEvent("Search_fragment_end_date_dialog", null)
         }
     }
 
@@ -277,4 +292,4 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     }
 }
 
-private fun Long.getNormallDate(): CharSequence? = SimpleDateFormat("dd.MM.yyyy").format(this)
+private fun Long.getNormallDate(): CharSequence? = SimpleDateFormat("dd.MM.yyyy", Locale.US).format(this)

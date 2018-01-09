@@ -19,6 +19,7 @@ import android.widget.Toast
 import android.arch.lifecycle.ViewModelProvider
 import android.util.Log
 import com.bumptech.glide.request.RequestOptions
+import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.android.synthetic.main.profilte_user_direction.*
 import kotlinx.android.synthetic.main.profile_main_image.*
 import ru.a1024bits.bytheway.App
@@ -32,7 +33,7 @@ import javax.inject.Inject
 class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCallback {
 
     private var mListener: OnFragmentInteractionListener? = null
-
+    private lateinit var mFirebaseAnalytics: FirebaseAnalytics
     private val userLoad: Observer<Response<User>> = Observer<Response<User>> { response ->
         when (response?.status) {
             Status.SUCCESS -> if (response.data == null) showErrorLoading() else fillProfile(response.data)
@@ -50,7 +51,10 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         App.component.inject(this)
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(context)
     }
+
+    private val TAG_ANALYTICS: String = "UserProfile_"
 
     private fun fillProfile(user: User) {
 
@@ -73,7 +77,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
             textCityTo.text = user.cities.get(Constants.LAST_INDEX_CITY)
         }
 
-        val formatDate = SimpleDateFormat("dd.MM.yyyy")
+        val formatDate = SimpleDateFormat("dd.MM.yyyy", Locale.US)
 
         if (user.dates.size > 0) {
             val dayBegin = formatDate.format(Date(user.dates.get(Constants.START_DATE) ?: 0))
@@ -95,29 +99,37 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
                     vkIcon.setImageResource(R.drawable.ic_vk_color)
                     vkIcon.setOnClickListener {
                         startActivity(createBrowserIntent(user.socialNetwork.get(name.key) ?: ""))
+                        mFirebaseAnalytics.logEvent(TAG_ANALYTICS + "OPEN_VK", null)
                     }
                 }
                 SocialNetwork.CS.link -> {
                     csIcon.setImageResource(R.drawable.ic_cs_color)
-                    csIcon.setOnClickListener { startActivity(createBrowserIntent(user.socialNetwork.get(name.key) ?: "")) }
-
+                    csIcon.setOnClickListener {
+                        startActivity(createBrowserIntent(user.socialNetwork.get(name.key) ?: ""))
+                        mFirebaseAnalytics.logEvent(TAG_ANALYTICS + "OPEN_CS", null)
+                    }
                 }
                 SocialNetwork.FB.link -> {
                     fbcon.setImageResource(R.drawable.ic_fb_color)
                     fbcon.setOnClickListener {
                         //  startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("facebook:/profile/id=${user.socialNetwork.get(name.key)}")))
                         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("${user.socialNetwork.get(name.key)}")))
+                        mFirebaseAnalytics.logEvent(TAG_ANALYTICS + "OPEN_FB", null)
                     }
                 }
                 SocialNetwork.WHATSAPP.link -> {
                     whatsAppIcon.setImageResource(R.drawable.ic_whats_icon_color)
                     whatsAppIcon.setOnClickListener {
+                        mFirebaseAnalytics.logEvent(TAG_ANALYTICS + "OPEN_WAP", null)
                         startActivity(createBrowserIntent("whatsapp://send?text=Привет, я нашел тебя в ByTheWay.&phone=+${user.socialNetwork.get(name.key)}&abid = +${user.socialNetwork.get(name.key)})}"))
                     }
                 }
                 SocialNetwork.TG.link -> {
                     tgIcon.setImageResource(R.drawable.ic_tg_color)
-                    tgIcon.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://telegram.me/${user.socialNetwork.get(name.key)}"))) }
+                    tgIcon.setOnClickListener {
+                        mFirebaseAnalytics.logEvent(TAG_ANALYTICS + "OPEN_TG", null)
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://telegram.me/${user.socialNetwork.get(name.key)}")))
+                    }
                 }
             }
         }

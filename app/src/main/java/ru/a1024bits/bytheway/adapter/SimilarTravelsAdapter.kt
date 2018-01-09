@@ -81,8 +81,7 @@ class SimilarTravelsAdapter(val context: Context, val users: List<User>) : Recyc
         init {
             view.setOnClickListener({ _ ->
                 if (adapterPosition != RecyclerView.NO_POSITION && context is MenuActivity) {
-                    val selectGroupUsers = if (adapterPosition <= 3) "FIRST_THREE" else adapterPosition.toString()
-                    FirebaseAnalytics.getInstance(context.applicationContext).logEvent("SimilarTravelsFragment_SELECT_USER_" + selectGroupUsers, null)
+                    FirebaseAnalytics.getInstance(context.applicationContext).logEvent("SimilarTravelsFragment_SELECT_USER_" + adapterPosition, null)
                     context.showUserSimpleProfile(users[adapterPosition])
                 }
             })
