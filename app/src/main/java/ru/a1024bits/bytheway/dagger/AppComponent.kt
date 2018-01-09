@@ -4,7 +4,6 @@ import dagger.Component
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.a1024bits.bytheway.ui.activity.RegistrationActivity
 import ru.a1024bits.bytheway.ui.fragments.*
-import ru.a1024bits.bytheway.viewmodel.BaseViewModel
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
 import ru.a1024bits.bytheway.viewmodel.RegistrationViewModel
 import javax.inject.Singleton

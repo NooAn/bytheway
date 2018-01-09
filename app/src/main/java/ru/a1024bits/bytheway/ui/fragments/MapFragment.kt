@@ -55,7 +55,7 @@ import kotlin.collections.HashMap
 
 
 /**
- * Created by andrey.gusenkov on 30/09/2017
+ * Created by andrey.gusenkov on 30/09/2017//
  */
 class MapFragment : Fragment(), OnMapReadyCallback {
 
