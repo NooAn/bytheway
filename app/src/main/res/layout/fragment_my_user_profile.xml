@@ -457,7 +457,7 @@
                 android:layout_marginStart="@dimen/margin_left_profile"
                 android:layout_marginTop="12dp"
                 android:drawablePadding="10dp"
-                android:drawableStart="@drawable/ic_rubles"
+                android:drawableStart="@drawable/ic_dollar2"
                 android:text="@string/budget"
                 android:textSize="16sp" />
 
