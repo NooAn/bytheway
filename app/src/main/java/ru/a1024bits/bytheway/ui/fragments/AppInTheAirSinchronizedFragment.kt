@@ -5,14 +5,11 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.fragment_app_in_the_air_sinchronized.*
-import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.terrakok.cicerone.commands.Replace
-import ru.a1024bits.bytheway.util.ServiceGenerator
 import android.content.Intent
 import android.net.Uri
 import com.google.firebase.analytics.FirebaseAnalytics

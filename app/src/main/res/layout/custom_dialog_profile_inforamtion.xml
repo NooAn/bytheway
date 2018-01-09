@@ -40,7 +40,7 @@
         android:text="@string/sex"
         android:textSize="@dimen/standard_text_size"
         app:layout_constraintBottom_toBottomOf="@+id/sex"
-         />
+        />
     <RadioGroup
         android:id="@+id/sex"
         android:layout_width="wrap_content"

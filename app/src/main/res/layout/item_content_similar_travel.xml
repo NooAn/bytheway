@@ -10,7 +10,7 @@
     android:padding="10dp">
 
     <ImageView
-        android:id="@+id/user_avatar"
+        android:id="@+id/userAvatar"
         android:layout_width="@dimen/similarTravelPhotoSize"
         android:layout_height="@dimen/similarTravelPhotoSize"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -19,26 +19,26 @@
 
 
     <TextView
-        android:id="@+id/name_content_user"
+        android:id="@+id/nameContentUser"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
         android:textColor="@color/mdtp_dark_gray"
         android:textSize="16sp"
-        app:layout_constraintStart_toEndOf="@+id/user_avatar"
+        app:layout_constraintStart_toEndOf="@+id/userAvatar"
         tools:text="Николаев Алексей" />
 
     <TextView
-        android:id="@+id/users_cities"
+        android:id="@+id/usersCities"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginBottom="4dp"
         android:layout_marginEnd="8dp"
         android:textColor="@color/mdtp_dark_gray"
         android:textSize="14sp"
-        app:layout_constraintBottom_toBottomOf="@+id/user_avatar"
-        app:layout_constraintStart_toStartOf="@+id/name_content_user"
-        app:layout_constraintTop_toBottomOf="@+id/name_content_user"
+        app:layout_constraintBottom_toBottomOf="@+id/userAvatar"
+        app:layout_constraintStart_toStartOf="@+id/nameContentUser"
+        app:layout_constraintTop_toBottomOf="@+id/nameContentUser"
         tools:text="Киев, Украина" />
 
     <TextView

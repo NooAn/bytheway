@@ -21,6 +21,7 @@ import android.widget.TextView
 import android.widget.Toast
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.fragment_maps.*
 import kotlinx.android.synthetic.main.fragment_search_block.*
@@ -41,6 +42,8 @@ import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.util.Constants.END_DATE
+import ru.a1024bits.bytheway.util.Constants.FIRST_INDEX_CITY
+import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.START_DATE
 import ru.a1024bits.bytheway.util.createMarker
 import ru.a1024bits.bytheway.util.toJsonString
@@ -55,7 +58,7 @@ import kotlin.collections.HashMap
 
 
 /**
- * Created by andrey.gusenkov on 30/09/2017
+ * Created by andrey.gusenkov on 30/09/2017//
  */
 class MapFragment : Fragment(), OnMapReadyCallback {
 
@@ -160,6 +163,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(context)
         val params = appBarLayout.layoutParams as CoordinatorLayout.LayoutParams
         val behavior = AppBarLayout.Behavior()
         behavior.setDragCallback(object : AppBarLayout.Behavior.DragCallback() {
@@ -261,9 +265,33 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         mMap?.animateCamera(CameraUpdateFactory.zoomTo(3F))
     }
 
+    private lateinit var mFirebaseAnalytics: FirebaseAnalytics
+
     fun goFlyPlan() {
         if (points.size < 2) return
         animateMarker()
+        logEvents()
+    }
+
+    private fun logEvents() {
+        if (searchFragment?.filter?.method?.equals(user.method) == false) {
+            mFirebaseAnalytics.logEvent("Search_screen_method_change", null)
+        }
+        if (searchFragment?.filter?.startCity != user.cities.get(FIRST_INDEX_CITY)) {
+            mFirebaseAnalytics.logEvent("Search_screen_start_city_change", null)
+        }
+        if (searchFragment?.filter?.endCity != user.cities.get(LAST_INDEX_CITY)) {
+            mFirebaseAnalytics.logEvent("Search_screen_last_city_change", null)
+        }
+        if (searchFragment?.filter?.endBudget?.toLong() != user.budget.toLong()) {
+            mFirebaseAnalytics.logEvent("Search_screen_end_budget_change", null)
+        }
+        if (searchFragment?.filter?.startDate != user.dates.get(START_DATE)) {
+            mFirebaseAnalytics.logEvent("Search_screen_str_date_change", null)
+        }
+        if (searchFragment?.filter?.endDate != user.dates.get(END_DATE)) {
+            mFirebaseAnalytics.logEvent("Search_screen_end_date_change", null)
+        }
     }
 
     //lat = y

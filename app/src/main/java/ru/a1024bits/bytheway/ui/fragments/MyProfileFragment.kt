@@ -6,8 +6,8 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.support.annotation.LayoutRes
 import android.support.design.widget.NavigationView
-import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
@@ -22,7 +22,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import com.borax12.materialdaterangepicker.date.DatePickerDialog
 import com.bumptech.glide.Glide
-import com.bumptech.glide.RequestManager
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException
 import com.google.android.gms.common.GooglePlayServicesRepairableException
@@ -67,7 +66,7 @@ import javax.inject.Inject
 import kotlin.collections.HashMap
 
 
-class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDateSetListener {
+class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback, DatePickerDialog.OnDateSetListener {
 
     companion object {
         val BUDGET = "budget"
@@ -85,15 +84,13 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         val NAME = "name"
         val LASTNAME = "lastName"
         val CITY = "city"
-        val VKLINK: String = "https://www.vk.com/"
-        val TGLINK = "@"
-        val CSLINK = "https://www.couchsurfing.com/people/"
-        val FBLINK = "https://www.facebook.com/"
     }
 
-    private var viewModel: MyProfileViewModel? = null
-    private var mListener: OnFragmentInteractionListener? = null
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    private var mListener: OnFragmentInteractionListener? = null
+
+
     private var uid = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
     private var name = ""
     private var cityFromLatLng = GeoPoint(0.0, 0.0)
@@ -102,11 +99,22 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     private var city = ""
     private lateinit var dateDialog: DatePickerDialog
     private var numberPhone: String = "+7"
-    private var whatsAppNumber: String = "+7"
-    private var vkLink: String = "https://www.vk.com/"
-    private var tgNick = "@"
-    private var csLink = "https://www.couchsurfing.com/people/"
-    private var fbLink = "https://www.facebook.com/"
+
+    private var socialValues: HashMap<String, String> = hashMapOf(
+            SocialNetwork.VK.link to "https://www.vk.com/",
+            SocialNetwork.TG.link to "@",
+            SocialNetwork.CS.link to "https://www.couchsurfing.com/people/",
+            SocialNetwork.FB.link to "https://www.facebook.com/",
+            SocialNetwork.WHATSAPP.link to "+7"
+    )
+    private var defaultSocialValues: HashMap<String, String> = hashMapOf(
+            SocialNetwork.VK.link to "https://www.vk.com/",
+            SocialNetwork.TG.link to "@",
+            SocialNetwork.CS.link to "https://www.couchsurfing.com/people/",
+            SocialNetwork.FB.link to "https://www.facebook.com/",
+            SocialNetwork.WHATSAPP.link to "+7"
+    )
+
     private var methods: HashMap<String, Boolean> = hashMapOf(
             Method.CAR.link to false,
             Method.TRAIN.link to false,
@@ -123,7 +131,6 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
     private var cities: HashMap<String, String> = hashMapOf()
     private var budget: Long = 0
     private var budgetPosition: Int = 0
-    private var glide: RequestManager? = null
     private var yearNow: Int = 0
     private var yearsArr: ArrayList<Int> = arrayListOf()
     private var profileStateHashMap: HashMap<String, String> = hashMapOf()
@@ -137,6 +144,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        App.component.inject(this)
         (activity as MenuActivity).pLoader?.show()
     }
 
@@ -157,9 +165,11 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         methodTextViews.put(Method.PLANE.link, travelPlaneText)
         methodTextViews.put(Method.HITCHHIKING.link, travelHitchHikingText)
 
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
+
+
 
         viewModel?.response?.observe(this, Observer<ResponseBtw<User>> { response ->
+
             when (response?.status) {
                 Status.SUCCESS -> {
                     if (response.data != null) {
@@ -178,6 +188,15 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         })
         viewModel?.load(uid)
     }
+
+    override fun getViewFactoryClass(): ViewModelProvider.Factory = viewModelFactory
+
+    @LayoutRes
+    override fun getLayoutRes(): Int {
+        return R.layout.fragment_user_profile
+    }
+
+    override fun getViewModelClass(): Class<MyProfileViewModel> = MyProfileViewModel::class.java
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -785,52 +804,35 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         val dialogView = View.inflate(context, R.layout.custom_dialog_profile_soc_network, null)
 
         simpleAlert.setView(dialogView)
+        var socVal = ""
+        socialValues[socialNetwork.link]?.let {
+            socVal = it
+        }
+        if (socialNetwork == SocialNetwork.TG && socVal.length <= 1) {
+            socVal = numberPhone
+        }
+        dialogView.findViewById<EditText>(R.id.socLinkText).setText(socVal)
 
-        dialogView.findViewById<EditText>(R.id.socLinkText).setText(
-                when (socialNetwork) {
-                    SocialNetwork.VK -> vkLink
-                    SocialNetwork.WHATSAPP -> whatsAppNumber
-                    SocialNetwork.CS -> csLink
-                    SocialNetwork.FB -> fbLink
-                    SocialNetwork.TG -> (if (tgNick.length > 1) tgNick else numberPhone)
-                })
         if (errorText != null) {
             dialogView.findViewById<EditText>(R.id.socLinkText).error = errorText
         }
         if (viewModel?.saveSocial?.hasObservers() == false) {
-            viewModel?.saveSocial?.observe(this, Observer<String> { link ->
-                link?.let {
-                    val newLink = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString()
-                    changeSocIconsActive(link)
-                    when (link) {
-                        SocialNetwork.VK.link -> vkLink = newLink
-                        SocialNetwork.WHATSAPP.link -> whatsAppNumber = newLink
-                        SocialNetwork.CS.link -> csLink = newLink
-                        SocialNetwork.FB.link -> fbLink = newLink
-                        SocialNetwork.TG.link -> tgNick = newLink
-                    }
+            viewModel?.saveSocial?.observe(this, Observer<SocialResponse> { response ->
+                response?.let {
+                    changeSocIconsActive(response.link, response.value)
                 }
             })
         }
         if (viewModel?.clearSocial?.hasObservers() == false) {
-            viewModel?.clearSocial?.observe(this, Observer<String> { link ->
-                link?.let {
-                    socNet.remove(link)
-                    changeSocIconsDisActive(link)
-                    when (link) {
-                        SocialNetwork.VK.link -> vkLink = VKLINK
-                        SocialNetwork.WHATSAPP.link -> whatsAppNumber = getString(R.string.default_phone_code)
-                        SocialNetwork.CS.link -> csLink = CSLINK
-                        SocialNetwork.FB.link -> fbLink = FBLINK
-                        SocialNetwork.TG.link -> tgNick = TGLINK
-                    }
+            viewModel?.clearSocial?.observe(this, Observer<SocialResponse> { response ->
+                response?.let {
+                    changeSocIconsDisActive(response.link)
                 }
-
             })
         }
         simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.remove), { _, _ ->
             viewModel?.saveLinks(socNet, uid, {
-                viewModel?.clearSocial?.setValue(socialNetwork.link)
+                viewModel?.clearSocial?.setValue(SocialResponse(socialNetwork.link))
             })
         })
         simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.save), { _, _ ->
@@ -849,7 +851,7 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
             } else {
                 socNet.put(socialNetwork.link, newLink)
                 viewModel?.saveLinks(socNet, uid, {
-                    viewModel?.saveSocial?.setValue(socialNetwork.link)
+                    viewModel?.saveSocial?.setValue(SocialResponse(socialNetwork.link, newLink))
                 })
             }
         })
@@ -881,8 +883,9 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         simpleAlert.show()
     }
 
-    private fun changeSocIconsActive(socialNetwork: String) {
-        when (socialNetwork) {
+    private fun changeSocIconsActive(socialNetworkLink: String, newLink: String) {
+        socialValues[socialNetworkLink] = newLink
+        when (socialNetworkLink) {
             SocialNetwork.VK.link -> vkIcon.setImageResource(R.drawable.ic_vk_color)
             SocialNetwork.CS.link -> csIcon.setImageResource(R.drawable.ic_cs_color)
             SocialNetwork.FB.link -> fbcon.setImageResource(R.drawable.ic_fb_color)
@@ -891,8 +894,12 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         }
     }
 
-    private fun changeSocIconsDisActive(socialNetwork: String) {
-        when (socialNetwork) {
+    private fun changeSocIconsDisActive(socialNetworkLink: String = "") {
+        socNet.remove(socialNetworkLink)
+        defaultSocialValues[socialNetworkLink]?.let {
+            socialValues[socialNetworkLink] = it
+        }
+        when (socialNetworkLink) {
             SocialNetwork.VK.link -> vkIcon.setImageResource(R.drawable.ic_vk_gray)
             SocialNetwork.CS.link -> csIcon.setImageResource(R.drawable.ic_cs_grey)
             SocialNetwork.FB.link -> fbcon.setImageResource(R.drawable.ic_fb_grey)
@@ -977,11 +984,13 @@ class MyProfileFragment : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDat
         name = user.name
         numberPhone = user.phone
 
-        whatsAppNumber = user.socialNetwork[SocialNetwork.WHATSAPP.link] ?: whatsAppNumber
-        vkLink = user.socialNetwork[SocialNetwork.VK.link] ?: vkLink
-        fbLink = user.socialNetwork[SocialNetwork.FB.link] ?: fbLink
-        csLink = user.socialNetwork[SocialNetwork.CS.link] ?: csLink
-        tgNick = user.socialNetwork[SocialNetwork.TG.link] ?: tgNick
+
+        user.socialNetwork.map {
+            if (it.key in socialValues) {
+                socialValues[it.key] = it.value
+            }
+        }
+
         travelledStatistics.visibility = if (user.flightHours == 0L) View.GONE else View.VISIBLE
 
         travelledCountries.text = user.countries.toString()

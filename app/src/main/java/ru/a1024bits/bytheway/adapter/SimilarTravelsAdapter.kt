@@ -11,6 +11,7 @@ import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.request.RequestOptions
+import com.google.firebase.analytics.FirebaseAnalytics
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
@@ -18,15 +19,8 @@ import ru.a1024bits.bytheway.util.Constants.FIRST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
 
 
-class SimilarTravelsAdapter(val context: Context) : RecyclerView.Adapter<SimilarTravelsAdapter.UserViewHolder>() {
+class SimilarTravelsAdapter(val context: Context, val users: List<User>) : RecyclerView.Adapter<SimilarTravelsAdapter.UserViewHolder>() {
     private var glide: RequestManager = Glide.with(this.context)
-    var users: MutableList<User> = ArrayList()
-
-    fun addItems(list: List<User>) {
-        this.users = list as MutableList<User>
-        notifyDataSetChanged()
-        Log.d("LOG", "addItems: " + list)
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
         return UserViewHolder(
@@ -62,20 +56,15 @@ class SimilarTravelsAdapter(val context: Context) : RecyclerView.Adapter<Similar
                 .apply(RequestOptions.circleCropTransform())
                 .into(holder.avatar)
 
-        holder.itemView.setOnClickListener {
-            if (context is MenuActivity) {
-                context.showUserSimpleProfile(currentUser)
-            }
-        }
     }
 
     private fun getShortCity(city: String): String? {
-        val n = if (city?.length > 14) 14 else city.length
-        val shortCity = city?.substring(0, n)
-        if (shortCity?.length == city?.length) {
-            return city
+        val n = if (city.length > 14) 14 else city.length
+        val shortCity = city.substring(0, n)
+        return if (shortCity.length == city.length) {
+            city
         } else {
-            return shortCity + "..."
+            shortCity + "..."
         }
     }
 
@@ -84,9 +73,18 @@ class SimilarTravelsAdapter(val context: Context) : RecyclerView.Adapter<Similar
     }
 
     inner class UserViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        var cities = view.findViewById<TextView>(R.id.users_cities)
-        var name = view.findViewById<TextView>(R.id.name_content_user)
-        var avatar = view.findViewById<ImageView>(R.id.user_avatar)
+        var cities = view.findViewById<TextView>(R.id.usersCities)
+        var name = view.findViewById<TextView>(R.id.nameContentUser)
+        var avatar = view.findViewById<ImageView>(R.id.userAvatar)
         var percentSimilarTravel = view.findViewById<TextView>(R.id.percent_similar_travel)
+
+        init {
+            view.setOnClickListener({ _ ->
+                if (adapterPosition != RecyclerView.NO_POSITION && context is MenuActivity) {
+                    FirebaseAnalytics.getInstance(context.applicationContext).logEvent("SimilarTravelsFragment_SELECT_USER_" + adapterPosition, null)
+                    context.showUserSimpleProfile(users[adapterPosition])
+                }
+            })
+        }
     }
 }

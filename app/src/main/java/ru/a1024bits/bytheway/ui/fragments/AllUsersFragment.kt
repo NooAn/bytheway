@@ -1,83 +1,83 @@
 package ru.a1024bits.bytheway.ui.fragments
 
-import android.animation.Animator
 import android.animation.LayoutTransition
 import android.app.SearchManager
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
 import android.support.design.widget.Snackbar
-import android.support.v4.app.Fragment
 import android.support.v7.widget.SearchView
 import android.util.Log
 import android.view.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import com.borax12.materialdaterangepicker.date.DatePickerDialog
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.crash.FirebaseCrash
 import kotlinx.android.synthetic.main.fragment_display_all_users.*
 import kotlinx.android.synthetic.main.searching_parameters_block.*
 import ru.a1024bits.bytheway.App
-import ru.a1024bits.bytheway.ExtensionsAllUsers
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.adapter.DisplayAllUsersAdapter
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
-import ru.a1024bits.bytheway.ui.activity.MenuActivity
+import ru.a1024bits.bytheway.repository.M_SEX
+import ru.a1024bits.bytheway.repository.W_SEX
 import ru.a1024bits.bytheway.util.DecimalInputFilter
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
-import uk.co.deanwild.materialshowcaseview.IShowcaseListener
-import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView
-import java.util.*
 import javax.inject.Inject
-import kotlin.collections.ArrayList
-import ru.a1024bits.bytheway.R.id.view
-import android.animation.AnimatorListenerAdapter
-import android.support.v4.view.ViewCompat.animate
 
 
-class AllUsersFragment : Fragment() {
+class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
     private val SIZE_INITIAL_ELEMENTS = 2
+    private val TAG_ANALYTICS = "AllUsersFragment_"
     private lateinit var filter: Filter
-    private lateinit var extension: ExtensionsAllUsers
-    private lateinit var viewModel: DisplayUsersViewModel
-    private lateinit var dateDialog: DatePickerDialog
+    private var dateDialog: DatePickerDialog? = null
     private lateinit var displayUsersAdapter: DisplayAllUsersAdapter
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
     private var countInitialElements = 0
-
+    private lateinit var analytics: FirebaseAnalytics
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        analytics = FirebaseAnalytics.getInstance(this.context)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
             inflater.inflate(R.layout.fragment_display_all_users, container, false)
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
         App.component.inject(this)
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(DisplayUsersViewModel::class.java)
-        filter = viewModel.filter
-        extension = viewModel.extension
+        super.onActivityCreated(savedInstanceState)
+        analytics.setCurrentScreen(this.activity, "AllUsersFragment", this.javaClass.simpleName)
 
-        installLogicToUI()
+        try {
+            filter = viewModel?.filter ?: Filter()
 
-        displayUsersAdapter = DisplayAllUsersAdapter(this.context, extension)
-        display_all_users.adapter = displayUsersAdapter
+            installLogicToUI()
 
-        viewModel.usersLiveData.observe(this, Observer<List<User>> { list ->
-            Log.e("LOG", "onChanged $list")
-            if (list != null) {
-                if (list.isNotEmpty())
-                    displayUsersAdapter.setItems(list)
-                updateViewsAfterSearch(list.isNotEmpty())
-            }
-        })
-        loadingWhereLoadUsers.visibility = View.VISIBLE
-        viewModel.getAllUsers(filter)
+            displayUsersAdapter = DisplayAllUsersAdapter(this.context, viewModel!!)
+            displayAllUsers.adapter = displayUsersAdapter
+
+            viewModel?.usersLiveData?.observe(this, Observer<List<User>> { list ->
+                Log.e("LOG", "onChanged $list")
+                if (list != null) {
+                    if (list.isNotEmpty())
+                        displayUsersAdapter.setItems(list)
+                    updateViewsAfterSearch(list.isNotEmpty())
+                }
+            })
+            loadingWhereLoadUsers.visibility = View.VISIBLE
+            viewModel?.getAllUsers(filter)
+
+            showPrompt("isFirstEnterAllUsersFragment", context.resources.getString(R.string.close_hint),
+                    context.resources.getString(R.string.hint_all_travelers), context.resources.getString(R.string.hint_all_travelers_description))
+        } catch (e: Throwable) {
+            Log.e("LOG_AUF", e.toString())
+            FirebaseCrash.report(e)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -89,23 +89,16 @@ class AllUsersFragment : Fragment() {
                 (context.getSystemService(Context.SEARCH_SERVICE) as SearchManager).getSearchableInfo(activity.componentName))
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             var isNotStartSearch = false
-            override fun onQueryTextSubmit(queryCustomRegister: String): Boolean {
-                val query = queryCustomRegister.toLowerCase()
-                val result = ArrayList<User>()
-                displayUsersAdapter.users.filterTo(result) {
-                    it.cities.containsValue(queryCustomRegister) || it.name.toLowerCase().contains(query) || it.email.toLowerCase().contains(query) ||
-                            it.age.toString().contains(query) || it.budget.toString().contains(query) ||
-                            it.city.toLowerCase().contains(query) || it.lastName.toLowerCase().contains(query) ||
-                            it.phone.contains(query) || it.route.contains(query)
-                }
-                displayUsersAdapter.setItems(result)
+            override fun onQueryTextSubmit(query: String): Boolean {
+                displayUsersAdapter.setItems(viewModel?.filterUsersByString(query.toLowerCase(), query, displayUsersAdapter.users))
+                analytics.logEvent(TAG_ANALYTICS + "SEARCH_QUERY", null)
                 return true
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-                if ("" == newText && isNotStartSearch) {
+                if (newText.isEmpty() && isNotStartSearch && this@AllUsersFragment.view != null) {
                     updateViewsBeforeSearch()
-                    viewModel.getAllUsers(filter)
+                    viewModel?.getAllUsers(filter)
                 }
                 isNotStartSearch = true
                 return false
@@ -120,12 +113,26 @@ class AllUsersFragment : Fragment() {
         else -> super.onOptionsItemSelected(item)
     }
 
+    override fun getViewFactoryClass() = viewModelFactory
+
+    override fun getLayoutRes() = R.layout.fragment_display_all_users
+
+    override fun getViewModelClass(): Class<DisplayUsersViewModel> = DisplayUsersViewModel::class.java
+
+    fun nonSuchSetDate() {
+        Snackbar.make(activity.findViewById(android.R.id.content), context.getString(R.string.dates_has_been_incorrect), Snackbar.LENGTH_LONG).show()
+    }
+
+    fun suchSetDate() {
+        updateChoseDateButtons()
+    }
+
     private fun installLogicToUI() {
         startBudget.filters = arrayOf(DecimalInputFilter())
         endBudget.filters = arrayOf(DecimalInputFilter())
 
         startAge.adapter = ArrayAdapter<String>(context, android.R.layout.simple_spinner_item,
-                extension.yearsOldUsers)
+                viewModel?.yearsOldUsers)
         startAge.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(p0: AdapterView<*>?) {}
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, p3: Long) {
@@ -137,7 +144,7 @@ class AllUsersFragment : Fragment() {
         }
 
         endAge.adapter = ArrayAdapter<String>(context, android.R.layout.simple_spinner_item,
-                extension.yearsOldUsers)
+                viewModel?.yearsOldUsers)
         endAge.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(p0: AdapterView<*>?) {}
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, p3: Long) {
@@ -147,30 +154,28 @@ class AllUsersFragment : Fragment() {
                     filter.endAge = position
             }
         }
-        updateDateDialog()
+        dateDialog = viewModel?.updateDateDialog(this)
         choseDate.setOnClickListener {
-            dateDialog.show(activity.fragmentManager, "")
+            dateDialog?.show(activity.fragmentManager, "")
         }
         sexButtons.setOnCheckedChangeListener { _, id ->
             filter.sex = when (id) {
-                sex_M.id -> 1
-                sex_W.id -> 2
+                sexM.id -> M_SEX
+                sexW.id -> W_SEX
                 else -> 0
             }
         }
         sexButtons.check(when (filter.sex) {
-            1 -> sex_M.id
-            2 -> sex_W.id
-            else -> sex_Any.id
+            M_SEX -> sexM.id
+            W_SEX -> sexW.id
+            else -> sexAny.id
         })
         updateChoseDateButtons()
 
         view_contain_block_parameters.layoutTransition.setDuration(700L)
-        cancelParameters.setOnClickListener {
-            animationSlide()
-            block_search_parameters.visibility = View.GONE
-        }
         saveParameters.setOnClickListener {
+            analytics.logEvent(TAG_ANALYTICS + "CLICK_ON_SEARCH", null)
+
             filter.startBudget = if (startBudget.text.isNotEmpty()) Integer.parseInt(startBudget.text.toString()) else -1
             filter.endBudget = if (endBudget.text.isNotEmpty()) Integer.parseInt(endBudget.text.toString()) else -1
             filter.startCity = startCity.text.toString()
@@ -178,15 +183,15 @@ class AllUsersFragment : Fragment() {
 
             animationSlide()
             block_search_parameters.visibility = View.GONE
-            viewModel.getAllUsers(filter)
+            setLogEventForSearch()
         }
 
         cancelParameters.setOnClickListener {
+            analytics.logEvent(TAG_ANALYTICS + "CLICK_ON_CANCEL", null)
+
             filter.sex = 0
             filter.startAge = -1
-            filter.endAge = -1
-            filter.startAge = 0
-            filter.endAge = extension.yearsOldUsers.size - 1
+            filter.endAge = viewModel?.yearsOldUsers?.size?.minus(1) ?: -1
             filter.startCity = ""
             filter.endCity = ""
             filter.startBudget = -1
@@ -201,14 +206,10 @@ class AllUsersFragment : Fragment() {
             startCity.setText("")
             endCity.setText("")
 
-            updateDateDialog()
+            dateDialog = viewModel?.updateDateDialog(this)
             updateChoseDateButtons()
 
-            sexButtons.check(when (filter.sex) {
-                1 -> sex_M.id
-                2 -> sex_W.id
-                else -> sex_Any.id
-            })
+            sexButtons.check(sexAny.id)
         }
 
         view_contain_block_parameters.layoutTransition.setDuration(700L)
@@ -219,26 +220,22 @@ class AllUsersFragment : Fragment() {
                 block_search_parameters.visibility = View.GONE
             }
         }
-
-        if ((activity as MenuActivity).preferences.getBoolean("isFirstEnterAllUsersFragment", true))
-            MaterialShowcaseView.Builder(activity)
-                    .setTarget(searchParametersText)
-                    .renderOverNavigationBar()
-                    .setDismissText(context.resources.getString(R.string.close_hint))
-                    .setTitleText(context.resources.getString(R.string.hint_all_travelers))
-                    .setContentText(context.resources.getString(R.string.hint_all_travelers_description))
-                    .withCircleShape()
-                    .setListener(object : IShowcaseListener {
-                        override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {
-                        }
-
-                        override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
-                            if (activity != null && !activity.isDestroyed)
-                                (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterAllUsersFragment", false).apply()
-                        }
-                    })
-                    .show()
     }
+
+    private fun setLogEventForSearch() {
+        if (filter.endDate != 0L) analytics.logEvent(TAG_ANALYTICS + "END_DATE", null)
+        if (filter.startDate != 0L) analytics.logEvent(TAG_ANALYTICS + "START_DATE", null)
+        if (filter.endAge != -1) analytics.logEvent(TAG_ANALYTICS + "END_AGE", null)
+        if (filter.startAge != -1) analytics.logEvent(TAG_ANALYTICS + "START_AGE", null)
+        if (filter.endCity.isNotBlank()) analytics.logEvent(TAG_ANALYTICS + "END_CITY", null)
+        if (filter.startCity.isNotBlank()) analytics.logEvent(TAG_ANALYTICS + "START_CITY", null)
+        if (filter.endBudget != -1) analytics.logEvent(TAG_ANALYTICS + "START_BUDGET", null)
+        if (filter.startBudget != -1) analytics.logEvent(TAG_ANALYTICS + "END_BUDGET", null)
+        if (filter.sex != 0) analytics.logEvent(TAG_ANALYTICS + "SEX_ANY", null)
+        if (filter.sex != W_SEX) analytics.logEvent(TAG_ANALYTICS + "SEX_FEMALE", null)
+        if (filter.sex != M_SEX) analytics.logEvent(TAG_ANALYTICS + "SEX_MALE", null)
+    }
+
 
     private fun animationSlide() {
         view_contain_block_parameters.layoutTransition.addTransitionListener(object : LayoutTransition.TransitionListener {
@@ -246,51 +243,15 @@ class AllUsersFragment : Fragment() {
             override fun endTransition(p0: LayoutTransition?, p1: ViewGroup?, view: View, p3: Int) {
                 if ((view.id == block_search_parameters.id) && (block_search_parameters.visibility == View.GONE)) {
                     updateViewsBeforeSearch()
+                    viewModel?.getAllUsers(filter)
                     view_contain_block_parameters.layoutTransition.removeTransitionListener(this)
                 }
             }
         })
     }
 
-    private fun updateDateDialog() {
-        val currentStartDate = Calendar.getInstance()
-        if (filter.startDate > 0L) currentStartDate.timeInMillis = filter.startDate
-        val currentEndDate = Calendar.getInstance()
-        currentEndDate.timeInMillis = currentEndDate.timeInMillis + 1000L * 60 * 60 * 24
-        if (filter.endDate > 0L) currentEndDate.timeInMillis = filter.endDate
-
-        dateDialog = DatePickerDialog.newInstance(
-                { _, year, monthOfYear, dayOfMonth, yearEnd, monthOfYearEnd, dayOfMonthEnd ->
-                    val calendarStartDate = Calendar.getInstance()
-                    calendarStartDate.set(Calendar.YEAR, year)
-                    calendarStartDate.set(Calendar.MONTH, monthOfYear)
-                    calendarStartDate.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-
-                    val calendarEndDate = Calendar.getInstance()
-                    calendarEndDate.set(Calendar.YEAR, yearEnd)
-                    calendarEndDate.set(Calendar.MONTH, monthOfYearEnd)
-                    calendarEndDate.set(Calendar.DAY_OF_MONTH, dayOfMonthEnd)
-
-                    if (calendarStartDate.timeInMillis >= calendarEndDate.timeInMillis) {
-                        Snackbar.make(activity.findViewById(android.R.id.content), "даты оказались некорректными, попробуйте ввести их снова", Snackbar.LENGTH_LONG).show()
-                        return@newInstance
-                    }
-                    filter.startDate = calendarStartDate.timeInMillis
-                    filter.endDate = calendarEndDate.timeInMillis
-                    updateChoseDateButtons()
-                },
-                currentStartDate.get(Calendar.YEAR),
-                currentStartDate.get(Calendar.MONTH),
-                currentStartDate.get(Calendar.DAY_OF_MONTH),
-                currentEndDate.get(Calendar.YEAR),
-                currentEndDate.get(Calendar.MONTH),
-                currentEndDate.get(Calendar.DAY_OF_MONTH))
-        dateDialog.setStartTitle(resources.getString(R.string.date_start))
-        dateDialog.setEndTitle(resources.getString(R.string.date_end))
-    }
-
     private fun updateViewsBeforeSearch() {
-        display_all_users.visibility = View.GONE
+        displayAllUsers.visibility = View.GONE
         block_empty_users.visibility = View.GONE
         loadingWhereLoadUsers.visibility = View.VISIBLE
     }
@@ -298,14 +259,14 @@ class AllUsersFragment : Fragment() {
     private fun updateViewsAfterSearch(isNotEmptyListUsers: Boolean) {
         loadingWhereLoadUsers.visibility = View.GONE
         if (isNotEmptyListUsers)
-            display_all_users.visibility = View.VISIBLE
+            displayAllUsers.visibility = View.VISIBLE
         else
             block_empty_users.visibility = View.VISIBLE
     }
 
     private fun updateChoseDateButtons() {
         choseDate.text = if (filter.startDate > 0L && filter.endDate > 0L)
-            extension.getTextFromDates(filter.startDate, filter.endDate, 0)
+            viewModel?.getTextFromDates(filter.startDate, filter.endDate, 0)
         else context.getString(R.string.filters_all_users_empty_date)
     }
 
