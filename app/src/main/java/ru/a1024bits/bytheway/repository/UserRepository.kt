@@ -36,25 +36,32 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) : IUsersR
         return store.collection(COLLECTION_USERS).get()
     }
 
-    override fun getAllUsers(): Single<MutableList<User>> =
-            Single.create<MutableList<User>> { e ->
-                store.collection(COLLECTION_USERS).get()
-                        .addOnCompleteListener({ task ->
-                            val result: MutableList<User> = CopyOnWriteArrayList()
-                            for (document in task.result) {
-                                try {
-                                    result.add(document.toObject(User::class.java))
-                                } catch (e: Exception) {
-                                }
+    override fun getAllUsers(): Single<MutableList<User>> {
+        Log.e("LOG get all users", Thread.currentThread().name)
+
+        return Single.create<MutableList<User>> { e ->
+            store.collection(COLLECTION_USERS).get()
+                    .addOnCompleteListener({ task ->
+                        Log.e("LOG completeListener", Thread.currentThread().name)
+                        val result: MutableList<User> = arrayListOf()
+                        for (document in task.result) {
+                            try {
+                                result.add(document.toObject(User::class.java))
+                            } catch (e: Exception) {
+                                e.printStackTrace()
                             }
-                            e.onSuccess(result)
-                        }).addOnFailureListener({ exception -> e.onError(exception) })
-            }
+                        }
+                        e.onSuccess(result)
+                    }).addOnFailureListener({ exception -> e.onError(exception) })
+        }
+    }
 
     override fun getReallUsers(paramSearch: Filter): Single<List<User>> =
             Single.create<List<User>> { stream ->
                 store.collection(COLLECTION_USERS).get().addOnCompleteListener({ task ->
                     if (task.isSuccessful) {
+                        Log.e("LOG get all users", Thread.currentThread().name)
+
                         val result: MutableList<User> = ArrayList()
                         for (document in task.result) {
                             Log.d(TAG, document.id + " => " + document.data)
@@ -94,7 +101,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) : IUsersR
         return store.collection(COLLECTION_USERS).document(user.id).set(user)
     }
 
-    override fun changeUserProfile(map: HashMap<String, Any>, id: String):Completable =
+    override fun changeUserProfile(map: HashMap<String, Any>, id: String): Completable =
             Completable.create { stream ->
                 Log.d("LOG", "change user profile send....")
                 val documentRef = store.collection(COLLECTION_USERS).document(id)

@@ -1,7 +1,9 @@
 package ru.a1024bits.bytheway.viewmodel
 
 import android.arch.lifecycle.MutableLiveData
+import android.util.Log
 import com.borax12.materialdaterangepicker.date.DatePickerDialog
+import io.reactivex.schedulers.Schedulers
 import ru.a1024bits.bytheway.App.Companion.INSTANCE
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.Response
@@ -17,7 +19,6 @@ import javax.inject.Inject
  * Created by andrey.gusenkov on 25/09/2017.
  */
 class DisplayUsersViewModel @Inject constructor(var userRepository: UserRepository) : BaseViewModel() {
-    var usersLiveData: MutableLiveData<List<User>> = MutableLiveData<List<User>>()
     val loadingStatus = MutableLiveData<Boolean>()
     var response: MutableLiveData<Response<List<User>>> = MutableLiveData()
     var yearsOldUsers = (0..MAX_AGE).mapTo(ArrayList<String>()) { it.toString() }
@@ -28,13 +29,17 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
     fun getAllUsers(filter: Filter) {
         disposables.add(userRepository.getAllUsers()
                 .subscribeOn(getBackgroundScheduler())
-                .observeOn(getMainThreadScheduler())
-                .doOnSubscribe({ loadingStatus.setValue(true) })
-                .doAfterTerminate({ loadingStatus.setValue(false) })
-                .observeOn(getBackgroundScheduler())
+                .doOnSubscribe({ loadingStatus.postValue(true) })
+                .doAfterTerminate({ loadingStatus.postValue(false) })
                 .doAfterSuccess { resultUsers -> filterUsersByFilter(resultUsers, filter) }
                 .observeOn(getMainThreadScheduler())
-                .subscribe({ resultUsers -> usersLiveData.setValue(resultUsers) })
+                .subscribe(
+                        { resultUsers ->
+                            Log.e("LOG subscribe", Thread.currentThread().name)
+                            response.postValue(Response.success(resultUsers))
+                        },
+                        { throwable -> response.postValue(Response.error(throwable)) }
+                )
         )
     }
 
@@ -132,6 +137,7 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
     }
 
     private fun filterUsersByFilter(resultUsers: MutableList<User>, filter: Filter) {
+        Log.e("LOG filter", Thread.currentThread().name)
         resultUsers.retainAll {
             (!((filter.startBudget >= 0) && (filter.endBudget > 0)) || (it.budget >= filter.startBudget && it.budget <= filter.endBudget)) &&
                     (!((filter.startDate > 0L) && (filter.endDate > 0L)) || ((it.dates["start_date"] as Long) >= filter.startDate && (it.dates["end_date"] as Long) <= filter.endDate)) &&

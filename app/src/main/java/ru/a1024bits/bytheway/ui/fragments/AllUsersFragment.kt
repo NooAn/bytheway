@@ -20,12 +20,17 @@ import kotlinx.android.synthetic.main.searching_parameters_block.*
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.adapter.DisplayAllUsersAdapter
+import ru.a1024bits.bytheway.model.Response
+import ru.a1024bits.bytheway.model.Status
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.repository.M_SEX
 import ru.a1024bits.bytheway.repository.W_SEX
+import ru.a1024bits.bytheway.router.Screens
+import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.a1024bits.bytheway.util.DecimalInputFilter
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
+import ru.terrakok.cicerone.commands.Forward
 import javax.inject.Inject
 
 
@@ -48,6 +53,25 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
             inflater.inflate(R.layout.fragment_display_all_users, container, false)
 
+    private val usersObservers: Observer<Response<List<User>>> = Observer<Response<List<User>>> { response ->
+        when (response?.status) {
+            Status.SUCCESS -> if (response.data == null) showErrorLoading() else {
+                if (response.data.isNotEmpty())
+                    displayUsersAdapter.setItems(response.data)
+                updateViewsAfterSearch(response.data.isNotEmpty())
+            }
+            Status.ERROR -> {
+                Log.e("LOG", "log e:" + response.error)
+                showErrorLoading()
+            }
+        }
+
+    }
+
+    private fun showErrorLoading() {
+
+    }
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         App.component.inject(this)
         super.onActivityCreated(savedInstanceState)
@@ -61,14 +85,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             displayUsersAdapter = DisplayAllUsersAdapter(this.context, viewModel!!)
             displayAllUsers.adapter = displayUsersAdapter
 
-            viewModel?.usersLiveData?.observe(this, Observer<List<User>> { list ->
-                Log.e("LOG", "onChanged $list")
-                if (list != null) {
-                    if (list.isNotEmpty())
-                        displayUsersAdapter.setItems(list)
-                    updateViewsAfterSearch(list.isNotEmpty())
-                }
-            })
+            viewModel?.response?.observe(this, usersObservers)
             loadingWhereLoadUsers.visibility = View.VISIBLE
             viewModel?.getAllUsers(filter)
 

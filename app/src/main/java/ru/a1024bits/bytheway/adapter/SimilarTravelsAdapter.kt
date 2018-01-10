@@ -31,10 +31,10 @@ class SimilarTravelsAdapter(val context: Context, val users: List<User>) : Recyc
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
         Log.d("LOG", "onBindViewHolder on position: " + position)
         val currentUser = users[position]
-
-        holder.cities.text = StringBuilder().append(getShortCity(currentUser.cities.get(FIRST_INDEX_CITY) ?: ""))
-                .append(" - ")
-                .append(getShortCity(currentUser.cities.get(LAST_INDEX_CITY) ?: ""))
+        if (currentUser.cities.size > 0)
+            holder.cities.text = StringBuilder().append(getShortCity(currentUser.cities.get(FIRST_INDEX_CITY) ?: ""))
+                    .append(" - ")
+                    .append(getShortCity(currentUser.cities.get(LAST_INDEX_CITY) ?: ""))
 
         holder.name.text = StringBuilder().append(currentUser.name)
                 .append(" ")
@@ -59,7 +59,7 @@ class SimilarTravelsAdapter(val context: Context, val users: List<User>) : Recyc
     }
 
     private fun getShortCity(city: String): String? {
-        val n = if (city.length > 14) 14 else city.length
+        val n = if (city.length > 19) 19 else city.length
         val shortCity = city.substring(0, n)
         return if (shortCity.length == city.length) {
             city

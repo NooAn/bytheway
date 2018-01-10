@@ -56,10 +56,10 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="12dp"
         android:ellipsize="end"
+        android:textAlignment="textEnd"
         android:maxLength="16"
         android:maxLines="1"
         android:text="@string/city_toSmall"
-        android:textAlignment="textEnd"
         android:textColor="@color/textColor"
         android:textSize="20sp"
         app:layout_constraintRight_toRightOf="parent" />

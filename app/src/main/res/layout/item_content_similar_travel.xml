@@ -32,6 +32,9 @@
         android:id="@+id/usersCities"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:maxLength="25"
+        android:maxLines="1"
+        android:text="@string/not_cities"
         android:layout_marginBottom="4dp"
         android:layout_marginEnd="8dp"
         android:textColor="@color/mdtp_dark_gray"
@@ -39,7 +42,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/userAvatar"
         app:layout_constraintStart_toStartOf="@+id/nameContentUser"
         app:layout_constraintTop_toBottomOf="@+id/nameContentUser"
-        tools:text="Киев, Украина" />
+        tools:text="Мегабольшиковское, Украина" />
 
     <TextView
         android:id="@+id/percent_similar_travel"
