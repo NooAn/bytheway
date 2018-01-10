@@ -253,7 +253,6 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
         if (filter.sex != M_SEX) analytics.logEvent(TAG_ANALYTICS + "SEX_MALE", null)
     }
 
-
     private fun animationSlide() {
         view_contain_block_parameters.layoutTransition.addTransitionListener(object : LayoutTransition.TransitionListener {
             override fun startTransition(p0: LayoutTransition?, p1: ViewGroup?, p2: View?, p3: Int) {}

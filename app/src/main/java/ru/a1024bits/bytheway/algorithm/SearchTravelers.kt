@@ -23,7 +23,7 @@ class SearchTravelers(val filter: Filter = Filter(), val user: User) {
         val c = calculateMethod() * WeightMethod
         val p = calculateBudget() * WeightBudget
 
-        Log.e("LOG", "name:${user.name} -  route:$n  date:$m  method:$c  budget:$p")
+//        Log.e("LOG", "name:${user.name} -  route:$n  date:$m  method:$c  budget:$p")
 
         return ((calculateRoute() * WeightRoute
                 + calculateDate() * WeightDate
@@ -112,8 +112,6 @@ class SearchTravelers(val filter: Filter = Filter(), val user: User) {
         }
         if (indexFirst < 0) indexFirst = 0.0
         if (indexLast < 0) indexLast = 0.0
-
-        Log.e("LOG", "first: $indexFirst  last: $indexLast startpoint: $startPoint endpoint:$endPoint lastR: $R")
 
         return (indexFirst / 2) + indexLast
     }

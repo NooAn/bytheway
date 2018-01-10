@@ -23,6 +23,7 @@ import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.GeoPoint
 import kotlinx.android.synthetic.main.fragment_maps.*
 import kotlinx.android.synthetic.main.fragment_search_block.*
 import retrofit2.Call
@@ -248,6 +249,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val dates: HashMap<String, Long> = hashMapOf()
         dates.put(START_DATE, searchFragment?.filter?.startDate ?: 0)
         dates.put(END_DATE, searchFragment?.filter?.endDate ?: 0)
+        hashMap.put(MyProfileFragment.CITY_FROM,
+                GeoPoint(searchFragment?.filter?.locationStartCity?.latitude ?: 0.0, searchFragment?.filter?.locationStartCity?.longitude ?: 0.0)
+        )
+        hashMap.put(MyProfileFragment.CITY_TO, GeoPoint(searchFragment?.filter?.locationEndCity?.latitude ?: 0.0, searchFragment?.filter?.locationEndCity?.longitude ?: 0.0))
         hashMap.put("dates", dates)
         return hashMap
     }
@@ -351,7 +356,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     onAnimationEnd = {
                         viewModel?.response?.observe(this@MapFragment, listUsers)
                         //  searchFragment?.filter?.endBudget = parseInt(budgetFromValue.toString())
-                        Log.d("LOG", budgetFromValue.toString())
+                       // Log.d("LOG", budgetFromValue.toString())
                         viewModel?.getUsersWithSimilarTravel(searchFragment?.filter ?: Filter())
                         mMap?.clear()
                         listPointPath.clear()

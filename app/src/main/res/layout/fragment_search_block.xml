@@ -138,6 +138,7 @@
                     android:layout_height="wrap_content"
                     android:imeOptions="actionNext"
                     android:inputType="number"
+                    android:hint="$"
                     android:maxEms="4"
                     android:minEms="4" />
             </android.support.design.widget.TextInputLayout>

@@ -283,7 +283,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     override fun onResume() {
         super.onResume()
-        //mapView.onResume()
+        mapView.onResume()
     }
 
     override fun onMapReady(map: GoogleMap?) {
@@ -378,11 +378,11 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
         try {
             mapView.onCreate(null)
-            ///MapsInitializer.initialize(context)
+            MapsInitializer.initialize(context)
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        mapView.getMapAsync(this)
+        mapView.getMapAsync(this@MyProfileFragment)
         val scroll = view.findViewById(R.id.scrollProfile) as ScrollView
         scroll.descendantFocusability = ViewGroup.FOCUS_BEFORE_DESCENDANTS
         scroll.isFocusable = true
@@ -534,7 +534,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_remove_trip", null)
         }
 
-        // mapView.onStart()
+
+        mapView.onStart()
     }
 
     override fun onStop() {

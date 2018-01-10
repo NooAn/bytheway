@@ -6,11 +6,14 @@ import android.location.Location
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.TextView
 import android.widget.Toast
 import com.borax12.materialdaterangepicker.date.DatePickerDialog
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException
@@ -68,6 +71,8 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         filter.endDate = user.dates.get(END_DATE) ?: 0
         filter.endBudget = user.budget.toInt()
         filter.method = user.method
+        filter.endCity = user.cities.get(LAST_INDEX_CITY) ?: ""
+        filter.startCity = user.cities.get(FIRST_INDEX_CITY) ?: ""
         filter.locationStartCity = LatLng(user.cityFromLatLng.latitude, user.cityFromLatLng.longitude)
         filter.locationEndCity = LatLng(user.cityToLatLng.latitude, user.cityToLatLng.longitude)
         return view
@@ -146,6 +151,9 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             text_from_city.text = text_to_city.text
             text_to_city.text = tempString
 
+            filter?.endCity = text_to_city.text.toString()
+            filter?.startCity = text_from_city.text.toString()
+
             val tempLng = filter.locationStartCity
             filter.locationStartCity = filter.locationEndCity
             filter.locationEndCity = tempLng
@@ -153,9 +161,20 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             updatePoints()
         }
 
-        budgetFromValue.setText(user.budget.toString())
+        budgetFromValue.setText("$ ${user.budget.toString()}")
         budgetFromValue.filters = arrayOf(DecimalInputFilter())
-        budgetToValue.filters = arrayOf(DecimalInputFilter()) //fixme textWatcher
+        budgetFromValue.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            }
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            }
+
+            override fun afterTextChanged(text: Editable?) {
+
+            }
+
+        })
         if (user.cityFromLatLng.latitude != 0.0 && user.cityToLatLng.latitude != 0.0 && user.cityToLatLng.longitude != 0.0) {
             updatePoints()
         }
