@@ -33,7 +33,6 @@ import javax.inject.Inject
 class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCallback {
 
     private var mListener: OnFragmentInteractionListener? = null
-    private lateinit var mFirebaseAnalytics: FirebaseAnalytics
     private val userLoad: Observer<Response<User>> = Observer<Response<User>> { response ->
         when (response?.status) {
             Status.SUCCESS -> if (response.data == null) showErrorLoading() else fillProfile(response.data)

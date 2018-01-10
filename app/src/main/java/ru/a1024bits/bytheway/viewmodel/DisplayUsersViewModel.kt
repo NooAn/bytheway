@@ -143,8 +143,8 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
                     (!((filter.startDate > 0L) && (filter.endDate > 0L)) || ((it.dates["start_date"] as Long) >= filter.startDate && (it.dates["end_date"] as Long) <= filter.endDate)) &&
                     ((it.age >= filter.startAge && it.age <= filter.endAge)) &&
                     ((filter.sex == 0) || (it.sex == filter.sex)) &&
-                    ((filter.startCity.isEmpty()) || (it.cities.contains(filter.startCity))) &&
-                    ((filter.endCity.isEmpty()) || (it.cities.contains(filter.endCity)))
+                    ((filter.startCity.isEmpty()) || (it.cities.containsValue(filter.startCity))) &&
+                    ((filter.endCity.isEmpty()) || (it.cities.containsValue(filter.endCity)))
         }
     }
 }

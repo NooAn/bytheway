@@ -8,6 +8,7 @@ import android.support.annotation.LayoutRes
 import android.support.v4.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
+import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.android.synthetic.main.fragment_display_all_users.*
 import ru.a1024bits.bytheway.viewmodel.BaseViewModel
 import uk.co.deanwild.materialshowcaseview.IShowcaseListener
@@ -20,6 +21,7 @@ abstract class BaseFragment<T : BaseViewModel> : Fragment() {
 
     protected var viewModel: T? = null
     protected var glide: RequestManager? = null
+    protected lateinit var mFirebaseAnalytics: FirebaseAnalytics
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

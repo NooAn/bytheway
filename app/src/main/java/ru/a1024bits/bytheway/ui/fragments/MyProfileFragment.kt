@@ -2,6 +2,7 @@ package ru.a1024bits.bytheway.ui.fragments
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -28,6 +29,7 @@ import com.google.android.gms.location.places.AutocompleteFilter
 import com.google.android.gms.location.places.ui.PlaceAutocomplete
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.GeoPoint
 import com.google.maps.android.PolyUtil
@@ -112,6 +114,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             SocialNetwork.FB.link to "https://www.facebook.com/",
             SocialNetwork.WHATSAPP.link to "+7"
     )
+
     private var methods: HashMap<String, Boolean> = hashMapOf(
             Method.CAR.link to false,
             Method.TRAIN.link to false,
@@ -149,6 +152,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         super.onActivityCreated(savedInstanceState)
         App.component.inject(this)
         glide = Glide.with(this)
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(context)
 
         methodIcons.put(Method.CAR.link, iconCar)
         methodIcons.put(Method.TRAIN.link, iconTrain)
@@ -163,6 +167,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         methodTextViews.put(Method.HITCHHIKING.link, travelHitchHikingText)
 
         viewModel?.response?.observe(this, Observer<ru.a1024bits.bytheway.model.Response<User>> { response ->
+
             when (response?.status) {
                 Status.SUCCESS -> {
                     if (response.data != null) {
@@ -278,7 +283,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     override fun onResume() {
         super.onResume()
-        mapView.onResume()
+        //mapView.onResume()
     }
 
     override fun onMapReady(map: GoogleMap?) {
@@ -300,7 +305,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             markerTitleFinal = cityFrom
             markerPositionStart = coordTo
             markerPositionFinal = coordFrom
-
 
         } else if (position == 2) {
             markerTitleFinal = cityTo
@@ -342,7 +346,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
         options.width(5f)
 
-
         if (routeString != "") {
             polyPts = PolyUtil.decode(routeString)
 
@@ -375,7 +378,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
         try {
             mapView.onCreate(null)
-            MapsInitializer.initialize(context)
+            ///MapsInitializer.initialize(context)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -408,8 +411,10 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     override fun onPause() {
         super.onPause()
-        mapView.onPause()
+        //   mapView.onPause()
     }
+
+    private val TAG_ANALYTICS: String = "MProfile_screen"
 
     override fun onStart() {
         super.onStart()
@@ -427,6 +432,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
         headerprofile.setOnClickListener {
             openInformationEditDialog()
+            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_header_click", null)
         }
 
         choosePriceTravel.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -460,6 +466,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         newTripText.setOnClickListener {
             hideBlockNewTrip()
             showBlockTravelInformation()
+            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_create_click", null)
         }
         vkIcon.setOnClickListener {
             /*
@@ -468,47 +475,63 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
              И меняем цвет иконки соответсвенно значениям.
              */
             openDialog(SocialNetwork.VK)
+            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_vk_click", null)
         }
         csIcon.setOnClickListener {
             openDialog(SocialNetwork.CS)
+            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_cs_click", null)
         }
         whatsAppIcon.setOnClickListener {
             openDialog(SocialNetwork.WHATSAPP)
+            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_wap_click", null)
         }
         fbcon.setOnClickListener {
             openDialog(SocialNetwork.FB)
+            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_fb_click", null)
         }
         tgIcon.setOnClickListener {
             openDialog(SocialNetwork.TG)
+            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_tg_click", null)
         }
 
         buttonSaveTravelInfo.setOnClickListener {
             Log.e("LOG", "save travel")
             sendUserInfoToServer()
+            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_save", null)
         }
         dateArrived.setOnClickListener {
             openDateDialog()
+            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_date_to_click", null)
+
         }
         textDateFrom.setOnClickListener {
             openDateDialog()
+            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_date_from_click", null)
         }
         addInfoUser.afterTextChanged({
             profileStateHashMap[ADD_INFO] = it
             profileChanged(null, false)
+            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_click_air", null)
+            Log.d("LOG User", "after text change")
         })
         textCityFrom.setOnClickListener {
             sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM)
+            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_city_from_change", null)
+
         }
 
         textCityTo.setOnClickListener {
             sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO)
+            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_city_to_change", null)
         }
         appinTheAirEnter.setOnClickListener {
             (activity as MenuActivity).navigator
                     .applyCommand(Replace(Screens.USER_SINHRONIZED_SCREEN, 1))
+            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_click_air", null)
         }
         buttonRemoveTravelInfo.setOnClickListener {
             openAlertDialog(this::removeTrip)
+            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_remove_trip", null)
         }
 
         // mapView.onStart()
@@ -601,6 +624,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     }
 
     private fun sendUserInfoToServer() {
+
         var errorString = ""
 
         if (textCityFrom.text.isEmpty() || textCityTo.text.isEmpty()) {
@@ -621,6 +645,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         }
         if (cityToLatLng.hashCode() == cityFromLatLng.hashCode()) {
             errorString += " " + getString(R.string.fill_diff_cities)
+            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_city_equals_err", null)
+
         }
 
         if (errorString.isNotEmpty()) {
@@ -657,6 +683,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     private fun showErrorResponse() {
         Toast.makeText(this@MyProfileFragment.context,
                 getString(R.string.error_update), Toast.LENGTH_SHORT).show()
+        mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_error_update", null)
+
     }
 
     private fun validCellPhone(number: String): Boolean {
@@ -738,8 +766,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             cityview.text = if (city.isNotEmpty()) city else getString(R.string.native_city)
             viewModel?.sendUserData(getHashMapUser(), uid)
 
-
-
             savingUserData(name, lastName, city)
 
         })
@@ -747,12 +773,11 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             simpleAlert.hide()
         })
 
-
+        var enterCounter = 0
         nameChoose.setOnKeyListener(View.OnKeyListener { _, keyCode, _ ->
-
             if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                enterCounter = 1
                 lastNameChoose.requestFocus()
-
                 return@OnKeyListener true
             }
             false
@@ -760,9 +785,10 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
         lastNameChoose.setOnKeyListener(View.OnKeyListener { _, keyCode, _ ->
             if (keyCode == KeyEvent.KEYCODE_ENTER) {
-
-                Log.d("LOG", "ENTER is Pressed on LastName")
-                cityChoose.requestFocus()
+                if (enterCounter == 0) {
+                    cityChoose.requestFocus()
+                    enterCounter = 1
+                } else enterCounter = 0
                 return@OnKeyListener true
             }
             false
@@ -770,13 +796,10 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
         cityChoose.setOnKeyListener(View.OnKeyListener { _, keyCode, _ ->
             if (keyCode == KeyEvent.KEYCODE_ENTER) {
-
-
-                val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.hideSoftInputFromWindow(cityChoose.windowToken, 0)
-
-
-
+                if (enterCounter == 0) {
+                    val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.hideSoftInputFromWindow(cityChoose.windowToken, 0)
+                } else enterCounter = 0
                 return@OnKeyListener true
             }
             false
@@ -824,12 +847,14 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             })
         }
         simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.remove), { _, _ ->
+            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_remove_links", null)
             viewModel?.saveLinks(socNet, uid, {
                 viewModel?.clearSocial?.setValue(SocialResponse(socialNetwork.link))
             })
         })
         simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.save), { _, _ ->
             val newLink = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString()
+            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_save_links", null)
 
             var valid = true
             var errorText = ""
@@ -1021,7 +1046,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
         fillAgeSex(user.age, user.sex)
         setMarkers(2)
-        drawPolyline()
+        obtainDirection()
         age = user.age
 
         glide?.load(user.urlPhoto)
@@ -1078,6 +1103,9 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     }
 
     fun getHashMapUser(): HashMap<String, Any> {
+        if (budget > 0)
+            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_budget_more_0", null)
+
         val hashMap = HashMap<String, Any>()
 
         hashMap[CITIES] = cities
@@ -1103,10 +1131,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             addInfoUser.clearFocus()
         }
         if (countTrip == 1) {
-
             var changed: Boolean = profileStateHashMap.hashCode() != oldProfileState
             force?.let { changed = it }
-
             (activity as MenuActivity).profileChanged = changed
         }
     }
