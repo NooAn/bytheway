@@ -754,12 +754,11 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             simpleAlert.hide()
         })
 
-
+        var enterCounter=0
         nameChoose.setOnKeyListener(View.OnKeyListener { _, keyCode, _ ->
-
             if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                enterCounter=1
                 lastNameChoose.requestFocus()
-
                 return@OnKeyListener true
             }
             false
@@ -767,9 +766,10 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
         lastNameChoose.setOnKeyListener(View.OnKeyListener { _, keyCode, _ ->
             if (keyCode == KeyEvent.KEYCODE_ENTER) {
-
-                Log.d("LOG", "ENTER is Pressed on LastName")
-                cityChoose.requestFocus()
+                if (enterCounter==0){
+                    cityChoose.requestFocus()
+                    enterCounter=1
+                }else enterCounter=0
                 return@OnKeyListener true
             }
             false
@@ -777,13 +777,10 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
         cityChoose.setOnKeyListener(View.OnKeyListener { _, keyCode, _ ->
             if (keyCode == KeyEvent.KEYCODE_ENTER) {
-
-
+                if (enterCounter==0){
                     val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                     imm.hideSoftInputFromWindow(cityChoose.windowToken, 0)
-
-
-
+                }else enterCounter=0
                 return@OnKeyListener true
             }
             false
@@ -1028,7 +1025,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
         fillAgeSex(user.age, user.sex)
         setMarkers(2)
-        drawPolyline()
+        obtainDirection()
         age = user.age
 
         glide?.load(user.urlPhoto)
