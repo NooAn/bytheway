@@ -5,8 +5,11 @@ import android.arch.lifecycle.LifecycleActivity
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.Toast
@@ -76,6 +79,20 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
             }
         })
         signIn()
+        if (isNetworkAvailable() == false) showSnack()
+    }
+
+    var snackbar: Snackbar? = null
+
+    private fun showSnack() {
+        snackbar = Snackbar.make(this.findViewById(android.R.id.content), R.string.no_internet, Snackbar.LENGTH_LONG)
+        snackbar?.show()
+    }
+
+    private fun isNetworkAvailable(): Boolean {
+        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetworkInfo = connectivityManager.getActiveNetworkInfo()
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected()
     }
 
     private fun signIn() {

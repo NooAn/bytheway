@@ -5,8 +5,11 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.os.Bundle
 import android.support.design.widget.NavigationView
+import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
@@ -66,7 +69,7 @@ class MenuActivity : AppCompatActivity(),
     val preferences: SharedPreferences by lazy { getSharedPreferences(Constants.APP_PREFERENCES, Context.MODE_PRIVATE) }
 
     private var mGoogleApiClient: GoogleApiClient? = null
-    public var pLoader: ProgressCustom? = null
+    var pLoader: ProgressCustom? = null
 
     override fun onSetPoint(l: LatLng, pos: Int) {
         val mapFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as MapFragment
@@ -90,6 +93,12 @@ class MenuActivity : AppCompatActivity(),
     private var viewModel: MyProfileViewModel? = null
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
 
+    private fun isNetworkAvailable(): Boolean {
+        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetworkInfo = connectivityManager.getActiveNetworkInfo()
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         App.component.inject(this)
@@ -100,7 +109,6 @@ class MenuActivity : AppCompatActivity(),
         FirebaseFirestore.setLoggingEnabled(true)
 
         setContentView(R.layout.activity_menu)
-
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
         val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
@@ -155,6 +163,14 @@ class MenuActivity : AppCompatActivity(),
         }
         feedback.setOnClickListener { openDialogFeedback() }
         pLoader = this.findViewById(R.id.pLoaderRes) as ProgressCustom
+        if (isNetworkAvailable() == false) showSnack()
+    }
+
+    var snackbar: Snackbar? = null
+
+    private fun showSnack() {
+        snackbar = Snackbar.make(this.findViewById(android.R.id.content), R.string.no_internet, Snackbar.LENGTH_LONG)
+        snackbar?.show()
     }
 
     private fun openProfile() {
@@ -346,6 +362,7 @@ class MenuActivity : AppCompatActivity(),
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
+        if (isNetworkAvailable() == false) showSnack()
         if (this.profileChanged == true) {
             openAwayFromProfileDialog({
                 this.profileChanged = false
