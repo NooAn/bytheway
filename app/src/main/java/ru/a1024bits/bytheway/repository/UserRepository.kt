@@ -2,12 +2,15 @@ package ru.a1024bits.bytheway.repository
 
 import android.arch.lifecycle.Observer
 import android.util.Log
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.*
 import io.reactivex.Completable
 import io.reactivex.Single
+import ru.a1024bits.bytheway.MapWebService
 import ru.a1024bits.bytheway.algorithm.SearchTravelers
 import ru.a1024bits.bytheway.model.User
+import ru.a1024bits.bytheway.util.toJsonString
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
@@ -18,7 +21,7 @@ const val COLLECTION_USERS = "users"
 /**
  * Created by andrey.gusenkov on 19/09/2017
  */
-class UserRepository @Inject constructor(val store: FirebaseFirestore) : IUsersRepository {
+class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapService: MapWebService) : IUsersRepository {
 
     var TAG = "LOG UserRepository"
 
@@ -119,4 +122,10 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore) : IUsersR
                     stream.onComplete()
                 }
             }
+
+   override fun getRoute(cityFromLatLng: GeoPoint, cityToLatLng: GeoPoint) =
+            mapService.getDirection(hashMapOf(
+                    "origin" to LatLng(cityFromLatLng.latitude, cityFromLatLng.longitude).toJsonString(),
+                    "destination" to LatLng(cityToLatLng.latitude, cityToLatLng.longitude).toJsonString(),
+                    "sensor" to "false"))
 }

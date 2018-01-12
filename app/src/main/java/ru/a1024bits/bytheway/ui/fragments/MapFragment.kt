@@ -367,7 +367,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
 
     private fun initBoxInputFragment() {
-
         searchFragment = SearchFragment.newInstance(user)
         childFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container_box, searchFragment, "SearchFragment")

@@ -4,6 +4,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import dagger.Module
 import dagger.Provides
+import ru.a1024bits.bytheway.MapWebService
 import ru.a1024bits.bytheway.repository.UserRepository
 import javax.inject.Singleton
 
@@ -15,7 +16,7 @@ class UserRepositoryModule {
 
     @Provides
     @Singleton
-    fun provideUserRepository(store: FirebaseFirestore): UserRepository = UserRepository(store)
+    fun provideUserRepository(store: FirebaseFirestore, mapService: MapWebService): UserRepository = UserRepository(store, mapService)
 
     @Provides
     @Singleton

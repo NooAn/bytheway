@@ -2,12 +2,19 @@ package ru.a1024bits.bytheway.viewmodel
 
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
+import com.google.android.gms.maps.model.LatLng
+import com.google.firebase.firestore.GeoPoint
+import retrofit2.Call
+import retrofit2.Callback
+import ru.a1024bits.bytheway.MapWebService
 import ru.a1024bits.bytheway.model.*
+import ru.a1024bits.bytheway.model.map_directions.RoutesList
 import ru.a1024bits.bytheway.repository.UserRepository
 import ru.a1024bits.bytheway.util.Constants.END_DATE
 import ru.a1024bits.bytheway.util.Constants.FIRST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.START_DATE
+import ru.a1024bits.bytheway.util.toJsonString
 import javax.inject.Inject
 
 /**
@@ -19,10 +26,9 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
     val error = MutableLiveData<Int>()
     var response = MutableLiveData<Response<User>>()
     val loadingStatus = MutableLiveData<Boolean>()
-
+    var routes = MutableLiveData<Response<RoutesList>>()
     val saveSocial = MutableLiveData<SocialResponse>()
     val clearSocial = MutableLiveData<SocialResponse>()
-
     val saveProfile = MutableLiveData<Response<Boolean>>()
 
     fun load(userId: String) {
@@ -57,7 +63,7 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                 .subscribe({
                     saveProfile.setValue(Response.success(true))
                 }, { throwable ->
-                    response.setValue(Response.error(throwable))
+                    saveProfile.setValue(Response.error(throwable))
                 })
         )
     }
@@ -99,5 +105,17 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
             }
             sendUserData(map, uid)
         }
+    }
+
+    fun getRoute(cityFromLatLng: GeoPoint, cityToLatLng: GeoPoint) {
+        disposables.add(userRepository.getRoute(cityFromLatLng, cityToLatLng)
+                .subscribeOn(getBackgroundScheduler())
+                .observeOn(getMainThreadScheduler())
+                .subscribe({
+                    routes.setValue(Response.success(it))
+                }, { throwable ->
+                    routes.setValue(Response.error(throwable))
+                })
+        )
     }
 }

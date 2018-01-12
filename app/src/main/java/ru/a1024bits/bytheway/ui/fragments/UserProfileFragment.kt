@@ -19,12 +19,17 @@ import android.widget.Toast
 import android.arch.lifecycle.ViewModelProvider
 import android.util.Log
 import com.bumptech.glide.request.RequestOptions
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.PolylineOptions
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.maps.android.PolyUtil
 import kotlinx.android.synthetic.main.profilte_user_direction.*
 import kotlinx.android.synthetic.main.profile_main_image.*
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.model.*
 import ru.a1024bits.bytheway.util.Constants
+import ru.a1024bits.bytheway.util.getBearing
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -57,6 +62,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
 
     private fun fillProfile(user: User) {
 
+        setMarkers(user)
         showRouteOnMap(user.route)
 
         username.text = StringBuilder().append(user.name).append(" ").append(user.lastName)
@@ -185,22 +191,13 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
     }
 
     private fun showRouteOnMap(route: String) {
-
+        drawPolyline(route)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-
         viewModel?.response?.observe(this, userLoad)
         viewModel?.loadingStatus?.observe(this, progressBarLoad)
-
-        if (arguments != null) {
-            val userId: String = arguments.getString(UID_KEY, "")
-            viewModel?.load(userId)
-        } else {
-            // fix me error when don't load user
-            showErrorLoading()
-        }
     }
 
     private fun showErrorLoading() {
@@ -226,10 +223,17 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
     }
 
     override fun onMapReady(map: GoogleMap?) {
-        if (googleMap != null)
-            this.googleMap = map
+        this.googleMap = map
         // Zooming to the Campus location
         googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(CENTRE, ZOOM))
+
+        if (arguments != null) {
+            val userId: String = arguments.getString(UID_KEY, "")
+            viewModel?.load(userId)
+        } else {
+            // fix me error when don't load user
+            showErrorLoading()
+        }
     }
 
     private var mMapView: MapView? = null
@@ -246,9 +250,9 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
         } catch (e: Exception) {
             e.printStackTrace()
         }
+        mMapView?.getMapAsync(this)
         settingsSocialNetworkButtons()
 
-        mMapView?.getMapAsync(this)
 
         return view
     }
@@ -278,13 +282,13 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
     }
 
     override fun onDetach() {
-        super.onDetach()
         mListener = null
+        super.onDetach()
     }
 
     override fun onPause() {
-        super.onPause()
         mMapView?.onPause()
+        super.onPause()
     }
 
     override fun onStart() {
@@ -293,13 +297,80 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
     }
 
     override fun onStop() {
-        super.onStop()
         mMapView?.onStop()
+        super.onStop()
+    }
+
+    private fun setMarkers(user: User) {
+        googleMap?.clear()
+        val coordFrom = LatLng(user.cityFromLatLng.latitude, user.cityFromLatLng.longitude)
+        val coordTo = LatLng(user.cityToLatLng.latitude, user.cityToLatLng.longitude)
+        var markerTitleStart: String? = ""
+        var markerTitleFinal: String? = ""
+        var markerPositionStart = LatLng(0.0, 0.0)
+        var markerPositionFinal = LatLng(0.0, 0.0)
+        val cityFrom = user.cities.get(Constants.FIRST_INDEX_CITY)
+        val cityTo = user.cities.get(Constants.LAST_INDEX_CITY)
+        markerTitleStart = cityTo
+        markerTitleFinal = cityFrom
+        markerPositionStart = coordTo
+        markerPositionFinal = coordFrom
+
+
+        val midPointLat = (coordFrom.latitude + coordTo.latitude) / 2
+        val midPointLong = (coordFrom.longitude + coordTo.longitude) / 2
+        val blueMarker = BitmapDescriptorFactory.fromResource(R.drawable.pin_blue)
+
+        googleMap?.addMarker(MarkerOptions()
+                .icon(blueMarker)
+                .position(markerPositionStart)
+                .title(markerTitleStart)
+                .anchor(0.5F, 1.0F)
+                .flat(true))
+
+        googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(markerPositionFinal, 6.0f))
+        googleMap?.addMarker(MarkerOptions()
+                .icon(blueMarker)
+                .position(markerPositionFinal)
+                .title(markerTitleFinal)
+                .anchor(0.5F, 1.0F)
+                .flat(true))
+
+        var perfectZoom = 190 / coordFrom.getBearing(coordTo)
+        googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(midPointLat, midPointLong), perfectZoom))
+    }
+
+    fun drawPolyline(routeString: String) {
+
+        val blueColor = activity.resources.getColor(R.color.blueRouteLine)
+
+        var polyPts: List<LatLng>
+        val options = PolylineOptions()
+        options.color(blueColor)
+
+        options.width(5f)
+
+        if (routeString.isNotBlank()) {
+            polyPts = PolyUtil.decode(routeString)
+
+            for (pts in polyPts) {
+                options.add(pts)
+            }
+        }
+
+        googleMap?.addPolyline(options)
     }
 
     override fun onDestroy() {
+        //Clean up resources from google map to prevent memory leaks.
+        //Stop tracking current location
+        if (googleMap != null) {
+            googleMap?.clear()
+        }
+        if (mapView != null) mapView.onDestroy()
+        googleMap = null
+
         super.onDestroy()
-        mMapView?.onDestroy()
     }
 
     override fun onLowMemory() {
@@ -324,15 +395,4 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
     }
 }// Required empty public constructor
 
-private val MAX_LENGTH_FOR_SHORT_STRING = 10
-
-private fun String.lastSymbols(): CharSequence? {
-    val n = if (this.length > MAX_LENGTH_FOR_SHORT_STRING) MAX_LENGTH_FOR_SHORT_STRING else this.length
-    val shortString = this.substring(0, n)
-    if (shortString.length == this.length) {
-        return this
-    } else {
-        return shortString + "..."
-    }
-}
 

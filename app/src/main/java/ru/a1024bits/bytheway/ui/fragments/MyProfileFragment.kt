@@ -2,7 +2,6 @@ package ru.a1024bits.bytheway.ui.fragments
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -28,7 +27,10 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException
 import com.google.android.gms.location.places.AutocompleteFilter
 import com.google.android.gms.location.places.ui.PlaceAutocomplete
 import com.google.android.gms.maps.*
-import com.google.android.gms.maps.model.*
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.PolylineOptions
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.GeoPoint
@@ -38,25 +40,20 @@ import kotlinx.android.synthetic.main.fragment_my_user_profile.*
 import kotlinx.android.synthetic.main.profile_add_trip.*
 import kotlinx.android.synthetic.main.profile_direction.*
 import kotlinx.android.synthetic.main.profile_main_image.*
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import ru.a1024bits.bytheway.App
-import ru.a1024bits.bytheway.MapWebService
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.*
 import ru.a1024bits.bytheway.model.map_directions.RoutesList
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
-import ru.a1024bits.bytheway.model.Response as ResponseBtw
 import ru.a1024bits.bytheway.util.Constants.END_DATE
 import ru.a1024bits.bytheway.util.Constants.FIRST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM
 import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO
 import ru.a1024bits.bytheway.util.Constants.START_DATE
-import ru.a1024bits.bytheway.util.toJsonString
+import ru.a1024bits.bytheway.util.getBearing
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import ru.terrakok.cicerone.commands.Replace
 import uk.co.deanwild.materialshowcaseview.IShowcaseListener
@@ -65,6 +62,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.HashMap
+import ru.a1024bits.bytheway.model.Response as ResponseBtw
 
 
 class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback, DatePickerDialog.OnDateSetListener {
@@ -136,10 +134,9 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     private var profileStateHashMap: HashMap<String, String> = hashMapOf()
     private var oldProfileState: Int = 0
     private var routeString: String = ""
-    @Inject lateinit var mapService: MapWebService
     private var routes: String = ""
     private var googleMap: GoogleMap? = null
-    private lateinit var mapView: MapView
+    private var mapView: MapView? = null
     private var countTrip: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -147,6 +144,51 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         App.component.inject(this)
         (activity as MenuActivity).pLoader?.show()
     }
+
+    private val routerObserver: Observer<ru.a1024bits.bytheway.model.Response<RoutesList>> =
+            Observer<ru.a1024bits.bytheway.model.Response<RoutesList>> { response ->
+                when (response?.status) {
+                    Status.SUCCESS -> {
+                        if (response.data != null) {
+                            if (activity != null) {
+                                response.data.routes?.map {
+                                    it.overviewPolyline?.encodedData?.let { routeString ->
+                                        this@MyProfileFragment.routeString = routeString
+                                        drawPolyline()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Status.ERROR -> {
+                        showErrorRouter()
+                    }
+                }
+            }
+
+    private fun showErrorRouter() {
+        mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_error_router", null)
+        Log.d("LOG", "error  get routing")
+    }
+
+    private val responseObserver: Observer<ru.a1024bits.bytheway.model.Response<User>> =
+            Observer<ru.a1024bits.bytheway.model.Response<User>> { response ->
+                when (response?.status) {
+                    Status.SUCCESS -> {
+                        if (response.data != null) {
+                            if (activity != null) {
+                                (activity as MenuActivity).pLoader?.hide()
+                                fillProfile(response.data)
+                                mListener?.onFragmentInteraction(response.data)
+                            }
+                        }
+                    }
+                    Status.ERROR -> {
+                        showErrorResponse()
+                        Log.e("LOG", "log e:" + response.error)
+                    }
+                }
+            }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -166,25 +208,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         methodTextViews.put(Method.PLANE.link, travelPlaneText)
         methodTextViews.put(Method.HITCHHIKING.link, travelHitchHikingText)
 
-        viewModel?.response?.observe(this, Observer<ru.a1024bits.bytheway.model.Response<User>> { response ->
-
-            when (response?.status) {
-                Status.SUCCESS -> {
-                    if (response.data != null) {
-                        if (activity != null) {
-                            (activity as MenuActivity).pLoader?.hide()
-                            fillProfile(response.data)
-                            mListener?.onFragmentInteraction(response.data)
-                        }
-                    }
-                }
-                Status.ERROR -> {
-                    showErrorResponse()
-                    Log.e("LOG", "log e:" + response.error)
-                }
-            }
-        })
-        viewModel?.load(uid)
+        viewModel?.routes?.observe(this, routerObserver)
+        viewModel?.response?.observe(this, responseObserver)
     }
 
     override fun getViewFactoryClass(): ViewModelProvider.Factory = viewModelFactory
@@ -283,11 +308,13 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     override fun onResume() {
         super.onResume()
-        mapView.onResume()
+        mapView?.onResume()
     }
 
     override fun onMapReady(map: GoogleMap?) {
         this.googleMap = map
+        viewModel?.load(uid)
+        Log.d("LOG", " load map ready")
     }
 
     private fun setMarkers(position: Int) {
@@ -332,7 +359,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                 .anchor(0.5F, 1.0F)
                 .flat(true))
 
-        var perfectZoom = 190 / getBearing(coordFrom, coordTo)
+        var perfectZoom = 190 / coordFrom.getBearing(coordFrom)
         googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(midPointLat, midPointLong), perfectZoom))
     }
 
@@ -357,33 +384,18 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         googleMap?.addPolyline(options)
     }
 
-    fun getBearing(begin: LatLng, end: LatLng): Float {
-        val lat = Math.abs(begin.latitude - end.latitude)
-        val lng = Math.abs(begin.longitude - end.longitude)
-        if (begin.latitude < end.latitude && begin.longitude < end.longitude)
-            return Math.toDegrees(Math.atan(lng / lat)).toFloat()
-        else if (begin.latitude >= end.latitude && begin.longitude < end.longitude)
-            return (90 - Math.toDegrees(Math.atan(lng / lat)) + 90).toFloat()
-        else if (begin.latitude >= end.latitude && begin.longitude >= end.longitude)
-            return (Math.toDegrees(Math.atan(lng / lat)) + 180).toFloat()
-        else if (begin.latitude < end.latitude && begin.longitude >= end.longitude)
-            return (90 - Math.toDegrees(Math.atan(lng / lat)) + 270).toFloat()
-        return -1f
-
-    }
-
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater?.inflate(R.layout.fragment_my_user_profile, container, false)
-        mapView = view?.findViewById(R.id.mapView)!!
+        mapView = view?.findViewById(R.id.mapView)
 
         try {
-            mapView.onCreate(null)
+            mapView?.onCreate(null)
             MapsInitializer.initialize(context)
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        mapView.getMapAsync(this@MyProfileFragment)
-        val scroll = view.findViewById(R.id.scrollProfile) as ScrollView
+        mapView?.getMapAsync(this@MyProfileFragment)
+        val scroll = view?.findViewById(R.id.scrollProfile) as ScrollView
         scroll.descendantFocusability = ViewGroup.FOCUS_BEFORE_DESCENDANTS
         scroll.isFocusable = true
         scroll.isFocusableInTouchMode = true
@@ -401,7 +413,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
-        mapView.onSaveInstanceState(outState)
+        mapView?.onSaveInstanceState(outState)
     }
 
     override fun onDetach() {
@@ -411,7 +423,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     override fun onPause() {
         super.onPause()
-        //   mapView.onPause()
+        mapView?.onPause()
     }
 
     private val TAG_ANALYTICS: String = "MProfile_screen"
@@ -534,18 +546,17 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_remove_trip", null)
         }
 
-
-        mapView.onStart()
+        mapView?.onStart()
     }
 
     override fun onStop() {
         super.onStop()
-        mapView.onStop()
+        mapView?.onStop()
     }
 
     override fun onDestroy() {
 
-        mapView.onDestroy()
+        mapView?.onDestroy()
         //Clean up resources from google map to prevent memory leaks.
         //Stop tracking current location
         if (googleMap != null) {
@@ -556,7 +567,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     override fun onLowMemory() {
         super.onLowMemory()
-        mapView.onLowMemory()
+        mapView?.onLowMemory()
     }
 
     override fun onDateSet(view: DatePickerDialog?, year: Int, monthOfYear: Int, dayOfMonth: Int, yearEnd: Int, monthOfYearEnd: Int, dayOfMonthEnd: Int) {
@@ -644,16 +655,17 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             }
             textCityFrom.parent.requestChildFocus(textCityFrom, textCityFrom)
         }
+
         if (cityToLatLng.hashCode() == cityFromLatLng.hashCode()) {
             errorString += " " + getString(R.string.fill_diff_cities)
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_city_equals_err", null)
-
         }
 
         if (errorString.isNotEmpty()) {
             Toast.makeText(this@MyProfileFragment.context, errorString, Toast.LENGTH_LONG).show()
             return
         }
+
         if (viewModel?.saveProfile?.hasObservers() == false) {
             viewModel?.saveProfile?.observe(this, Observer<ResponseBtw<Boolean>> { response ->
                 when (response?.status) {
@@ -1046,8 +1058,14 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         }
 
         fillAgeSex(user.age, user.sex)
+
         setMarkers(2)
-        obtainDirection()
+        if (user.route.isNotBlank()) {
+            routeString = user.route
+            drawPolyline()
+        } else
+            obtainDirection()
+
         age = user.age
 
         glide?.load(user.urlPhoto)
@@ -1139,23 +1157,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     }
 
     private fun obtainDirection() {
-        mapService.getDirections(hashMapOf(
-                "origin" to LatLng(cityFromLatLng.latitude, cityFromLatLng.longitude).toJsonString(),
-                "destination" to LatLng(cityToLatLng.latitude, cityToLatLng.longitude).toJsonString(),
-                "sensor" to "false")).enqueue(object : Callback<RoutesList?> {
-            override fun onResponse(call: Call<RoutesList?>?, response: Response<RoutesList?>?) {
-                response?.body()?.routes?.map {
-                    it.overviewPolyline?.encodedData?.let { routeString ->
-                        this@MyProfileFragment.routeString = routeString
-                        drawPolyline()
-                    }
-                }
-            }
-
-            override fun onFailure(call: Call<RoutesList?>?, t: Throwable?) {
-                t?.printStackTrace()
-                showErrorResponse()
-            }
-        })
+        viewModel?.getRoute(cityFromLatLng = cityFromLatLng, cityToLatLng = cityToLatLng)
     }
 }

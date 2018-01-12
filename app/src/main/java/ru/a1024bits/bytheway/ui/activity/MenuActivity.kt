@@ -171,6 +171,7 @@ class MenuActivity : AppCompatActivity(),
     private fun showSnack() {
         snackbar = Snackbar.make(this.findViewById(android.R.id.content), R.string.no_internet, Snackbar.LENGTH_LONG)
         snackbar?.show()
+        pLoader?.hide()
     }
 
     private fun openProfile() {
@@ -246,7 +247,7 @@ class MenuActivity : AppCompatActivity(),
         val currentTime = System.currentTimeMillis() / 1000
         for (flight in list) {
             if (flight.departureUtc.toLong() > currentTime) {
-                val formatter = SimpleDateFormat("dd MMM yyyy")
+                val formatter = SimpleDateFormat("dd MMM yyyy", Locale.US)
                 val calendar = Calendar.getInstance()
                 calendar.timeInMillis = flight.departureUtc.toLong() * 1000
                 return formatter.format(calendar.getTime())

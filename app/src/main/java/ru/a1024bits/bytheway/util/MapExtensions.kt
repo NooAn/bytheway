@@ -16,3 +16,18 @@ fun LatLng.createMarker(title: String): MarkerOptions =
                 .title(title)
 
 fun LatLng.toJsonString(): String = "${this.latitude},${this.longitude}"
+
+fun LatLng.getBearing( end: LatLng): Float {
+    val lat = Math.abs(this.latitude - end.latitude)
+    val lng = Math.abs(this.longitude - end.longitude)
+    if (this.latitude < end.latitude && this.longitude < end.longitude)
+        return Math.toDegrees(Math.atan(lng / lat)).toFloat()
+    else if (this.latitude >= end.latitude && this.longitude < end.longitude)
+        return (90 - Math.toDegrees(Math.atan(lng / lat)) + 90).toFloat()
+    else if (this.latitude >= end.latitude && this.longitude >= end.longitude)
+        return (Math.toDegrees(Math.atan(lng / lat)) + 180).toFloat()
+    else if (this.latitude < end.latitude && this.longitude >= end.longitude)
+        return (90 - Math.toDegrees(Math.atan(lng / lat)) + 270).toFloat()
+    return -1f
+
+}
