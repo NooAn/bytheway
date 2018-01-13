@@ -546,7 +546,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_remove_trip", null)
         }
 
-        mapView?.onStart()
+      //  mapView?.onStart()
     }
 
     override fun onStop() {
