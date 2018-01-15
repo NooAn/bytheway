@@ -41,7 +41,12 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
 
     override fun getAllUsers(): Single<MutableList<User>> {
         Log.e("LOG get all users", Thread.currentThread().name)
-
+        store.collection(COLLECTION_USERS).document("cities.size").get().addOnCompleteListener {
+            Log.e("|LOG", "1")
+        }
+        store.collection(COLLECTION_USERS).document("cities.first_city").get().addOnCompleteListener {
+            Log.e("|LOG", "1")
+        }
         return Single.create<MutableList<User>> { e ->
             store.collection(COLLECTION_USERS).get()
                     .addOnCompleteListener({ task ->
@@ -49,7 +54,10 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                         val result: MutableList<User> = arrayListOf()
                         for (document in task.result) {
                             try {
-                                result.add(document.toObject(User::class.java))
+                                val user = document.toObject(User::class.java)
+                                if (user.cities.size > 0) {
+                                    result.add(user)
+                                }
                             } catch (e: Exception) {
                                 e.printStackTrace()
                             }
@@ -123,7 +131,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                 }
             }
 
-   override fun getRoute(cityFromLatLng: GeoPoint, cityToLatLng: GeoPoint) =
+    override fun getRoute(cityFromLatLng: GeoPoint, cityToLatLng: GeoPoint) =
             mapService.getDirection(hashMapOf(
                     "origin" to LatLng(cityFromLatLng.latitude, cityFromLatLng.longitude).toJsonString(),
                     "destination" to LatLng(cityToLatLng.latitude, cityToLatLng.longitude).toJsonString(),
