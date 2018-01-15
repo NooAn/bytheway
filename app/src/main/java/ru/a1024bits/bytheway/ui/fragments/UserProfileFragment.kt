@@ -88,14 +88,13 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
         if (user.dates.size > 0) {
             val dayBegin = formatDate.format(Date(user.dates.get(Constants.START_DATE) ?: 0))
             val dayArrival = formatDate.format(Date(user.dates.get(Constants.END_DATE) ?: 0))
-            if (dayBegin.isNotBlank() && dayBegin.length > 0) textDateFrom.setText(dayBegin) else iconDateFromEmpty.visibility = View.VISIBLE
-            if (dayArrival.isNotBlank() && dayArrival.length > 0) dateArrived.setText(dayArrival) else iconDateArrivedEmpty.visibility = View.VISIBLE
+            if (dayBegin.isNotBlank() && dayBegin.length > 0 && !dayBegin.equals("01.01.1970")) textDateFrom.setText(dayBegin) else iconDateFromEmpty.visibility = View.VISIBLE
+            if (dayArrival.isNotBlank() && dayArrival.length > 0 && !dayBegin.equals("01.01.1970")) dateArrived.setText(dayArrival) else iconDateArrivedEmpty.visibility = View.VISIBLE
         } else {
             textDateEmpty.visibility = View.VISIBLE
         }
 
         fillAgeSex(user.age, user.sex)
-
 
         glide?.load(user.urlPhoto)
                 ?.apply(RequestOptions.circleCropTransform())
@@ -358,15 +357,17 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
     }
 
     override fun onDestroy() {
+        super.onDestroy()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        mapView?.onDestroy()
         //Clean up resources from google map to prevent memory leaks.
         //Stop tracking current location
         if (googleMap != null) {
             googleMap?.clear()
         }
-        if (mapView != null) mapView.onDestroy()
-        googleMap = null
-
-        super.onDestroy()
     }
 
     override fun onLowMemory() {

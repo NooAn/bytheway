@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/custom_rec"
-    android:elevation="8dp"
+    android:elevation="4dp"
     android:paddingEnd="16dp"
     android:paddingStart="16dp">
 

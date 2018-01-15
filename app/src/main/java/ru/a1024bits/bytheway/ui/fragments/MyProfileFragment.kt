@@ -312,9 +312,12 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     }
 
     override fun onMapReady(map: GoogleMap?) {
+        Log.e("LOG", "google map hash ${googleMap?.hashCode()}")
         this.googleMap = map
         viewModel?.load(uid)
         Log.d("LOG", " load map ready")
+        Log.e("LOG", "google map hash (a) ${googleMap?.hashCode()}")
+
     }
 
     private fun setMarkers(position: Int) {
@@ -554,14 +557,17 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         mapView?.onStop()
     }
 
-    override fun onDestroy() {
-
+    override fun onDestroyView() {
+        super.onDestroyView()
         mapView?.onDestroy()
         //Clean up resources from google map to prevent memory leaks.
         //Stop tracking current location
         if (googleMap != null) {
             googleMap?.clear()
         }
+    }
+
+    override fun onDestroy() {
         super.onDestroy()
     }
 
@@ -1050,10 +1056,11 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         val formatDate = SimpleDateFormat("dd.MM.yyyy", Locale.US)
 
         if (user.dates.size > 0) {
-            val dayBegin = formatDate.format(Date(user.dates[START_DATE] ?: 0))
-            val dayArrival = formatDate.format(Date(user.dates[END_DATE] ?: 0))
-            textDateFrom.setText(dayBegin)
-            dateArrived.setText(dayArrival)
+            if (user.dates[START_DATE] != null || user.dates[START_DATE] != 0L) {
+                textDateFrom.setText(formatDate.format(Date(user.dates[START_DATE] ?: 0)))
+            }
+            if (user.dates[END_DATE] != null || user.dates[END_DATE] != 0L)
+                dateArrived.setText(formatDate.format(Date(user.dates[END_DATE] ?: 0)))
             dates = user.dates
         }
 

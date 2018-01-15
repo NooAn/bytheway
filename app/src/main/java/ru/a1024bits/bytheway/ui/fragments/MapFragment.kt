@@ -135,10 +135,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         mMapView?.onStop()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+
+    override fun onDestroyView() {
+        super.onDestroyView()
         mMapView?.onDestroy()
+        //Clean up resources from google map to prevent memory leaks.
+        //Stop tracking current location
+        mMap?.clear()
         mMapView = null
+
     }
 
     override fun onLowMemory() {
@@ -356,7 +361,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     onAnimationEnd = {
                         viewModel?.response?.observe(this@MapFragment, listUsers)
                         //  searchFragment?.filter?.endBudget = parseInt(budgetFromValue.toString())
-                       // Log.d("LOG", budgetFromValue.toString())
+                        // Log.d("LOG", budgetFromValue.toString())
                         viewModel?.getUsersWithSimilarTravel(searchFragment?.filter ?: Filter())
                         mMap?.clear()
                         listPointPath.clear()
