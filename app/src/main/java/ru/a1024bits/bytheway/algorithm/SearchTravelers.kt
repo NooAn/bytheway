@@ -39,6 +39,7 @@ class SearchTravelers(val filter: Filter = Filter(), val user: User) {
         val start = user.dates.get(START_DATE)?.toLong() ?: 0
         val end = user.dates.get(END_DATE)?.toLong() ?: 0
         if (filter.startDate == start && filter.endDate == end) return 1.0
+        if (start == 0L || end == 0L) return 0.0
         if (filter.startDate > start && filter.startDate > end && filter.endDate > start && filter.startDate > end) return 0.0
         if (filter.startDate < start && filter.endDate < end && filter.endDate < start && filter.startDate < end) return 0.0
         return ((1000.0 / Math.abs(filter.startDate.toDouble() - start.toDouble()))

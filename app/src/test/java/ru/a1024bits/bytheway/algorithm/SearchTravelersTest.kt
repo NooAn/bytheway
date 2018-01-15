@@ -51,6 +51,13 @@ class SearchTravelersTest {
     }
 
     @Test
+    fun getWeightMethod_Test_DateNullAll() {
+        filter.startDate = 0
+        filter.endDate = 0
+        Assert.assertEquals(0.0, search.calculateDate(), 0.09)
+    }
+
+    @Test
     fun getWeightMethod_Test_1_equals_dates() {
         filter.startDate = 14_000
         filter.endDate = 16_000
@@ -198,7 +205,7 @@ class SearchTravelersTest {
         filter.locationEndCity = LatLng(latEnd, lonEnd)
         user.cityFromLatLng = GeoPoint(latStartUser, lonStartUSer)
         user.cityToLatLng = GeoPoint(latEnd, lonEnd)
-        Assert.assertEquals(0.920, search.calculateRoute(),  0.001)
+        Assert.assertEquals(0.920, search.calculateRoute(), 0.001)
     }
 
     @Test
