@@ -41,14 +41,11 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
 
     override fun getAllUsers(): Single<MutableList<User>> {
         Log.e("LOG get all users", Thread.currentThread().name)
-        store.collection(COLLECTION_USERS).document("cities.size").get().addOnCompleteListener {
-            Log.e("|LOG", "1")
-        }
-        store.collection(COLLECTION_USERS).document("cities.first_city").get().addOnCompleteListener {
-            Log.e("|LOG", "1")
-        }
         return Single.create<MutableList<User>> { e ->
-            store.collection(COLLECTION_USERS).get()
+            val time = System.currentTimeMillis() / 1000
+            store.collection(COLLECTION_USERS)
+                   // .whereGreaterThanOrEqualTo("cities.first_city", 0)
+                    .get()
                     .addOnCompleteListener({ task ->
                         Log.e("LOG completeListener", Thread.currentThread().name)
                         val result: MutableList<User> = arrayListOf()

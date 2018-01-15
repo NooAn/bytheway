@@ -17,6 +17,7 @@ import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.viewmodel.UserProfileViewModel
 import android.widget.Toast
 import android.arch.lifecycle.ViewModelProvider
+import android.support.v4.content.ContextCompat
 import android.util.Log
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
@@ -87,8 +88,10 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
         if (user.dates.size > 0) {
             val dayBegin = formatDate.format(Date(user.dates.get(Constants.START_DATE) ?: 0))
             val dayArrival = formatDate.format(Date(user.dates.get(Constants.END_DATE) ?: 0))
-            textDateFrom.setText(dayBegin)
-            dateArrived.setText(dayArrival)
+            if (dayBegin.isNotBlank() && dayBegin.length > 0) textDateFrom.setText(dayBegin) else iconDateFromEmpty.visibility = View.VISIBLE
+            if (dayArrival.isNotBlank() && dayArrival.length > 0) dateArrived.setText(dayArrival) else iconDateArrivedEmpty.visibility = View.VISIBLE
+        } else {
+            textDateEmpty.visibility = View.VISIBLE
         }
 
         fillAgeSex(user.age, user.sex)
@@ -126,7 +129,12 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
                     whatsAppIcon.setImageResource(R.drawable.ic_whats_icon_color)
                     whatsAppIcon.setOnClickListener {
                         mFirebaseAnalytics.logEvent(TAG_ANALYTICS + "OPEN_WAP", null)
-                        startActivity(createBrowserIntent("whatsapp://send?text=Привет, я нашел тебя в ByTheWay.&phone=+${user.socialNetwork.get(name.key)}&abid = +${user.socialNetwork.get(name.key)})}"))
+                        try {
+                            startActivity(createBrowserIntent("whatsapp://send?text=Привет, я нашел тебя в ByTheWay.&phone=+${user.socialNetwork.get(name.key)}&abid = +${user.socialNetwork.get(name.key)})}"))
+                        } catch (e: Exception) {
+                            Toast.makeText(activity.applicationContext, "${user.socialNetwork.get(name.key)}", Toast.LENGTH_LONG).show()
+                            e.printStackTrace()
+                        }
                     }
                 }
                 SocialNetwork.TG.link -> {
@@ -253,7 +261,6 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
         mMapView?.getMapAsync(this)
         settingsSocialNetworkButtons()
 
-
         return view
     }
 
@@ -336,28 +343,17 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
                 .anchor(0.5F, 1.0F)
                 .flat(true))
 
-        var perfectZoom = 190 / coordFrom.getBearing(coordTo)
+        val perfectZoom = 190 / coordFrom.getBearing(coordTo)
+
         googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(midPointLat, midPointLong), perfectZoom))
     }
 
     fun drawPolyline(routeString: String) {
-
-        val blueColor = activity.resources.getColor(R.color.blueRouteLine)
-
-        var polyPts: List<LatLng>
+        val blueColor = ContextCompat.getColor(context, R.color.blueRouteLine)
         val options = PolylineOptions()
         options.color(blueColor)
-
         options.width(5f)
-
-        if (routeString.isNotBlank()) {
-            polyPts = PolyUtil.decode(routeString)
-
-            for (pts in polyPts) {
-                options.add(pts)
-            }
-        }
-
+        if (routeString != "") options.addAll(PolyUtil.decode(routeString))
         googleMap?.addPolyline(options)
     }
 

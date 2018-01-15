@@ -123,4 +123,5 @@
     <string name="hint_save_and_search">Сохраняйте и находите!</string>
     <string name="hint_save_and_search_description">При нажатии на кнопку “СОХРАНИТЬ”, внесенные изменения о поездке автоматически сохранятся в Вашем профиле. Вы можете продолжить поиск попутчиков без сохранения поездки..</string>
     <string name="no_internet">У вас нет интернет соединения</string>
+    <string name="date_empty">* пользователь не указал даты поездки</string>
 </resources>

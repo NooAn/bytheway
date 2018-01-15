@@ -359,7 +359,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                 .anchor(0.5F, 1.0F)
                 .flat(true))
 
-        var perfectZoom = 190 / coordFrom.getBearing(coordFrom)
+        var perfectZoom = 190 / coordFrom.getBearing(coordTo)
         googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(midPointLat, midPointLong), perfectZoom))
     }
 
@@ -546,7 +546,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_remove_trip", null)
         }
 
-      //  mapView?.onStart()
+        //  mapView?.onStart()
     }
 
     override fun onStop() {
