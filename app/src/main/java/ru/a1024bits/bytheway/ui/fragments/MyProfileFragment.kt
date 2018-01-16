@@ -1121,6 +1121,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         methods.clear()
         cities.clear()
         dates.clear()
+        googleMap?.clear()
         routeString = ""
         viewModel?.sendUserData(getHashMapUser(), uid)
         hideBlockTravelInforamtion()
