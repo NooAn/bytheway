@@ -9,7 +9,7 @@
     <string name="type_money"> </string>
     <string name="money">Бюджет поездки</string>
     <string name="description">Описание поездки</string>
-    <string name="city">Родной город</string>
+    <string name="city">Город проживания</string>
     <string name="drawer_item_map_search">Поиск попутчиков</string>
     <string name="drawer_item_profile">Профиль</string>
     <string name="title_activity_menu"><font size="20">bytheway</font></string>
@@ -124,4 +124,5 @@
     <string name="hint_save_and_search_description">При нажатии на кнопку “СОХРАНИТЬ”, внесенные изменения о поездке автоматически сохранятся в Вашем профиле. Вы можете продолжить поиск попутчиков без сохранения поездки..</string>
     <string name="no_internet">У вас нет интернет соединения</string>
     <string name="date_empty">* пользователь не указал даты поездки</string>
+    <string name="date_error_set">Дата окончания поездки не может быть раньше чем начала.</string>
 </resources>

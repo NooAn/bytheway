@@ -197,14 +197,24 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                 .append(" ")
                 .append(year).toString())
 
-        dateToValue.setText(StringBuilder(" ")
-                .append(dayOfMonthEnd)
-                .append(" ")
-                .append(context.resources.getStringArray(R.array.months_array)[monthOfYearEnd])
-                .append(" ")
-                .append(yearEnd).toString())
+        if (getLongFromDate(dayOfMonth, monthOfYear, year) < getLongFromDate(dayOfMonthEnd, monthOfYearEnd, yearEnd)) {
+            dateToValue.setText(StringBuilder(" ")
+                    .append(dayOfMonthEnd)
+                    .append(" ")
+                    .append(context.resources.getStringArray(R.array.months_array)[monthOfYearEnd])
+                    .append(" ")
+                    .append(yearEnd).toString())
+            filter.endDate = getLongFromDate(dayOfMonthEnd, monthOfYearEnd, yearEnd)
+        } else {
+            Toast.makeText(context, R.string.date_error_set, Toast.LENGTH_SHORT).show()
+            dateToValue.setText(StringBuilder(" ")
+                    .append(dayOfMonth)
+                    .append(" ")
+                    .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
+                    .append(" ")
+                    .append(year).toString())
+        }
         filter.startDate = getLongFromDate(dayOfMonth, monthOfYear, year)
-        filter.endDate = getLongFromDate(dayOfMonthEnd, monthOfYearEnd, yearEnd)
     }
 
     private fun getLongFromDate(day: Int, month: Int, year: Int): Long {
@@ -299,7 +309,7 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                     .build()
             val intent = PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY).setFilter(typeFilter).build(activity)
             startActivityForResult(intent, code)
-        } catch (e: GooglePlayServicesNotAvailableException) {
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }

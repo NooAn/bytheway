@@ -71,7 +71,7 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
             override fun onChanged(upload: Boolean?) {
                 if (upload == true) {
                     mFirebaseAnalytics.logEvent("RegistrationScreen_Success", null)
-                    startActivity(Intent(this@RegistrationActivity, MenuActivity::class.java))
+                    startActivity(Intent(this@RegistrationActivity, MenuActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
                 } else {
                     mFirebaseAnalytics.logEvent("RegistrationScreen_Error_Checkin", null)
                     Toast.makeText(this@RegistrationActivity, "Error for registration", Toast.LENGTH_SHORT).show()

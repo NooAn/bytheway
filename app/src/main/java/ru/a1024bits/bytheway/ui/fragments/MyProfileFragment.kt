@@ -82,6 +82,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         val AGE = "age"
         val NAME = "name"
         val LASTNAME = "lastName"
+        val ROUTE = "route"
         val CITY = "city"
     }
 
@@ -134,7 +135,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     private var profileStateHashMap: HashMap<String, String> = hashMapOf()
     private var oldProfileState: Int = 0
     private var routeString: String = ""
-    private var routes: String = ""
     private var googleMap: GoogleMap? = null
     private var mapView: MapView? = null
     private var countTrip: Int = 0
@@ -377,11 +377,9 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         options.width(5f)
 
         if (routeString != "") {
-            polyPts = PolyUtil.decode(routeString)
-
-            for (pts in polyPts) {
-                options.add(pts)
-            }
+            options.addAll(PolyUtil.decode(routeString))
+        } else {
+            // fix me рисуем прямую линию ( как будто на самолете летим)
         }
 
         googleMap?.addPolyline(options)
@@ -416,7 +414,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
-        mapView?.onSaveInstanceState(outState)
+        //   mapView?.onSaveInstanceState(outState)
     }
 
     override fun onDetach() {
@@ -585,16 +583,26 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                 .append(" ")
                 .append(year).toString())
 
-        dateArrived.setText(StringBuilder(" ")
-                .append(dayOfMonthEnd)
-                .append(" ")
-                .append(context.resources.getStringArray(R.array.months_array)[monthOfYearEnd])
-                .append(" ")
-                .append(yearEnd).toString())
 
+        if (getLongFromDate(dayOfMonth, monthOfYear, year) < getLongFromDate(dayOfMonthEnd, monthOfYearEnd, yearEnd)) {
+            dateArrived.setText(StringBuilder(" ")
+                    .append(dayOfMonthEnd)
+                    .append(" ")
+                    .append(context.resources.getStringArray(R.array.months_array)[monthOfYearEnd])
+                    .append(" ")
+                    .append(yearEnd).toString())
+            dates.put(END_DATE, getLongFromDate(dayOfMonthEnd, monthOfYearEnd, yearEnd))
+        } else {
+            Toast.makeText(context, R.string.date_error_set, Toast.LENGTH_SHORT).show()
+            dateArrived.setText(StringBuilder(" ")
+                    .append(dayOfMonth)
+                    .append(" ")
+                    .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
+                    .append(" ")
+                    .append(year).toString())
+        }
 
         dates.put(START_DATE, getLongFromDate(dayOfMonth, monthOfYear, year))
-        dates.put(END_DATE, getLongFromDate(dayOfMonthEnd, monthOfYearEnd, yearEnd))
         profileStateHashMap[DATES] = dates.toString()
         profileChanged()
     }
@@ -1012,7 +1020,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         fullName.text = StringBuilder().append(user.name).append(" ").append(user.lastName)
         username.text = StringBuilder(user.name).append(" ").append(user.lastName)
 
-        routes = user.route
         cityFromLatLng = user.cityFromLatLng
         cityToLatLng = user.cityToLatLng
 
@@ -1114,6 +1121,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         methods.clear()
         cities.clear()
         dates.clear()
+        routeString = ""
         viewModel?.sendUserData(getHashMapUser(), uid)
         hideBlockTravelInforamtion()
         showBlockAddTrip()
@@ -1137,6 +1145,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         hashMap[CITIES] = cities
         hashMap[METHOD] = methods
         hashMap[DATES] = dates
+        hashMap[ROUTE] = routeString
         hashMap[BUDGET] = budget
         hashMap[BUDGET_POSITION] = budgetPosition
         hashMap[CITY_FROM] = cityFromLatLng

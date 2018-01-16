@@ -24,7 +24,7 @@ class SplashActivity : Activity() {
     private fun checkRegistrationAndForward() {
         //checks first enter
         if (preferences.getBoolean(Constants.FIRST_ENTER, true)) {
-            startActivity(Intent(this, RegistrationActivity::class.java))
+            startActivity(Intent(this, RegistrationActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
         } else {
             //if it isn't first start
             startActivity(Intent(this, MenuActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))

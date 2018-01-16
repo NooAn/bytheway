@@ -40,7 +40,7 @@ android {
             dimension "default"
         }
         bytheway {
-            versionCode 3
+            versionCode 6
             versionName "0.1"
             dimension "default"
         }
@@ -49,7 +49,7 @@ android {
     buildTypes {
         release {
             applicationIdSuffix ".release"
-        //    signingConfig signingConfigs.release
+            signingConfig signingConfigs.release
             //minifyEnabled true
             //   proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

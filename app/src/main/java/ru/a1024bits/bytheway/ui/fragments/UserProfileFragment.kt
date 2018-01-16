@@ -167,6 +167,9 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
 
         if (user.budget > 0) {
             displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(user.budget)
+        } else {
+            displayPriceTravel.text = "0"
+            moneyForTrip.visibility = View.GONE
         }
         addInfoUser.text = user.addInformation
     }
@@ -284,7 +287,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
 
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
-        mMapView?.onSaveInstanceState(outState)
+        //mMapView?.onSaveInstanceState(outState)
     }
 
     override fun onDetach() {
