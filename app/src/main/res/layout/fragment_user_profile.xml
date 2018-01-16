@@ -365,7 +365,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:drawablePadding="4dp"
-                android:drawableStart="@drawable/ic_ruble_blue"
+                android:drawableStart="@drawable/ic_dollar"
                 android:textColor="@color/colorPrimary"
                 android:textSize="@dimen/standard_text_size"
                 tools:text="8000" />
