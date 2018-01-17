@@ -18,7 +18,6 @@
         <activity android:name=".ui.activity.RegistrationActivity" />
         <activity
             android:name=".ui.activity.MenuActivity"
-            android:launchMode="singleTask"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:hardwareAccelerated="true">
 

@@ -53,6 +53,7 @@ import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM
 import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO
 import ru.a1024bits.bytheway.util.Constants.START_DATE
+import ru.a1024bits.bytheway.util.DecimalInputFilter
 import ru.a1024bits.bytheway.util.getBearing
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import ru.terrakok.cicerone.commands.Replace
@@ -130,8 +131,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     private var cities: HashMap<String, String> = hashMapOf()
     private var budget: Long = 0
     private var budgetPosition: Int = 0
-    private var yearNow: Int = 0
-    private var yearsArr: ArrayList<Int> = arrayListOf()
     private var profileStateHashMap: HashMap<String, String> = hashMapOf()
     private var oldProfileState: Int = 0
     private var routeString: String = ""
@@ -145,50 +144,76 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         (activity as MenuActivity).pLoader?.show()
     }
 
-    private val routerObserver: Observer<ru.a1024bits.bytheway.model.Response<RoutesList>> =
-            Observer<ru.a1024bits.bytheway.model.Response<RoutesList>> { response ->
-                when (response?.status) {
-                    Status.SUCCESS -> {
-                        if (response.data != null) {
-                            if (activity != null) {
-                                response.data.routes?.map {
-                                    it.overviewPolyline?.encodedData?.let { routeString ->
-                                        this@MyProfileFragment.routeString = routeString
-                                        drawPolyline()
-                                    }
-                                }
-                            }
+    private val routsObserver: Observer<ResponseBtw<RoutesList>> = Observer<ResponseBtw<RoutesList>> { response ->
+        when (response?.status) {
+            Status.SUCCESS -> {
+                if (response.data != null && activity != null) {
+                    response.data.routes?.map {
+                        it.overviewPolyline?.encodedData?.let { routeString ->
+                            this@MyProfileFragment.routeString = routeString
+                            drawPolyline()
                         }
-                    }
-                    Status.ERROR -> {
-                        showErrorRouter()
                     }
                 }
             }
+            Status.ERROR -> {
+                showErrorRout()
+            }
+        }
+    }
 
-    private fun showErrorRouter() {
-        mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_error_router", null)
+    private fun showErrorRout() {
+        mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_error_routs", null)
         Log.d("LOG", "error  get routing")
     }
 
-    private val responseObserver: Observer<ru.a1024bits.bytheway.model.Response<User>> =
-            Observer<ru.a1024bits.bytheway.model.Response<User>> { response ->
-                when (response?.status) {
-                    Status.SUCCESS -> {
-                        if (response.data != null) {
-                            if (activity != null) {
-                                (activity as MenuActivity).pLoader?.hide()
-                                fillProfile(response.data)
-                                mListener?.onFragmentInteraction(response.data)
-                            }
-                        }
-                    }
-                    Status.ERROR -> {
-                        showErrorResponse()
-                        Log.e("LOG", "log e:" + response.error)
+    private val responseObserver: Observer<ResponseBtw<User>> = Observer<ResponseBtw<User>> { response ->
+        when (response?.status) {
+            Status.SUCCESS -> {
+                if (response.data != null) {
+                    if (activity != null) {
+                        (activity as MenuActivity).pLoader?.hide()
+                        fillProfile(response.data)
+                        mListener?.onFragmentInteraction(response.data)
                     }
                 }
             }
+            Status.ERROR -> {
+                showErrorResponse()
+                Log.e("LOG", "log e:" + response.error)
+            }
+        }
+    }
+
+    private val observerSaveProfile: Observer<ResponseBtw<Boolean>> = Observer<ResponseBtw<Boolean>> { response ->
+        when (response?.status) {
+            Status.SUCCESS -> {
+                if (response.data == true && activity != null) {
+                    Toast.makeText(this@MyProfileFragment.context, resources.getString(R.string.save_succesfull), Toast.LENGTH_SHORT).show()
+                    profileChanged(false)
+                    (activity as MenuActivity).pLoader?.hide()
+                } else {
+                    showErrorResponse()
+                }
+            }
+            Status.ERROR -> {
+                showErrorResponse()
+                Log.e("LOG", "log e:" + response.error)
+            }
+        }
+    }
+
+    private val observerClearSocial: Observer<SocialResponse> = Observer<SocialResponse> { response ->
+        response?.let {
+            changeSocIconsDisActive(response.link)
+        }
+    }
+
+    private val observerSaveSocial: Observer<SocialResponse> = Observer<SocialResponse> { response ->
+        response?.let {
+            changeSocIconsActive(response.link, response.value)
+        }
+    }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -208,8 +233,19 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         methodTextViews.put(Method.PLANE.link, travelPlaneText)
         methodTextViews.put(Method.HITCHHIKING.link, travelHitchHikingText)
 
-        viewModel?.routes?.observe(this, routerObserver)
+        viewModel?.routes?.observe(this, routsObserver)
         viewModel?.response?.observe(this, responseObserver)
+
+        if (viewModel?.saveSocial?.hasObservers() == false) {
+            viewModel?.saveSocial?.observe(this, observerSaveSocial)
+        }
+        if (viewModel?.clearSocial?.hasObservers() == false) {
+            viewModel?.clearSocial?.observe(this, observerClearSocial)
+        }
+        if (viewModel?.saveProfile?.hasObservers() == false) {
+            viewModel?.saveProfile?.observe(this, observerSaveProfile)
+        }
+
     }
 
     override fun getViewFactoryClass(): ViewModelProvider.Factory = viewModelFactory
@@ -256,16 +292,16 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                     textCityFrom.setText(place.name)
                     textCityFrom.error = null
                     cityFromLatLng = GeoPoint(place.latLng.latitude, place.latLng.longitude)
-                    if (cityToLatLng.hashCode() == cityFromLatLng.hashCode()) {
+                    if (cityFromLatLng.hashCode() == cityToLatLng.hashCode()) {
                         textCityFrom.error = "true"
-
                         Toast.makeText(this@MyProfileFragment.context,
                                 getString(R.string.fill_diff_cities), Toast.LENGTH_LONG).show()
                     } else {
                         cities.put(FIRST_INDEX_CITY, place.name.toString())
                         profileStateHashMap[CITY_FROM] = cityFromLatLng.hashCode().toString()
 
-                        obtainDirection()
+                        if (cityToLatLng.latitude != 0.0 && cityToLatLng.longitude != 0.0)
+                            obtainDirection()
                         setMarkers(1)
                         profileChanged()
                     }
@@ -291,7 +327,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                     } else {
                         cities.put(LAST_INDEX_CITY, place.name.toString())
                         profileStateHashMap[CITY_TO] = cityToLatLng.hashCode().toString()
-                        obtainDirection()
+                        if (cityFromLatLng.latitude != 0.0 && cityFromLatLng.longitude != 0.0)
+                            obtainDirection()
                         setMarkers(2)
                         profileChanged()
                     }
@@ -308,16 +345,16 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     override fun onResume() {
         super.onResume()
-        mapView?.onResume()
+        try {
+            mapView?.onResume()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     override fun onMapReady(map: GoogleMap?) {
-        Log.e("LOG", "google map hash ${googleMap?.hashCode()}")
         this.googleMap = map
         viewModel?.load(uid)
-        Log.d("LOG", " load map ready")
-        Log.e("LOG", "google map hash (a) ${googleMap?.hashCode()}")
-
     }
 
     private fun setMarkers(position: Int) {
@@ -506,7 +543,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             openDialog(SocialNetwork.TG)
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_tg_click", null)
         }
-
         buttonSaveTravelInfo.setOnClickListener {
             Log.e("LOG", "save travel")
             sendUserInfoToServer()
@@ -515,7 +551,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         dateArrived.setOnClickListener {
             openDateDialog()
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_date_to_click", null)
-
         }
         textDateFrom.setOnClickListener {
             openDateDialog()
@@ -524,15 +559,13 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         addInfoUser.afterTextChanged({
             profileStateHashMap[ADD_INFO] = it
             profileChanged(null, false)
-            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_click_air", null)
+            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_add_info", null)
             Log.d("LOG User", "after text change")
         })
         textCityFrom.setOnClickListener {
             sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM)
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_city_from_change", null)
-
         }
-
         textCityTo.setOnClickListener {
             sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO)
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_city_to_change", null)
@@ -546,8 +579,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             openAlertDialog(this::removeTrip)
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_remove_trip", null)
         }
-
-        //  mapView?.onStart()
     }
 
     override fun onStop() {
@@ -680,27 +711,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             return
         }
 
-        if (viewModel?.saveProfile?.hasObservers() == false) {
-            viewModel?.saveProfile?.observe(this, Observer<ResponseBtw<Boolean>> { response ->
-                when (response?.status) {
-                    Status.SUCCESS -> {
-                        if (response.data == true) {
-                            if (activity != null) {
-                                Toast.makeText(this@MyProfileFragment.context, resources.getString(R.string.save_succesfull), Toast.LENGTH_SHORT).show()
-                                profileChanged(false)
-                                (activity as MenuActivity).pLoader?.hide()
-                            }
-                        } else {
-                            showErrorResponse()
-                        }
-                    }
-                    Status.ERROR -> {
-                        showErrorResponse()
-                        Log.e("LOG", "log e:" + response.error)
-                    }
-                }
-            })
-        }
+
         (activity as MenuActivity).pLoader?.show()
         countTrip = 1
 
@@ -748,7 +759,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         val cityChoose = dialogView.findViewById<View>(R.id.dialog_city) as EditText
         cityChoose.setText(city)
 
-        val spinnerYearsView = dialogView.findViewById<View>(R.id.spinnerYearsView) as Spinner
 
         val man = dialogView.findViewById<RadioButton>(R.id.man)
         val woman = dialogView.findViewById<RadioButton>(R.id.woman)
@@ -760,41 +770,22 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             sexChoose.check(woman.id)
         }
 
-        val calendar = Calendar.getInstance()
-        yearNow = calendar.get(Calendar.YEAR)
+        val yearsView = dialogView.findViewById<EditText>(R.id.yearsView)
+        yearsView.setText(age.toString())
+        yearsView.filters = arrayOf(DecimalInputFilter())
 
-        for (i in 1920..yearNow) yearsArr.add(i)
-
-        val yearsAdapter = ArrayAdapter<Int>(this.context, android.R.layout.simple_spinner_item, yearsArr)
-
-        yearsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinnerYearsView.adapter = yearsAdapter
-        spinnerYearsView.prompt = getString(R.string.date)
-
-        spinnerYearsView.setSelection(yearsArr.size - age - 1)
-        spinnerYearsView.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                val selectedItem = parent.getItemAtPosition(position).toString().toLong()
-                age = (yearNow - selectedItem).toInt()
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {
-                Log.e("LOG", "Nothing 2")
-            }
-        }
         simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.save), { _, _ ->
             sex = if (man.isChecked) 1 else if (woman.isChecked) 2 else 0
-            fillAgeSex(age, sex)
             name = (nameChoose.text.toString()).capitalize()
             lastName = (lastNameChoose.text.toString()).capitalize()
             city = (cityChoose.text.toString()).capitalize()
+            age = (yearsView.text.toString()).toInt()
 
             username.text = StringBuilder(name).append(" ").append(lastName)
             cityview.text = if (city.isNotEmpty()) city else getString(R.string.native_city)
-            viewModel?.sendUserData(getHashMapUser(), uid)
+            fillAgeSex(age, sex)
 
-            savingUserData(name, lastName, city)
-
+            savingUserData(name, lastName, city, age, sex)
         })
         simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.cancel), { _, _ ->
             simpleAlert.hide()
@@ -834,10 +825,16 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         simpleAlert.show()
     }
 
-    private fun savingUserData(name: String, lastName: String, city: String) {
-        username.text = StringBuilder(name).append(" ").append(lastName)
-        cityview.text = if (city.isNotEmpty()) city else getString(R.string.native_city)
-        viewModel?.sendUserData(getHashMapUser(), uid)
+    private fun savingUserData(name: String, lastName: String, city: String, age: Int, sex: Int) {
+
+        val hashMap = HashMap<String, Any>()
+        hashMap[NAME] = name
+        hashMap[LASTNAME] = lastName
+        hashMap[CITY] = city
+        hashMap[AGE] = age
+        hashMap[SEX] = sex
+
+        viewModel?.sendUserData(hashMap, uid)
     }
 
     private fun openDialog(socialNetwork: SocialNetwork, errorText: String? = null) {
@@ -859,20 +856,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         if (errorText != null) {
             dialogView.findViewById<EditText>(R.id.socLinkText).error = errorText
         }
-        if (viewModel?.saveSocial?.hasObservers() == false) {
-            viewModel?.saveSocial?.observe(this, Observer<SocialResponse> { response ->
-                response?.let {
-                    changeSocIconsActive(response.link, response.value)
-                }
-            })
-        }
-        if (viewModel?.clearSocial?.hasObservers() == false) {
-            viewModel?.clearSocial?.observe(this, Observer<SocialResponse> { response ->
-                response?.let {
-                    changeSocIconsDisActive(response.link)
-                }
-            })
-        }
+
         simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.remove), { _, _ ->
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_remove_links", null)
             viewModel?.saveLinks(socNet, uid, {
@@ -1120,6 +1104,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         budget = 0
         methods.clear()
         cities.clear()
+        cityFromLatLng = GeoPoint(0.0, 0.0)
+        cityToLatLng = GeoPoint(0.0, 0.0)
         dates.clear()
         googleMap?.clear()
         routeString = ""

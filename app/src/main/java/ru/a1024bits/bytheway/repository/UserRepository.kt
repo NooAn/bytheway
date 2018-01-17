@@ -4,6 +4,7 @@ import android.arch.lifecycle.Observer
 import android.util.Log
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -52,7 +53,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                         for (document in task.result) {
                             try {
                                 val user = document.toObject(User::class.java)
-                                if (user.cities.size > 0) {
+                                if (user.cities.size > 0 && user.id != FirebaseAuth.getInstance().currentUser?.uid) {
                                     result.add(user)
                                 }
                             } catch (e: Exception) {

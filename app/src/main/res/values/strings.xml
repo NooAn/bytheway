@@ -111,7 +111,7 @@
     <string name="remove">Удалить</string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
-    <string name="year_born">Год рождения</string>
+    <string name="year_born">Возраст</string>
     <string name="dates_has_been_incorrect">даты оказались некорректными, попробуйте ввести их снова</string>
     <string name="lastname">Фамилия</string>
     <string name="feedback_text1">Мы будем Вам благодарны  за оставленный отзыв.</string>
@@ -125,4 +125,5 @@
     <string name="no_internet">У вас нет интернет соединения</string>
     <string name="date_empty">* пользователь не указал даты поездки</string>
     <string name="date_error_set">Дата окончания поездки не может быть раньше чем начала.</string>
+    <string name="error_sinchronized">Очень жаль.... Но не получилось синхронизироваться с app in the air.</string>
 </resources>

@@ -19,4 +19,4 @@ data class Filter(var startAge: Int = 0,
 
 val M_SEX = 1
 val W_SEX = 2
-val MAX_AGE = 120
+val MAX_AGE = 80

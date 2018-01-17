@@ -137,7 +137,7 @@ class MenuActivity : AppCompatActivity(),
             } else {
                 if (intent.data != null && intent.data.host.contains("appintheair", true)) {
                     // viewModel?.load(FirebaseAuth.getInstance().currentUser?.uid.toString())
-                    navigator.applyCommand(Replace(Screens.AIR_SUCCES_SCREEN, 1))
+                    //  navigator.applyCommand(Replace(Screens.AIR_SUCCES_SCREEN, 1))
                 } else {
                     navigator.applyCommand(Replace(Screens.MY_PROFILE_SCREEN, 1))
                 }
@@ -163,13 +163,13 @@ class MenuActivity : AppCompatActivity(),
         }
         feedback.setOnClickListener { openDialogFeedback() }
         pLoader = this.findViewById(R.id.pLoaderRes) as ProgressCustom
-        if (isNetworkAvailable() == false) showSnack()
+        if (isNetworkAvailable() == false) showSnack(getString(R.string.no_internet))
     }
 
     var snackbar: Snackbar? = null
 
-    private fun showSnack() {
-        snackbar = Snackbar.make(this.findViewById(android.R.id.content), R.string.no_internet, Snackbar.LENGTH_LONG)
+    private fun showSnack(string: String) {
+        snackbar = Snackbar.make(this.findViewById(android.R.id.content), string, Snackbar.LENGTH_LONG)
         snackbar?.show()
         pLoader?.hide()
     }
@@ -279,22 +279,24 @@ class MenuActivity : AppCompatActivity(),
                 // get access token
                 // we'll do that in a minute
                 val generator = ServiceGenerator()
-                val loginService = generator.createService(AirWebService::class.java);
+                val loginService = generator.createService(AirWebService::class.java)
                 val call = loginService.getAccessToken(code, clientId, clientSecret,
                         "authorization_code",
                         redirectUri)
                 call.enqueue(object : Callback<AccessToken?> {
                     override fun onFailure(call: Call<AccessToken?>?, t: Throwable?) {
                         Log.e("LOG", "on Fail for authorization ")
+                        showSnack(getString(R.string.error_sinchronized))
                     }
 
                     override fun onResponse(call: Call<AccessToken?>?, response: Response<AccessToken?>?) {
                         val accessToken = response?.body()
                         saveToken(accessToken)
-                        val loginService = generator.createService(AirWebService::class.java, accessToken?.getTokenType() + " " + accessToken?.accessToken);
+                        val loginService = generator.createService(AirWebService::class.java, accessToken?.getTokenType() + " " + accessToken?.accessToken)
                         loginService.getUserProfile().enqueue(object : Callback<AirUser?> {
                             override fun onFailure(call: Call<AirUser?>?, t: Throwable?) {
                                 Log.e("LOGI", "fail", t)
+                                showSnack(getString(R.string.error_sinchronized))
                             }
 
                             override fun onResponse(call: Call<AirUser?>?, response: Response<AirUser?>?) {
@@ -305,6 +307,7 @@ class MenuActivity : AppCompatActivity(),
                         loginService.getMyTrips().enqueue(object : Callback<AirUser?> {
                             override fun onResponse(call: Call<AirUser?>?, response: Response<AirUser?>?) {
                                 viewModel?.updateFeatureTrips(response?.body(), FirebaseAuth.getInstance().currentUser?.uid.toString())
+                                Log.e("LOG", "${response?.body()?.data?.trips?.get(0)?.flights}")
                                 if (response?.body() != null && response?.body()?.data?.trips?.isEmpty() == false) {
                                     navigator.applyCommand(Replace(Screens.AIR_SUCCES_SCREEN, response?.body()?.data?.trips?.get(0)?.flights))
                                 }
@@ -312,6 +315,7 @@ class MenuActivity : AppCompatActivity(),
 
                             override fun onFailure(call: Call<AirUser?>?, t: Throwable?) {
                                 Log.e("LOGI", "fail", t)
+                                showSnack(getString(R.string.error_sinchronized))
                             }
                         })
                     }
@@ -320,6 +324,7 @@ class MenuActivity : AppCompatActivity(),
             } else if (uri.getQueryParameter("error") != null) {
                 // show an error message here
                 Log.e("LOGI:", "error: ${uri.getQueryParameter("error")}")
+                showSnack(getString(R.string.error_sinchronized))
             }
         }
         navigatorHolder.setNavigator(navigator)
@@ -363,7 +368,7 @@ class MenuActivity : AppCompatActivity(),
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
-        if (isNetworkAvailable() == false) showSnack()
+        if (isNetworkAvailable() == false) showSnack(getString(R.string.no_internet))
         if (this.profileChanged == true) {
             openAwayFromProfileDialog({
                 this.profileChanged = false

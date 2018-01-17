@@ -195,7 +195,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         buttonSaveTravelInfo.setOnClickListener {
             //send data to Firebase
             viewModel?.sendUserData(getHashMapUser(), uid)
-            // routeString?.let { route -> viewModel?.sendUserData(getHashMapRoute(route), uid) }
         }
 
         buttonSearch.setOnClickListener {
@@ -422,8 +421,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         when (points.size) {
             1 -> mMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(points.valueAt(0).position, 7F/* zoom level */))
             else -> {
-                mMap?.animateCamera(CameraUpdateFactory.newLatLngBounds(createLatLngBounds(points),
-                        resources.getDimensionPixelSize(R.dimen.latLngBoundsPadding)))
+                mMap?.animateCamera(CameraUpdateFactory.newLatLngBounds(createLatLngBounds(points), resources.getDimensionPixelSize(R.dimen.latLngBoundsPadding)))
                 obtainDirection()
             }
         }

@@ -48,6 +48,10 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     var user: User = User()
     var filter: Filter = Filter()
 
+    private val FIRST_MARKER_POSITION: Int = 1
+
+    private val SECOND_MARKER_POSITION: Int = 2
+
     companion object {
         fun newInstance(user: User?): SearchFragment {
             val fragment = SearchFragment()
@@ -177,8 +181,8 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     private fun updatePoints() {
         firstPoint = LatLng(user.cityFromLatLng.latitude, user.cityFromLatLng.longitude)
         secondPoint = LatLng(user.cityToLatLng.latitude, user.cityToLatLng.longitude)
-        firstPoint?.let { latLng -> (activity as OnFragmentInteractionListener).onSetPoint(latLng, 1) }
-        secondPoint?.let { latLng -> (activity as OnFragmentInteractionListener).onSetPoint(latLng, 2) }
+        firstPoint?.let { latLng -> (activity as OnFragmentInteractionListener).onSetPoint(latLng, FIRST_MARKER_POSITION) }
+        secondPoint?.let { latLng -> (activity as OnFragmentInteractionListener).onSetPoint(latLng, SECOND_MARKER_POSITION) }
     }
 
     private fun openDateDialog() {
@@ -267,7 +271,7 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                         text_to_city.error = null
                         text_from_city.error = null
                     }
-                    firstPoint?.let { latLng -> (activity as OnFragmentInteractionListener).onSetPoint(latLng, 1) }
+                    firstPoint?.let { latLng -> (activity as OnFragmentInteractionListener).onSetPoint(latLng, FIRST_MARKER_POSITION) }
                 }
                 else -> {
                     val status = PlaceAutocomplete.getStatus(activity, data)
@@ -291,7 +295,7 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                         text_from_city.error = null
                         text_to_city.error = null
                     }
-                    secondPoint?.let { latLng -> (activity as OnFragmentInteractionListener).onSetPoint(latLng, 2) }
+                    secondPoint?.let { latLng -> (activity as OnFragmentInteractionListener).onSetPoint(latLng, SECOND_MARKER_POSITION) }
                 }
                 else -> {
                     val status = PlaceAutocomplete.getStatus(activity, data)

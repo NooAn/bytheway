@@ -15,6 +15,8 @@ import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.terrakok.cicerone.commands.Replace
 import android.content.Intent
+import android.util.Log
+import android.widget.TextView
 import com.google.firebase.analytics.FirebaseAnalytics
 
 
@@ -28,12 +30,17 @@ class AirSuccesfullFragment : Fragment() {
 
     lateinit var mFirebaseAnalytics: FirebaseAnalytics
 
+    private val MIN_LENGTH_AIRPORT: Int  = 1
+
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this.context)
         val view: View?
-        if (arguments != null && arguments.getString(NAME).length > 0) {
+
+        Log.e("LOG", "le ${arguments.getString(NAME).length} name:${arguments.getString(NAME)}")
+
+        if (arguments != null && arguments.getString(NAME).length > MIN_LENGTH_AIRPORT) {
             view = inflater?.inflate(R.layout.fragment_air_succesfull, container, false)
             mFirebaseAnalytics.setCurrentScreen(this.activity, "AppInTheAir_succesfull_sinch", this.javaClass.simpleName)
         } else {
@@ -46,7 +53,7 @@ class AirSuccesfullFragment : Fragment() {
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        button_miss.setOnClickListener {
+        view?.findViewById<View>(R.id.button_miss)?.setOnClickListener {
             //return in menu // change on the Router
             (activity as MenuActivity).navigator.applyCommand(Replace(Screens.MY_PROFILE_SCREEN, 1))
         }
@@ -56,12 +63,11 @@ class AirSuccesfullFragment : Fragment() {
             i.data = Uri.parse(url)
             startActivity(i)
             mFirebaseAnalytics.logEvent("AppInTheAir_common_look_link", null)
-
         }
-        if (arguments != null) {
-            city_from_air.text = arguments.getString(NAME)
+        if (arguments != null && arguments.getString(NAME).length > MIN_LENGTH_AIRPORT) {
+            view?.findViewById<TextView>(R.id.city_from_air)?.text = arguments.getString(NAME)
             mFirebaseAnalytics.logEvent("AppInTheAir_common", arguments)
-            if (date_air_go != null) date_air_go.text = arguments.getString(DATE)
+            if (view?.findViewById<TextView>(R.id.date_air_go) != null) view.findViewById<TextView>(R.id.date_air_go).text = arguments.getString(DATE)
         }
     }
 
@@ -82,7 +88,7 @@ class AirSuccesfullFragment : Fragment() {
 
     override fun onDetach() {
         super.onDetach()
-        mListener = null//////
+        mListener = null
     }
 
 
