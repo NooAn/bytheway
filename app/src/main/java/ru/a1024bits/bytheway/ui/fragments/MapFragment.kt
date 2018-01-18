@@ -180,15 +180,19 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         mapFragmentRoot.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
-                mapFragmentRoot.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                try {
+                    mapFragmentRoot.viewTreeObserver.removeOnGlobalLayoutListener(this)
 
-                val targetMapHeight = mapFragmentRoot.height - resources.getDimensionPixelSize(R.dimen.chooseDestinationLayoutHeight)
-                val mapParams = map.layoutParams
+                    val targetMapHeight = mapFragmentRoot.height - resources.getDimensionPixelSize(R.dimen.chooseDestinationLayoutHeight)
+                    val mapParams = map.layoutParams
 
-                mapParams.height = targetMapHeight
-                map.layoutParams = mapParams
+                    mapParams.height = targetMapHeight
+                    map.layoutParams = mapParams
 
-                mapFragmentScrollView.scrollTo(0, 0)
+                    mapFragmentScrollView.scrollTo(0, 0)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
         })
 
@@ -198,7 +202,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
 
         buttonSearch.setOnClickListener {
-
             var error = 0
             val departure = text_from_city.text.isNotEmpty()
             val destination = text_to_city.text.isNotEmpty()

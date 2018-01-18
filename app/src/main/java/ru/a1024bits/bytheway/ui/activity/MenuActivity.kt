@@ -301,12 +301,12 @@ class MenuActivity : AppCompatActivity(),
 
                             override fun onResponse(call: Call<AirUser?>?, response: Response<AirUser?>?) {
                                 Log.e("LOGI", response?.message().toString())
-                                viewModel?.updateStaticalInfo(response?.body(), FirebaseAuth.getInstance().currentUser?.uid.toString())
+                                viewModel?.updateStaticalInfo(response?.body(), FirebaseAuth.getInstance().currentUser?.uid.toString(), mainUser)
                             }
                         })
                         loginService.getMyTrips().enqueue(object : Callback<AirUser?> {
                             override fun onResponse(call: Call<AirUser?>?, response: Response<AirUser?>?) {
-                                viewModel?.updateFeatureTrips(response?.body(), FirebaseAuth.getInstance().currentUser?.uid.toString())
+                                viewModel?.updateFeatureTrips(response?.body(), FirebaseAuth.getInstance().currentUser?.uid.toString(), mainUser)
                                 Log.e("LOG", "${response?.body()?.data?.trips?.get(0)?.flights}")
                                 if (response?.body() != null && response?.body()?.data?.trips?.isEmpty() == false) {
                                     navigator.applyCommand(Replace(Screens.AIR_SUCCES_SCREEN, response?.body()?.data?.trips?.get(0)?.flights))
@@ -420,7 +420,7 @@ class MenuActivity : AppCompatActivity(),
                     }
                 }
             })
-            viewModel?.sendUserData(myProfile.getHashMapUser(), FirebaseAuth.getInstance().currentUser?.uid.toString())
+            viewModel?.sendUserData(myProfile.getHashMapUser(), FirebaseAuth.getInstance().currentUser?.uid.toString(), mainUser)
         })
         simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.no), { dialogInterface, i ->
             Log.e("LOG", " refused")

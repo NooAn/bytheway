@@ -161,6 +161,9 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             }
         }
     }
+    private val usersObservers: Observer<User> = Observer<User> { user ->
+        mListener?.onFragmentInteraction(user)
+    }
 
     private fun showErrorRout() {
         mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_error_routs", null)
@@ -175,6 +178,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                         (activity as MenuActivity).pLoader?.hide()
                         fillProfile(response.data)
                         mListener?.onFragmentInteraction(response.data)
+                        mainUser = response.data
                     }
                 }
             }
@@ -235,6 +239,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
         viewModel?.routes?.observe(this, routsObserver)
         viewModel?.response?.observe(this, responseObserver)
+        viewModel?.user?.observe(this, usersObservers)
 
         if (viewModel?.saveSocial?.hasObservers() == false) {
             viewModel?.saveSocial?.observe(this, observerSaveSocial)
@@ -245,7 +250,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         if (viewModel?.saveProfile?.hasObservers() == false) {
             viewModel?.saveProfile?.observe(this, observerSaveProfile)
         }
-
     }
 
     override fun getViewFactoryClass(): ViewModelProvider.Factory = viewModelFactory
@@ -384,7 +388,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         val midPointLong = (coordFrom.longitude + coordTo.longitude) / 2
         val blueMarker = BitmapDescriptorFactory.fromResource(R.drawable.pin_blue)
 
-        if (markerPositionStart!= LatLng(0.0,0.0)) {
+        if (markerPositionStart != LatLng(0.0, 0.0)) {
             googleMap?.addMarker(MarkerOptions()
                     .icon(blueMarker)
                     .position(markerPositionStart)
@@ -393,7 +397,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                     .flat(true))
         }
 
-        if (markerPositionFinal!= LatLng(0.0,0.0)) {
+        if (markerPositionFinal != LatLng(0.0, 0.0)) {
             googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(markerPositionFinal, 5.0f))
             googleMap?.addMarker(MarkerOptions()
                     .icon(blueMarker)
@@ -402,8 +406,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                     .anchor(0.5F, 1.0F)
                     .flat(true))
 
-            if (markerPositionStart!= LatLng(0.0,0.0)) {
-              var  perfectZoom = 190 / coordFrom.getBearing(coordTo)
+            if (markerPositionStart != LatLng(0.0, 0.0)) {
+                var perfectZoom = 190 / coordFrom.getBearing(coordTo)
                 googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(midPointLat, midPointLong), perfectZoom))
             }
 
@@ -689,6 +693,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         dateDialog.show(activity.fragmentManager, "")
     }
 
+    private var mainUser: User? = null
+
     private fun sendUserInfoToServer() {
 
         var errorString = ""
@@ -724,7 +730,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         (activity as MenuActivity).pLoader?.show()
         countTrip = 1
 
-        viewModel?.sendUserData(getHashMapUser(), uid)
+        viewModel?.sendUserData(getHashMapUser(), uid, mainUser)
     }
 
     private fun showErrorResponse() {
@@ -843,7 +849,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         hashMap[AGE] = age
         hashMap[SEX] = sex
 
-        viewModel?.sendUserData(hashMap, uid)
+        viewModel?.sendUserData(hashMap, uid, mainUser)
     }
 
     private fun openDialog(socialNetwork: SocialNetwork, errorText: String? = null) {
@@ -1118,7 +1124,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         dates.clear()
         googleMap?.clear()
         routeString = ""
-        viewModel?.sendUserData(getHashMapUser(), uid)
+        viewModel?.sendUserData(getHashMapUser(), uid, mainUser)
         hideBlockTravelInforamtion()
         showBlockAddTrip()
     }
