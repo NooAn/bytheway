@@ -165,13 +165,19 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
             }
         }
 
+        if (!user.method.containsValue(true)) {
+            layout_method_moving.visibility = View.GONE
+        }
+
         if (user.budget > 0) {
-            displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(user.budget)
+            displayPriceTravel.text = user.budget.toString()
         } else {
             displayPriceTravel.text = "0"
             moneyForTrip.visibility = View.GONE
         }
+
         addInfoUser.text = user.addInformation
+        if (user.addInformation.isBlank()) descriptionProfile.visibility = View.GONE
     }
 
     fun fillAgeSex(userAge: Int, userSex: Int) {
@@ -382,7 +388,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
 
     companion object {
         private val UID_KEY = "uid"
-        val CENTRE: LatLng = LatLng(-23.570991, -46.649886)
+        val CENTRE: LatLng = LatLng(-23.570991, -43.649886)
         val ZOOM = 9f
 
         fun newInstance(uid: String): UserProfileFragment {
