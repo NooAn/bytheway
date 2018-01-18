@@ -140,7 +140,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
                     tgIcon.setImageResource(R.drawable.ic_tg_color)
                     tgIcon.setOnClickListener {
                         mFirebaseAnalytics.logEvent(TAG_ANALYTICS + "OPEN_TG", null)
-                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://telegram.me/${user.socialNetwork.get(name.key)}")))
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/${user.socialNetwork[name.key]?.replace("@", "")}")))
                     }
                 }
             }
