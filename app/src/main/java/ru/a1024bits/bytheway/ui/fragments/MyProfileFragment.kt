@@ -397,8 +397,9 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                     .flat(true))
         }
 
+
         if (markerPositionFinal != LatLng(0.0, 0.0)) {
-            googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(markerPositionFinal, 5.0f))
+            googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(markerPositionFinal, 4.0f))
             googleMap?.addMarker(MarkerOptions()
                     .icon(blueMarker)
                     .position(markerPositionFinal)
@@ -409,18 +410,15 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             if (markerPositionStart != LatLng(0.0, 0.0)) {
                 var perfectZoom = 190 / coordFrom.getBearing(coordTo)
                 googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(midPointLat, midPointLong), perfectZoom))
-            }
-
+            } else
+                googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(markerPositionFinal, 2.0f))
         }
-
-
     }
 
     fun drawPolyline() {
 
         val blueColor = activity.resources.getColor(R.color.blueRouteLine)
 
-        var polyPts: List<LatLng>
         val options = PolylineOptions()
         options.color(blueColor)
 
