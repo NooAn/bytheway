@@ -384,23 +384,32 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         val midPointLong = (coordFrom.longitude + coordTo.longitude) / 2
         val blueMarker = BitmapDescriptorFactory.fromResource(R.drawable.pin_blue)
 
-        googleMap?.addMarker(MarkerOptions()
-                .icon(blueMarker)
-                .position(markerPositionStart)
-                .title(markerTitleStart)
-                .anchor(0.5F, 1.0F)
-                .flat(true))
+        if (markerPositionStart!= LatLng(0.0,0.0)) {
+            googleMap?.addMarker(MarkerOptions()
+                    .icon(blueMarker)
+                    .position(markerPositionStart)
+                    .title(markerTitleStart)
+                    .anchor(0.5F, 1.0F)
+                    .flat(true))
+        }
 
-        googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(markerPositionFinal, 6.0f))
-        googleMap?.addMarker(MarkerOptions()
-                .icon(blueMarker)
-                .position(markerPositionFinal)
-                .title(markerTitleFinal)
-                .anchor(0.5F, 1.0F)
-                .flat(true))
+        if (markerPositionFinal!= LatLng(0.0,0.0)) {
+            googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(markerPositionFinal, 5.0f))
+            googleMap?.addMarker(MarkerOptions()
+                    .icon(blueMarker)
+                    .position(markerPositionFinal)
+                    .title(markerTitleFinal)
+                    .anchor(0.5F, 1.0F)
+                    .flat(true))
 
-        var perfectZoom = 190 / coordFrom.getBearing(coordTo)
-        googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(midPointLat, midPointLong), perfectZoom))
+            if (markerPositionStart!= LatLng(0.0,0.0)) {
+              var  perfectZoom = 190 / coordFrom.getBearing(coordTo)
+                googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(midPointLat, midPointLong), perfectZoom))
+            }
+
+        }
+
+
     }
 
     fun drawPolyline() {
@@ -1056,8 +1065,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         }
 
         fillAgeSex(user.age, user.sex)
-
         setMarkers(2)
+
         if (user.route.isNotBlank()) {
             routeString = user.route
             drawPolyline()
