@@ -445,8 +445,8 @@
                 android:layout_height="0dp"
                 android:layout_marginTop="24dp"
                 android:layout_weight="1"
-                android:max="30"
-                android:progress="1"
+                android:max="50"
+                android:progress="0"
                 android:progressTint="@color/colorPrimary"
                 android:thumbTint="@color/colorPrimary" />
 
@@ -477,8 +477,8 @@
 
             <TextView
                 android:layout_width="match_parent"
-                android:layout_marginStart="2dp"
                 android:layout_height="match_parent"
+                android:layout_marginStart="2dp"
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/add_info_profile"
                 android:textSize="16sp" />

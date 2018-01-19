@@ -477,6 +477,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     private val TAG_ANALYTICS: String = "MProfile_screen"
 
+    private val START_BUDGET: Int = 50
+
     override fun onStart() {
         super.onStart()
 
@@ -498,8 +500,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
         choosePriceTravel.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, number: Int, p2: Boolean) {
-                budget = (150 * number).toLong()
-                displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(budget)
+                budget = (START_BUDGET * number).toLong()
+                displayPriceTravel.text = budget.toString()
                 if (number != budgetPosition) {
                     budgetPosition = number
                     profileStateHashMap[BUDGET] = budget.toString()
