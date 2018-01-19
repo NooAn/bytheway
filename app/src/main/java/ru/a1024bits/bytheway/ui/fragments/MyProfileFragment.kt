@@ -462,7 +462,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
-        //   mapView?.onSaveInstanceState(outState)
     }
 
     override fun onDetach() {
@@ -472,10 +471,11 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     override fun onPause() {
         super.onPause()
-        mapView?.onPause()
     }
 
     private val TAG_ANALYTICS: String = "MProfile_screen"
+
+    private val START_BUDGET: Int = 50
 
     override fun onStart() {
         super.onStart()
@@ -498,8 +498,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
         choosePriceTravel.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, number: Int, p2: Boolean) {
-                budget = (150 * number).toLong()
-                displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(budget)
+                budget = (START_BUDGET * number).toLong()
+                displayPriceTravel.text = budget.toString()
                 if (number != budgetPosition) {
                     budgetPosition = number
                     profileStateHashMap[BUDGET] = budget.toString()

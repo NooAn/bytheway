@@ -129,6 +129,7 @@
                 android:layout_marginEnd="5dp"
                 android:layout_marginTop="10dp"
                 android:layout_toStartOf="@+id/budgetToLayout"
+                android:hint="$"
                 android.support.design:hintAnimationEnabled="true"
                 android.support.design:hintEnabled="true">
 
@@ -137,8 +138,8 @@
                     android:layout_width="115dp"
                     android:layout_height="wrap_content"
                     android:imeOptions="actionNext"
+                    android:importantForAutofill="noExcludeDescendants"
                     android:inputType="number"
-                    android:hint="$"
                     android:maxEms="4"
                     android:minEms="4" />
             </android.support.design.widget.TextInputLayout>
