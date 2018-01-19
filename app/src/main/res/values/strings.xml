@@ -126,4 +126,6 @@
     <string name="date_empty">* пользователь не указал даты поездки</string>
     <string name="date_error_set">Дата окончания поездки не может быть раньше чем начала.</string>
     <string name="error_sinchronized">Очень жаль.... Но не получилось синхронизироваться с app in the air.</string>
+    <string name="this_date_is_not_set">Дата еще не установлена.</string>
+    <string name="copy_done">Телефон скопирован</string>
 </resources>

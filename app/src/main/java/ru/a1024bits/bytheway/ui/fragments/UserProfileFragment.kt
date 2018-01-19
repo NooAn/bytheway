@@ -1,5 +1,6 @@
 package ru.a1024bits.bytheway.ui.fragments
 
+import android.app.Dialog
 import android.arch.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
@@ -17,6 +18,7 @@ import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.viewmodel.UserProfileViewModel
 import android.widget.Toast
 import android.arch.lifecycle.ViewModelProvider
+import android.content.pm.PackageManager
 import android.support.v4.content.ContextCompat
 import android.util.Log
 import com.bumptech.glide.request.RequestOptions
@@ -29,6 +31,7 @@ import kotlinx.android.synthetic.main.profilte_user_direction.*
 import kotlinx.android.synthetic.main.profile_main_image.*
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.model.*
+import ru.a1024bits.bytheway.ui.dialogs.SocNetworkdialog
 import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.util.getBearing
 import java.text.SimpleDateFormat
@@ -89,10 +92,12 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
             val dayBegin = formatDate.format(Date(user.dates.get(Constants.START_DATE) ?: 0))
             val dayArrival = formatDate.format(Date(user.dates.get(Constants.END_DATE) ?: 0))
             if (dayBegin.isNotBlank() && dayBegin.length > 0 && !dayBegin.equals("01.01.1970")) textDateFrom.setText(dayBegin) else iconDateFromEmpty.visibility = View.VISIBLE
-            if (dayArrival.isNotBlank() && dayArrival.length > 0 && !dayBegin.equals("01.01.1970")) dateArrived.setText(dayArrival) else iconDateArrivedEmpty.visibility = View.VISIBLE
+            if (dayArrival.isNotBlank() && dayArrival.length > 0 && !dayArrival.equals("01.01.1970")) dateArrived.setText(dayArrival) else iconDateArrivedEmpty.visibility = View.VISIBLE
         } else {
             textDateEmpty.visibility = View.VISIBLE
         }
+        iconDateArrivedEmpty.setOnClickListener { clickForIconDateEmpty() }
+        iconDateFromEmpty.setOnClickListener { clickForIconDateEmpty() }
 
         fillAgeSex(user.age, user.sex)
 
@@ -131,7 +136,8 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
                         try {
                             startActivity(createBrowserIntent("whatsapp://send?text=Привет, я нашел тебя в ByTheWay.&phone=+${user.socialNetwork.get(name.key)}&abid = +${user.socialNetwork.get(name.key)})}"))
                         } catch (e: Exception) {
-                            Toast.makeText(activity.applicationContext, "${user.socialNetwork.get(name.key)}", Toast.LENGTH_LONG).show()
+                            val dialog = SocNetworkdialog(activity, user.socialNetwork.get(name.key))
+                            dialog.show()
                             e.printStackTrace()
                         }
                     }
@@ -139,8 +145,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
                 SocialNetwork.TG.link -> {
                     tgIcon.setImageResource(R.drawable.ic_tg_color)
                     tgIcon.setOnClickListener {
-                        mFirebaseAnalytics.logEvent(TAG_ANALYTICS + "OPEN_TG", null)
-                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/${user.socialNetwork[name.key]?.replace("@", "")}")))
+                        intentMessageTelegram(user.socialNetwork[name.key])
                     }
                 }
             }
@@ -178,6 +183,10 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
 
         addInfoUser.text = user.addInformation
         if (user.addInformation.isBlank()) descriptionProfile.visibility = View.GONE
+    }
+
+    private fun clickForIconDateEmpty() {
+        Toast.makeText(activity, R.string.this_date_is_not_set, Toast.LENGTH_LONG).show()
     }
 
     fun fillAgeSex(userAge: Int, userSex: Int) {
@@ -293,7 +302,6 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
 
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
-        //mMapView?.onSaveInstanceState(outState)
     }
 
     override fun onDetach() {
@@ -302,17 +310,14 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
     }
 
     override fun onPause() {
-        mMapView?.onPause()
         super.onPause()
     }
 
     override fun onStart() {
         super.onStart()
-        mMapView?.onStart()
     }
 
     override fun onStop() {
-        mMapView?.onStop()
         super.onStop()
     }
 
@@ -369,6 +374,40 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
         super.onDestroy()
     }
 
+    fun intentMessageTelegram(id: String?) {
+//        val appName = "org.telegram.messenger";
+//        val isAppInstalled = isAppAvailable(activity.getApplicationContext(), appName);
+        if (id?.isNumberPhone() == false) {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/${id?.replace("@", "")}")))
+            mFirebaseAnalytics.logEvent(TAG_ANALYTICS + "OPEN_TG", null)
+        } else {
+            mFirebaseAnalytics.logEvent(TAG_ANALYTICS + "NOT_OPEN_TG", null)
+            val dialog = SocNetworkdialog(activity, id)
+            dialog.show()
+        }
+    }
+
+    /**
+     * Indicates whether the specified app ins installed and can used as an intent. This
+     * method checks the package manager for installed packages that can
+     * respond to an intent with the specified app. If no suitable package is
+     * found, this method returns false.
+     *
+     * @param context The application's environment.
+     * @param appName The name of the package you want to check
+     *
+     * @return True if app is installed
+     */
+    fun isAppAvailable(context: Context, appName: String): Boolean {
+        val pm = context.getPackageManager();
+        try {
+            pm.getPackageInfo(appName, PackageManager.GET_ACTIVITIES);
+            return true;
+        } catch (e: PackageManager.NameNotFoundException) {
+            return false;
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         mapView?.onDestroy()
@@ -400,5 +439,10 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
         }
     }
 }// Required empty public constructor
+
+private fun String.isNumberPhone(): Boolean {
+    return this.matches(Regex("^([0-9]|\\+[0-9]){11,13}\$")) ||
+            this.startsWith("+7") && !this.startsWith("@")
+}
 
 
