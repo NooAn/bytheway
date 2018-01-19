@@ -462,7 +462,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
-        //   mapView?.onSaveInstanceState(outState)
     }
 
     override fun onDetach() {
@@ -472,7 +471,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     override fun onPause() {
         super.onPause()
-        mapView?.onPause()
     }
 
     private val TAG_ANALYTICS: String = "MProfile_screen"
