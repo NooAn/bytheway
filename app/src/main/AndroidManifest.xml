@@ -1,21 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="ru.a1024bits.bytheway">
+    package="ru.a1024bits.bytheway">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+
 
     <application
+        android:name=".App"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/icon_logo"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+        android:theme="@style/AppTheme.NoActionBar">
+        <activity android:name=".ui.activity.RegistrationActivity" />
+        <activity
+            android:name=".ui.activity.MenuActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:hardwareAccelerated="true">
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="www.appintheair.mobi"
+                    android:scheme="https" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".ui.activity.SplashActivity"
+            android:label="@string/title_activity_menu">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDBqb2pdkfSx1ii31xwPsFf635j-cQB1tU" />
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="ffb4d33983aaa714c5d96ca2dc7836360d357ee7" />
     </application>
 
 </manifest>

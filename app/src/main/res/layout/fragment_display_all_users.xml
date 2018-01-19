@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/view_contain_block_parameters"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    android:orientation="vertical"
+    android:theme="@style/AppTheme.NoActionBar">
+
+    <LinearLayout
+        android:background="@color/colorFiltersBackground"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/searchParametersText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/colorFiltersBackground"
+        android:gravity="center_vertical|start"
+        android:paddingBottom="@dimen/all_users_searchParametersText_vertical_margin"
+        android:paddingStart="@dimen/standard_margin"
+        android:paddingTop="@dimen/all_users_searchParametersText_vertical_margin"
+        android:text="@string/optionSearch"
+        android:textAllCaps="true"
+        android:textColor="@color/colorPrimaryTeams"
+        android:textSize="@dimen/all_users_searchParametersText_text_size" />
+    </LinearLayout>
+
+
+    <include
+        android:id="@+id/block_search_parameters"
+        layout="@layout/searching_parameters_block"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:visibility="gone"
+        tools:visibility="gone" />
+
+    <include
+        android:id="@+id/block_empty_users"
+        layout="@layout/block_empty_users"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/displayAllUsers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingEnd="@dimen/standard_margin"
+        android:paddingStart="@dimen/standard_margin"
+        app:layoutManager="LinearLayoutManager"
+        tools:listitem="@layout/item_content_all_users" />
+
+    <ProgressBar
+        android:id="@+id/loadingWhereLoadUsers"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:indeterminate="true"
+        tools:visiblity="gone" />
+
+</android.support.v7.widget.LinearLayoutCompat>

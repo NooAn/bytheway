@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="2dp">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/standard_margin">
+
+        <ImageView
+            android:id="@+id/userAvatar"
+            android:layout_width="@dimen/size_user_avatar"
+            android:layout_height="@dimen/size_user_avatar"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:src="@mipmap/ic_launcher_round" />
+
+        <TextView
+            android:id="@+id/nameContentUser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/standard_margin"
+            android:textColor="@color/black"
+            android:textSize="@dimen/item_all_users_main_text"
+            app:layout_constraintStart_toEndOf="@id/userAvatar"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Николаев Алексей" />
+
+        <TextView
+            android:id="@+id/ageContentUser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:textColor="@color/black"
+            android:textSize="@dimen/item_all_users_main_text"
+            app:layout_constraintBottom_toTopOf="@+id/usersCities"
+            app:layout_constraintStart_toEndOf="@id/nameContentUser"
+            app:layout_constraintTop_toTopOf="@+id/nameContentUser"
+            tools:text=", 16" />
+
+        <TextView
+            android:id="@+id/usersCities"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLength="25"
+            android:maxLines="1"
+            android:text="@string/not_cities"
+            android:textAlignment="textEnd"
+            android:textColor="@color/black"
+            android:textSize="@dimen/item_all_users_subsidiary_text"
+            app:layout_constraintBottom_toBottomOf="@+id/userAvatar"
+            app:layout_constraintStart_toStartOf="@id/nameContentUser"
+            app:layout_constraintTop_toBottomOf="@+id/nameContentUser" />
+
+        <TextView
+            android:id="@+id/usersDates"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/item_all_users_empty_date"
+            android:textColor="@color/colorPrimaryTeams"
+            android:textSize="@dimen/item_all_users_subsidiary_text"
+            app:layout_constraintStart_toStartOf="@id/nameContentUser"
+            app:layout_constraintTop_toBottomOf="@+id/usersCities"
+            tools:text="@string/date" />
+
+    </android.support.constraint.ConstraintLayout>
+
+</android.support.v7.widget.CardView>

@@ -1,0 +1,554 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scrollProfile"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        tools:context="ru.a1024bits.bytheway.ui.fragments.MyProfileFragment">
+
+        <include layout="@layout/profile_main_image" />
+
+        <LinearLayout
+            android:id="@+id/headerprofile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/profile_image"
+            android:layout_marginTop="18dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/username"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                android:textSize="24sp"
+                tools:text="@string/fullname" />
+
+            <TextView
+                android:id="@+id/cityview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:freezesText="true"
+                android:text="@string/city"
+                android:textAlignment="center"
+                android:textSize="16sp"
+                tools:text="Москва, Россия" />
+
+            <TextView
+                android:id="@+id/sexAndAge"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:freezesText="true"
+                android:text="@string/sex_and_age"
+                android:textAlignment="center"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/socnetwork"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/headerprofile"
+            android:layout_gravity="center_horizontal|center"
+            android:layout_marginBottom="32dp"
+            android:layout_marginTop="44dp"
+            android:baselineAligned="false"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/vkIcon"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="6dp"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1.0"
+                android:scaleType="center"
+                android:src="@drawable/ic_vk_gray"
+                tools:ignore="ContentDescription"
+                tools:src="@drawable/ic_vk_gray" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="30dp"
+                android:background="@color/greyTravelTypeDivider" />
+
+            <ImageView
+                android:id="@+id/whatsAppIcon"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="6dp"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1.0"
+                android:scaleType="center"
+                android:src="@drawable/ic_whats_icon_grey"
+                tools:ignore="ContentDescription"
+                tools:src="@drawable/ic_whats_icon_color" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="30dp"
+                android:background="@color/greyTravelTypeDivider" />
+
+            <ImageView
+                android:id="@+id/tgIcon"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="6dp"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1.0"
+                android:scaleType="center"
+                android:src="@drawable/tg_grey"
+                android:visibility="visible"
+                tools:ignore="ContentDescription"
+                tools:src="@drawable/ic_tg_color" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="30dp"
+                android:background="@color/greyTravelTypeDivider" />
+
+            <ImageView
+                android:id="@+id/fbcon"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="6dp"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1.0"
+                android:scaleType="center"
+                android:src="@drawable/ic_fb_grey"
+                tools:ignore="ContentDescription"
+                tools:src="@drawable/ic_fb_color" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="30dp"
+                android:background="@color/greyTravelTypeDivider" />
+
+            <ImageView
+                android:id="@+id/csIcon"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="6dp"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1.0"
+                android:scaleType="center"
+                android:src="@drawable/ic_cs_grey"
+                tools:ignore="ContentDescription"
+                tools:src="@drawable/ic_cs_color" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/travelledStatistics"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/socnetwork"
+            android:layout_marginBottom="25dp"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <TextView
+                    android:id="@+id/travelledCountries"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:drawablePadding="6dp"
+                    android:drawableStart="@drawable/ic_country"
+                    android:textColor="@color/mdtp_dark_gray"
+                    android:textSize="20sp"
+                    tools:text="60" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/travelledCountries"
+                    android:layout_centerHorizontal="true"
+                    android:text="стран" />
+            </RelativeLayout>
+
+            <!-- FliflightHoursours -->
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <TextView
+                    android:id="@+id/flightHours"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:drawablePadding="6dp"
+                    android:drawableStart="@drawable/ic_flight_time"
+                    android:textColor="@color/mdtp_dark_gray"
+                    android:textSize="20sp"
+                    tools:text="45" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/flightHours"
+                    android:layout_centerHorizontal="true"
+                    android:text="в полете" />
+            </RelativeLayout>
+
+            <!-- FliflightHoursours -->
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <TextView
+                    android:id="@+id/flightDistance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:drawablePadding="6dp"
+                    android:drawableStart="@drawable/ic_flight_distance"
+                    android:textColor="@color/mdtp_dark_gray"
+                    android:textSize="20sp"
+                    tools:text="1480" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/flightDistance"
+                    android:layout_centerHorizontal="true"
+                    android:text="км"
+                    android:textAlignment="center" />
+
+            </RelativeLayout>
+        </LinearLayout>
+
+        <include
+            android:id="@+id/addNewTrip"
+            layout="@layout/profile_add_trip"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <include
+            android:id="@+id/direction"
+            layout="@layout/profile_direction"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <LinearLayout
+            android:id="@+id/maplayout"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:layout_below="@+id/direction"
+            android:orientation="vertical"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <com.google.android.gms.maps.MapView
+                android:id="@+id/mapView"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/methodMoving"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/maplayout"
+            android:layout_marginEnd="@dimen/margin_left_profile"
+            android:layout_marginStart="@dimen/margin_left_profile"
+            android:layout_marginTop="24dp"
+            android:orientation="vertical"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/method_move"
+                android:textSize="16sp" />
+        </LinearLayout>
+        <!-- Travel types -->
+        <LinearLayout
+            android:id="@+id/layoutTravelMethod"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/methodMoving"
+            android:gravity="bottom"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            tools:visibility="visible">
+            <!-- Car -->
+            <RelativeLayout
+                android:id="@+id/iconCar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <TextView
+                    android:id="@+id/travelCarText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:drawablePadding="10dp"
+                    android:drawableTop="@drawable/ic_search_car_selector"
+                    android:gravity="center_horizontal"
+                    android:text="@string/travelCar"
+                    android:textSize="@dimen/travelTypeHintTextSize" />
+
+                <View
+                    android:layout_width="2dp"
+                    android:layout_height="match_parent"
+                    android:layout_alignBottom="@+id/travelCarText"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginBottom="@dimen/travelTypeHintTextMarginBottom"
+                    android:background="@color/greyTravelTypeDivider" />
+            </RelativeLayout>
+            <!-- Train -->
+            <RelativeLayout
+                android:id="@+id/iconTrain"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <TextView
+                    android:id="@+id/travelTrainText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:drawablePadding="10dp"
+                    android:drawableTop="@drawable/ic_search_train_selector"
+                    android:gravity="center_horizontal"
+                    android:text="@string/travelTrain"
+                    android:textSize="@dimen/travelTypeHintTextSize" />
+
+                <View
+                    android:layout_width="2dp"
+                    android:layout_height="match_parent"
+                    android:layout_alignBottom="@+id/travelTrainText"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginBottom="@dimen/travelTypeHintTextMarginBottom"
+                    android:background="@color/greyTravelTypeDivider" />
+            </RelativeLayout>
+            <!-- Bus -->
+            <RelativeLayout
+                android:id="@+id/iconBus"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <TextView
+                    android:id="@+id/travelBusText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:drawablePadding="10dp"
+                    android:drawableTop="@drawable/ic_search_bus_selector"
+                    android:gravity="center_horizontal"
+                    android:text="@string/travelBus"
+                    android:textSize="@dimen/travelTypeHintTextSize" />
+
+                <View
+                    android:layout_width="2dp"
+                    android:layout_height="match_parent"
+                    android:layout_alignBottom="@+id/travelBusText"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginBottom="@dimen/travelTypeHintTextMarginBottom"
+                    android:background="@color/greyTravelTypeDivider" />
+            </RelativeLayout>
+            <!-- Plane -->
+            <RelativeLayout
+                android:id="@+id/iconPlane"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <TextView
+                    android:id="@+id/travelPlaneText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:drawablePadding="10dp"
+                    android:drawableTop="@drawable/ic_search_plane_selector"
+                    android:gravity="center_horizontal"
+                    android:text="@string/travelPlane"
+                    android:textSize="@dimen/travelTypeHintTextSize" />
+
+                <View
+                    android:layout_width="2dp"
+                    android:layout_height="match_parent"
+                    android:layout_alignBottom="@+id/travelPlaneText"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginBottom="@dimen/travelTypeHintTextMarginBottom"
+                    android:background="@color/greyTravelTypeDivider" />
+            </RelativeLayout>
+            <!-- Hitch hicking -->
+            <RelativeLayout
+                android:id="@+id/iconHitchHicking"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <TextView
+                    android:id="@+id/travelHitchHikingText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:drawablePadding="10dp"
+                    android:drawableTop="@drawable/ic_search_hitch_hiking_selector"
+                    android:gravity="center_horizontal"
+                    android:text="@string/travelHitchHicking"
+                    android:textSize="@dimen/travelTypeHintTextSize" />
+            </RelativeLayout>
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/moneyfortrip"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/layoutTravelMethod"
+            android:layout_marginEnd="@dimen/margin_left_profile"
+            android:layout_marginStart="@dimen/margin_left_profile"
+            android:layout_marginTop="24dp"
+            android:orientation="vertical"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/money"
+                android:textSize="16sp" />
+
+            <SeekBar
+                android:id="@+id/choosePriceTravel"
+                style="@style/Widget.AppCompat.SeekBar"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="24dp"
+                android:layout_weight="1"
+                android:max="30"
+                android:progress="1"
+                android:progressTint="@color/colorPrimary"
+                android:thumbTint="@color/colorPrimary" />
+
+            <TextView
+                android:id="@+id/displayPriceTravel"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/margin_left_profile"
+                android:layout_marginTop="12dp"
+                android:drawablePadding="10dp"
+                android:drawableStart="@drawable/ic_dollar"
+                android:text="@string/budget"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/descriptionprofile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/moneyfortrip"
+            android:layout_marginEnd="@dimen/margin_left_profile"
+            android:layout_marginStart="14dp"
+            android:layout_marginTop="24dp"
+            android:orientation="vertical"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_marginStart="2dp"
+                android:layout_height="match_parent"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/add_info_profile"
+                android:textSize="16sp" />
+
+            <EditText
+                android:id="@+id/addInfoUser"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="18dp"
+                android:backgroundTint="@color/colorPrimary"
+                android:hint="@string/description"
+                android:inputType="textMultiLine"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/appinTheAirEnter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/descriptionprofile"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="24dp"
+            android:drawablePadding="10dp"
+            android:drawableStart="@drawable/app_pic"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/add_new_trip_from_app_in_the_air"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <View
+            android:id="@+id/grayLine"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_below="@id/appinTheAirEnter"
+            android:layout_marginEnd="15dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="25dp"
+            android:background="@drawable/back"
+            android:visibility="gone"
+            tools:visibility="invisible" />
+
+        <Button
+            android:id="@+id/buttonSaveTravelInfo"
+            android:layout_width="150dp"
+            android:layout_height="match_parent"
+            android:layout_alignEnd="@+id/grayLine"
+            android:layout_alignParentBottom="true"
+            android:fontFamily="sans-serif-medium"
+            android:padding="24dp"
+            android:text="@string/save"
+            android:textSize="16sp"
+            android:theme="@style/WhiteButton"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <Button
+            android:id="@+id/buttonRemoveTravelInfo"
+            android:layout_width="150dp"
+            android:layout_height="match_parent"
+            android:layout_alignTop="@+id/grayLine"
+            android:layout_toStartOf="@+id/buttonSaveTravelInfo"
+            android:fontFamily="sans-serif-medium"
+            android:padding="24dp"
+            android:text="@string/remove"
+            android:textSize="16sp"
+            android:theme="@style/WhiteButton"
+            android:visibility="gone"
+            tools:visibility="visible" />
+    </RelativeLayout>
+
+
+</ScrollView>

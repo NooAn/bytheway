@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="2dp"
+    android:background="?android:selectableItemBackground"
+    android:orientation="horizontal"
+    android:padding="10dp">
+
+    <ImageView
+        android:id="@+id/userAvatar"
+        android:layout_width="@dimen/similarTravelPhotoSize"
+        android:layout_height="@dimen/similarTravelPhotoSize"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:srcCompat="@mipmap/ic_launcher_round"
+        tools:ignore="ContentDescription" />
+
+
+    <TextView
+        android:id="@+id/nameContentUser"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:textColor="@color/mdtp_dark_gray"
+        android:textSize="16sp"
+        app:layout_constraintStart_toEndOf="@+id/userAvatar"
+        tools:text="Николаев Алексей" />
+
+    <TextView
+        android:id="@+id/usersCities"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:maxLength="25"
+        android:maxLines="1"
+        android:text="@string/not_cities"
+        android:layout_marginBottom="4dp"
+        android:layout_marginEnd="8dp"
+        android:textColor="@color/mdtp_dark_gray"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="@+id/userAvatar"
+        app:layout_constraintStart_toStartOf="@+id/nameContentUser"
+        app:layout_constraintTop_toBottomOf="@+id/nameContentUser"
+        tools:text="Мегабольшиковское, Украина" />
+
+    <TextView
+        android:id="@+id/percent_similar_travel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="90%" />
+</android.support.constraint.ConstraintLayout>

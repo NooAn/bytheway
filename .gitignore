@@ -53,3 +53,7 @@ google-services.json
 freeline.py
 freeline/
 freeline_project_description.json
+.idea/
+bytheway/release/output.json
+app/bytheway/release/output.json
+gradle.properties

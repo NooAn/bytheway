@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:fitsSystemWindows="true"
+    tools:openDrawer="start">
+
+    <include
+        layout="@layout/app_bar_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <android.support.design.widget.NavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="@color/white"
+        android:fitsSystemWindows="true"
+        app:headerLayout="@layout/nav_header_main"
+        app:itemTextColor="@color/all_level"
+        app:menu="@menu/activity_main_drawer">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="@color/white"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/feedback"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:drawablePadding="30dp"
+                android:drawableStart="@drawable/ic_feedback"
+                android:gravity="center_vertical|start"
+                android:paddingStart="25dp"
+                android:stateListAnimator="@null"
+                android:text="@string/feedback"
+                android:textAllCaps="false"
+                android:textColor="@color/all_level"
+                android:textColorHint="@color/all_level" />
+
+            <Button
+                android:id="@+id/sing_out"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:drawablePadding="30dp"
+                android:paddingStart="25dp"
+                android:drawableStart="@drawable/ic_exit_to_app"
+                android:gravity="center_vertical|start"
+                android:stateListAnimator="@null"
+                android:text="@string/exit"
+                android:textAllCaps="false"
+                android:textColor="@color/all_level" />
+
+        </LinearLayout>
+    </android.support.design.widget.NavigationView>
+
+    <ru.a1024bits.bytheway.util.ProgressCustom
+        android:id="@+id/pLoaderRes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+</android.support.v4.widget.DrawerLayout>

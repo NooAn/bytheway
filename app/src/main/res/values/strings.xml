@@ -1,3 +1,129 @@
 <resources>
-    <string name="app_name">ByTheWay</string>
+    <string name="app_name">bytheway</string>
+    <string name="password">Пароль</string>
+    <string name="button_send">Отправить</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="fullname">Andrey Petrov</string>
+    <string name="datetrip">Дата</string>
+    <string name="type_money"> </string>
+    <string name="money">Бюджет поездки</string>
+    <string name="description">Описание поездки</string>
+    <string name="city">Город проживания</string>
+    <string name="drawer_item_map_search">Поиск попутчиков</string>
+    <string name="drawer_item_profile">Профиль</string>
+    <string name="title_activity_menu"><font size="20">bytheway</font></string>
+
+    <string name="city_end">Пункт назначения</string>
+    <string name="name_button_search">Поиск попутчиков</string>
+    <string name="city_start">Пункт отправления</string>
+    <string name="action_example">Example action</string>
+    <string name="action_settings">Settings</string>
+    <string name="city_fromSmall"><font size="13">Откуда</font></string>
+    <string name="city_toSmall"><font size="13">Куда</font></string>
+    <string name="city_from">Откуда</string>
+    <string name="city_to">Куда</string>
+    <string name="date_from">Дата</string>
+    <string name="date_to">Дата</string>
+    <string name="date_start">Начало</string>
+    <string name="date_end">Конец</string>
+    <string name="from_date_filter">"c   "</string>
+    <string name="to_date_filter">"   по   "</string>
+    <string name="date_trip">Дата путешествия</string>
+    <string name="method_move">Способ передвижения</string>
+    <string name="budget">1000 </string>
+    <string name="budgetName">Бюджет</string>
+    <string name="add_info_profile">Дополнительная информация</string>
+    <string name="date">Дата</string>
+    <string name="save_filter">Сохранить фильтры</string>
+    <string name="sex">Пол</string>
+    <string name="name">Имя</string>
+    <string name="default_phone_code">+7</string>
+    <string name="gender_male">М</string>
+    <string name="gender_female">Ж</string>
+    <string name="save">Сохранить</string>
+    <string name="exit">Выйти</string>
+    <string name="search_users_text">Поиск</string>
+    <string name="text_away_from_profile">Сохранить измененные данные?</string>
+    <string name="fill_required_fields">Пожалуйста заполните обязательные поля:</string>
+    <string name="fill_phone_invalid">Неверный формат телефона</string>
+    <string name="fill_diff_cities">Города не должны совпадать</string>
+    <string name="fill_all_location">Не выбраны пункты</string>
+    <string name="fill_from_location">Не выбран пункт отправления</string>
+    <string name="fill_to_location">Не выбран пункт назначения</string>
+    <string name="social_links">Ссылки на социальные сети</string>
+    <string name="error_update">Ошибка обновления</string>
+    <string name="text_confirm_remove_trip">Все изменения будет потеряны. \n Вы действительно хотите удалить поездку?</string>
+    <string name="sex_and_age">Пол, возраст</string>
+    <string name="age">Возраст</string>
+    <string name="add_new_trip">+ Создать поездку</string>
+    <string name="app_in_the_air">App in the Air</string>
+    <string name="personal_flight_assistant">Personal flight assistant</string>
+    <string name="app_sinchronized">Синхронизация с App in the Air</string>
+    <string name="text_sinch_app_air">Для автоматического создания поездок и быстрого поиска попутчиков мы можем добавить ваши рейсы  из приложения App in the Air.</string>
+    <string name="sinch_button">СИНХРОНИЗИРОВАТЬ</string>
+    <string name="miss">пропустить</string>
+    <string name="hint_all_travelers_description">Если Вы захотите присоединиться к другим путешествиям, можете использовать этот экран. Фильтр поможет Вам :)</string>
+    <string name="close_hint">ДАЛЕЕ</string>
+
+    <string-array name="months_array">
+        <item>янв</item>
+        <item>фев</item>
+        <item>март</item>
+        <item>апр</item>
+        <item>май</item>
+        <item>июнь</item>
+        <item>июль</item>
+        <item>авг</item>
+        <item>сен</item>
+        <item>окт</item>
+        <item>ноя</item>
+        <item>дек</item>
+    </string-array>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="air_next_profile">Перейти в профиль</string>
+    <string name="text_air_succesful_add">Ваши поездки успешно добавлены !</string>
+    <string name="exampleCity">Берлин - Москва</string>
+
+    <string name="travelCar">Машина</string>
+    <string name="travelTrain">Поезд</string>
+    <string name="travelBus">Автобус</string>
+    <string name="travelPlane">Самолет</string>
+    <string name="travelHitchHicking">Автостоп</string>
+    <string name="mail">Электронный адрес</string>
+    <string name="feedback_writte">Напишите отзыв или предложение</string>
+    <string name="add_new_trip_from_app_in_the_air">+ Добавить поездку  App in the Air</string>
+    <string name="feedback">Обратная связь</string>
+    <string name="textBodyDisaster">Мы не смогли найти ваши предстоящие поездки.</string>
+    <string name="textHeadAirDisaster">Ваш аккаунт синхронизирован!</string>
+    <string name="item_all_users_empty_date"> </string>
+    <string name="filters_all_users_empty_date">с\t\t\t_____\t\t\tпо\t\t\t_____</string>
+    <string name="not_cities">Пока ничего не ищет</string>
+    <string name="optionSearch">+ Параметры поиска</string>
+    <string name="to">до</string>
+    <string name="from">от</string>
+    <string name="social_text">Добавьте Ваши контактные данные, чтобы другие путешественники смогли найти Вас</string>
+    <string name="save_succesfull">Профайл успешно изменен</string>
+    <string name="cancel">Отмена</string>
+    <string name="any">Любой</string>
+    <string name="native_city">Родной город</string>
+    <string name="remove">Удалить</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
+    <string name="year_born">Возраст</string>
+    <string name="dates_has_been_incorrect">даты оказались некорректными, попробуйте ввести их снова</string>
+    <string name="lastname">Фамилия</string>
+    <string name="feedback_text1">Мы будем Вам благодарны  за оставленный отзыв.</string>
+    <string name="feedback_text2">Вместе мы сделаем наше приложение лучше! :)</string>
+    <string name="email">Ваша почта</string>
+    <string name="hint_all_travelers">Все путешественники</string>
+    <string name="hint_create_travel">Создайте поездку!</string>
+    <string name="hint_create_travel_description">Введите максимум информации для эффективного поиска попутчиков, и чтобы другие пользователи смогли найти Вас :)</string>
+    <string name="hint_save_and_search">Сохраняйте и находите!</string>
+    <string name="hint_save_and_search_description">При нажатии на кнопку “СОХРАНИТЬ”, внесенные изменения о поездке автоматически сохранятся в Вашем профиле. Вы можете продолжить поиск попутчиков без сохранения поездки..</string>
+    <string name="no_internet">У вас нет интернет соединения</string>
+    <string name="date_empty">* пользователь не указал даты поездки</string>
+    <string name="date_error_set">Дата окончания поездки не может быть раньше чем начала.</string>
+    <string name="error_sinchronized">Очень жаль.... Но не получилось синхронизироваться с app in the air.</string>
 </resources>
