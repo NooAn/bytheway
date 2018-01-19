@@ -40,8 +40,8 @@ android {
             dimension "default"
         }
         bytheway {
-            versionCode 7
-            versionName "0.1"
+            versionCode 8
+            versionName "0.8"
             dimension "default"
         }
     }

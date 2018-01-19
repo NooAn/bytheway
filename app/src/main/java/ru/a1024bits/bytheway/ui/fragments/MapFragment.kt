@@ -253,6 +253,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         if (method != null)
             hashMap.set("method", method)
         hashMap.put("route", routeString ?: "")
+        hashMap.put("countTrip", 1)
         val dates: HashMap<String, Long> = hashMapOf()
         dates.put(START_DATE, searchFragment?.filter?.startDate ?: 0)
         dates.put(END_DATE, searchFragment?.filter?.endDate ?: 0)

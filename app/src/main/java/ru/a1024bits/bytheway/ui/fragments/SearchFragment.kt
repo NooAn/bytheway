@@ -14,7 +14,6 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.Toast
 import com.borax12.materialdaterangepicker.date.DatePickerDialog
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException
 import com.google.android.gms.location.places.AutocompleteFilter
 import com.google.android.gms.location.places.ui.PlaceAutocomplete
 import com.google.android.gms.maps.model.LatLng
@@ -159,7 +158,7 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             updatePoints()
         }
 
-        budgetFromValue.setText(user.budget.toString())
+        budgetFromValue.setText(user.budget.toStringOrEmpty)
         budgetFromValue.filters = arrayOf(DecimalInputFilter())
         budgetFromValue.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
@@ -262,21 +261,19 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                     val place = PlaceAutocomplete.getPlace(activity, data);
                     text_from_city.text = place.name
                     firstPoint = place.latLng
+                    filter.startCity = place.name.toString()
                     filter.locationEndCity = place.latLng
                     text_from_city.error = null
-                    if (secondPoint != null && firstPoint?.latitude == secondPoint?.latitude) {
-                        text_from_city.error = "true"
-                        Toast.makeText(this@SearchFragment.context, getString(R.string.fill_diff_cities), Toast.LENGTH_SHORT).show()
-                    } else {
-                        text_to_city.error = null
-                        text_from_city.error = null
-                    }
+                    manageErrorCityEquals(secondPoint)
+
                     firstPoint?.let { latLng -> (activity as OnFragmentInteractionListener).onSetPoint(latLng, FIRST_MARKER_POSITION) }
                 }
                 else -> {
                     val status = PlaceAutocomplete.getStatus(activity, data)
                     Log.i("LOG", status.getStatusMessage() + " ")
-                    text_from_city.text = ""
+                    if (text_from_city != null) {
+                        text_from_city.text = filter.startCity
+                    }
                 }
             }
 
@@ -286,23 +283,29 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                     text_to_city.text = place.name
                     secondPoint = place.latLng
                     filter.locationStartCity = place.latLng
-
+                    filter.endCity = place.name.toString()
                     text_to_city.error = null
-                    if (firstPoint != null && firstPoint?.latitude == secondPoint?.latitude) {
-                        text_to_city.error = "true"
-                        Toast.makeText(this@SearchFragment.context, getString(R.string.fill_diff_cities), Toast.LENGTH_SHORT).show()
-                    } else {
-                        text_from_city.error = null
-                        text_to_city.error = null
-                    }
+                    manageErrorCityEquals(firstPoint)
                     secondPoint?.let { latLng -> (activity as OnFragmentInteractionListener).onSetPoint(latLng, SECOND_MARKER_POSITION) }
                 }
                 else -> {
                     val status = PlaceAutocomplete.getStatus(activity, data)
                     Log.i("LOG", status.statusMessage + " ")
-                    text_to_city.text = ""
+                    if (text_to_city != null)
+                        text_to_city.text = filter.endCity
                 }
             }
+        }
+    }
+
+    private fun manageErrorCityEquals(point: LatLng?) {
+        if (point != null && this.firstPoint?.latitude == this.secondPoint?.latitude && this.firstPoint?.longitude == this.secondPoint?.longitude) {
+            text_to_city.error = "true"
+            text_from_city.error = "true"
+            Toast.makeText(this@SearchFragment.context, getString(R.string.fill_diff_cities), Toast.LENGTH_SHORT).show()
+        } else {
+            text_from_city.error = null
+            text_to_city.error = null
         }
     }
 
@@ -318,5 +321,10 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         }
     }
 }
+
+private val Long.toStringOrEmpty: String
+    get() {
+        return if (this == 0L) "" else this.toString()
+    }
 
 private fun Long.getNormallDate(): CharSequence? = SimpleDateFormat("dd.MM.yyyy", Locale.US).format(this)
