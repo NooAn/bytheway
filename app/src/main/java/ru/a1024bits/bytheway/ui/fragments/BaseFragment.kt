@@ -23,10 +23,6 @@ abstract class BaseFragment<T : BaseViewModel> : Fragment() {
     protected var glide: RequestManager? = null
     protected lateinit var mFirebaseAnalytics: FirebaseAnalytics
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         glide = Glide.with(this)

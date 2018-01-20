@@ -1,6 +1,5 @@
 package ru.a1024bits.bytheway.ui.fragments
 
-import android.app.Dialog
 import android.arch.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
@@ -31,6 +30,7 @@ import kotlinx.android.synthetic.main.profilte_user_direction.*
 import kotlinx.android.synthetic.main.profile_main_image.*
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.model.*
+import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.a1024bits.bytheway.ui.dialogs.SocNetworkdialog
 import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.util.getBearing
@@ -51,9 +51,6 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
                 showErrorLoading()
             }
         }
-    }
-    private val progressBarLoad: Observer<Boolean> = Observer<Boolean> { b ->
-        // fix me after create loader for app
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -221,8 +218,8 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        viewModel?.loadingStatus?.observe(this, (activity as MenuActivity).progressBarLoad)
         viewModel?.response?.observe(this, userLoad)
-        viewModel?.loadingStatus?.observe(this, progressBarLoad)
     }
 
     private fun showErrorLoading() {

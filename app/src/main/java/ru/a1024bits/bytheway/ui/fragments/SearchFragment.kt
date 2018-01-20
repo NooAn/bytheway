@@ -64,14 +64,18 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         val view = inflater?.inflate(R.layout.fragment_search_block, container, false)
         activity.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(context)
-        filter.startDate = user.dates.get(START_DATE) ?: 0
-        filter.endDate = user.dates.get(END_DATE) ?: 0
-        filter.endBudget = user.budget.toInt()
-        filter.method = user.method
-        filter.endCity = user.cities.get(LAST_INDEX_CITY) ?: ""
-        filter.startCity = user.cities.get(FIRST_INDEX_CITY) ?: ""
-        filter.locationStartCity = LatLng(user.cityFromLatLng.latitude, user.cityFromLatLng.longitude)
-        filter.locationEndCity = LatLng(user.cityToLatLng.latitude, user.cityToLatLng.longitude)
+        try {
+            filter.startDate = user.dates.get(START_DATE) ?: 0
+            filter.endDate = user.dates.get(END_DATE) ?: 0
+            filter.endBudget = user.budget.toInt()
+            filter.method = user.method
+            filter.endCity = user.cities.get(LAST_INDEX_CITY) ?: ""
+            filter.startCity = user.cities.get(FIRST_INDEX_CITY) ?: ""
+            filter.locationStartCity = LatLng(user.cityFromLatLng.latitude, user.cityFromLatLng.longitude)
+            filter.locationEndCity = LatLng(user.cityToLatLng.latitude, user.cityToLatLng.longitude)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
         return view
     }
 
@@ -139,8 +143,10 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         }
 
         if (user.dates.size > 0) {
-            dateFromValue.text = user.dates.get(START_DATE)?.getNormallDate()
-            dateToValue.text = user.dates.get(END_DATE)?.getNormallDate()
+            if (user.dates[START_DATE] != null && user.dates[START_DATE] != 0L)
+                dateFromValue.text = user.dates.get(START_DATE)?.getNormallDate()
+            if (user.dates[END_DATE] != null && user.dates[END_DATE] != 0L)
+                dateToValue.text = user.dates.get(END_DATE)?.getNormallDate()
         }
 
         swap_cities.setOnClickListener {
@@ -238,11 +244,12 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                 now.get(Calendar.MONTH),
                 now.get(Calendar.DAY_OF_MONTH)
         )
+
         dateFromValue.setOnClickListener {
             openDateDialog()
             mFirebaseAnalytics.logEvent("Search_fragment_str_date_dialog", null)
-
         }
+
         dateToValue.setOnClickListener {
             openDateDialog()
             mFirebaseAnalytics.logEvent("Search_fragment_end_date_dialog", null)

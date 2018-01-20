@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProvider
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.support.annotation.LayoutRes
 import android.support.design.widget.NavigationView
 import android.support.v4.content.ContextCompat
@@ -20,7 +21,6 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import com.borax12.materialdaterangepicker.date.DatePickerDialog
-import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException
 import com.google.android.gms.common.GooglePlayServicesRepairableException
@@ -69,25 +69,28 @@ import ru.a1024bits.bytheway.model.Response as ResponseBtw
 class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback, DatePickerDialog.OnDateSetListener {
 
     companion object {
-        val BUDGET = "budget"
-        val BUDGET_POSITION = "budgetPosition"
-        val CITIES = "cities"
-        val METHOD = "method"
-        val METHODS = "methods"
-        val DATES = "dates"
-        val CITY_FROM = "cityFromLatLng"
-        val CITY_TO = "cityToLatLng"
-        val ADD_INFO = "addInformation"
-        val COUNT_TRIP = "countTrip"
-        val SEX = "sex"
-        val AGE = "age"
-        val NAME = "name"
-        val LASTNAME = "lastName"
-        val ROUTE = "route"
-        val CITY = "city"
+        const val BUDGET = "budget"
+        const val BUDGET_POSITION = "budgetPosition"
+        const val CITIES = "cities"
+        const val METHOD = "method"
+        const val METHODS = "methods"
+        const val DATES = "dates"
+        const val CITY_FROM = "cityFromLatLng"
+        const val CITY_TO = "cityToLatLng"
+        const val ADD_INFO = "addInformation"
+        const val COUNT_TRIP = "countTrip"
+        const val SEX = "sex"
+        const val AGE = "age"
+        const val NAME = "name"
+        const val LASTNAME = "lastName"
+        const val ROUTE = "route"
+        const val CITY = "city"
+        const val TAG_ANALYTICS: String = "MProfile_screen"
+        const val START_BUDGET: Int = 50
     }
 
-    @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
 
     private var mListener: OnFragmentInteractionListener? = null
 
@@ -138,13 +141,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     private var mapView: MapView? = null
     private var countTrip: Int = 0
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        App.component.inject(this)
-        (activity as MenuActivity).pLoader?.show()
-    }
-
-    private val routsObserver: Observer<ResponseBtw<RoutesList>> = Observer<ResponseBtw<RoutesList>> { response ->
+    private val routsObserver: Observer<ResponseBtw<RoutesList>> = Observer { response ->
         when (response?.status) {
             Status.SUCCESS -> {
                 if (response.data != null && activity != null) {
@@ -161,21 +158,16 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             }
         }
     }
-    private val usersObservers: Observer<User> = Observer<User> { user ->
+    private val usersObservers: Observer<User> = Observer { user ->
         mListener?.onFragmentInteraction(user)
     }
 
-    private fun showErrorRout() {
-        mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_error_routs", null)
-        Log.d("LOG", "error  get routing")
-    }
 
-    private val responseObserver: Observer<ResponseBtw<User>> = Observer<ResponseBtw<User>> { response ->
+    private val responseObserver: Observer<ResponseBtw<User>> = Observer { response ->
         when (response?.status) {
             Status.SUCCESS -> {
                 if (response.data != null) {
                     if (activity != null) {
-                        (activity as MenuActivity).pLoader?.hide()
                         fillProfile(response.data)
                         mListener?.onFragmentInteraction(response.data)
                         mainUser = response.data
@@ -189,13 +181,12 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         }
     }
 
-    private val observerSaveProfile: Observer<ResponseBtw<Boolean>> = Observer<ResponseBtw<Boolean>> { response ->
+    private val observerSaveProfile: Observer<ResponseBtw<Boolean>> = Observer { response ->
         when (response?.status) {
             Status.SUCCESS -> {
                 if (response.data == true && activity != null) {
                     Toast.makeText(this@MyProfileFragment.context, resources.getString(R.string.save_succesfull), Toast.LENGTH_SHORT).show()
                     profileChanged(false)
-                    (activity as MenuActivity).pLoader?.hide()
                 } else {
                     showErrorResponse()
                 }
@@ -207,22 +198,30 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         }
     }
 
-    private val observerClearSocial: Observer<SocialResponse> = Observer<SocialResponse> { response ->
+    private val observerSaveSocial: Observer<SocialResponse> = Observer { response ->
         response?.let {
-            changeSocIconsDisActive(response.link)
+            if (response.value.isEmpty()) {
+                changeSocIconsDisActive(response.link)
+            } else {
+                changeSocIconsActive(response.link, response.value)
+            }
         }
     }
 
-    private val observerSaveSocial: Observer<SocialResponse> = Observer<SocialResponse> { response ->
-        response?.let {
-            changeSocIconsActive(response.link, response.value)
-        }
+    private var mainUser: User? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        App.component.inject(this)
+    }
+
+    private fun showErrorRout() {
+        mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_error_routs", null)
+        Log.d("LOG", "error  get routing")
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        App.component.inject(this)
-        glide = Glide.with(this)
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(context)
 
         methodIcons.put(Method.CAR.link, iconCar)
@@ -240,12 +239,10 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         viewModel?.routes?.observe(this, routsObserver)
         viewModel?.response?.observe(this, responseObserver)
         viewModel?.user?.observe(this, usersObservers)
+        viewModel?.loadingStatus?.observe(this, (activity as MenuActivity).progressBarLoad)
 
         if (viewModel?.saveSocial?.hasObservers() == false) {
             viewModel?.saveSocial?.observe(this, observerSaveSocial)
-        }
-        if (viewModel?.clearSocial?.hasObservers() == false) {
-            viewModel?.clearSocial?.observe(this, observerClearSocial)
         }
         if (viewModel?.saveProfile?.hasObservers() == false) {
             viewModel?.saveProfile?.observe(this, observerSaveProfile)
@@ -261,10 +258,12 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     override fun getViewModelClass(): Class<MyProfileViewModel> = MyProfileViewModel::class.java
 
+    var showView: MaterialShowcaseView? = null
+
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if ((activity as MenuActivity).preferences.getBoolean("isFirstEnterMyProfileFragment", true)) {
-            MaterialShowcaseView.Builder(activity)
+            showView = MaterialShowcaseView.Builder(activity)
                     .setTarget(newTripText)
                     .renderOverNavigationBar()
                     .setDismissText(getString(R.string.close_hint))
@@ -272,13 +271,31 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                     .setContentText(getString(R.string.hint_create_travel_description))
                     .withCircleShape()
                     .setListener(object : IShowcaseListener {
-                        override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {}
+                        override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {
+                            val mHandler = Handler()
+                            val time = 10000L // 10 sec after we can hide tips
+                            try {
+                                mHandler.postDelayed({ hide() }, time)
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+                        }
+
                         override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
                             if (activity != null && !activity.isDestroyed) {
                                 (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterMyProfileFragment", false).apply()
                             }
                         }
-                    }).show()
+                    }).build()
+            showView?.show(activity)
+        }
+    }
+
+    private fun hide() {
+        try {
+            showView?.hide()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
@@ -301,7 +318,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                         Toast.makeText(this@MyProfileFragment.context,
                                 getString(R.string.fill_diff_cities), Toast.LENGTH_LONG).show()
                     } else {
-                        cities.put(FIRST_INDEX_CITY, place.name.toString())
+                        cities[FIRST_INDEX_CITY] = place.name.toString()
                         profileStateHashMap[CITY_FROM] = cityFromLatLng.hashCode().toString()
 
                         if (cityToLatLng.latitude != 0.0 && cityToLatLng.longitude != 0.0)
@@ -329,7 +346,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                         Toast.makeText(this@MyProfileFragment.context,
                                 getString(R.string.fill_diff_cities), Toast.LENGTH_LONG).show()
                     } else {
-                        cities.put(LAST_INDEX_CITY, place.name.toString())
+                        cities[LAST_INDEX_CITY] = place.name.toString()
                         profileStateHashMap[CITY_TO] = cityToLatLng.hashCode().toString()
                         if (cityFromLatLng.latitude != 0.0 && cityFromLatLng.longitude != 0.0)
                             obtainDirection()
@@ -369,8 +386,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         var markerTitleFinal: String? = ""
         var markerPositionStart = LatLng(0.0, 0.0)
         var markerPositionFinal = LatLng(0.0, 0.0)
-        val cityFrom = cities.get(FIRST_INDEX_CITY)
-        val cityTo = cities.get(LAST_INDEX_CITY)
+        val cityFrom = cities[FIRST_INDEX_CITY]
+        val cityTo = cities[LAST_INDEX_CITY]
         if (position == 1) {
             markerTitleStart = cityTo
             markerTitleFinal = cityFrom
@@ -460,22 +477,10 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle?) {
-        super.onSaveInstanceState(outState)
-    }
-
     override fun onDetach() {
         super.onDetach()
         mListener = null
     }
-
-    override fun onPause() {
-        super.onPause()
-    }
-
-    private val TAG_ANALYTICS: String = "MProfile_screen"
-
-    private val START_BUDGET: Int = 50
 
     override fun onStart() {
         super.onStart()
@@ -607,10 +612,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-    }
-
     override fun onLowMemory() {
         super.onLowMemory()
         mapView?.onLowMemory()
@@ -633,7 +634,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                     .append(context.resources.getStringArray(R.array.months_array)[monthOfYearEnd])
                     .append(" ")
                     .append(yearEnd).toString())
-            dates.put(END_DATE, getLongFromDate(dayOfMonthEnd, monthOfYearEnd, yearEnd))
+            dates[END_DATE] = getLongFromDate(dayOfMonthEnd, monthOfYearEnd, yearEnd)
         } else {
             Toast.makeText(context, R.string.date_error_set, Toast.LENGTH_SHORT).show()
             dateArrived.setText(StringBuilder(" ")
@@ -644,17 +645,16 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                     .append(year).toString())
         }
 
-        dates.put(START_DATE, getLongFromDate(dayOfMonth, monthOfYear, year))
+        dates[START_DATE] = getLongFromDate(dayOfMonth, monthOfYear, year)
         profileStateHashMap[DATES] = dates.toString()
         profileChanged()
     }
 
     private fun getLongFromDate(day: Int, month: Int, year: Int): Long {
-        val dateString = "$day $month $year"
+        val dateString = "$day ${month + 1} $year"
         val dateFormat = SimpleDateFormat("dd MM yyyy", Locale.US)
         val date = dateFormat.parse(dateString)
         return date.time
-
     }
 
     private fun TextView.afterTextChanged(afterTextChanged: (String) -> Unit) {
@@ -691,8 +691,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         dateDialog.show(activity.fragmentManager, "")
     }
 
-    private var mainUser: User? = null
-
     private fun sendUserInfoToServer() {
 
         var errorString = ""
@@ -724,8 +722,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             return
         }
 
-
-        (activity as MenuActivity).pLoader?.show()
         countTrip = 1
 
         viewModel?.sendUserData(getHashMapUser(), uid, mainUser)
@@ -873,7 +869,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.remove), { _, _ ->
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_remove_links", null)
             viewModel?.saveLinks(socNet, uid, {
-                viewModel?.clearSocial?.setValue(SocialResponse(socialNetwork.link))
+                viewModel?.saveSocial?.setValue(SocialResponse(socialNetwork.link))
             })
         })
         simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.save), { _, _ ->
@@ -891,7 +887,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             if (!valid) {
                 openDialog(socialNetwork, errorText)
             } else {
-                socNet.put(socialNetwork.link, newLink)
+                socNet[socialNetwork.link] = newLink
                 viewModel?.saveLinks(socNet, uid, {
                     viewModel?.saveSocial?.setValue(SocialResponse(socialNetwork.link, newLink))
                 })
@@ -1060,10 +1056,10 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         val formatDate = SimpleDateFormat("dd.MM.yyyy", Locale.US)
 
         if (user.dates.size > 0) {
-            if (user.dates[START_DATE] != null || user.dates[START_DATE] != 0L) {
+            if (user.dates[START_DATE] != null && user.dates[START_DATE] != 0L) {
                 textDateFrom.setText(formatDate.format(Date(user.dates[START_DATE] ?: 0)))
             }
-            if (user.dates[END_DATE] != null || user.dates[END_DATE] != 0L)
+            if (user.dates[END_DATE] != null && user.dates[END_DATE] != 0L)
                 dateArrived.setText(formatDate.format(Date(user.dates[END_DATE] ?: 0)))
             dates = user.dates
         }
@@ -1084,7 +1080,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                 ?.into(image_avatar)
 
         for (name in user.socialNetwork) {
-            socNet.put(name.key, name.value)
+            socNet[name.key] = name.value
             when (name.key) {
                 SocialNetwork.VK.link -> vkIcon.setImageResource(R.drawable.ic_vk_color)
                 SocialNetwork.CS.link -> csIcon.setImageResource(R.drawable.ic_cs_color)
@@ -1151,7 +1147,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         hashMap[CITY_FROM] = cityFromLatLng
         hashMap[CITY_TO] = cityToLatLng
         hashMap[ADD_INFO] = addInfoUser.text.toString()
-        hashMap.put(COUNT_TRIP, countTrip)
+        hashMap[COUNT_TRIP] = countTrip
         hashMap[SEX] = sex
         hashMap[AGE] = age
         hashMap[NAME] = name

@@ -3,7 +3,6 @@ package ru.a1024bits.bytheway.viewmodel
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
 import com.borax12.materialdaterangepicker.date.DatePickerDialog
-import io.reactivex.schedulers.Schedulers
 import ru.a1024bits.bytheway.App.Companion.INSTANCE
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.Response
@@ -19,7 +18,6 @@ import javax.inject.Inject
  * Created by andrey.gusenkov on 25/09/2017.
  */
 class DisplayUsersViewModel @Inject constructor(var userRepository: UserRepository) : BaseViewModel() {
-    val loadingStatus = MutableLiveData<Boolean>()
     var response: MutableLiveData<Response<List<User>>> = MutableLiveData()
     var yearsOldUsers = (0..MAX_AGE).mapTo(ArrayList<String>()) { it.toString() }
     val filter = Filter()
@@ -104,7 +102,6 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
         var fromWord = INSTANCE.applicationContext.getString(R.string.from_date_filter)
         var toWord = INSTANCE.applicationContext.getString(R.string.to_date_filter)
         if (variant == 1) {
-            fromWord = ""
             toWord = " - "
         }
         val calendarStartDate = Calendar.getInstance()
@@ -117,7 +114,13 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
             yearStart = calendarStartDate.get(Calendar.YEAR).toString()
             yearEnd = calendarEndDate.get(Calendar.YEAR).toString()
         }
-        return getTextStartEndDates(fromWord, calendarStartDate, yearStart, toWord, calendarEndDate, yearEnd)
+        if (calendarEndDate.timeInMillis == 0L)
+            return getTextDate(calendarStartDate, yearStart)
+
+        if (calendarStartDate.timeInMillis == 0L)
+            return getTextDate(calendarEndDate, yearEnd)
+
+        return getTextDate(calendarStartDate, yearStart) + toWord + getTextDate(calendarEndDate, yearEnd)
     }
 
     fun filterUsersByString(queryCustomRegister: String, primaryQuery: String, primaryList: MutableList<User>): MutableList<User> =
@@ -128,12 +131,13 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
                         it.phone.contains(primaryQuery) || it.route.contains(queryCustomRegister)
             }
 
-    private fun getTextStartEndDates(fromWord: String?, calendarStartDate: Calendar, yearStart: String, toWord: String?, calendarEndDate: Calendar, yearEnd: String): String {
-        return StringBuilder(fromWord).append(calendarStartDate.get(Calendar.DAY_OF_MONTH)).append(" ")
-                .append(INSTANCE.applicationContext.resources.getStringArray(R.array.months_array)[calendarStartDate.get(Calendar.MONTH)]).append(" ")
-                .append(yearStart).append(toWord).append(calendarEndDate.get(Calendar.DAY_OF_MONTH)).append(" ")
-                .append(INSTANCE.applicationContext.resources.getStringArray(R.array.months_array)[calendarEndDate.get(Calendar.MONTH)]).append(" ")
-                .append(yearEnd).toString()
+    private fun getTextDate(calendarStartDate: Calendar, yearStart: String): String {
+        return StringBuilder("").append(calendarStartDate.get(Calendar.DAY_OF_MONTH))
+                .append(" ")
+                .append(INSTANCE.applicationContext.resources.getStringArray(R.array.months_array)[calendarStartDate.get(Calendar.MONTH)])
+                .append(" ")
+                .append(yearStart)
+                .toString()
     }
 
     private fun filterUsersByFilter(resultUsers: MutableList<User>, filter: Filter) {

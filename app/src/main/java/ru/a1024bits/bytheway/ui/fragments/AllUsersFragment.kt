@@ -86,6 +86,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             displayAllUsers.adapter = displayUsersAdapter
 
             viewModel?.response?.observe(this, usersObservers)
+            viewModel?.loadingStatus?.observe(this, (activity as MenuActivity).progressBarLoad)
             loadingWhereLoadUsers.visibility = View.VISIBLE
             viewModel?.getAllUsers(filter)
 

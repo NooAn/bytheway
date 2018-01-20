@@ -2,11 +2,11 @@ package ru.a1024bits.bytheway.ui.activity
 
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
+import android.arch.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.ConnectivityManager
-import android.net.NetworkInfo
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.design.widget.Snackbar
@@ -70,6 +70,13 @@ class MenuActivity : AppCompatActivity(),
 
     private var mGoogleApiClient: GoogleApiClient? = null
     var pLoader: ProgressCustom? = null
+    val progressBarLoad: Observer<Boolean> = Observer { b ->
+        if (b == true) {
+            pLoader?.show()
+        } else {
+            pLoader?.hide()
+        }
+    }
 
     override fun onSetPoint(l: LatLng, pos: Int) {
         val mapFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as MapFragment
@@ -163,7 +170,7 @@ class MenuActivity : AppCompatActivity(),
         }
         feedback.setOnClickListener { openDialogFeedback() }
         pLoader = this.findViewById(R.id.pLoaderRes) as ProgressCustom
-        if (isNetworkAvailable() == false) showSnack(getString(R.string.no_internet))
+        if (!isNetworkAvailable()) showSnack(getString(R.string.no_internet))
     }
 
     var snackbar: Snackbar? = null
