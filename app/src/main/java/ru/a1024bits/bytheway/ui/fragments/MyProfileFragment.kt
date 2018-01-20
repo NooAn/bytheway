@@ -274,12 +274,16 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                         override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {
                             val mHandler = Handler()
                             val time = 10000L // 10 sec after we can hide tips
-                            mHandler.postDelayed({ hide() }, time)
+                            try {
+                                mHandler.postDelayed({ hide() }, time)
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
                         }
 
                         override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
                             if (activity != null && !activity.isDestroyed) {
-                                  (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterMyProfileFragment", false).apply()
+                                (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterMyProfileFragment", false).apply()
                             }
                         }
                     }).build()
@@ -288,7 +292,11 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     }
 
     private fun hide() {
-        showView?.hide()
+        try {
+            showView?.hide()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

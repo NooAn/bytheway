@@ -380,9 +380,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun initBoxInputFragment() {
         searchFragment = SearchFragment.newInstance(user)
-        childFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container_box, searchFragment, "SearchFragment")
-                .commitAllowingStateLoss()
+        if (childFragmentManager != null)
+            childFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container_box, searchFragment, "SearchFragment")
+                    .commitAllowingStateLoss()
     }
 
     private val PATTERN_GAP_LENGTH_PX = 20F
