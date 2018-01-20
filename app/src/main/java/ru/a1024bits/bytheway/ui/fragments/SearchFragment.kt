@@ -240,11 +240,12 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                 now.get(Calendar.MONTH),
                 now.get(Calendar.DAY_OF_MONTH)
         )
+
         dateFromValue.setOnClickListener {
             openDateDialog()
             mFirebaseAnalytics.logEvent("Search_fragment_str_date_dialog", null)
-
         }
+
         dateToValue.setOnClickListener {
             openDateDialog()
             mFirebaseAnalytics.logEvent("Search_fragment_end_date_dialog", null)
