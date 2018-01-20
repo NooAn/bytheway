@@ -1,16 +1,12 @@
 package ru.a1024bits.bytheway.viewmodel
 
-import android.arch.lifecycle.AndroidViewModel
-import android.arch.lifecycle.Lifecycle
-import android.arch.lifecycle.LifecycleObserver
-import android.arch.lifecycle.ViewModel
+import android.arch.lifecycle.*
 import android.content.Context
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import ru.a1024bits.bytheway.App
-import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.a1024bits.bytheway.util.Constants
 
 /**
@@ -18,6 +14,7 @@ import ru.a1024bits.bytheway.util.Constants
  */
 open class BaseViewModel : ViewModel(), LifecycleObserver {
     val disposables = CompositeDisposable()
+    val loadingStatus = MutableLiveData<Boolean>()
 
     fun addObserver(lifecycle: Lifecycle) {
         lifecycle.addObserver(this)
@@ -48,5 +45,4 @@ open class BaseViewModel : ViewModel(), LifecycleObserver {
         disposables.dispose()
         super.onCleared()
     }
-
 }

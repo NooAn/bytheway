@@ -34,7 +34,6 @@ import javax.inject.Inject
 class MyProfileViewModel @Inject constructor(var userRepository: UserRepository) : BaseViewModel() {
     val user = MutableLiveData<User>()
     var response = MutableLiveData<Response<User>>()
-    val loadingStatus = MutableLiveData<Boolean>()
     var routes = MutableLiveData<Response<RoutesList>>()
     val saveSocial = MutableLiveData<SocialResponse>()
     val saveProfile = MutableLiveData<Response<Boolean>>()
@@ -70,6 +69,8 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
         disposables.add(userRepository.changeUserProfile(map, id)
                 .subscribeOn(getBackgroundScheduler())
                 .observeOn(getMainThreadScheduler())
+                .doOnSubscribe({ _ -> loadingStatus.setValue(true) })
+                .doAfterTerminate({ loadingStatus.setValue(false) })
                 .subscribe({
                     saveProfile.setValue(Response.success(true))
                     user.value = makeUserFromMap(map, oldUser)

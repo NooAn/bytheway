@@ -167,7 +167,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             Status.SUCCESS -> {
                 if (response.data != null) {
                     if (activity != null) {
-                        (activity as MenuActivity).pLoader?.hide()
                         fillProfile(response.data)
                         mListener?.onFragmentInteraction(response.data)
                         mainUser = response.data
@@ -187,7 +186,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                 if (response.data == true && activity != null) {
                     Toast.makeText(this@MyProfileFragment.context, resources.getString(R.string.save_succesfull), Toast.LENGTH_SHORT).show()
                     profileChanged(false)
-                    (activity as MenuActivity).pLoader?.hide()
                 } else {
                     showErrorResponse()
                 }
@@ -214,7 +212,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         App.component.inject(this)
-        (activity as MenuActivity).pLoader?.show()
     }
 
     private fun showErrorRout() {
@@ -241,6 +238,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         viewModel?.routes?.observe(this, routsObserver)
         viewModel?.response?.observe(this, responseObserver)
         viewModel?.user?.observe(this, usersObservers)
+        viewModel?.loadingStatus?.observe(this, (activity as MenuActivity).progressBarLoad)
 
         if (viewModel?.saveSocial?.hasObservers() == false) {
             viewModel?.saveSocial?.observe(this, observerSaveSocial)
@@ -704,8 +702,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             return
         }
 
-
-        (activity as MenuActivity).pLoader?.show()
         countTrip = 1
 
         viewModel?.sendUserData(getHashMapUser(), uid, mainUser)

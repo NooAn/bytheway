@@ -19,7 +19,6 @@ import javax.inject.Inject
  * Created by andrey.gusenkov on 25/09/2017.
  */
 class DisplayUsersViewModel @Inject constructor(var userRepository: UserRepository) : BaseViewModel() {
-    val loadingStatus = MutableLiveData<Boolean>()
     var response: MutableLiveData<Response<List<User>>> = MutableLiveData()
     var yearsOldUsers = (0..MAX_AGE).mapTo(ArrayList<String>()) { it.toString() }
     val filter = Filter()
