@@ -12,12 +12,18 @@ import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.adapter.SimilarTravelsAdapter
 import ru.a1024bits.bytheway.model.User
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 class SimilarTravelsFragment : Fragment() {
     var listUser: List<User>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (savedInstanceState != null && listUser == null) {
+            val message = savedInstanceState.getString(SAVE)
+            listUser = Gson().fromJson(message, object : TypeToken<List<User>>() {}.type)
+        }
         retainInstance = true
     }
 
@@ -30,16 +36,23 @@ class SimilarTravelsFragment : Fragment() {
         FirebaseAnalytics.getInstance(context.applicationContext).setCurrentScreen(this.activity, "SimilarTravelsFragment", this.javaClass.simpleName)
     }
 
+    override fun onSaveInstanceState(outState: Bundle?) {
+        outState?.putString(SAVE, Gson().toJson(listUser))
+        super.onSaveInstanceState(outState)
+    }
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         App.component.inject(this)
         block_empty_users.visibility = View.GONE
         view?.let {
-            it.findViewById<RecyclerView>(R.id.display_similar_user_travels).adapter = SimilarTravelsAdapter(this.context, listUser ?: arrayListOf())
+            it.findViewById<RecyclerView>(R.id.display_similar_user_travels).adapter = SimilarTravelsAdapter(this.context, listUser
+                    ?: arrayListOf())
         }
     }
 
     companion object {
+        const val SAVE = "listUser"
         fun newInstance(list: List<User>): SimilarTravelsFragment {
             val fragment = SimilarTravelsFragment()
             fragment.arguments = Bundle()
