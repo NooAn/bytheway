@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProvider
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.support.annotation.LayoutRes
 import android.support.design.widget.NavigationView
 import android.support.v4.content.ContextCompat
@@ -257,10 +258,12 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     override fun getViewModelClass(): Class<MyProfileViewModel> = MyProfileViewModel::class.java
 
+    var showView: MaterialShowcaseView? = null
+
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if ((activity as MenuActivity).preferences.getBoolean("isFirstEnterMyProfileFragment", true)) {
-            MaterialShowcaseView.Builder(activity)
+            showView = MaterialShowcaseView.Builder(activity)
                     .setTarget(newTripText)
                     .renderOverNavigationBar()
                     .setDismissText(getString(R.string.close_hint))
@@ -268,14 +271,24 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                     .setContentText(getString(R.string.hint_create_travel_description))
                     .withCircleShape()
                     .setListener(object : IShowcaseListener {
-                        override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {}
+                        override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {
+                            val mHandler = Handler()
+                            val time = 10000L // 10 sec after we can hide tips
+                            mHandler.postDelayed({ hide() }, time)
+                        }
+
                         override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
                             if (activity != null && !activity.isDestroyed) {
-                                (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterMyProfileFragment", false).apply()
+                                  (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterMyProfileFragment", false).apply()
                             }
                         }
-                    }).show()
+                    }).build()
+            showView?.show(activity)
         }
+    }
+
+    private fun hide() {
+        showView?.hide()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -1036,10 +1049,10 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         val formatDate = SimpleDateFormat("dd.MM.yyyy", Locale.US)
 
         if (user.dates.size > 0) {
-            if (user.dates[START_DATE] != null || user.dates[START_DATE] != 0L) {
+            if (user.dates[START_DATE] != null && user.dates[START_DATE] != 0L) {
                 textDateFrom.setText(formatDate.format(Date(user.dates[START_DATE] ?: 0)))
             }
-            if (user.dates[END_DATE] != null || user.dates[END_DATE] != 0L)
+            if (user.dates[END_DATE] != null && user.dates[END_DATE] != 0L)
                 dateArrived.setText(formatDate.format(Date(user.dates[END_DATE] ?: 0)))
             dates = user.dates
         }

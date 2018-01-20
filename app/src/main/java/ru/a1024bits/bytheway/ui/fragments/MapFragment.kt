@@ -7,6 +7,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
 import android.support.design.widget.AppBarLayout
 import android.support.design.widget.CoordinatorLayout
 import android.support.v4.app.Fragment
@@ -17,7 +18,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
-import android.widget.TextView
 import android.widget.Toast
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
@@ -34,7 +34,6 @@ import ru.a1024bits.aviaanimation.ui.util.MarkerAnimation
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.MapWebService
 import ru.a1024bits.bytheway.R
-import ru.a1024bits.bytheway.model.Method
 import ru.a1024bits.bytheway.model.Status
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.model.map_directions.RoutesList
@@ -224,7 +223,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
 
         if ((activity as MenuActivity).preferences.getBoolean("isFirstEnterMapFragment", true))
-            MaterialShowcaseView.Builder(activity)
+            showView = MaterialShowcaseView.Builder(activity)
                     .setTarget(buttonSaveTravelInfo)
                     .renderOverNavigationBar()
                     .setDismissText(getString(R.string.close_hint))
@@ -233,6 +232,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     .withCircleShape()
                     .setListener(object : IShowcaseListener {
                         override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {
+                            val mHandler = Handler()
+                            val time = 10000L // 10 sec after we can hide tips
+                            mHandler.postDelayed({ showView?.hide() }, time)
                         }
 
                         override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
@@ -242,6 +244,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     })
                     .show()
     }
+
+    var showView: MaterialShowcaseView? = null
 
     private fun getHashMapUser(): HashMap<String, Any> {
         val hashMap = HashMap<String, Any>()

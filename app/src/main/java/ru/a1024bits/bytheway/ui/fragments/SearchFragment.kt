@@ -139,8 +139,10 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         }
 
         if (user.dates.size > 0) {
-            dateFromValue.text = user.dates.get(START_DATE)?.getNormallDate()
-            dateToValue.text = user.dates.get(END_DATE)?.getNormallDate()
+            if (user.dates[START_DATE] != null && user.dates[START_DATE] != 0L)
+                dateFromValue.text = user.dates.get(START_DATE)?.getNormallDate()
+            if (user.dates[END_DATE] != null && user.dates[END_DATE] != 0L)
+                dateToValue.text = user.dates.get(END_DATE)?.getNormallDate()
         }
 
         swap_cities.setOnClickListener {
