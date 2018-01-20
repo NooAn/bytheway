@@ -651,7 +651,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     }
 
     private fun getLongFromDate(day: Int, month: Int, year: Int): Long {
-        val dateString = "$day $month $year"
+        val dateString = "$day ${month + 1} $year"
         val dateFormat = SimpleDateFormat("dd MM yyyy", Locale.US)
         val date = dateFormat.parse(dateString)
         return date.time
