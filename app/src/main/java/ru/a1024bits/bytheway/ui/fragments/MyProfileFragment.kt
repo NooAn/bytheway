@@ -1053,10 +1053,10 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         val formatDate = SimpleDateFormat("dd.MM.yyyy", Locale.US)
 
         if (user.dates.size > 0) {
-            if (user.dates[START_DATE] != null || user.dates[START_DATE] != 0L) {
+            if (user.dates[START_DATE] != null && user.dates[START_DATE] != 0L) {
                 textDateFrom.setText(formatDate.format(Date(user.dates[START_DATE] ?: 0)))
             }
-            if (user.dates[END_DATE] != null || user.dates[END_DATE] != 0L)
+            if (user.dates[END_DATE] != null && user.dates[END_DATE] != 0L)
                 dateArrived.setText(formatDate.format(Date(user.dates[END_DATE] ?: 0)))
             dates = user.dates
         }
