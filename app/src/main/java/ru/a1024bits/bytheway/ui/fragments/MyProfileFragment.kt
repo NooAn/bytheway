@@ -655,7 +655,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         val dateFormat = SimpleDateFormat("dd MM yyyy", Locale.US)
         val date = dateFormat.parse(dateString)
         return date.time
-
     }
 
     private fun TextView.afterTextChanged(afterTextChanged: (String) -> Unit) {

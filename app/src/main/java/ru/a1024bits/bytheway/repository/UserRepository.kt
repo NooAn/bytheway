@@ -13,7 +13,6 @@ import ru.a1024bits.bytheway.algorithm.SearchTravelers
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.util.toJsonString
 import java.util.*
-import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 
 
@@ -45,7 +44,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
         return Single.create<MutableList<User>> { e ->
             val time = System.currentTimeMillis() / 1000
             store.collection(COLLECTION_USERS)
-                   // .whereGreaterThanOrEqualTo("cities.first_city", 0)
+                    // .whereGreaterThanOrEqualTo("cities.first_city", 0)
                     .get()
                     .addOnCompleteListener({ task ->
                         Log.e("LOG completeListener", Thread.currentThread().name)
@@ -86,7 +85,8 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                                 if (user.cities.size > 0) {
                                     // run search algorithm
                                     val search = SearchTravelers(filter = paramSearch, user = user)
-                                    user.percentsSimilarTravel = search.getEstimation()
+                                    val s = search.getEstimation()
+                                    user.percentsSimilarTravel = if (s > 100) 100 else s
                                     result.add(user)
                                 }
                             } catch (ex: Exception) {
