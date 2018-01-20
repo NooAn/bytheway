@@ -20,7 +20,6 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import com.borax12.materialdaterangepicker.date.DatePickerDialog
-import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException
 import com.google.android.gms.common.GooglePlayServicesRepairableException
@@ -221,8 +220,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        App.component.inject(this)
-        glide = Glide.with(this)
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(context)
 
         methodIcons.put(Method.CAR.link, iconCar)
