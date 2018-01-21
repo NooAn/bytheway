@@ -131,4 +131,5 @@
     <string name="copy_done">Телефон скопирован</string>
     <string name="search_change">Ваша поездка будет изменена.</string>
     <string name="search_change_text1">Вы уверены, что хотите сохранить текущую информацию?</string>
+    <string name="registration_error">В данный момент приложение поддерживает только вход через ГуглАккаунт. И сейчас видать что-то не получилось.\nПроверьте интернет и запустите приложение заново.</string>
 </resources>

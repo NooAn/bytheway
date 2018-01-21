@@ -76,6 +76,7 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+
         return view
     }
 
@@ -149,6 +150,8 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                 dateToValue.text = user.dates.get(END_DATE)?.getNormallDate()
         }
 
+
+
         swap_cities.setOnClickListener {
             val tempString = text_from_city.text
             text_from_city.text = text_to_city.text
@@ -179,6 +182,7 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
 
         })
         if (user.cityFromLatLng.latitude != 0.0 && user.cityToLatLng.latitude != 0.0 && user.cityToLatLng.longitude != 0.0) {
+
             updatePoints()
         }
     }
