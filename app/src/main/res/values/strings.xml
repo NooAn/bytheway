@@ -128,4 +128,5 @@
     <string name="error_sinchronized">Очень жаль.... Но не получилось синхронизироваться с app in the air.</string>
     <string name="this_date_is_not_set">Дата еще не установлена.</string>
     <string name="copy_done">Телефон скопирован</string>
+    <string name="registration_error">В данный момент приложение поддерживает только вход через ГуглАккаунт. И сейчас видать что-то не получилось.\nПроверьте интернет и запустите приложение заново.</string>
 </resources>
