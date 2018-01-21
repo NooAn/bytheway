@@ -69,15 +69,22 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private var routeString: String? = null
 
     private var viewModel: DisplayUsersViewModel? = null
-    @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
 
     private val uid: String by lazy { FirebaseAuth.getInstance().currentUser?.uid.orEmpty() }
 
-    @Inject lateinit var mapService: MapWebService
+    @Inject
+    lateinit var mapService: MapWebService
 
     var user: User = User()
 
     companion object {
+        const val DATES = "dates"
+        const val CITIES = "cities"
+        const val METHOD = "method"
+        const val COUNT_TRIP = "countTrip"
+        const val ROUTE = "route"
         fun newInstance(user: User?): MapFragment {
             val fragment = MapFragment()
             fragment.arguments = Bundle()
@@ -99,7 +106,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         collapsingToolbar?.setContentScrimColor(
                 ContextCompat.getColor(activity, R.color.colorAccent))
 
-        mMapView = view?.findViewById<MapView>(R.id.map)
+        mMapView = view?.findViewById(R.id.map)
 
         try {
             mMapView?.onCreate(savedInstanceState)
@@ -118,10 +125,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
         mMapView?.onSaveInstanceState(outState)
-    }
-
-    override fun onDetach() {
-        super.onDetach()
     }
 
     override fun onPause() {
@@ -252,24 +255,28 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val cities: HashMap<String, String> = hashMapOf()
         cities.put(Constants.FIRST_INDEX_CITY, searchFragment?.filter?.startCity.toString())
         cities.put(Constants.LAST_INDEX_CITY, searchFragment?.filter?.endCity.toString())
-        hashMap.put("cities", cities)
+
+        hashMap[CITIES] = cities
         val method = searchFragment?.filter?.method
-        if (method != null)
-            hashMap.set("method", method)
-        hashMap.put("route", routeString ?: "")
-        hashMap.put("countTrip", 1)
+        if (method != null) {
+            hashMap[METHOD] = method
+        }
+
+        hashMap[ROUTE] = routeString ?: ""
+        hashMap[COUNT_TRIP] = 1
         val dates: HashMap<String, Long> = hashMapOf()
-        dates.put(START_DATE, searchFragment?.filter?.startDate ?: 0)
-        dates.put(END_DATE, searchFragment?.filter?.endDate ?: 0)
-        hashMap.put(MyProfileFragment.CITY_FROM,
-                GeoPoint(searchFragment?.filter?.locationStartCity?.latitude ?: 0.0, searchFragment?.filter?.locationStartCity?.longitude ?: 0.0)
-        )
-        hashMap.put(MyProfileFragment.CITY_TO, GeoPoint(searchFragment?.filter?.locationEndCity?.latitude ?: 0.0, searchFragment?.filter?.locationEndCity?.longitude ?: 0.0))
-        hashMap.put("dates", dates)
+        dates[START_DATE] = searchFragment?.filter?.startDate ?: 0
+        dates[END_DATE] = searchFragment?.filter?.endDate ?: 0
+        hashMap[MyProfileFragment.CITY_FROM] = GeoPoint(searchFragment?.filter?.locationStartCity?.latitude
+                ?: 0.0, searchFragment?.filter?.locationStartCity?.longitude ?: 0.0)
+
+        hashMap[MyProfileFragment.CITY_TO] = GeoPoint(searchFragment?.filter?.locationEndCity?.latitude
+                ?: 0.0, searchFragment?.filter?.locationEndCity?.longitude ?: 0.0)
+        hashMap[DATES] = dates
         return hashMap
     }
 
-    var marker: Marker? = null
+    private var marker: Marker? = null
 
     override fun onMapReady(googleMap: GoogleMap) {
         this.mMap = googleMap
@@ -284,7 +291,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var mFirebaseAnalytics: FirebaseAnalytics
 
-    fun goFlyPlan() {
+    private fun goFlyPlan() {
         if (points.size < 2) return
         animateMarker()
         logEvents()
@@ -294,31 +301,31 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         if (searchFragment?.filter?.method?.equals(user.method) == false) {
             mFirebaseAnalytics.logEvent("Search_screen_method_change", null)
         }
-        if (searchFragment?.filter?.startCity != user.cities.get(FIRST_INDEX_CITY)) {
+        if (searchFragment?.filter?.startCity != user.cities[FIRST_INDEX_CITY]) {
             mFirebaseAnalytics.logEvent("Search_screen_start_city_change", null)
         }
-        if (searchFragment?.filter?.endCity != user.cities.get(LAST_INDEX_CITY)) {
+        if (searchFragment?.filter?.endCity != user.cities[LAST_INDEX_CITY]) {
             mFirebaseAnalytics.logEvent("Search_screen_last_city_change", null)
         }
-        if (searchFragment?.filter?.endBudget?.toLong() != user.budget.toLong()) {
+        if (searchFragment?.filter?.endBudget?.toLong() != user.budget) {
             mFirebaseAnalytics.logEvent("Search_screen_end_budget_change", null)
         }
-        if (searchFragment?.filter?.startDate != user.dates.get(START_DATE)) {
+        if (searchFragment?.filter?.startDate != user.dates[START_DATE]) {
             mFirebaseAnalytics.logEvent("Search_screen_str_date_change", null)
         }
-        if (searchFragment?.filter?.endDate != user.dates.get(END_DATE)) {
+        if (searchFragment?.filter?.endDate != user.dates[END_DATE]) {
             mFirebaseAnalytics.logEvent("Search_screen_end_date_change", null)
         }
     }
 
     //lat = y
     //lon = x
-    var searchFragment: SearchFragment? = null
-    val markerAnimation = MarkerAnimation()
-    var listPointPath: ArrayList<LatLng> = ArrayList()
+    private var searchFragment: SearchFragment? = null
+    private val markerAnimation = MarkerAnimation()
+    private var listPointPath: ArrayList<LatLng> = ArrayList()
 
     //Method for finding bearing between two points
-    fun getBearing(begin: LatLng, end: LatLng): Float {
+    private fun getBearing(begin: LatLng, end: LatLng): Float {
         val lat = Math.abs(begin.latitude - end.latitude)
         val lng = Math.abs(begin.longitude - end.longitude)
 
@@ -343,9 +350,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
 
-    fun animateMarker() {
+    private fun animateMarker() {
         // Whatever destination coordinates
-        if (markerAnimation.flag == false) {
+        if (!markerAnimation.flag) {
 
             val fromLocation = points.valueAt(0).position
             val endLocation = points.valueAt(1).position
@@ -392,8 +399,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private val PATTERN_POLYGON_ALPHA = Arrays.asList(GAP, DOT)
     private val COLOR_BLUE_ARGB = -0x657db
+
     // Draw polyline on map
-    fun drawPolyLineOnMap(list: List<LatLng>) {
+    private fun drawPolyLineOnMap(list: List<LatLng>) {
         val strokeColor = COLOR_BLUE_ARGB
         val polyOptions = PolylineOptions()
         polyOptions.color(Color.RED)
@@ -440,12 +448,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val builder = LatLngBounds.builder()
         points.map { latLng -> builder.include(latLng.value?.position) }
         return builder.build()
-    }
-
-    fun getHashMapRoute(route: String): HashMap<String, Any> {
-        val hashMap = HashMap<String, Any>()
-        hashMap.put("route", route)
-        return hashMap
     }
 
     private fun obtainDirection() {

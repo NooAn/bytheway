@@ -26,34 +26,28 @@ import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.repository.M_SEX
 import ru.a1024bits.bytheway.repository.W_SEX
-import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.a1024bits.bytheway.util.DecimalInputFilter
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
-import ru.terrakok.cicerone.commands.Forward
 import javax.inject.Inject
 
 
 class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
-    private val SIZE_INITIAL_ELEMENTS = 2
-    private val TAG_ANALYTICS = "AllUsersFragment_"
+    companion object {
+        const val SIZE_INITIAL_ELEMENTS = 2
+        const val TAG_ANALYTICS = "AllUsersFragment_"
+        fun newInstance(): AllUsersFragment = AllUsersFragment()
+    }
+
     private lateinit var filter: Filter
     private var dateDialog: DatePickerDialog? = null
     private lateinit var displayUsersAdapter: DisplayAllUsersAdapter
-    @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
     private var countInitialElements = 0
     private lateinit var analytics: FirebaseAnalytics
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-        analytics = FirebaseAnalytics.getInstance(this.context)
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-            inflater.inflate(R.layout.fragment_display_all_users, container, false)
-
-    private val usersObservers: Observer<Response<List<User>>> = Observer<Response<List<User>>> { response ->
+    private val usersObservers: Observer<Response<List<User>>> = Observer { response ->
         when (response?.status) {
             Status.SUCCESS -> if (response.data == null) showErrorLoading() else {
                 if (response.data.isNotEmpty())
@@ -67,6 +61,15 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
         }
 
     }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+        analytics = FirebaseAnalytics.getInstance(this.context)
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+            inflater.inflate(R.layout.fragment_display_all_users, container, false)
 
     private fun showErrorLoading() {
 
@@ -285,9 +288,5 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
         choseDate.text = if (filter.startDate > 0L && filter.endDate > 0L)
             viewModel?.getTextFromDates(filter.startDate, filter.endDate, 0)
         else context.getString(R.string.filters_all_users_empty_date)
-    }
-
-    companion object {
-        fun newInstance(): AllUsersFragment = AllUsersFragment()
     }
 }
