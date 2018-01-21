@@ -3,6 +3,9 @@ package ru.a1024bits.bytheway.viewmodel
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
 import com.borax12.materialdaterangepicker.date.DatePickerDialog
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.QuerySnapshot
+import io.reactivex.Single
 import ru.a1024bits.bytheway.App.Companion.INSTANCE
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.Response
@@ -10,46 +13,60 @@ import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.repository.MAX_AGE
 import ru.a1024bits.bytheway.repository.UserRepository
-import ru.a1024bits.bytheway.ui.fragments.AllUsersFragment
 import java.util.*
 import javax.inject.Inject
 
 /**
  * Created by andrey.gusenkov on 25/09/2017.
  */
-class DisplayUsersViewModel @Inject constructor(var userRepository: UserRepository) : BaseViewModel() {
+
+class DisplayUsersViewModel @Inject constructor(var userRepository: UserRepository?) : BaseViewModel(), FilterAndInstallListener {
     var response: MutableLiveData<Response<List<User>>> = MutableLiveData()
     var yearsOldUsers = (0..MAX_AGE).mapTo(ArrayList<String>()) { it.toString() }
     val filter = Filter()
 
     val TAG = "showUserViewModel"
 
-    fun getAllUsers(filter: Filter) {
-        disposables.add(userRepository.getAllUsers()
+    fun getAllUsers() {
+        userRepository?.installAllUsers(this)
+    }
+
+    override fun filterAndInstallUsers(snapshot: QuerySnapshot) {
+        Single.create<MutableList<User>> { owner ->
+            Log.e("LOG get all users", Thread.currentThread().name)
+            val result: MutableList<User> = ArrayList()
+            for (document in snapshot) {
+                try {
+                    val user = document.toObject(User::class.java)
+                    if (user.cities.size > 0 && user.id != FirebaseAuth.getInstance().currentUser?.uid) {
+                        result.add(user)
+                    }
+                } catch (e: Exception) {
+                }
+            }
+            filterUsersByFilter(result, filter)
+            owner.onSuccess(result)
+        }
                 .subscribeOn(getBackgroundScheduler())
+                .observeOn(getMainThreadScheduler())
                 .doOnSubscribe({ loadingStatus.postValue(true) })
                 .doAfterTerminate({ loadingStatus.postValue(false) })
-                .doAfterSuccess { resultUsers -> filterUsersByFilter(resultUsers, filter) }
-                .observeOn(getMainThreadScheduler())
-                .subscribe(
-                        { resultUsers ->
-                            Log.e("LOG subscribe", Thread.currentThread().name)
-                            response.postValue(Response.success(resultUsers))
-                        },
-                        { throwable -> response.postValue(Response.error(throwable)) }
-                )
-        )
+                .subscribe({ resultUsers ->
+                    Log.e("LOG subscribe", Thread.currentThread().name)
+                    response.postValue(Response.success(resultUsers))
+                },
+                        { throwable -> response.postValue(Response.error(throwable)) })
     }
 
     fun sendUserData(map: HashMap<String, Any>, id: String) {
         loadingStatus.setValue(true)
         //fixme
-        userRepository.changeUserProfile(map, id).subscribe()
+        userRepository?.changeUserProfile(map, id)?.subscribe()
     }
 
     fun getUsersWithSimilarTravel(paramSearch: Filter) {
         loadingStatus.setValue(true)
-        disposables.add(userRepository.getReallUsers(paramSearch)
+        disposables.add(userRepository!!.getReallUsers(paramSearch)
                 .subscribeOn(getBackgroundScheduler())
                 .observeOn(getMainThreadScheduler())
                 .doAfterTerminate({ loadingStatus.setValue(false) })
@@ -60,7 +77,7 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
         )
     }
 
-    fun updateDateDialog(fragment: AllUsersFragment): DatePickerDialog {
+    fun updateDateDialog(listener: OnUpdateDialog?): DatePickerDialog {
         val currentStartDate = Calendar.getInstance()
         if (filter.startDate > 0L) currentStartDate.timeInMillis = filter.startDate
         val currentEndDate = Calendar.getInstance()
@@ -80,12 +97,12 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
                     calendarEndDate.set(Calendar.DAY_OF_MONTH, dayOfMonthEnd)
 
                     if (calendarStartDate.timeInMillis >= calendarEndDate.timeInMillis) {
-                        fragment.nonSuchSetDate()
+                        listener?.notSuchSetDate()
                         return@newInstance
                     }
                     filter.startDate = calendarStartDate.timeInMillis
                     filter.endDate = calendarEndDate.timeInMillis
-                    fragment.suchSetDate()
+                    listener?.onSuchSetDate()
                 },
                 currentStartDate.get(Calendar.YEAR),
                 currentStartDate.get(Calendar.MONTH),
@@ -99,7 +116,6 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
     }
 
     fun getTextFromDates(startDate: Long?, endDate: Long?, variant: Int): String {
-        var fromWord = INSTANCE.applicationContext.getString(R.string.from_date_filter)
         var toWord = INSTANCE.applicationContext.getString(R.string.to_date_filter)
         if (variant == 1) {
             toWord = " - "
@@ -151,4 +167,13 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
                     ((filter.endCity.isEmpty()) || (it.cities.containsValue(filter.endCity)))
         }
     }
+}
+
+interface FilterAndInstallListener {
+    fun filterAndInstallUsers(snapshot: QuerySnapshot)
+}
+
+interface OnUpdateDialog {
+    fun onSuchSetDate()
+    fun notSuchSetDate()
 }

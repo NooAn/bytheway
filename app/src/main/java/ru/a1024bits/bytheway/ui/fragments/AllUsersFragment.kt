@@ -26,15 +26,14 @@ import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.repository.M_SEX
 import ru.a1024bits.bytheway.repository.W_SEX
-import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.a1024bits.bytheway.util.DecimalInputFilter
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
-import ru.terrakok.cicerone.commands.Forward
+import ru.a1024bits.bytheway.viewmodel.OnUpdateDialog
 import javax.inject.Inject
 
 
-class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
+class AllUsersFragment : BaseFragment<DisplayUsersViewModel>(), OnUpdateDialog {
     private val SIZE_INITIAL_ELEMENTS = 2
     private val TAG_ANALYTICS = "AllUsersFragment_"
     private lateinit var filter: Filter
@@ -88,7 +87,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             viewModel?.response?.observe(this, usersObservers)
             viewModel?.loadingStatus?.observe(this, (activity as MenuActivity).progressBarLoad)
             loadingWhereLoadUsers.visibility = View.VISIBLE
-            viewModel?.getAllUsers(filter)
+            viewModel?.getAllUsers()
 
             showPrompt("isFirstEnterAllUsersFragment", context.resources.getString(R.string.close_hint),
                     context.resources.getString(R.string.hint_all_travelers), context.resources.getString(R.string.hint_all_travelers_description))
@@ -116,7 +115,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             override fun onQueryTextChange(newText: String): Boolean {
                 if (newText.isEmpty() && isNotStartSearch && this@AllUsersFragment.view != null) {
                     updateViewsBeforeSearch()
-                    viewModel?.getAllUsers(filter)
+                    viewModel?.getAllUsers()
                 }
                 isNotStartSearch = true
                 return false
@@ -137,11 +136,11 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
 
     override fun getViewModelClass(): Class<DisplayUsersViewModel> = DisplayUsersViewModel::class.java
 
-    fun nonSuchSetDate() {
+    override fun notSuchSetDate() {
         Snackbar.make(activity.findViewById(android.R.id.content), context.getString(R.string.dates_has_been_incorrect), Snackbar.LENGTH_LONG).show()
     }
 
-    fun suchSetDate() {
+    override fun onSuchSetDate() {
         updateChoseDateButtons()
     }
 
@@ -230,7 +229,6 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             sexButtons.check(sexAny.id)
         }
 
-        view_contain_block_parameters.layoutTransition.setDuration(700L)
         searchParametersText.setOnClickListener {
             if (block_search_parameters.visibility == View.GONE) {
                 block_search_parameters.visibility = View.VISIBLE
@@ -260,7 +258,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             override fun endTransition(p0: LayoutTransition?, p1: ViewGroup?, view: View, p3: Int) {
                 if ((view.id == block_search_parameters.id) && (block_search_parameters.visibility == View.GONE)) {
                     updateViewsBeforeSearch()
-                    viewModel?.getAllUsers(filter)
+                    viewModel?.getAllUsers()
                     view_contain_block_parameters.layoutTransition.removeTransitionListener(this)
                 }
             }

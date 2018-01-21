@@ -32,10 +32,13 @@ class DisplayAllUsersAdapter(val context: Context, val viewModel: DisplayUsersVi
     override fun onBindViewHolder(holder: UserViewHolder?, position: Int) {
         val currentUser = users[position]
         holder?.name?.text = currentUser.name
-        holder?.dates?.text = if (currentUser.dates["start_date"] != null && currentUser.dates["end_date"] != null)
-            viewModel.getTextFromDates(currentUser.dates["start_date"], currentUser.dates["end_date"], 1)
-        else
-            context.getString(R.string.item_all_users_empty_date)
+        holder?.dates?.text = ""
+        currentUser.dates["start_date"]?.let { itStart ->
+            currentUser.dates["end_date"]?.let { itEnd ->
+                if (itStart > 0L && itEnd > 0L)
+                    holder?.dates?.text = viewModel.getTextFromDates(currentUser.dates["start_date"], currentUser.dates["end_date"], 1)
+            }
+        }
         if (currentUser.age >= 0)
             holder?.age?.text = if (currentUser.age > 0) StringBuilder(", ").append(currentUser.age.toString()) else ""
         holder?.cities?.text = if (currentUser.cities["first_city"] != null && currentUser.cities["last_city"] != null)
