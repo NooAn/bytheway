@@ -43,8 +43,14 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
 
     fun sendUserData(map: HashMap<String, Any>, id: String) {
         loadingStatus.setValue(true)
-        //fixme
-        userRepository.changeUserProfile(map, id).subscribe()
+        disposables.add(userRepository.changeUserProfile(map, id)
+                .doAfterTerminate({ loadingStatus.setValue(false) })
+                .subscribe(
+                        { Log.e("LOG", "complete") },
+                        { t -> response.setValue(Response.error(t))
+                            Log.e("LOG view model", "send User Data", t)
+                        }
+                ))
     }
 
     fun getUsersWithSimilarTravel(paramSearch: Filter) {

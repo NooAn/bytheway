@@ -40,6 +40,7 @@ import ru.a1024bits.bytheway.model.map_directions.RoutesList
 import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
+import ru.a1024bits.bytheway.ui.dialogs.TravelSearchSaveDialog
 import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.util.Constants.END_DATE
 import ru.a1024bits.bytheway.util.Constants.FIRST_INDEX_CITY
@@ -166,7 +167,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun showErrorLoading() {
-        Log.e("LOG", "error in map rx response")
+        Toast.makeText(activity, R.string.just_error, Toast.LENGTH_SHORT).show()
     }
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
@@ -199,8 +200,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         })
 
         buttonSaveTravelInfo.setOnClickListener {
-            //send data to Firebase
-            viewModel?.sendUserData(getHashMapUser(), uid)
+            openDialogSave()
         }
 
         buttonSearch.setOnClickListener {
@@ -225,7 +225,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             }
         }
 
-        if ((activity as MenuActivity).preferences.getBoolean("isFirstEnterMapFragment", true))
+        if (activity != null && (activity as MenuActivity).preferences.getBoolean("isFirstEnterMapFragment", true))
             showView = MaterialShowcaseView.Builder(activity)
                     .setTarget(buttonSaveTravelInfo)
                     .renderOverNavigationBar()
@@ -246,6 +246,16 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                         }
                     })
                     .show()
+    }
+
+    private fun openDialogSave() {
+        val dialog = TravelSearchSaveDialog(this)
+        dialog.show()
+    }
+
+    fun saveData() {
+        //send data to Firebase
+        viewModel?.sendUserData(getHashMapUser(), uid)
     }
 
     var showView: MaterialShowcaseView? = null

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="16dp"
+        android:paddingEnd="28dp"
+        android:paddingStart="28dp"
+        android:text="@string/search_change_text1"
+        android:textAlignment="center" />
+
+    <TextView
+        android:id="@+id/textFeedback2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView3"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:paddingEnd="28dp"
+        android:paddingStart="28dp"
+        android:text="@string/search_change"
+        android:textAlignment="center" />
+
+    <Button
+        android:id="@+id/cancelButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textFeedback2"
+        android:layout_margin="8dp"
+        android:gravity="center"
+        android:text="@string/cancel"
+        android:theme="@style/WhiteButton" />
+
+    <Button
+        android:id="@+id/saveButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/cancelButton"
+        android:layout_alignBottom="@+id/cancelButton"
+        android:layout_alignEnd="@+id/textView3"
+        android:layout_margin="8dp"
+        android:text="@string/save"
+        android:theme="@style/WhiteButton" />
+
+</RelativeLayout>
