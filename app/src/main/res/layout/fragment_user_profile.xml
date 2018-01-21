@@ -274,6 +274,7 @@
                 android:layout_height="match_parent"
                 android:layout_toStartOf="@+id/travelWayImagesContainer"
                 android:fontFamily="sans-serif-medium"
+                android:paddingBottom="16dp"
                 android:text="@string/method_move"
                 android:textSize="16sp" />
 
@@ -356,6 +357,7 @@
                 android:layout_height="match_parent"
                 android:layout_toStartOf="@+id/displayPriceTravel"
                 android:fontFamily="sans-serif-medium"
+                android:paddingBottom="16dp"
                 android:text="@string/money"
                 android:textSize="16sp" />
 
@@ -399,6 +401,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/imageQuoteDescription"
                 android:layout_toEndOf="@+id/imageQuoteDescription"
+                android:paddingBottom="16dp"
                 android:textColor="@color/black"
                 android:textSize="@dimen/standard_text_size"
                 tools:text="Собираюсь провести отпуск в Ижевске. Шутка))) Еду в Карловы Вары" />
