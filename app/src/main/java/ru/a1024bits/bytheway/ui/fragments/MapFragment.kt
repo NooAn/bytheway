@@ -235,9 +235,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     .withCircleShape()
                     .setListener(object : IShowcaseListener {
                         override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {
-                            val mHandler = Handler()
-                            val time = 10000L // 10 sec after we can hide tips
-                            mHandler.postDelayed({ showView?.hide() }, time)
+                            try {
+                                val mHandler = Handler()
+                                val time = 10000L // 10 sec after we can hide tips
+                                mHandler.postDelayed({ showView?.hide() }, time)
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
                         }
 
                         override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
@@ -255,7 +259,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     fun saveData() {
         //send data to Firebase
-        viewModel?.sendUserData(getHashMapUser(), uid)
+        try {
+            viewModel?.sendUserData(getHashMapUser(), uid)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     var showView: MaterialShowcaseView? = null
