@@ -201,6 +201,15 @@ class SearchFragment : Fragment() {
     }
 
     private fun openDateFromDialog() {
+
+        val dateFrom = Calendar.getInstance() //current time by default
+        if(filter.startDate > 0L) dateFrom.timeInMillis = filter.startDate
+
+        dateDialog = CalendarDatePickerDialogFragment()
+                .setFirstDayOfWeek(Calendar.MONDAY)
+                .setThemeCustom(R.style.BythewayDatePickerDialogTheme)
+                .setPreselectedDate(dateFrom.get(Calendar.YEAR), dateFrom.get(Calendar.MONTH), dateFrom.get(Calendar.DAY_OF_MONTH))
+
         dateDialog.setDateRange(MonthAdapter.CalendarDay(System.currentTimeMillis()), null)
         dateDialog.setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
             dateFromValue.text = StringBuilder(" ")
@@ -215,6 +224,14 @@ class SearchFragment : Fragment() {
     }
 
     private fun openDateToDialog() {
+        val dateTo = Calendar.getInstance() //current time by default
+        if(filter.endDate > 0L) dateTo.timeInMillis = filter.endDate
+
+        dateDialog = CalendarDatePickerDialogFragment()
+                .setFirstDayOfWeek(Calendar.MONDAY)
+                .setThemeCustom(R.style.BythewayDatePickerDialogTheme)
+                .setPreselectedDate(dateTo.get(Calendar.YEAR), dateTo.get(Calendar.MONTH), dateTo.get(Calendar.DAY_OF_MONTH))
+
         dateDialog.setDateRange(
                 MonthAdapter.CalendarDay(
                         if (filter.startDate > 0L) filter.startDate
