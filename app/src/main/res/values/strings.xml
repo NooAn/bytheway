@@ -53,6 +53,7 @@
     <string name="fill_to_location">Не выбран пункт назначения</string>
     <string name="social_links">Ссылки на социальные сети</string>
     <string name="error_update">Ошибка обновления</string>
+    <string name="just_error">Ошибка c сервером. Может попозже?</string>
     <string name="text_confirm_remove_trip">Все изменения будет потеряны. \n Вы действительно хотите удалить поездку?</string>
     <string name="sex_and_age">Пол, возраст</string>
     <string name="age">Возраст</string>
@@ -128,4 +129,11 @@
     <string name="error_sinchronized">Очень жаль.... Но не получилось синхронизироваться с app in the air.</string>
     <string name="this_date_is_not_set">Дата еще не установлена.</string>
     <string name="copy_done">Телефон скопирован</string>
+    <string name="search_change">Ваша поездка будет изменена.</string>
+    <string name="search_change_text1">Вы уверены, что хотите сохранить текущую информацию?</string>
+    <string name="registration_error">В данный момент приложение поддерживает только вход через ГуглАккаунт. И сейчас видать что-то не получилось.\nПроверьте интернет и запустите приложение заново.</string>
+    <string name="tips_for_blank_social">Привет! Мы обнаружили, что Вы создали поездку и собираетесь искать попутчика, но не указали свои контактные данные. Советуем добавить ссылки на вк, номер в whatsapp или ник для телеграмма.</string>
+    <string name="ok_I_understand">Хорошо, я понял.</string>
+    <string name="start">Старт</string>
+    <string name="finish">Финиш</string>
 </resources>

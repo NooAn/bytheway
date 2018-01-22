@@ -35,12 +35,11 @@ class SimilarTravelsAdapter(val context: Context, val users: List<User>) : Recyc
             holder.cities.text = StringBuilder().append(getShortCity(currentUser.cities.get(FIRST_INDEX_CITY) ?: ""))
                     .append(" - ")
                     .append(getShortCity(currentUser.cities.get(LAST_INDEX_CITY) ?: ""))
+        
+        val nameText = StringBuilder().append(currentUser.name).append(" ").append(currentUser.lastName)
+        if (currentUser.age > 0) nameText.append(", ").append(currentUser.age)
+        holder.name.text = nameText
 
-        holder.name.text = StringBuilder().append(currentUser.name)
-                .append(" ")
-                .append(currentUser.lastName)
-                .append(", ")
-                .append(currentUser.age)
 
         holder.percentSimilarTravel.text = StringBuilder().append(currentUser.percentsSimilarTravel).append(" %")
 

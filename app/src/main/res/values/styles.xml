@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
@@ -36,5 +36,34 @@
     <style name="UsersTextInFilters">
         <item name="android:textColor">@color/black</item>
         <item name="android:textSize">@dimen/standard_text_size</item>
+    </style>
+
+    <style name="BythewayDatePickerDialogTheme" parent="BetterPickersRadialTimePickerDialog.PrimaryColor">
+        <item name="android:colorAccent" tools:targetApi="lollipop">@color/colorPrimary</item>
+        <item name="colorAccent">@color/colorPrimary</item>
+
+        <item name="bpBodyBackgroundColor">@color/white</item>
+        <item name="bpBodySelectedTextColor">@color/colorPrimary</item>
+        <item name="bpBodyUnselectedTextColor">@color/black</item>
+
+        <item name="bpRadialBackgroundColor">@color/white</item>
+        <item name="bpRadialTextColor">@color/colorPrimary</item>
+        <item name="bpRadialPointerColor">@android:color/black</item>
+
+        <item name="bpButtonsBackgroundColor">@color/white</item>
+        <item name="bpButtonsTextColor">@color/colorPrimary</item>
+        <item name="bpDialogBackground">@color/white</item>
+        <item name="bpTextColor">@color/black</item>
+        <item name="bpTitleColor">@color/white</item>
+        <item name="bpDividerColor">@color/white</item>
+        <item name="bpKeyboardIndicatorColor">#dcdcdc</item>
+        <item name="bpAmPmCircleColor">@color/colorPrimary</item>
+        <item name="bpDisabledDayTextColor">#f5f5f5</item>
+
+        <!-- for custom datepicker pre-Lollipop -->
+        <item name="bpPreHeaderBackgroundColor">@color/colorPrimary</item>
+        <item name="bpHeaderBackgroundColor">@color/colorPrimary</item>
+        <item name="bpHeaderSelectedTextColor">@color/white</item>
+        <item name="bpHeaderUnselectedTextColor">#a5a5a5</item>
     </style>
 </resources>

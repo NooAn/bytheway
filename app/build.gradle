@@ -40,8 +40,8 @@ android {
             dimension "default"
         }
         bytheway {
-            versionCode 11
-            versionName "1.0.1"
+            versionCode 12
+            versionName "1.0.2"
             dimension "default"
         }
     }
@@ -100,6 +100,8 @@ dependencies {
     annotationProcessor "android.arch.lifecycle:compiler:1.0.0"
     implementation "android.arch.lifecycle:common-java8:1.0.0"
 
+    compile 'com.code-troopers.betterpickers:library:3.1.0'
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
@@ -128,6 +130,7 @@ configurations.all { config ->
     if (config.name.contains('UnitTest')) {
         config.resolutionStrategy.eachDependency { details ->
             if (details.requested.group == 'com.squareup.leakcanary' && details.requested.name == 'leakcanary-android') {
+
                 details.useTarget(group: details.requested.group, name: 'leakcanary-android-no-op', version: details.requested.version)
             }
         }
