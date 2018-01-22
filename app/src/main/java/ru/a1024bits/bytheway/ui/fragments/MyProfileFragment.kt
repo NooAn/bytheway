@@ -683,6 +683,14 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     }
 
     private fun openDateFromDialog() {
+        val dateFrom = Calendar.getInstance() //current time by default
+        if(dates[START_DATE]?:0L > 0L) dateFrom.timeInMillis = dates[START_DATE]?: dateFrom.timeInMillis
+
+        dateDialog = CalendarDatePickerDialogFragment()
+                .setFirstDayOfWeek(Calendar.MONDAY)
+                .setThemeCustom(R.style.BythewayDatePickerDialogTheme)
+                .setPreselectedDate(dateFrom.get(Calendar.YEAR), dateFrom.get(Calendar.MONTH), dateFrom.get(Calendar.DAY_OF_MONTH))
+
         dateDialog.setDateRange(MonthAdapter.CalendarDay(System.currentTimeMillis()), null)
         dateDialog.setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
             textDateFrom.setText(StringBuilder(" ")
@@ -700,6 +708,14 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     }
 
     private fun openDateArrivedDialog() {
+        val dateTo = Calendar.getInstance() //current time by default
+        if(dates[END_DATE]?:0L > 0L) dateTo.timeInMillis = dates[END_DATE]?: dateTo.timeInMillis
+
+        dateDialog = CalendarDatePickerDialogFragment()
+                .setFirstDayOfWeek(Calendar.MONDAY)
+                .setThemeCustom(R.style.BythewayDatePickerDialogTheme)
+                .setPreselectedDate(dateTo.get(Calendar.YEAR), dateTo.get(Calendar.MONTH), dateTo.get(Calendar.DAY_OF_MONTH))
+
         dateDialog.setDateRange(MonthAdapter.CalendarDay(dates[START_DATE] ?: System.currentTimeMillis()), null)
         dateDialog.setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
             dateArrived.setText(StringBuilder(" ")

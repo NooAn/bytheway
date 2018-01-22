@@ -199,36 +199,51 @@ class SearchFragment : Fragment() {
         }
     }
 
-    /*private fun openDateDialog() {
-        dateDialog.setStartTitle(getString(R.string.date_start))
-        dateDialog.setEndTitle(getString(R.string.date_end))
-        dateDialog.accentColor = resources.getColor(R.color.colorPrimary)
-        dateDialog.show(activity.fragmentManager, "")
-    }*/
-
     private fun openDateFromDialog() {
+
+        val dateFrom = Calendar.getInstance() //current time by default
+        if (filter.startDate > 0L) dateFrom.timeInMillis = filter.startDate
+
+        dateDialog = CalendarDatePickerDialogFragment()
+                .setFirstDayOfWeek(Calendar.MONDAY)
+                .setThemeCustom(R.style.BythewayDatePickerDialogTheme)
+                .setPreselectedDate(dateFrom.get(Calendar.YEAR), dateFrom.get(Calendar.MONTH), dateFrom.get(Calendar.DAY_OF_MONTH))
+
         dateDialog.setDateRange(MonthAdapter.CalendarDay(System.currentTimeMillis()), null)
         dateDialog.setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
-            dateFromValue.setText(StringBuilder(" ")
+            dateFromValue.text = StringBuilder(" ")
                     .append(dayOfMonth)
                     .append(" ")
                     .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
                     .append(" ")
-                    .append(year).toString())
+                    .append(year).toString()
             filter.startDate = getLongFromDate(dayOfMonth, monthOfYear, year)
         }
         dateDialog.show(activity.supportFragmentManager, "")
     }
 
     private fun openDateToDialog() {
-        dateDialog.setDateRange(MonthAdapter.CalendarDay(filter.startDate), null)
+        val dateTo = Calendar.getInstance() //current time by default
+        if (filter.endDate > 0L) dateTo.timeInMillis = filter.endDate
+
+        dateDialog = CalendarDatePickerDialogFragment()
+                .setFirstDayOfWeek(Calendar.MONDAY)
+                .setThemeCustom(R.style.BythewayDatePickerDialogTheme)
+                .setPreselectedDate(dateTo.get(Calendar.YEAR), dateTo.get(Calendar.MONTH), dateTo.get(Calendar.DAY_OF_MONTH))
+
+        dateDialog.setDateRange(
+                MonthAdapter.CalendarDay(
+                        if (filter.startDate > 0L) filter.startDate
+                        else System.currentTimeMillis()),
+                null)
         dateDialog.setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
-            dateToValue.setText(StringBuilder(" ")
+
+            dateToValue.text = StringBuilder(" ")
                     .append(dayOfMonth)
                     .append(" ")
                     .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
                     .append(" ")
-                    .append(year).toString())
+                    .append(year).toString()
             filter.endDate = getLongFromDate(dayOfMonth, monthOfYear, year)
         }
         dateDialog.show(activity.supportFragmentManager, "")
@@ -269,7 +284,7 @@ class SearchFragment : Fragment() {
     }*/
 
     private fun getLongFromDate(day: Int, month: Int, year: Int): Long {
-        val dateString = "$day $month $year"
+        val dateString = "$day ${month + 1} $year"
         val dateFormat = SimpleDateFormat("dd MM yyyy", Locale.US)
         val date = dateFormat.parse(dateString)
         val unixTime = date.time.toLong()
