@@ -31,7 +31,7 @@ abstract class BaseFragment<T : BaseViewModel> : Fragment() {
     }
 
     fun showPrompt(nameScreenPrompt: String, dismissText: String?, titleText: String?, contentText: String?) {
-        if (viewModel!!.promptNotShowing(nameScreenPrompt) && Build.VERSION.SDK_INT < Build.VERSION_CODES.N)
+        if (viewModel?.promptNotShowing(nameScreenPrompt) == true && Build.VERSION.SDK_INT < Build.VERSION_CODES.N)
             MaterialShowcaseView.Builder(activity)
                     .setTarget(searchParametersText)
                     .renderOverNavigationBar()

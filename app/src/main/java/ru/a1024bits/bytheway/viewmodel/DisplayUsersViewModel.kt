@@ -47,7 +47,8 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
                 .doAfterTerminate({ loadingStatus.setValue(false) })
                 .subscribe(
                         { Log.e("LOG", "complete") },
-                        { t -> response.setValue(Response.error(t))
+                        { t ->
+                            response.setValue(Response.error(t))
                             Log.e("LOG view model", "send User Data", t)
                         }
                 ))
@@ -150,7 +151,9 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
         Log.e("LOG filter", Thread.currentThread().name)
         resultUsers.retainAll {
             (!((filter.startBudget >= 0) && (filter.endBudget > 0)) || (it.budget >= filter.startBudget && it.budget <= filter.endBudget)) &&
-                    (!((filter.startDate > 0L) && (filter.endDate > 0L)) || ((it.dates["start_date"] as Long) >= filter.startDate && (it.dates["end_date"] as Long) <= filter.endDate)) &&
+                    (!((filter.startDate > 0L) && (filter.endDate > 0L)) ||
+                            ((it.dates["start_date"] ?: filter.startDate) >= filter.startDate &&
+                                    (it.dates["end_date"] ?: filter.endDate) <= filter.endDate)) &&
                     ((it.age >= filter.startAge && it.age <= filter.endAge)) &&
                     ((filter.sex == 0) || (it.sex == filter.sex)) &&
                     ((filter.startCity.isEmpty()) || (it.cities.containsValue(filter.startCity))) &&
