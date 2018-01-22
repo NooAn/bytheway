@@ -8,5 +8,5 @@ import ru.a1024bits.bytheway.model.User
  */
 interface OnFragmentInteractionListener {
     fun onFragmentInteraction(user: User?)
-    fun onSetPoint(l: LatLng, pos: Int)
+    fun onSetPoint(l: LatLng, pos: Int, swap: Boolean = false)
 }

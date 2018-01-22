@@ -301,14 +301,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         var constLocation = LatLng(50.0, 50.0)
 
         if (points.size > 0) {
-
-            setMarker(points.valueAt(0).position,1)
-            setMarker(points.valueAt(1).position,2)
-        }else {
+            setMarker(points.valueAt(0).position, 1)
+            setMarker(points.valueAt(1).position, 2)
+        } else {
             mMap?.moveCamera(CameraUpdateFactory.newLatLng(constLocation))
             mMap?.animateCamera(CameraUpdateFactory.zoomTo(3F))
         }
-
     }
 
     private lateinit var mFirebaseAnalytics: FirebaseAnalytics
@@ -399,7 +397,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                         //  searchFragment?.filter?.endBudget = parseInt(budgetFromValue.toString())
                         // Log.d("LOG", budgetFromValue.toString())
                         viewModel?.getUsersWithSimilarTravel(searchFragment?.filter ?: Filter())
-                      //  mMap?.clear()
+                        //  mMap?.clear()
                         listPointPath.clear()
                         markerAnimation.flag = false
                     })
@@ -443,26 +441,25 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    fun setMarker(point: LatLng, position: Int) {
+    fun setMarker(point: LatLng, position: Int, swap: Boolean = false) {
         mMap?.clear()
 
-        Log.d("LOG","setMarker running...")
         if (position == 1) {
-            points.put(key = position, value = point.createMarker("Старт"))
+            points.put(key = position, value = point.createMarker(getString(R.string.start)))
         }
         if (position == 2) {
-            points.put(key = position, value = point.createMarker("Финиш"))
+            points.put(key = position, value = point.createMarker(getString(R.string.finish)))
         }
 
         //add markers on map
         points.map { it.value }.map { marker -> mMap?.addMarker(marker) }
-        Log.d("LOG","points:  ${points[1]}")
         //animate camera to show markers
         when (points.size) {
             1 -> mMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(points.valueAt(0).position, 7F/* zoom level */))
             else -> {
                 mMap?.animateCamera(CameraUpdateFactory.newLatLngBounds(createLatLngBounds(points), resources.getDimensionPixelSize(R.dimen.latLngBoundsPadding)))
-                obtainDirection()
+                if (!swap)
+                    obtainDirection()
             }
         }
     }
