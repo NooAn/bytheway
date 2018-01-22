@@ -133,15 +133,7 @@ public class SplashProfileDialogActivityTest {
                         isDisplayed()));
         appCompatRadioButton.perform(click());
 
-        ViewInteraction appCompatSpinner = onView(
-                allOf(withId(R.id.spinnerYearsView),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.custom),
-                                        0),
-                                6),
-                        isDisplayed()));
-        appCompatSpinner.perform(click());
+
 
         DataInteraction appCompatCheckedTextView = onData(anything())
                 .inAdapterView(childAtPosition(

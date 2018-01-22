@@ -1144,6 +1144,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         budget = 0
         methods.clear()
         cities.clear()
+        //addInfoUser.setText("")
         cityFromLatLng = GeoPoint(0.0, 0.0)
         cityToLatLng = GeoPoint(0.0, 0.0)
         dates.clear()

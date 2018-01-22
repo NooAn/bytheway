@@ -18,10 +18,10 @@ class SearchTravelers(val filter: Filter = Filter(), val user: User) {
     val WeightDate: Int = 10
 
     fun getEstimation(): Int {
-        val n = calculateRoute() * WeightRoute
-        val m = calculateDate() * WeightDate
-        val c = calculateMethod() * WeightMethod
-        val p = calculateBudget() * WeightBudget
+//        val n = calculateRoute() * WeightRoute
+//        val m = calculateDate() * WeightDate
+//        val c = calculateMethod() * WeightMethod
+//        val p = calculateBudget() * WeightBudget
 
 //        Log.e("LOG", "name:${user.name} -  route:$n  date:$m  method:$c  budget:$p")
 

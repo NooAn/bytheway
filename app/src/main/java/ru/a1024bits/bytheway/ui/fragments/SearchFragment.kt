@@ -166,7 +166,7 @@ class SearchFragment : Fragment() {
             filter.locationStartCity = filter.locationEndCity
             filter.locationEndCity = tempLng
 
-            updatePoints()
+            updatePoints(filter.locationStartCity, filter.locationEndCity, swap = true)
         }
 
         budgetFromValue.setText(user.budget.toStringOrEmpty)
@@ -184,16 +184,20 @@ class SearchFragment : Fragment() {
 
         })
         if (user.cityFromLatLng.latitude != 0.0 && user.cityToLatLng.latitude != 0.0 && user.cityToLatLng.longitude != 0.0) {
-
-            updatePoints()
+            // ставим маркеры на карту
+            updatePoints(LatLng(user.cityFromLatLng.latitude, user.cityFromLatLng.longitude), LatLng(user.cityToLatLng.latitude, user.cityToLatLng.longitude))
         }
     }
 
-    private fun updatePoints() {
-        firstPoint = LatLng(user.cityFromLatLng.latitude, user.cityFromLatLng.longitude)
-        secondPoint = LatLng(user.cityToLatLng.latitude, user.cityToLatLng.longitude)
-        firstPoint?.let { latLng -> (activity as OnFragmentInteractionListener).onSetPoint(latLng, FIRST_MARKER_POSITION) }
-        secondPoint?.let { latLng -> (activity as OnFragmentInteractionListener).onSetPoint(latLng, SECOND_MARKER_POSITION) }
+    private fun updatePoints(start: LatLng, end: LatLng, swap: Boolean = false) {
+        firstPoint = start
+        secondPoint = end
+        firstPoint?.let { latLng ->
+            (activity as OnFragmentInteractionListener).onSetPoint(latLng, FIRST_MARKER_POSITION, swap)
+        }
+        secondPoint?.let { latLng ->
+            (activity as OnFragmentInteractionListener).onSetPoint(latLng, SECOND_MARKER_POSITION, swap)
+        }
     }
 
     /*private fun openDateDialog() {

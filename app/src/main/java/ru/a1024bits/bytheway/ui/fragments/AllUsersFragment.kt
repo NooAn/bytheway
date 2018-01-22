@@ -197,8 +197,16 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
         saveParameters.setOnClickListener {
             analytics.logEvent(TAG_ANALYTICS + "CLICK_ON_SEARCH", null)
 
-            filter.startBudget = if (startBudget.text.isNotEmpty()) Integer.parseInt(startBudget.text.toString()) else -1
-            filter.endBudget = if (endBudget.text.isNotEmpty()) Integer.parseInt(endBudget.text.toString()) else -1
+            try {
+                filter.startBudget = if (startBudget.text.isNotEmpty()) Integer.parseInt(startBudget.text.toString()) else -1
+                filter.endBudget = if (endBudget.text.isNotEmpty()) Integer.parseInt(endBudget.text.toString()) else -1
+            } catch (e: Exception) {
+                e.printStackTrace()
+                filter.endBudget = -1
+                filter.startBudget = 0
+
+            }
+
             filter.startCity = startCity.text.toString()
             filter.endCity = endCity.text.toString()
 
