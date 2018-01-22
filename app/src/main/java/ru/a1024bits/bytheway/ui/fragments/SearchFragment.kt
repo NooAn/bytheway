@@ -200,36 +200,33 @@ class SearchFragment : Fragment() {
         }
     }
 
-    /*private fun openDateDialog() {
-        dateDialog.setStartTitle(getString(R.string.date_start))
-        dateDialog.setEndTitle(getString(R.string.date_end))
-        dateDialog.accentColor = resources.getColor(R.color.colorPrimary)
-        dateDialog.show(activity.fragmentManager, "")
-    }*/
-
     private fun openDateFromDialog() {
         dateDialog.setDateRange(MonthAdapter.CalendarDay(System.currentTimeMillis()), null)
         dateDialog.setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
-            textDateFrom.setText(StringBuilder(" ")
+            dateFromValue.text = StringBuilder(" ")
                     .append(dayOfMonth)
                     .append(" ")
                     .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
                     .append(" ")
-                    .append(year).toString())
+                    .append(year).toString()
             filter.startDate = getLongFromDate(dayOfMonth, monthOfYear, year)
         }
         dateDialog.show(activity.supportFragmentManager, "")
     }
 
     private fun openDateToDialog() {
-        dateDialog.setDateRange(MonthAdapter.CalendarDay(filter.startDate), null)
+        dateDialog.setDateRange(
+                MonthAdapter.CalendarDay(
+                        if (filter.startDate > 0L) filter.startDate
+                        else System.currentTimeMillis()),
+                null)
         dateDialog.setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
-            dateArrived.setText(StringBuilder(" ")
+            dateToValue.text = StringBuilder(" ")
                     .append(dayOfMonth)
                     .append(" ")
                     .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
                     .append(" ")
-                    .append(year).toString())
+                    .append(year).toString()
             filter.endDate = getLongFromDate(dayOfMonth, monthOfYear, year)
         }
         dateDialog.show(activity.supportFragmentManager, "")
