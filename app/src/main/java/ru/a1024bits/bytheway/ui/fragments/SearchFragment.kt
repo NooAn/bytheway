@@ -327,7 +327,6 @@ class SearchFragment : Fragment() {
                     filter.locationStartCity = place.latLng
                     text_from_city.error = null
                     manageErrorCityEquals(secondPoint)
-
                     firstPoint?.let { latLng -> (activity as OnFragmentInteractionListener).onSetPoint(latLng, FIRST_MARKER_POSITION) }
                 }
                 else -> {
