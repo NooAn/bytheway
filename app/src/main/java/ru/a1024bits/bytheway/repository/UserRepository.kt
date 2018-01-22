@@ -45,7 +45,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
 
     override fun getAllUsers(): Single<MutableList<User>> {
         Log.e("LOG get all users", Thread.currentThread().name)
-        return Single.create<MutableList<User>> {stream ->
+        return Single.create<MutableList<User>> { stream ->
             try {
                 store.collection(COLLECTION_USERS)
                         .get()
@@ -69,6 +69,8 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
             }
         }
     }
+
+    private val MIN_LIMIT = 1
 
     override fun getReallUsers(paramSearch: Filter): Single<List<User>> =
             Single.create<List<User>> { stream ->
@@ -94,7 +96,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                                         val search = SearchTravelers(filter = paramSearch, user = user)
                                         val s = search.getEstimation()
                                         user.percentsSimilarTravel = if (s > 100) 100 else s
-                                        result.add(user)
+                                        if (user.percentsSimilarTravel > MIN_LIMIT) result.add(user)
                                     }
                                 } catch (ex: Exception) {
                                     stream.onError(ex)
