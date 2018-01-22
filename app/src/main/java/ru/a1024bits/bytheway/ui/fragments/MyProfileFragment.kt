@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.support.annotation.LayoutRes
 import android.support.design.widget.NavigationView
-import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.text.Editable
@@ -20,8 +19,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
-import com.borax12.materialdaterangepicker.date.DatePickerDialog
 import com.bumptech.glide.request.RequestOptions
+import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment
+import com.codetroopers.betterpickers.calendardatepicker.MonthAdapter
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException
 import com.google.android.gms.common.GooglePlayServicesRepairableException
 import com.google.android.gms.location.places.AutocompleteFilter
@@ -67,7 +67,7 @@ import kotlin.collections.HashMap
 import ru.a1024bits.bytheway.model.Response as ResponseBtw
 
 
-class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback, DatePickerDialog.OnDateSetListener {
+class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback {
 
     companion object {
         const val BUDGET = "budget"
@@ -101,7 +101,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     private var cityToLatLng = GeoPoint(0.0, 0.0)
     private var lastName = ""
     private var city = ""
-    private lateinit var dateDialog: DatePickerDialog
+    private lateinit var dateDialog: CalendarDatePickerDialogFragment
     private var numberPhone: String = "+7"
     private var socialValues: HashMap<String, String> = hashMapOf(
             SocialNetwork.VK.link to "https://www.vk.com/",
@@ -489,12 +489,10 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
         val now = Calendar.getInstance()
 
-        dateDialog = DatePickerDialog.newInstance(
-                this@MyProfileFragment,
-                now.get(Calendar.YEAR),
-                now.get(Calendar.MONTH),
-                now.get(Calendar.DAY_OF_MONTH)
-        )
+        dateDialog = CalendarDatePickerDialogFragment()
+                .setFirstDayOfWeek(Calendar.MONDAY)
+                .setThemeCustom(R.style.BythewayDatePickerDialogTheme)
+                .setPreselectedDate(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH))
 
         headerprofile.setOnClickListener {
             openInformationEditDialog()
@@ -565,11 +563,11 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_save", null)
         }
         dateArrived.setOnClickListener {
-            openDateDialog()
+            openDateArrivedDialog()
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_date_to_click", null)
         }
         textDateFrom.setOnClickListener {
-            openDateDialog()
+            openDateFromDialog()
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_date_from_click", null)
         }
         addInfoUser.afterTextChanged({
@@ -617,7 +615,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         mapView?.onLowMemory()
     }
 
-    override fun onDateSet(view: DatePickerDialog?, year: Int, monthOfYear: Int, dayOfMonth: Int, yearEnd: Int, monthOfYearEnd: Int, dayOfMonthEnd: Int) {
+    /*override fun onDateSet(view: DatePickerDialog?, year: Int, monthOfYear: Int, dayOfMonth: Int, yearEnd: Int, monthOfYearEnd: Int, dayOfMonthEnd: Int) {
         Log.e("LOG Date", "$year  $monthOfYear $dayOfMonth - $yearEnd $monthOfYearEnd $dayOfMonthEnd")
         textDateFrom.setText(StringBuilder(" ")
                 .append(dayOfMonth)
@@ -648,7 +646,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         dates[START_DATE] = getLongFromDate(dayOfMonth, monthOfYear, year)
         profileStateHashMap[DATES] = dates.toString()
         profileChanged()
-    }
+    }*/
 
     private fun getLongFromDate(day: Int, month: Int, year: Int): Long {
         val dateString = "$day ${month + 1} $year"
@@ -684,11 +682,38 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         }
     }
 
-    private fun openDateDialog() {
-        dateDialog.setStartTitle(resources.getString(R.string.date_start))
-        dateDialog.setEndTitle(resources.getString(R.string.date_end))
-        dateDialog.accentColor = ContextCompat.getColor(context, R.color.colorPrimary)
-        dateDialog.show(activity.fragmentManager, "")
+    private fun openDateFromDialog() {
+        dateDialog.setDateRange(MonthAdapter.CalendarDay(System.currentTimeMillis()), null)
+        dateDialog.setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
+            textDateFrom.setText(StringBuilder(" ")
+                    .append(dayOfMonth)
+                    .append(" ")
+                    .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
+                    .append(" ")
+                    .append(year).toString())
+            dates[START_DATE] = getLongFromDate(dayOfMonth, monthOfYear, year)
+
+            profileStateHashMap[DATES] = dates.toString()
+            profileChanged()
+        }
+        dateDialog.show(activity.supportFragmentManager, "")
+    }
+
+    private fun openDateArrivedDialog() {
+        dateDialog.setDateRange(MonthAdapter.CalendarDay(dates[START_DATE] ?: System.currentTimeMillis()), null)
+        dateDialog.setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
+            dateArrived.setText(StringBuilder(" ")
+                    .append(dayOfMonth)
+                    .append(" ")
+                    .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
+                    .append(" ")
+                    .append(year).toString())
+            dates[END_DATE] = getLongFromDate(dayOfMonth, monthOfYear, year)
+
+            profileStateHashMap[DATES] = dates.toString()
+            profileChanged()
+        }
+        dateDialog.show(activity.supportFragmentManager, "")
     }
 
     private fun sendUserInfoToServer() {

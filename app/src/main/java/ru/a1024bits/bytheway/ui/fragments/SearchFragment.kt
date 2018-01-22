@@ -13,12 +13,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.Toast
-import com.borax12.materialdaterangepicker.date.DatePickerDialog
+import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment
+import com.codetroopers.betterpickers.calendardatepicker.MonthAdapter
 import com.google.android.gms.location.places.AutocompleteFilter
 import com.google.android.gms.location.places.ui.PlaceAutocomplete
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.android.synthetic.main.fragment_search_block.*
+import kotlinx.android.synthetic.main.profile_direction.*
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.Method
 import ru.a1024bits.bytheway.model.User
@@ -36,12 +38,12 @@ import java.util.*
 
 
 /**
- * Created by andrey.gusenkov on 29/09/2017.
+ * Created by andrey.gusenkov on 29/09/2017
  */
-class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
+class SearchFragment : Fragment() {
 
     private lateinit var mFirebaseAnalytics: FirebaseAnalytics
-    private lateinit var dateDialog: DatePickerDialog
+    private lateinit var dateDialog: CalendarDatePickerDialogFragment
     var firstPoint: LatLng? = null
     var secondPoint: LatLng? = null
     var user: User = User()
@@ -194,14 +196,42 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         secondPoint?.let { latLng -> (activity as OnFragmentInteractionListener).onSetPoint(latLng, SECOND_MARKER_POSITION) }
     }
 
-    private fun openDateDialog() {
+    /*private fun openDateDialog() {
         dateDialog.setStartTitle(getString(R.string.date_start))
         dateDialog.setEndTitle(getString(R.string.date_end))
         dateDialog.accentColor = resources.getColor(R.color.colorPrimary)
         dateDialog.show(activity.fragmentManager, "")
+    }*/
+
+    private fun openDateFromDialog() {
+        dateDialog.setDateRange(MonthAdapter.CalendarDay(System.currentTimeMillis()), null)
+        dateDialog.setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
+            textDateFrom.setText(StringBuilder(" ")
+                    .append(dayOfMonth)
+                    .append(" ")
+                    .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
+                    .append(" ")
+                    .append(year).toString())
+            filter.startDate = getLongFromDate(dayOfMonth, monthOfYear, year)
+        }
+        dateDialog.show(activity.supportFragmentManager, "")
     }
 
-    override fun onDateSet(view: DatePickerDialog?, year: Int, monthOfYear: Int, dayOfMonth: Int, yearEnd: Int, monthOfYearEnd: Int, dayOfMonthEnd: Int) {
+    private fun openDateToDialog() {
+        dateDialog.setDateRange(MonthAdapter.CalendarDay(filter.startDate), null)
+        dateDialog.setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
+            dateArrived.setText(StringBuilder(" ")
+                    .append(dayOfMonth)
+                    .append(" ")
+                    .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
+                    .append(" ")
+                    .append(year).toString())
+            filter.endDate = getLongFromDate(dayOfMonth, monthOfYear, year)
+        }
+        dateDialog.show(activity.supportFragmentManager, "")
+    }
+
+    /*override fun onDateSet(view: DatePickerDialog?, year: Int, monthOfYear: Int, dayOfMonth: Int, yearEnd: Int, monthOfYearEnd: Int, dayOfMonthEnd: Int) {
         try {
             dateFromValue.setText(StringBuilder(" ")
                     .append(dayOfMonth)
@@ -233,7 +263,7 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             filter.endDate = 0
             e.printStackTrace()
         }
-    }
+    }*/
 
     private fun getLongFromDate(day: Int, month: Int, year: Int): Long {
         val dateString = "$day $month $year"
@@ -247,20 +277,18 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         super.onStart()
         val now = Calendar.getInstance()
 
-        dateDialog = DatePickerDialog.newInstance(
-                this@SearchFragment,
-                now.get(Calendar.YEAR),
-                now.get(Calendar.MONTH),
-                now.get(Calendar.DAY_OF_MONTH)
-        )
+        dateDialog = CalendarDatePickerDialogFragment()
+                .setFirstDayOfWeek(Calendar.MONDAY)
+                .setThemeCustom(R.style.BythewayDatePickerDialogTheme)
+                .setPreselectedDate(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH))
 
         dateFromValue.setOnClickListener {
-            openDateDialog()
+            openDateFromDialog()
             mFirebaseAnalytics.logEvent("Search_fragment_str_date_dialog", null)
         }
 
         dateToValue.setOnClickListener {
-            openDateDialog()
+            openDateToDialog()
             mFirebaseAnalytics.logEvent("Search_fragment_end_date_dialog", null)
         }
     }
