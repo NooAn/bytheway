@@ -202,32 +202,37 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
     }
 
     override fun onDateSet(view: DatePickerDialog?, year: Int, monthOfYear: Int, dayOfMonth: Int, yearEnd: Int, monthOfYearEnd: Int, dayOfMonthEnd: Int) {
-        Log.e("LOG Date", "$year  $monthOfYear $dayOfMonth - $yearEnd $monthOfYearEnd $dayOfMonthEnd")
-        dateFromValue.setText(StringBuilder(" ")
-                .append(dayOfMonth)
-                .append(" ")
-                .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
-                .append(" ")
-                .append(year).toString())
-
-        if (getLongFromDate(dayOfMonth, monthOfYear, year) < getLongFromDate(dayOfMonthEnd, monthOfYearEnd, yearEnd)) {
-            dateToValue.setText(StringBuilder(" ")
-                    .append(dayOfMonthEnd)
-                    .append(" ")
-                    .append(context.resources.getStringArray(R.array.months_array)[monthOfYearEnd])
-                    .append(" ")
-                    .append(yearEnd).toString())
-            filter.endDate = getLongFromDate(dayOfMonthEnd, monthOfYearEnd, yearEnd)
-        } else {
-            Toast.makeText(context, R.string.date_error_set, Toast.LENGTH_SHORT).show()
-            dateToValue.setText(StringBuilder(" ")
+        try {
+            dateFromValue.setText(StringBuilder(" ")
                     .append(dayOfMonth)
                     .append(" ")
                     .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
                     .append(" ")
                     .append(year).toString())
+
+            if (getLongFromDate(dayOfMonth, monthOfYear, year) < getLongFromDate(dayOfMonthEnd, monthOfYearEnd, yearEnd)) {
+                dateToValue.setText(StringBuilder(" ")
+                        .append(dayOfMonthEnd)
+                        .append(" ")
+                        .append(context.resources.getStringArray(R.array.months_array)[monthOfYearEnd])
+                        .append(" ")
+                        .append(yearEnd).toString())
+                filter.endDate = getLongFromDate(dayOfMonthEnd, monthOfYearEnd, yearEnd)
+            } else {
+                Toast.makeText(context, R.string.date_error_set, Toast.LENGTH_SHORT).show()
+                dateToValue.setText(StringBuilder(" ")
+                        .append(dayOfMonth)
+                        .append(" ")
+                        .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
+                        .append(" ")
+                        .append(year).toString())
+            }
+            filter.startDate = getLongFromDate(dayOfMonth, monthOfYear, year)
+        } catch (e: Exception) {
+            filter.startDate = 0
+            filter.endDate = 0
+            e.printStackTrace()
         }
-        filter.startDate = getLongFromDate(dayOfMonth, monthOfYear, year)
     }
 
     private fun getLongFromDate(day: Int, month: Int, year: Int): Long {

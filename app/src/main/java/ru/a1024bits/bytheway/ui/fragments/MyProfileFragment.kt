@@ -47,6 +47,7 @@ import ru.a1024bits.bytheway.model.map_directions.RoutesList
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
+import ru.a1024bits.bytheway.ui.dialogs.SocialTipsDialog
 import ru.a1024bits.bytheway.util.Constants.END_DATE
 import ru.a1024bits.bytheway.util.Constants.FIRST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
@@ -102,7 +103,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     private var city = ""
     private lateinit var dateDialog: DatePickerDialog
     private var numberPhone: String = "+7"
-
     private var socialValues: HashMap<String, String> = hashMapOf(
             SocialNetwork.VK.link to "https://www.vk.com/",
             SocialNetwork.TG.link to "@",
@@ -868,10 +868,10 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
         simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.remove), { _, _ ->
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_remove_links", null)
-            viewModel?.saveLinks(socNet, uid, {
-                viewModel?.saveSocial?.setValue(SocialResponse(socialNetwork.link))
-            })
+            socNet.remove(socialNetwork.link)
+            viewModel?.saveLinks(socNet, uid, SocialResponse(socialNetwork.link))
         })
+
         simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.save), { _, _ ->
             val newLink = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString()
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_save_links", null)
@@ -885,12 +885,12 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             }
 
             if (!valid) {
-                openDialog(socialNetwork, errorText)
+                //openDialog(socialNetwork, errorText)
+                dialogView.findViewById<EditText>(R.id.socLinkText).error = errorText
             } else {
                 socNet[socialNetwork.link] = newLink
-                viewModel?.saveLinks(socNet, uid, {
-                    viewModel?.saveSocial?.setValue(SocialResponse(socialNetwork.link, newLink))
-                })
+                viewModel?.saveLinks(socNet, uid, SocialResponse(socialNetwork.link, newLink)
+                )
             }
         })
 
@@ -1021,13 +1021,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         name = user.name
         numberPhone = user.phone
 
-
-        user.socialNetwork.map {
-            if (it.key in socialValues) {
-                socialValues[it.key] = it.value
-            }
-        }
-
         travelledStatistics.visibility = if (user.flightHours == 0L) View.GONE else View.VISIBLE
 
         travelledCountries.text = user.countries.toString()
@@ -1088,7 +1081,15 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                 SocialNetwork.WHATSAPP.link -> whatsAppIcon.setImageResource(R.drawable.ic_whats_icon_color)
                 SocialNetwork.TG.link -> tgIcon.setImageResource(R.drawable.ic_tg_color)
             }
+            if (name.key in socialValues) {
+                socialValues[name.key] = name.value
+            }
         }
+
+        if (user.socialNetwork.size == 0 && user.countTrip > 0) {
+            showTipsForEmptySocialLink()
+        }
+
         methods.putAll(user.method)
         profileStateHashMap[METHODS] = methods.hashCode().toString()
 
@@ -1106,6 +1107,11 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         saveProfileState()
         addInfoUser.setText(user.addInformation)
         addInfoUser.clearFocus()
+    }
+
+    private fun showTipsForEmptySocialLink() {
+        val tips = SocialTipsDialog()
+        tips.show(fragmentManager, "Tips")
     }
 
     private fun removeTrip() {

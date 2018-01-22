@@ -26,13 +26,17 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
     var TAG = "LOG UserRepository"
 
     override fun getUser(id: String): Single<User> =
-            Single.create<User> { e ->
-                store.collection(COLLECTION_USERS).document(id).get().addOnSuccessListener({ document ->
-                    val user = document.toObject(User::class.java)
-                    e.onSuccess(user)
-                }).addOnFailureListener({ t ->
-                    e.onError(t)
-                })
+            Single.create<User> { stream ->
+                try {
+                    store.collection(COLLECTION_USERS).document(id).get().addOnSuccessListener({ document ->
+                        val user = document.toObject(User::class.java)
+                        stream.onSuccess(user)
+                    }).addOnFailureListener({ t ->
+                        stream.onError(t)
+                    })
+                } catch (e: Exception) {
+                    stream.onError(e)
+                }
             }
 
     override fun getSimilarUsersTravels(data: Filter, observer: Observer<List<User>>): Task<QuerySnapshot> {
@@ -41,64 +45,71 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
 
     override fun getAllUsers(): Single<MutableList<User>> {
         Log.e("LOG get all users", Thread.currentThread().name)
-        return Single.create<MutableList<User>> { e ->
-            val time = System.currentTimeMillis() / 1000
-            store.collection(COLLECTION_USERS)
-                    // .whereGreaterThanOrEqualTo("cities.first_city", 0)
-                    .get()
-                    .addOnCompleteListener({ task ->
-                        Log.e("LOG completeListener", Thread.currentThread().name)
-                        val result: MutableList<User> = arrayListOf()
-                        for (document in task.result) {
-                            try {
-                                val user = document.toObject(User::class.java)
-                                if (user.cities.size > 0 && user.id != FirebaseAuth.getInstance().currentUser?.uid) {
-                                    result.add(user)
+        return Single.create<MutableList<User>> {stream ->
+            try {
+                store.collection(COLLECTION_USERS)
+                        .get()
+                        .addOnCompleteListener({ task ->
+                            Log.e("LOG completeListener", Thread.currentThread().name)
+                            val result: MutableList<User> = arrayListOf()
+                            for (document in task.result) {
+                                try {
+                                    val user = document.toObject(User::class.java)
+                                    if (user.cities.size > 0 && user.id != FirebaseAuth.getInstance().currentUser?.uid) {
+                                        result.add(user)
+                                    }
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
                                 }
-                            } catch (e: Exception) {
-                                e.printStackTrace()
                             }
-                        }
-                        e.onSuccess(result)
-                    }).addOnFailureListener({ exception -> e.onError(exception) })
+                            stream.onSuccess(result)
+                        }).addOnFailureListener({ exception -> stream.onError(exception) })
+            } catch (exp: Exception) {
+                stream.onError(exp) // for fix bugs FirebaseFirestoreException: DEADLINE_EXCEEDED
+            }
         }
     }
 
     override fun getReallUsers(paramSearch: Filter): Single<List<User>> =
             Single.create<List<User>> { stream ->
-                store.collection(COLLECTION_USERS).get().addOnCompleteListener({ task ->
-                    if (task.isSuccessful) {
-                        Log.e("LOG get all users", Thread.currentThread().name)
+                try {
+                    store.collection(COLLECTION_USERS).get().addOnCompleteListener({ task ->
+                        if (task.isSuccessful) {
+                            Log.e("LOG get all users", Thread.currentThread().name)
 
-                        val result: MutableList<User> = ArrayList()
-                        for (document in task.result) {
-                            Log.d(TAG, document.id + " => " + document.data)
+                            val result: MutableList<User> = ArrayList()
+                            for (document in task.result) {
+                                Log.d(TAG, document.id + " => " + document.data)
 
-                            var user = User()
-                            try {
-                                user = document.toObject(User::class.java)
-                            } catch (ex2: Exception) {
-                                Log.e(TAG, "Error!: " + document.id + " => " + document.data, ex2)
-                                ex2.printStackTrace()
-                            }
-                            try {
-                                if (user.cities.size > 0) {
-                                    // run search algorithm
-                                    val search = SearchTravelers(filter = paramSearch, user = user)
-                                    val s = search.getEstimation()
-                                    user.percentsSimilarTravel = if (s > 100) 100 else s
-                                    result.add(user)
+                                var user = User()
+                                try {
+                                    user = document.toObject(User::class.java)
+                                } catch (ex2: Exception) {
+                                    Log.e(TAG, "Error!: " + document.id + " => " + document.data, ex2)
+                                    ex2.printStackTrace()
                                 }
-                            } catch (ex: Exception) {
-                                stream.onError(ex)
+                                try {
+                                    if (user.cities.size > 0) {
+                                        // run search algorithm
+                                        val search = SearchTravelers(filter = paramSearch, user = user)
+                                        val s = search.getEstimation()
+                                        user.percentsSimilarTravel = if (s > 100) 100 else s
+                                        result.add(user)
+                                    }
+                                } catch (ex: Exception) {
+                                    stream.onError(ex)
+                                }
                             }
+                            result.sortByDescending { it.percentsSimilarTravel } // перед отправкой сортируем по степени похожести маршрута.
+                            stream.onSuccess(result)
+                        } else {
+                            stream.onError(Exception("Not Successful load users"))
                         }
-                        result.sortByDescending { it.percentsSimilarTravel } // перед отправкой сортируем по степени похожести маршрута.
-                        stream.onSuccess(result)
-                    } else {
-                        stream.onError(Exception("Not Successful load users"))
-                    }
-                })
+                    })
+                } catch (exp: Exception) {
+                    stream.onError(exp) // for fix bugs FirebaseFirestoreException: DEADLINE_EXCEEDED
+                }
+
             }
 
     override fun getUserById(userID: String): Task<DocumentSnapshot> {
@@ -113,19 +124,23 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
     override fun changeUserProfile(map: HashMap<String, Any>, id: String): Completable =
             Completable.create { stream ->
                 Log.d("LOG", "change user profile send....")
-                val documentRef = store.collection(COLLECTION_USERS).document(id)
-                store.runTransaction(object : Transaction.Function<Void> {
-                    override fun apply(transaction: Transaction): Void? {
-                        map.put("timestamp", FieldValue.serverTimestamp())
-                        documentRef.update(map)
-                        return null
-                    }
-                }).addOnCompleteListener {
-                    Log.e("LOG", "finish update user profile")
-                }.addOnFailureListener {
-                    stream.onError(it)
-                }.addOnSuccessListener { _ ->
-                    stream.onComplete()
+                try {
+                    val documentRef = store.collection(COLLECTION_USERS).document(id)
+                    store.runTransaction(object : Transaction.Function<Void> {
+                        override fun apply(transaction: Transaction): Void? {
+                            map.put("timestamp", FieldValue.serverTimestamp())
+                            documentRef.update(map)
+                            return null
+                        }
+                    }).addOnCompleteListener {
+                        Log.e("LOG", "finish update user profile")
+                    }.addOnFailureListener {
+                                stream.onError(it)
+                            }.addOnSuccessListener { _ ->
+                                stream.onComplete()
+                            }
+                } catch (e: Exception) {
+                    stream.onError(e)
                 }
             }
 

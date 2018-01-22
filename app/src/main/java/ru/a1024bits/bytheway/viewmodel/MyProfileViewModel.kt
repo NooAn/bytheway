@@ -51,17 +51,19 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
         )
     }
 
-    fun saveLinks(arraySocNetwork: HashMap<String, String>, id: String, onSuccess: () -> Unit = {}) {
+    fun saveLinks(arraySocNetwork: HashMap<String, String>, id: String, link: SocialResponse) {
         val map: HashMap<String, Any> = hashMapOf()
-        map.put("socialNetwork", arraySocNetwork) // fixme
+        map.put("socialNetwork", arraySocNetwork)
         disposables.add(userRepository.changeUserProfile(map, id)
                 .subscribeOn(getBackgroundScheduler())
                 .observeOn(getMainThreadScheduler())
                 .doOnSubscribe({ _ -> loadingStatus.setValue(true) })
                 .doAfterTerminate({ loadingStatus.setValue(false) })
-                .subscribe(onSuccess, { throwable ->
-                    response.setValue(Response.error(throwable))
-                }))
+                .subscribe(
+                        { saveSocial.setValue(link) },
+                        { throwable ->
+                            response.setValue(Response.error(throwable))
+                        }))
     }
 
     fun sendUserData(map: HashMap<String, Any>, id: String, oldUser: User?) {
