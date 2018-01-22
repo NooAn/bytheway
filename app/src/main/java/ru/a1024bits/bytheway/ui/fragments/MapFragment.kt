@@ -225,7 +225,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             }
         }
 
-        if (activity != null && (activity as MenuActivity).preferences.getBoolean("isFirstEnterMapFragment", true))
+        if (activity != null && (activity as MenuActivity).preferences.getBoolean("isFirstEnterMapFragment", true)) {
             showView = MaterialShowcaseView.Builder(activity)
                     .setTarget(buttonSaveTravelInfo)
                     .renderOverNavigationBar()
@@ -235,23 +235,27 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     .withCircleShape()
                     .setListener(object : IShowcaseListener {
                         override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {
+                            show = true
                             try {
                                 val mHandler = Handler()
                                 val time = 10000L // 10 sec after we can hide tips
-                                mHandler.postDelayed({ showView?.hide() }, time)
+                                mHandler.postDelayed({ if (show) showView?.hide() }, time)
                             } catch (e: Exception) {
                                 e.printStackTrace()
                             }
                         }
 
                         override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
-                            if (activity != null && !activity.isDestroyed)
+                            if (activity != null && !activity.isDestroyed) {
                                 (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterMapFragment", false).apply()
+                                show = false;
+                            }
                         }
                     })
                     .show()
+        }
     }
-
+    var show = false;
     private fun openDialogSave() {
         val dialog = TravelSearchSaveDialog(this)
         dialog.show()

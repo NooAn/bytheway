@@ -20,7 +20,6 @@ import com.google.android.gms.location.places.ui.PlaceAutocomplete
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.android.synthetic.main.fragment_search_block.*
-import kotlinx.android.synthetic.main.profile_direction.*
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.Method
 import ru.a1024bits.bytheway.model.User
@@ -210,7 +209,7 @@ class SearchFragment : Fragment() {
     private fun openDateFromDialog() {
         dateDialog.setDateRange(MonthAdapter.CalendarDay(System.currentTimeMillis()), null)
         dateDialog.setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
-            textDateFrom.setText(StringBuilder(" ")
+            dateFromValue.setText(StringBuilder(" ")
                     .append(dayOfMonth)
                     .append(" ")
                     .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
@@ -224,7 +223,7 @@ class SearchFragment : Fragment() {
     private fun openDateToDialog() {
         dateDialog.setDateRange(MonthAdapter.CalendarDay(filter.startDate), null)
         dateDialog.setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
-            dateArrived.setText(StringBuilder(" ")
+            dateToValue.setText(StringBuilder(" ")
                     .append(dayOfMonth)
                     .append(" ")
                     .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
