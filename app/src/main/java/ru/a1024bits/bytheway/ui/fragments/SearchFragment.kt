@@ -324,7 +324,7 @@ class SearchFragment : Fragment() {
                     text_from_city.text = place.name
                     firstPoint = place.latLng
                     filter.startCity = place.name.toString()
-                    filter.locationEndCity = place.latLng
+                    filter.locationStartCity = place.latLng
                     text_from_city.error = null
                     manageErrorCityEquals(secondPoint)
 
@@ -344,7 +344,7 @@ class SearchFragment : Fragment() {
                     val place = PlaceAutocomplete.getPlace(activity, data);
                     text_to_city.text = place.name
                     secondPoint = place.latLng
-                    filter.locationStartCity = place.latLng
+                    filter.locationEndCity = place.latLng
                     filter.endCity = place.name.toString()
                     text_to_city.error = null
                     manageErrorCityEquals(firstPoint)
