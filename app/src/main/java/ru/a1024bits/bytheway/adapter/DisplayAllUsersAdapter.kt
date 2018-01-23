@@ -34,8 +34,7 @@ class DisplayAllUsersAdapter(val context: Context, val viewModel: DisplayUsersVi
         holder?.name?.text = currentUser.name
         holder?.dates?.text = if (currentUser.dates["start_date"] != null && currentUser.dates["end_date"] != null)
             viewModel.getTextFromDates(currentUser.dates["start_date"], currentUser.dates["end_date"])
-        else
-            context.getString(R.string.item_all_users_empty_date)
+        else ""
         if (currentUser.age >= 0)
             holder?.age?.text = if (currentUser.age > 0) StringBuilder(", ").append(currentUser.age.toString()) else ""
         holder?.cities?.text = if (currentUser.cities["first_city"] != null && currentUser.cities["last_city"] != null)
