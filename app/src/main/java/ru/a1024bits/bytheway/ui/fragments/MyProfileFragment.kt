@@ -56,6 +56,7 @@ import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT
 import ru.a1024bits.bytheway.util.Constants.START_DATE
 import ru.a1024bits.bytheway.util.DecimalInputFilter
 import ru.a1024bits.bytheway.util.getBearing
+import ru.a1024bits.bytheway.util.getLongFromDate
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import ru.terrakok.cicerone.commands.Replace
 import uk.co.deanwild.materialshowcaseview.IShowcaseListener
@@ -615,45 +616,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         mapView?.onLowMemory()
     }
 
-    /*override fun onDateSet(view: DatePickerDialog?, year: Int, monthOfYear: Int, dayOfMonth: Int, yearEnd: Int, monthOfYearEnd: Int, dayOfMonthEnd: Int) {
-        Log.e("LOG Date", "$year  $monthOfYear $dayOfMonth - $yearEnd $monthOfYearEnd $dayOfMonthEnd")
-        textDateFrom.setText(StringBuilder(" ")
-                .append(dayOfMonth)
-                .append(" ")
-                .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
-                .append(" ")
-                .append(year).toString())
 
-
-        if (getLongFromDate(dayOfMonth, monthOfYear, year) < getLongFromDate(dayOfMonthEnd, monthOfYearEnd, yearEnd)) {
-            dateArrived.setText(StringBuilder(" ")
-                    .append(dayOfMonthEnd)
-                    .append(" ")
-                    .append(context.resources.getStringArray(R.array.months_array)[monthOfYearEnd])
-                    .append(" ")
-                    .append(yearEnd).toString())
-            dates[END_DATE] = getLongFromDate(dayOfMonthEnd, monthOfYearEnd, yearEnd)
-        } else {
-            Toast.makeText(context, R.string.date_error_set, Toast.LENGTH_SHORT).show()
-            dateArrived.setText(StringBuilder(" ")
-                    .append(dayOfMonth)
-                    .append(" ")
-                    .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
-                    .append(" ")
-                    .append(year).toString())
-        }
-
-        dates[START_DATE] = getLongFromDate(dayOfMonth, monthOfYear, year)
-        profileStateHashMap[DATES] = dates.toString()
-        profileChanged()
-    }*/
-
-    private fun getLongFromDate(day: Int, month: Int, year: Int): Long {
-        val dateString = "$day ${month + 1} $year"
-        val dateFormat = SimpleDateFormat("dd MM yyyy", Locale.US)
-        val date = dateFormat.parse(dateString)
-        return date.time
-    }
 
     private fun TextView.afterTextChanged(afterTextChanged: (String) -> Unit) {
         this.addTextChangedListener(object : TextWatcher {
