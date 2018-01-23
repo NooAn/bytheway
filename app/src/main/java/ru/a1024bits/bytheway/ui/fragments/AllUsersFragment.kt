@@ -92,7 +92,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             viewModel?.response?.observe(this, usersObservers)
             viewModel?.loadingStatus?.observe(this, (activity?.let { it as MenuActivity })?.progressBarLoad
                     ?: return)
-            //  loadingWhereLoadUsers.visibility = View.VISIBLE
+            //loadingWhereLoadUsers.visibility = View.VISIBLE
             viewModel?.getAllUsers(filter)
 
             showPrompt("isFirstEnterAllUsersFragment", context.resources.getString(R.string.close_hint),
