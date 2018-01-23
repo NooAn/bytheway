@@ -1000,7 +1000,9 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         methodTextViews.values.map {
             it?.isActivated = false
         }
-
+        methodIcons.values.map {
+            it?.isActivated = false
+        }
         appinTheAirEnter.visibility = View.GONE
         layoutTravelMethod.visibility = View.GONE
         moneyfortrip.visibility = View.GONE
