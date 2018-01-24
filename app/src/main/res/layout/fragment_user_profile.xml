@@ -289,9 +289,9 @@
                     android:id="@+id/directions_car"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="6dp"
-                    android:layout_marginStart="6dp"
-                    android:src="@drawable/ic_directions_car"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="10dp"
+                    android:src="@drawable/ic_car_activated"
                     android:visibility="gone"
                     tools:ignore="ContentDescription" />
 
@@ -299,9 +299,9 @@
                     android:id="@+id/directions_railway"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="6dp"
-                    android:layout_marginStart="6dp"
-                    android:src="@drawable/ic_directions_railway"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="10dp"
+                    android:src="@drawable/ic_train_activated"
                     android:visibility="gone"
                     tools:ignore="ContentDescription"
                     tools:visibility="visible" />
@@ -310,29 +310,29 @@
                     android:id="@+id/directions_bus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="6dp"
-                    android:layout_marginStart="6dp"
-                    android:src="@drawable/ic_directions_bus"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="10dp"
+                    android:src="@drawable/ic_bus_activated"
                     android:visibility="gone"
                     tools:ignore="ContentDescription" />
 
                 <ImageView
                     android:id="@+id/directions_flight"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginEnd="6dp"
-                    android:layout_marginStart="6dp"
-                    android:src="@drawable/ic_flight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="10dp"
+                    android:src="@drawable/ic_plane_activated"
                     android:visibility="gone"
                     tools:ignore="ContentDescription" />
 
                 <ImageView
                     android:id="@+id/direction_hitchiking"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginEnd="6dp"
-                    android:layout_marginStart="6dp"
-                    android:src="@drawable/ic_directions_hitchhiking"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="10dp"
+                    android:src="@drawable/ic_hitch_hiking_activated"
                     android:visibility="gone"
                     tools:ignore="ContentDescription" />
 

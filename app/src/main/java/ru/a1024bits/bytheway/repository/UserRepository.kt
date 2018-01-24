@@ -96,7 +96,10 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                                         val search = SearchTravelers(filter = paramSearch, user = user)
                                         val s = search.getEstimation()
                                         user.percentsSimilarTravel = if (s > 100) 100 else s
-                                        if (user.percentsSimilarTravel > MIN_LIMIT) result.add(user)
+                                        if (user.percentsSimilarTravel > MIN_LIMIT &&
+                                                user.id != FirebaseAuth.getInstance().currentUser?.uid)  {
+                                            result.add(user)
+                                        }
                                     }
                                 } catch (ex: Exception) {
                                     stream.onError(ex)
