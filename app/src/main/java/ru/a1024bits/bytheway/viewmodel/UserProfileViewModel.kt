@@ -16,9 +16,9 @@ class UserProfileViewModel @Inject constructor(var userRepository: UserRepositor
     fun load(uid: String) {
         disposables.add(userRepository.getUser(uid)
                 .subscribeOn(getBackgroundScheduler())
-                .observeOn(getMainThreadScheduler())
                 .doOnSubscribe({ _ -> loadingStatus.setValue(true) })
                 .doAfterTerminate({ loadingStatus.setValue(false) })
+                .observeOn(getMainThreadScheduler())
                 .subscribe(
                         { newUser -> response.setValue(Response.success(newUser)) },
                         { throwable -> response.setValue(Response.error(throwable)) }

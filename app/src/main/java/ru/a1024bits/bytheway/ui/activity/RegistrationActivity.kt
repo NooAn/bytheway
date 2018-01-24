@@ -152,6 +152,12 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
                         updateUI(false)
                     }
                 }
+                ?.addOnFailureListener {
+                    Log.w("LOG", "signInWithCredential:failure")
+                    Toast.makeText(this, "Authentication failed.",
+                            Toast.LENGTH_SHORT).show()
+                    mFirebaseAnalytics.logEvent("RegistrationScreen_Error_Login", null)
+                }
     }
 
     private fun updateUI(signedIn: Boolean) {

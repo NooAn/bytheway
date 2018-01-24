@@ -41,9 +41,9 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
     fun load(userId: String) {
         disposables.add(userRepository.getUser(userId)
                 .subscribeOn(getBackgroundScheduler())
-                .observeOn(getMainThreadScheduler())
                 .doOnSubscribe({ _ -> loadingStatus.setValue(true) })
                 .doAfterTerminate({ loadingStatus.setValue(false) })
+                .observeOn(getMainThreadScheduler())
                 .subscribe(
                         { user -> response.setValue(Response.success(user)) },
                         { throwable -> response.setValue(Response.error(throwable)) }
@@ -56,9 +56,9 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
         map.put("socialNetwork", arraySocNetwork)
         disposables.add(userRepository.changeUserProfile(map, id)
                 .subscribeOn(getBackgroundScheduler())
-                .observeOn(getMainThreadScheduler())
                 .doOnSubscribe({ _ -> loadingStatus.setValue(true) })
                 .doAfterTerminate({ loadingStatus.setValue(false) })
+                .observeOn(getMainThreadScheduler())
                 .subscribe(
                         { saveSocial.setValue(link) },
                         { throwable ->
@@ -70,9 +70,9 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
         Log.e("LOG map: id = ", id + " " + map.toString())
         disposables.add(userRepository.changeUserProfile(map, id)
                 .subscribeOn(getBackgroundScheduler())
-                .observeOn(getMainThreadScheduler())
                 .doOnSubscribe({ _ -> loadingStatus.setValue(true) })
                 .doAfterTerminate({ loadingStatus.setValue(false) })
+                .observeOn(getMainThreadScheduler())
                 .subscribe({
                     saveProfile.setValue(Response.success(true))
                     user.value = makeUserFromMap(map, oldUser)

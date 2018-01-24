@@ -251,7 +251,6 @@ class SearchFragment : Fragment() {
     }
 
 
-
     override fun onStart() {
         super.onStart()
         val now = Calendar.getInstance()
