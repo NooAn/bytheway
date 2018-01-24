@@ -43,7 +43,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                 } catch (e: Exception) {
                     stream.onError(e)
                 }
-            }.timeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            }
 
     override fun getSimilarUsersTravels(data: Filter, observer: Observer<List<User>>): Task<QuerySnapshot> {
         return store.collection(COLLECTION_USERS).get()

@@ -6,6 +6,7 @@ import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import java.util.concurrent.TimeUnit
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.util.Constants
 
@@ -15,7 +16,10 @@ import ru.a1024bits.bytheway.util.Constants
 open class BaseViewModel : ViewModel(), LifecycleObserver {
     val disposables = CompositeDisposable()
     val loadingStatus = MutableLiveData<Boolean>()
-
+    val timeoutUnit = TimeUnit.SECONDS
+    companion object {
+        const val TIMEOUT_SECONDS = 2L
+    }
     fun addObserver(lifecycle: Lifecycle) {
         lifecycle.addObserver(this)
     }

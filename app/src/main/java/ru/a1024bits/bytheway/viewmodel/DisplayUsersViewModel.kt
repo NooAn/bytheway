@@ -9,7 +9,6 @@ import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.repository.MAX_AGE
 import ru.a1024bits.bytheway.repository.UserRepository
-import ru.a1024bits.bytheway.ui.fragments.AllUsersFragment
 import java.util.*
 import javax.inject.Inject
 
@@ -21,10 +20,14 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
     var yearsOldUsers = (0..MAX_AGE).mapTo(ArrayList<String>()) { it.toString() }
     val filter = Filter()
 
-    val TAG = "showUserViewModel"
+    companion object {
+        const val TAG = "showUserViewModel"
+    }
 
     fun getAllUsers(filter: Filter) {
         disposables.add(userRepository.getAllUsers()
+                .timeout(TIMEOUT_SECONDS, timeoutUnit)
+                .retry(2)
                 .subscribeOn(getBackgroundScheduler())
                 .doOnSubscribe({ loadingStatus.postValue(true) })
                 .doAfterTerminate({ loadingStatus.postValue(false) })
@@ -43,6 +46,8 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
     fun sendUserData(map: HashMap<String, Any>, id: String) {
         loadingStatus.setValue(true)
         disposables.add(userRepository.changeUserProfile(map, id)
+                .timeout(TIMEOUT_SECONDS, timeoutUnit)
+                .retry(2)
                 .doAfterTerminate({ loadingStatus.setValue(false) })
                 .subscribe(
                         { Log.e("LOG", "complete") },
@@ -56,6 +61,8 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
     fun getUsersWithSimilarTravel(paramSearch: Filter) {
         loadingStatus.setValue(true)
         disposables.add(userRepository.getReallUsers(paramSearch)
+                .timeout(TIMEOUT_SECONDS, timeoutUnit)
+                .retry(2)
                 .subscribeOn(getBackgroundScheduler())
                 .observeOn(getMainThreadScheduler())
                 .doAfterTerminate({ loadingStatus.setValue(false) })
