@@ -18,7 +18,7 @@ open class BaseViewModel : ViewModel(), LifecycleObserver {
     val loadingStatus = MutableLiveData<Boolean>()
     val timeoutUnit = TimeUnit.SECONDS
     companion object {
-        const val TIMEOUT_SECONDS = 2L
+        const val TIMEOUT_SECONDS = 30L
     }
     fun addObserver(lifecycle: Lifecycle) {
         lifecycle.addObserver(this)
