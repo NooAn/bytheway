@@ -13,7 +13,6 @@ import ru.a1024bits.bytheway.algorithm.SearchTravelers
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.util.toJsonString
 import java.util.*
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 
@@ -24,10 +23,8 @@ const val COLLECTION_USERS = "users"
  */
 class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapService: MapWebService) : IUsersRepository {
 
-    var TAG = "LOG UserRepository"
-
     companion object {
-        const val TIMEOUT_SECONDS = 30L
+        const val TAG = "LOG UserRepository"
         const val MIN_LIMIT = 1
     }
 
@@ -73,7 +70,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
             } catch (exp: Exception) {
                 stream.onError(exp) // for fix bugs FirebaseFirestoreException: DEADLINE_EXCEEDED
             }
-        }.timeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+        }
     }
 
     override fun getReallUsers(paramSearch: Filter): Single<List<User>> =
@@ -119,7 +116,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                     stream.onError(exp) // for fix bugs FirebaseFirestoreException: DEADLINE_EXCEEDED
                 }
 
-            }.timeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            }
 
     override fun getUserById(userID: String): Task<DocumentSnapshot> {
         return store.collection(COLLECTION_USERS).document(userID).get()
@@ -151,7 +148,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                 } catch (e: Exception) {
                     stream.onError(e)
                 }
-            }.timeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            }
 
     override fun getRoute(cityFromLatLng: GeoPoint, cityToLatLng: GeoPoint) =
             mapService.getDirection(hashMapOf(
