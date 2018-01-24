@@ -43,9 +43,9 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                 .timeout(TIMEOUT_SECONDS, timeoutUnit)
                 .retry(2)
                 .subscribeOn(getBackgroundScheduler())
-                .observeOn(getMainThreadScheduler())
                 .doOnSubscribe({ _ -> loadingStatus.setValue(true) })
                 .doAfterTerminate({ loadingStatus.setValue(false) })
+                .observeOn(getMainThreadScheduler())
                 .subscribe(
                         { user -> response.setValue(Response.success(user)) },
                         { throwable -> response.setValue(Response.error(throwable)) }
@@ -60,9 +60,9 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                 .timeout(TIMEOUT_SECONDS, timeoutUnit)
                 .retry(2)
                 .subscribeOn(getBackgroundScheduler())
-                .observeOn(getMainThreadScheduler())
                 .doOnSubscribe({ _ -> loadingStatus.setValue(true) })
                 .doAfterTerminate({ loadingStatus.setValue(false) })
+                .observeOn(getMainThreadScheduler())
                 .subscribe(
                         { saveSocial.setValue(link) },
                         { throwable ->
@@ -76,9 +76,9 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                 .timeout(TIMEOUT_SECONDS, timeoutUnit)
                 .retry(2)
                 .subscribeOn(getBackgroundScheduler())
-                .observeOn(getMainThreadScheduler())
                 .doOnSubscribe({ _ -> loadingStatus.setValue(true) })
                 .doAfterTerminate({ loadingStatus.setValue(false) })
+                .observeOn(getMainThreadScheduler())
                 .subscribe({
                     saveProfile.setValue(Response.success(true))
                     user.value = makeUserFromMap(map, oldUser)
