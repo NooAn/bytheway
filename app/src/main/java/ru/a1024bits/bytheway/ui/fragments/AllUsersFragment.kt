@@ -61,7 +61,6 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
                 showErrorLoading()
             }
         }
-
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

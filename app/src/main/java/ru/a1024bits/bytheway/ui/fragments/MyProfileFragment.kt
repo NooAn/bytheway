@@ -33,6 +33,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.GeoPoint
 import com.google.maps.android.PolyUtil
 import kotlinx.android.synthetic.main.confirm_dialog.view.*
@@ -297,6 +298,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             showView?.hide()
         } catch (e: Exception) {
             e.printStackTrace()
+            FirebaseCrash.report(e)
         }
     }
 
@@ -617,7 +619,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     }
 
 
-
     private fun TextView.afterTextChanged(afterTextChanged: (String) -> Unit) {
         this.addTextChangedListener(object : TextWatcher {
 
@@ -647,7 +648,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     private fun openDateFromDialog() {
         val dateFrom = Calendar.getInstance() //current time by default
-        if(dates[START_DATE]?:0L > 0L) dateFrom.timeInMillis = dates[START_DATE]?: dateFrom.timeInMillis
+        if (dates[START_DATE] ?: 0L > 0L) dateFrom.timeInMillis = dates[START_DATE] ?: dateFrom.timeInMillis
 
         dateDialog = CalendarDatePickerDialogFragment()
                 .setFirstDayOfWeek(Calendar.MONDAY)
@@ -672,14 +673,15 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     private fun openDateArrivedDialog() {
         val dateTo = Calendar.getInstance() //current time by default
-        if(dates[END_DATE]?:0L > 0L) dateTo.timeInMillis = dates[END_DATE]?: dateTo.timeInMillis
+        if (dates[END_DATE] ?: 0L > 0L) dateTo.timeInMillis = dates[END_DATE] ?: dateTo.timeInMillis
 
         dateDialog = CalendarDatePickerDialogFragment()
                 .setFirstDayOfWeek(Calendar.MONDAY)
                 .setThemeCustom(R.style.BythewayDatePickerDialogTheme)
                 .setPreselectedDate(dateTo.get(Calendar.YEAR), dateTo.get(Calendar.MONTH), dateTo.get(Calendar.DAY_OF_MONTH))
 
-        dateDialog.setDateRange(MonthAdapter.CalendarDay(dates[START_DATE] ?: System.currentTimeMillis()), null)
+        dateDialog.setDateRange(MonthAdapter.CalendarDay(dates[START_DATE]
+                ?: System.currentTimeMillis()), null)
         dateDialog.setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
             dateArrived.setText(StringBuilder(" ")
                     .append(dayOfMonth)
@@ -792,7 +794,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             name = (nameChoose.text.toString()).capitalize()
             lastName = (lastNameChoose.text.toString()).capitalize()
             city = (cityChoose.text.toString()).capitalize()
-            age = (yearsView.text.toString()).toInt()
+            age = (yearsView.text.toStringOrNill()).toInt()
 
             username.text = StringBuilder(name).append(" ").append(lastName)
             cityview.text = if (city.isNotEmpty()) city else getString(R.string.native_city)
@@ -1185,3 +1187,5 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         viewModel?.getRoute(cityFromLatLng = cityFromLatLng, cityToLatLng = cityToLatLng)
     }
 }
+
+private fun Editable.toStringOrNill(): String = if (this.toString().isBlank()) "0" else this.toString()
