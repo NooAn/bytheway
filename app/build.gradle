@@ -57,6 +57,9 @@ android {
     kapt {
         generateStubs = true
     }
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
 }
 ext {
     rx_lifecycle = '2.1.0'
