@@ -69,9 +69,6 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
         analytics = FirebaseAnalytics.getInstance(this.context)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-            inflater.inflate(R.layout.fragment_display_all_users, container, false)
-
     private fun showErrorLoading() {
     }
 

@@ -224,7 +224,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(context)
 
         methodIcons.put(Method.CAR.link, iconCar)
         methodIcons.put(Method.TRAIN.link, iconTrain)
@@ -255,52 +254,55 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     @LayoutRes
     override fun getLayoutRes(): Int {
-        return R.layout.fragment_user_profile
+        return R.layout.fragment_my_user_profile
     }
 
     override fun getViewModelClass(): Class<MyProfileViewModel> = MyProfileViewModel::class.java
 
-    var showView: MaterialShowcaseView? = null
+//    var showView: MaterialShowcaseView? = null
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if ((activity as MenuActivity).preferences.getBoolean("isFirstEnterMyProfileFragment", true)) {
-            showView = MaterialShowcaseView.Builder(activity)
-                    .setTarget(newTripText)
-                    .renderOverNavigationBar()
-                    .setDismissText(getString(R.string.close_hint))
-                    .setTitleText(getString(R.string.hint_create_travel))
-                    .setContentText(getString(R.string.hint_create_travel_description))
-                    .withCircleShape()
-                    .setListener(object : IShowcaseListener {
-                        override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {
-                            val mHandler = Handler()
-                            val time = 10000L // 10 sec after we can hide tips
-                            try {
-                                mHandler.postDelayed({ hide() }, time)
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                            }
-                        }
+        showPrompt("isFirstEnterMyProfileFragment", context.resources.getString(R.string.close_hint),
+                getString(R.string.hint_create_travel), getString(R.string.hint_create_travel_description))
 
-                        override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
-                            if (activity != null && !activity.isDestroyed) {
-                                (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterMyProfileFragment", false).apply()
-                            }
-                        }
-                    }).build()
-            showView?.show(activity)
-        }
+//        if ((activity as MenuActivity).preferences.getBoolean("isFirstEnterMyProfileFragment", true)) {
+//            showView = MaterialShowcaseView.Builder(activity)
+//                    .setTarget(newTripText)
+//                    .renderOverNavigationBar()
+//                    .setDismissText(getString(R.string.close_hint))
+//                    .setTitleText(getString(R.string.hint_create_travel))
+//                    .setContentText(getString(R.string.hint_create_travel_description))
+//                    .withCircleShape()
+//                    .setListener(object : IShowcaseListener {
+//                        override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {
+//                            val mHandler = Handler()
+//                            val time = 10000L // 10 sec after we can hide tips
+//                            try {
+//                                mHandler.postDelayed({ hide() }, time)
+//                            } catch (e: Exception) {
+//                                e.printStackTrace()
+//                            }
+//                        }
+//
+//                        override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
+//                            if (activity != null && !activity.isDestroyed) {
+//                                (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterMyProfileFragment", false).apply()
+//                            }
+//                        }
+//                    }).build()
+//            showView?.show(activity)
+        //       }
     }
 
-    private fun hide() {
-        try {
-            showView?.hide()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            FirebaseCrash.report(e)
-        }
-    }
+//    private fun hide() {
+//        try {
+//            showView?.hide()
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//            FirebaseCrash.report(e)
+//        }
+//    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -454,7 +456,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater?.inflate(R.layout.fragment_my_user_profile, container, false)
+        val view = super.onCreateView(inflater, container, savedInstanceState)
         mapView = view?.findViewById(R.id.mapView)
 
         try {
@@ -1013,13 +1015,11 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     }
 
     private fun fillProfile(user: User) {
-        val navigationView = activity.findViewById<NavigationView>(R.id.nav_view)
-        val hView = navigationView.getHeaderView(0)
-        val cityName = hView.findViewById<TextView>(R.id.menu_city_name)
-        cityName.text = user.city
-        val fullName = hView.findViewById<TextView>(R.id.menu_fullname)
-        fullName.text = StringBuilder().append(user.name).append(" ").append(user.lastName)
-        username.text = StringBuilder(user.name).append(" ").append(user.lastName)
+        glide?.load(user.urlPhoto)
+                ?.apply(RequestOptions.circleCropTransform())
+                ?.into(image_avatar)
+
+
 
         cityFromLatLng = user.cityFromLatLng
         cityToLatLng = user.cityToLatLng
@@ -1076,9 +1076,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
         age = user.age
 
-        glide?.load(user.urlPhoto)
-                ?.apply(RequestOptions.circleCropTransform())
-                ?.into(image_avatar)
+
 
         for (name in user.socialNetwork) {
             socNet[name.key] = name.value
@@ -1115,6 +1113,14 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         saveProfileState()
         addInfoUser.setText(user.addInformation)
         addInfoUser.clearFocus()
+
+        val navigationView = activity.findViewById<NavigationView>(R.id.nav_view)
+        val hView = navigationView.getHeaderView(0)
+        val cityName = hView.findViewById<TextView>(R.id.menu_city_name)
+        cityName.text = user.city
+        val fullName = hView.findViewById<TextView>(R.id.menu_fullname)
+        fullName.text = StringBuilder().append(user.name).append(" ").append(user.lastName)
+        username.text = StringBuilder(user.name).append(" ").append(user.lastName)
     }
 
     private fun showTipsForEmptySocialLink() {

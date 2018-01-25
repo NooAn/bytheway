@@ -26,9 +26,9 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
 
     fun getAllUsers(filter: Filter) {
         disposables.add(userRepository.getAllUsers()
+                .subscribeOn(getBackgroundScheduler())
                 .timeout(TIMEOUT_SECONDS, timeoutUnit)
                 .retry(2)
-                .subscribeOn(getBackgroundScheduler())
                 .doOnSubscribe({ loadingStatus.postValue(true) })
                 .doAfterTerminate({ loadingStatus.postValue(false) })
                 .doAfterSuccess { resultUsers -> filterUsersByFilter(resultUsers, filter) }

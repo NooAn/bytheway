@@ -8,6 +8,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
+import android.support.annotation.LayoutRes
 import android.support.design.widget.AppBarLayout
 import android.support.design.widget.CoordinatorLayout
 import android.support.v4.app.Fragment
@@ -49,6 +50,7 @@ import ru.a1024bits.bytheway.util.Constants.START_DATE
 import ru.a1024bits.bytheway.util.createMarker
 import ru.a1024bits.bytheway.util.toJsonString
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
+import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import ru.terrakok.cicerone.commands.Forward
 import uk.co.deanwild.materialshowcaseview.IShowcaseListener
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView
@@ -61,7 +63,18 @@ import kotlin.collections.HashMap
 /**
  * Created by andrey.gusenkov on 30/09/2017//
  */
-class MapFragment : Fragment(), OnMapReadyCallback {
+class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
+
+    override fun getViewFactoryClass(): ViewModelProvider.Factory = viewModelFactory
+
+
+    @LayoutRes
+    override fun getLayoutRes(): Int {
+        return R.layout.fragment_maps
+    }
+
+    override fun getViewModelClass(): Class<DisplayUsersViewModel> = DisplayUsersViewModel::class.java
+
 
     private var mMap: GoogleMap? = null
     private var mMapView: MapView? = null
@@ -69,7 +82,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private val points: ArrayMap<Int, MarkerOptions> by lazy { ArrayMap<Int, MarkerOptions>() }
     private var routeString: String? = null
 
-    private var viewModel: DisplayUsersViewModel? = null
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
@@ -96,13 +108,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        App.component.inject(this)
-
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(DisplayUsersViewModel::class.java)
     }
-
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        App.component.inject(this)
+    }
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater?.inflate(R.layout.fragment_maps, container, false)
+        val view = super.onCreateView(inflater, container, savedInstanceState)
 
         collapsingToolbar?.setContentScrimColor(
                 ContextCompat.getColor(activity, R.color.colorAccent))
@@ -224,37 +236,40 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 goFlyPlan()
             }
         }
+        showPrompt("isFirstEnterMyProfileFragment", context.resources.getString(R.string.close_hint),
+                getString(R.string.hint_save_and_search), getString(R.string.hint_save_and_search_description))
 
-        if (activity != null && (activity as MenuActivity).preferences.getBoolean("isFirstEnterMapFragment", true)) {
-            showView = MaterialShowcaseView.Builder(activity)
-                    .setTarget(buttonSaveTravelInfo)
-                    .renderOverNavigationBar()
-                    .setDismissText(getString(R.string.close_hint))
-                    .setTitleText(getString(R.string.hint_save_and_search))
-                    .setContentText(getString(R.string.hint_save_and_search_description))
-                    .withCircleShape()
-                    .setListener(object : IShowcaseListener {
-                        override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {
-                            show = true
-                            try {
-                                val mHandler = Handler()
-                                val time = 10000L // 10 sec after we can hide tips
-                                mHandler.postDelayed({ if (show) showView?.hide() }, time)
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                            }
-                        }
-
-                        override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
-                            if (activity != null && !activity.isDestroyed) {
-                                (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterMapFragment", false).apply()
-                                show = false;
-                            }
-                        }
-                    })
-                    .show()
-        }
+//        if (activity != null && (activity as MenuActivity).preferences.getBoolean("isFirstEnterMapFragment", true)) {
+//            showView = MaterialShowcaseView.Builder(activity)
+//                    .setTarget(buttonSaveTravelInfo)
+//                    .renderOverNavigationBar()
+//                    .setDismissText(getString(R.string.close_hint))
+//                    .setTitleText(getString(R.string.hint_save_and_search))
+//                    .setContentText(getString(R.string.hint_save_and_search_description))
+//                    .withCircleShape()
+//                    .setListener(object : IShowcaseListener {
+//                        override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {
+//                            show = true
+//                            try {
+//                                val mHandler = Handler()
+//                                val time = 10000L // 10 sec after we can hide tips
+//                                mHandler.postDelayed({ if (show) showView?.hide() }, time)
+//                            } catch (e: Exception) {
+//                                e.printStackTrace()
+//                            }
+//                        }
+//
+//                        override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
+//                            if (activity != null && !activity.isDestroyed) {
+//                                (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterMapFragment", false).apply()
+//                                show = false;
+//                            }
+//                        }
+//                    })
+//                    .show()
+//        }
     }
+
     var show = false;
     private fun openDialogSave() {
         val dialog = TravelSearchSaveDialog(this)
@@ -312,8 +327,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             mMap?.animateCamera(CameraUpdateFactory.zoomTo(3F))
         }
     }
-
-    private lateinit var mFirebaseAnalytics: FirebaseAnalytics
 
     private fun goFlyPlan() {
         if (points.size < 2) return
