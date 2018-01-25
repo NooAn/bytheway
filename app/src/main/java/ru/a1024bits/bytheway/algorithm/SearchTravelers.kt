@@ -1,6 +1,7 @@
 package ru.a1024bits.bytheway.algorithm
 
 import android.location.Location
+import android.util.Log
 import ru.a1024bits.bytheway.model.Method
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
@@ -22,8 +23,8 @@ class SearchTravelers(val filter: Filter = Filter(), val user: User) {
 //        val m = calculateDate() * WeightDate
 //        val c = calculateMethod() * WeightMethod
 //        val p = calculateBudget() * WeightBudget
-
-//        Log.e("LOG", "name:${user.name} -  route:$n  date:$m  method:$c  budget:$p")
+//
+//        Log.e("LOG", "name:${user.name} -  route:$n  date:$m  method:$c  budget:$p sum:${m + n + c + p}")
 
         return ((calculateRoute() * WeightRoute
                 + calculateDate() * WeightDate
