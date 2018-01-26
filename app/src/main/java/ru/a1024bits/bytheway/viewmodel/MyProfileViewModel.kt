@@ -45,7 +45,7 @@ import java.io.File
 /**
  * Created by andrey.gusenkov on 25/09/2017.
  */
-class MyProfileViewModel @Inject constructor(var userRepository: IUsersRepository) : BaseViewModel() {
+class MyProfileViewModel @Inject constructor(var userRepository: UserRepository) : BaseViewModel() {
     val user = MutableLiveData<User>()
     var response = MutableLiveData<Response<User>>()
     var routes = MutableLiveData<Response<RoutesList>>()
