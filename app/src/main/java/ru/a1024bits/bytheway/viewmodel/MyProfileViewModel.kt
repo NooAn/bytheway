@@ -44,7 +44,7 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                 .retry(2)
                 .subscribeOn(getBackgroundScheduler())
                 .doOnSubscribe({ _ -> loadingStatus.setValue(true) })
-                .doAfterTerminate({ loadingStatus.setValue(false) })
+                .doOnError({ loadingStatus.setValue(false) })
                 .observeOn(getMainThreadScheduler())
                 .subscribe(
                         { user -> response.setValue(Response.success(user)) },
