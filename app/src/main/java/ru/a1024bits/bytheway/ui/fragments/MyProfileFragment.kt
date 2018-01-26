@@ -1,9 +1,11 @@
 package ru.a1024bits.bytheway.ui.fragments
 
+import android.app.Activity
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.support.annotation.LayoutRes
@@ -160,6 +162,23 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             }
         }
     }
+    private val photoUrlObserver: Observer<ResponseBtw<String>> = Observer {
+        when (it?.status) {
+            Status.SUCCESS -> {
+                if (it.data != null && !activity.isDestroyed) {
+                    updateImageProfile(it.data)
+                }
+            }
+            Status.ERROR -> {
+                showErrorUploadImage()
+            }
+        }
+    }
+
+    private fun showErrorUploadImage() {
+
+    }
+
     private val usersObservers: Observer<User> = Observer { user ->
         mListener?.onFragmentInteraction(user)
     }
@@ -241,7 +260,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         viewModel?.response?.observe(this, responseObserver)
         viewModel?.user?.observe(this, usersObservers)
         viewModel?.loadingStatus?.observe(this, (activity as MenuActivity).progressBarLoad)
-
+        viewModel?.photoUrl?.observe(this, photoUrlObserver)
         if (viewModel?.saveSocial?.hasObservers() == false) {
             viewModel?.saveSocial?.observe(this, observerSaveSocial)
         }
@@ -265,51 +284,10 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         super.onViewCreated(view, savedInstanceState)
         showPrompt("isFirstEnterMyProfileFragment", context.resources.getString(R.string.close_hint),
                 getString(R.string.hint_create_travel), getString(R.string.hint_create_travel_description))
-
-//        if ((activity as MenuActivity).preferences.getBoolean("isFirstEnterMyProfileFragment", true)) {
-//            showView = MaterialShowcaseView.Builder(activity)
-//                    .setTarget(newTripText)
-//                    .renderOverNavigationBar()
-//                    .setDismissText(getString(R.string.close_hint))
-//                    .setTitleText(getString(R.string.hint_create_travel))
-//                    .setContentText(getString(R.string.hint_create_travel_description))
-//                    .withCircleShape()
-//                    .setListener(object : IShowcaseListener {
-//                        override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {
-//                            val mHandler = Handler()
-//                            val time = 10000L // 10 sec after we can hide tips
-//                            try {
-//                                mHandler.postDelayed({ hide() }, time)
-//                            } catch (e: Exception) {
-//                                e.printStackTrace()
-//                            }
-//                        }
-//
-//                        override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
-//                            if (activity != null && !activity.isDestroyed) {
-//                                (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterMyProfileFragment", false).apply()
-//                            }
-//                        }
-//                    }).build()
-//            showView?.show(activity)
-        //       }
     }
-
-//    private fun hide() {
-//        try {
-//            showView?.hide()
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//            FirebaseCrash.report(e)
-//        }
-//    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        Log.e("LOG code:", requestCode.toString() + " " +
-                resultCode + " " + PlaceAutocomplete.getPlace(activity, data))
-
-        // FIXME refactoring in viewModel
 
         when (requestCode) {
             PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM -> when (resultCode) {
@@ -364,6 +342,20 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                     Log.i("LOG", status.statusMessage + " ")
                     if (textCityTo.text.isEmpty())
                         textCityTo.setText("")
+                }
+            }
+            READ_REQUEST_CODE -> when (resultCode) {
+                Activity.RESULT_OK -> {
+                    // The document selected by the user won't be returned in the intent.
+                    // Instead, a URI to that document will be contained in the return intent
+                    // provided to this method as a parameter.
+                    // Pull that URI using resultData.getData().
+                    var uri: Uri? = null
+                    if (data != null) {
+                        uri = data.getData()
+                        Log.i("LOG", "Uri: ${uri.path} ${uri.encodedPath}" + uri!!.toString())
+                        viewModel?.loadImage(uri, FirebaseAuth.getInstance().currentUser?.uid!!)
+                    }
                 }
             }
         }
@@ -1018,11 +1010,40 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         }
     }
 
-    private fun fillProfile(user: User) {
-        glide?.load(user.urlPhoto)
+    private val READ_REQUEST_CODE = 42
+    /**
+     * Fires an intent to spin up the "file chooser" UI and select an image.
+     */
+    fun performFileSearch() {
+
+        // ACTION_OPEN_DOCUMENT is the intent to choose a file via the system's file
+        // browser.
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+
+        // Filter to only show results that can be "opened", such as a
+        // file (as opposed to a list of contacts or timezones)
+        intent.addCategory(Intent.CATEGORY_OPENABLE)
+
+        // Filter to show only images, using the image MIME data type.
+        // If one wanted to search for ogg vorbis files, the type would be "audio/ogg".
+        // To search for all documents available via installed storage providers,
+        // it would be "*/*".
+        intent.type = "image/*"
+
+        startActivityForResult(intent, READ_REQUEST_CODE)
+    }
+
+    private fun updateImageProfile(link: String) {
+        glide?.load(link)
                 ?.apply(RequestOptions.circleCropTransform())
                 ?.into(image_avatar)
+    }
 
+    private fun fillProfile(user: User) {
+        updateImageProfile(user.urlPhoto)
+        image_avatar.setOnClickListener {
+            performFileSearch()
+        }
 
 
         cityFromLatLng = user.cityFromLatLng

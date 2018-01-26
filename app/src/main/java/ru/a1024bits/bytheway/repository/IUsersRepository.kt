@@ -1,6 +1,7 @@
 package ru.a1024bits.bytheway.repository
 
 import android.arch.lifecycle.Observer
+import android.net.Uri
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentSnapshot
@@ -14,13 +15,10 @@ import ru.a1024bits.bytheway.model.map_directions.RoutesList
 interface IUsersRepository {
     fun getReallUsers(paramSearch: Filter): Single<List<User>>
     fun getAllUsers(): Single<MutableList<User>>
-    fun getSimilarUsersTravels(data: Filter, observer: Observer<List<User>>): Task<QuerySnapshot>
     fun getUserById(userID: String): Task<DocumentSnapshot>
     fun addUser(user: User): Task<Void>
-
-    // RX Wrapper
+    fun uploadPhotoLink(path: Uri, id: String): Single<String>
     fun getUser(id: String): Single<User>
-
-    fun changeUserProfile(map: HashMap<String, Any>, id: String): Completable?
+    fun changeUserProfile(map: HashMap<String, Any>, id: String): Completable
     fun getRoute(cityFromLatLng: GeoPoint, cityToLatLng: GeoPoint): Single<RoutesList>
 }

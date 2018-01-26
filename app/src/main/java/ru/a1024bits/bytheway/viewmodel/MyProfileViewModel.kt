@@ -1,8 +1,10 @@
 package ru.a1024bits.bytheway.viewmodel
 
 import android.arch.lifecycle.MutableLiveData
+import android.net.Uri
 import android.util.Log
 import com.google.firebase.firestore.GeoPoint
+import com.google.firebase.storage.FirebaseStorage
 import ru.a1024bits.bytheway.model.*
 import ru.a1024bits.bytheway.model.map_directions.RoutesList
 import ru.a1024bits.bytheway.repository.UserRepository
@@ -27,16 +29,53 @@ import ru.a1024bits.bytheway.util.Constants.FIRST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.START_DATE
 import javax.inject.Inject
+import com.google.firebase.storage.UploadTask
+import com.google.android.gms.tasks.OnSuccessListener
+import com.google.android.gms.tasks.OnFailureListener
+import com.google.firebase.storage.StorageReference
+import io.reactivex.Completable
+import io.reactivex.Single
+import io.reactivex.SingleObserver
+import io.reactivex.disposables.Disposable
+import io.reactivex.subscribers.DisposableSubscriber
+import ru.a1024bits.bytheway.repository.IUsersRepository
+import java.io.File
+
 
 /**
  * Created by andrey.gusenkov on 25/09/2017.
  */
-class MyProfileViewModel @Inject constructor(var userRepository: UserRepository) : BaseViewModel() {
+class MyProfileViewModel @Inject constructor(var userRepository: IUsersRepository) : BaseViewModel() {
     val user = MutableLiveData<User>()
     var response = MutableLiveData<Response<User>>()
     var routes = MutableLiveData<Response<RoutesList>>()
     val saveSocial = MutableLiveData<SocialResponse>()
     val saveProfile = MutableLiveData<Response<Boolean>>()
+    val photoUrl = MutableLiveData<Response<String>>()
+
+    fun loadImage(pathFile: Uri, userId: String) {
+        var url: String = ""
+        userRepository.uploadPhotoLink(path = pathFile, id = userId)
+                .subscribeOn(getBackgroundScheduler())
+                .doOnSubscribe({ _ -> loadingStatus.setValue(true) })
+                .doAfterTerminate({ loadingStatus.setValue(false) })
+                .doOnSuccess { url = it }
+                //.flatMap { urlPhoto: String -> savePhotoLink(urlPhoto, userId).toMaybe<String>() }
+                .observeOn(getMainThreadScheduler())
+                .subscribe(
+                        { t -> photoUrl.setValue(Response.success(url)) },
+                        { throwable ->
+                            photoUrl.setValue(Response.error(throwable))
+                        })
+    }
+
+    private fun savePhotoLink(downloadUrl: String, id: String): Completable {
+        val map: HashMap<String, Any> = hashMapOf()
+        map.put("urlPhoto", downloadUrl)
+        return userRepository.changeUserProfile(map, id)
+                .timeout(TIMEOUT_SECONDS, timeoutUnit)
+                .retry(2)
+    }
 
     fun load(userId: String) {
         disposables.add(userRepository.getUser(userId)

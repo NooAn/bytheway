@@ -24,6 +24,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
+import com.google.firebase.crash.FirebaseCrash
 import com.google.maps.android.PolyUtil
 import kotlinx.android.synthetic.main.profilte_user_direction.*
 import kotlinx.android.synthetic.main.profile_main_image.*
@@ -105,23 +106,27 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
                 SocialNetwork.VK.link -> {
                     vkIcon.setImageResource(R.drawable.ic_vk_color)
                     vkIcon.setOnClickListener {
-                        startActivity(createBrowserIntent(user.socialNetwork.get(name.key) ?: ""))
-                        mFirebaseAnalytics.logEvent(TAG_ANALYTICS + "OPEN_VK", null)
+                        try {
+                            mFirebaseAnalytics.logEvent(TAG_ANALYTICS + "OPEN_VK", null)
+                            startActivity(createBrowserIntent(user.socialNetwork.get(name.key) ?: ""))
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            FirebaseCrash.report(e)
+                        }
                     }
                 }
                 SocialNetwork.CS.link -> {
                     csIcon.setImageResource(R.drawable.ic_cs_color)
                     csIcon.setOnClickListener {
-                        startActivity(createBrowserIntent(user.socialNetwork.get(name.key) ?: ""))
                         mFirebaseAnalytics.logEvent(TAG_ANALYTICS + "OPEN_CS", null)
+                        startActivity(createBrowserIntent(user.socialNetwork.get(name.key) ?: ""))
                     }
                 }
                 SocialNetwork.FB.link -> {
                     fbcon.setImageResource(R.drawable.ic_fb_color)
                     fbcon.setOnClickListener {
-                        //  startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("facebook:/profile/id=${user.socialNetwork.get(name.key)}")))
-                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("${user.socialNetwork.get(name.key)}")))
                         mFirebaseAnalytics.logEvent(TAG_ANALYTICS + "OPEN_FB", null)
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("${user.socialNetwork.get(name.key)}")))
                     }
                 }
                 SocialNetwork.WHATSAPP.link -> {
