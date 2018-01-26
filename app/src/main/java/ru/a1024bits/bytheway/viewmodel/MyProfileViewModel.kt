@@ -40,10 +40,12 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
 
     fun load(userId: String) {
         disposables.add(userRepository.getUser(userId)
+                .timeout(TIMEOUT_SECONDS, timeoutUnit)
+                .retry(2)
                 .subscribeOn(getBackgroundScheduler())
-                .observeOn(getMainThreadScheduler())
                 .doOnSubscribe({ _ -> loadingStatus.setValue(true) })
                 .doAfterTerminate({ loadingStatus.setValue(false) })
+                .observeOn(getMainThreadScheduler())
                 .subscribe(
                         { user -> response.setValue(Response.success(user)) },
                         { throwable -> response.setValue(Response.error(throwable)) }
@@ -51,26 +53,32 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
         )
     }
 
-    fun saveLinks(arraySocNetwork: HashMap<String, String>, id: String, onSuccess: () -> Unit = {}) {
+    fun saveLinks(arraySocNetwork: HashMap<String, String>, id: String, link: SocialResponse) {
         val map: HashMap<String, Any> = hashMapOf()
-        map.put("socialNetwork", arraySocNetwork) // fixme
+        map.put("socialNetwork", arraySocNetwork)
         disposables.add(userRepository.changeUserProfile(map, id)
+                .timeout(TIMEOUT_SECONDS, timeoutUnit)
+                .retry(2)
                 .subscribeOn(getBackgroundScheduler())
-                .observeOn(getMainThreadScheduler())
                 .doOnSubscribe({ _ -> loadingStatus.setValue(true) })
                 .doAfterTerminate({ loadingStatus.setValue(false) })
-                .subscribe(onSuccess, { throwable ->
-                    response.setValue(Response.error(throwable))
-                }))
+                .observeOn(getMainThreadScheduler())
+                .subscribe(
+                        { saveSocial.setValue(link) },
+                        { throwable ->
+                            response.setValue(Response.error(throwable))
+                        }))
     }
 
     fun sendUserData(map: HashMap<String, Any>, id: String, oldUser: User?) {
         Log.e("LOG map: id = ", id + " " + map.toString())
         disposables.add(userRepository.changeUserProfile(map, id)
+                .timeout(TIMEOUT_SECONDS, timeoutUnit)
+                .retry(2)
                 .subscribeOn(getBackgroundScheduler())
-                .observeOn(getMainThreadScheduler())
                 .doOnSubscribe({ _ -> loadingStatus.setValue(true) })
                 .doAfterTerminate({ loadingStatus.setValue(false) })
+                .observeOn(getMainThreadScheduler())
                 .subscribe({
                     saveProfile.setValue(Response.success(true))
                     user.value = makeUserFromMap(map, oldUser)
@@ -142,6 +150,8 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
 
     fun getRoute(cityFromLatLng: GeoPoint, cityToLatLng: GeoPoint) {
         disposables.add(userRepository.getRoute(cityFromLatLng, cityToLatLng)
+                .timeout(TIMEOUT_SECONDS, timeoutUnit)
+                .retry(2)
                 .subscribeOn(getBackgroundScheduler())
                 .observeOn(getMainThreadScheduler())
                 .subscribe({

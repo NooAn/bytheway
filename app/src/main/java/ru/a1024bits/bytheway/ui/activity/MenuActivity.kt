@@ -78,9 +78,9 @@ class MenuActivity : AppCompatActivity(),
         }
     }
 
-    override fun onSetPoint(l: LatLng, pos: Int) {
+    override fun onSetPoint(l: LatLng, pos: Int, swap: Boolean) {
         val mapFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as MapFragment
-        mapFragment.setMarker(l, pos)
+        mapFragment.setMarker(l, pos, swap)
     }
 
     override fun onConnectionFailed(p0: ConnectionResult) {
@@ -90,15 +90,18 @@ class MenuActivity : AppCompatActivity(),
     var screenNames: ArrayList<String> = arrayListOf()
     private val STATE_SCREEN_NAMES = "state_screen_names"
 
-    @Inject lateinit var navigatorHolder: NavigatorHolder
-    @Inject lateinit var router: Router
+    @Inject
+    lateinit var navigatorHolder: NavigatorHolder
+    @Inject
+    lateinit var router: Router
 
     private var glide: RequestManager? = null
     var mainUser: User? = null
     var profileChanged: Boolean? = false
 
     private var viewModel: MyProfileViewModel? = null
-    @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
 
     private fun isNetworkAvailable(): Boolean {
         val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -143,8 +146,7 @@ class MenuActivity : AppCompatActivity(),
                 markFirstEnter()
             } else {
                 if (intent.data != null && intent.data.host.contains("appintheair", true)) {
-                    // viewModel?.load(FirebaseAuth.getInstance().currentUser?.uid.toString())
-                    //  navigator.applyCommand(Replace(Screens.AIR_SUCCES_SCREEN, 1))
+
                 } else {
                     navigator.applyCommand(Replace(Screens.MY_PROFILE_SCREEN, 1))
                 }
@@ -163,7 +165,7 @@ class MenuActivity : AppCompatActivity(),
         sing_out.setOnClickListener {
             openAwayFromProfileDialog({
                 preferences.edit().putBoolean(Constants.FIRST_ENTER, true).apply()
-                Log.d("tag", "FIRST_ENTERsign_iut: " + preferences.getBoolean(Constants.FIRST_ENTER, true))
+                Log.d("tag", "FIRST_ENTER sign_out: " + preferences.getBoolean(Constants.FIRST_ENTER, true))
                 FirebaseAuth.getInstance().signOut()
                 finishAffinity()
             })
@@ -193,15 +195,20 @@ class MenuActivity : AppCompatActivity(),
         navigator.applyCommand(Forward(Screens.USER_PROFILE_SCREEN, displayingUser))
     }
 
+    val fragmentProfile = MyProfileFragment()
+    val allUsersFragment = AllUsersFragment.newInstance()
+
     val navigator = object : SupportFragmentNavigator(supportFragmentManager, R.id.fragment_container) {
         override fun createFragment(screenKey: String?, data: Any?): Fragment {
             Log.e("LOG", screenKey + " " + data)
-            return if (data is User)
-                UserProfileFragment.newInstance(data.id)
-            else
+            return if (data is User) {
+                return UserProfileFragment.newInstance(data.id)
+            } else
                 when (screenKey) {
 
-                    MY_PROFILE_SCREEN -> return MyProfileFragment()
+                    MY_PROFILE_SCREEN -> {
+                        return fragmentProfile
+                    }
 
                     SEARCH_MAP_SCREEN -> return MapFragment.newInstance(mainUser)
 
@@ -217,7 +224,7 @@ class MenuActivity : AppCompatActivity(),
 
                     USER_SINHRONIZED_SCREEN -> return AppInTheAirSinchronizedFragment()
 
-                    ALL_USERS_SCREEN -> return AllUsersFragment.newInstance()
+                    ALL_USERS_SCREEN -> return allUsersFragment
 
                     SIMILAR_TRAVELS_SCREEN -> {
                         SimilarTravelsFragment.newInstance(data as List<User>)

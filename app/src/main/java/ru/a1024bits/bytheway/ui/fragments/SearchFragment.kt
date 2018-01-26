@@ -13,7 +13,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.Toast
-import com.borax12.materialdaterangepicker.date.DatePickerDialog
+import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment
+import com.codetroopers.betterpickers.calendardatepicker.MonthAdapter
 import com.google.android.gms.location.places.AutocompleteFilter
 import com.google.android.gms.location.places.ui.PlaceAutocomplete
 import com.google.android.gms.maps.model.LatLng
@@ -31,17 +32,18 @@ import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT
 import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO
 import ru.a1024bits.bytheway.util.Constants.START_DATE
 import ru.a1024bits.bytheway.util.DecimalInputFilter
+import ru.a1024bits.bytheway.util.getLongFromDate
 import java.text.SimpleDateFormat
 import java.util.*
 
 
 /**
- * Created by andrey.gusenkov on 29/09/2017.
+ * Created by andrey.gusenkov on 29/09/2017
  */
-class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
+class SearchFragment : Fragment() {
 
     private lateinit var mFirebaseAnalytics: FirebaseAnalytics
-    private lateinit var dateDialog: DatePickerDialog
+    private lateinit var dateDialog: CalendarDatePickerDialogFragment
     var firstPoint: LatLng? = null
     var secondPoint: LatLng? = null
     var user: User = User()
@@ -76,6 +78,7 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+
         return view
     }
 
@@ -149,6 +152,8 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                 dateToValue.text = user.dates.get(END_DATE)?.getNormallDate()
         }
 
+
+
         swap_cities.setOnClickListener {
             val tempString = text_from_city.text
             text_from_city.text = text_to_city.text
@@ -161,7 +166,7 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             filter.locationStartCity = filter.locationEndCity
             filter.locationEndCity = tempLng
 
-            updatePoints()
+            updatePoints(filter.locationStartCity, filter.locationEndCity, swap = true)
         }
 
         budgetFromValue.setText(user.budget.toStringOrEmpty)
@@ -174,84 +179,94 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
             }
 
             override fun afterTextChanged(text: Editable?) {
-
+                filter.endBudget = text.toString().getIntOrNothing()
             }
 
         })
         if (user.cityFromLatLng.latitude != 0.0 && user.cityToLatLng.latitude != 0.0 && user.cityToLatLng.longitude != 0.0) {
-            updatePoints()
+            // ставим маркеры на карту
+            updatePoints(LatLng(user.cityFromLatLng.latitude, user.cityFromLatLng.longitude), LatLng(user.cityToLatLng.latitude, user.cityToLatLng.longitude))
         }
     }
 
-    private fun updatePoints() {
-        firstPoint = LatLng(user.cityFromLatLng.latitude, user.cityFromLatLng.longitude)
-        secondPoint = LatLng(user.cityToLatLng.latitude, user.cityToLatLng.longitude)
-        firstPoint?.let { latLng -> (activity as OnFragmentInteractionListener).onSetPoint(latLng, FIRST_MARKER_POSITION) }
-        secondPoint?.let { latLng -> (activity as OnFragmentInteractionListener).onSetPoint(latLng, SECOND_MARKER_POSITION) }
+    private fun updatePoints(start: LatLng, end: LatLng, swap: Boolean = false) {
+        firstPoint = start
+        secondPoint = end
+        firstPoint?.let { latLng ->
+            (activity as OnFragmentInteractionListener).onSetPoint(latLng, FIRST_MARKER_POSITION, swap)
+        }
+        secondPoint?.let { latLng ->
+            (activity as OnFragmentInteractionListener).onSetPoint(latLng, SECOND_MARKER_POSITION, swap)
+        }
     }
 
-    private fun openDateDialog() {
-        dateDialog.setStartTitle(getString(R.string.date_start))
-        dateDialog.setEndTitle(getString(R.string.date_end))
-        dateDialog.accentColor = resources.getColor(R.color.colorPrimary)
-        dateDialog.show(activity.fragmentManager, "")
-    }
+    private fun openDateFromDialog() {
 
-    override fun onDateSet(view: DatePickerDialog?, year: Int, monthOfYear: Int, dayOfMonth: Int, yearEnd: Int, monthOfYearEnd: Int, dayOfMonthEnd: Int) {
-        Log.e("LOG Date", "$year  $monthOfYear $dayOfMonth - $yearEnd $monthOfYearEnd $dayOfMonthEnd")
-        dateFromValue.setText(StringBuilder(" ")
-                .append(dayOfMonth)
-                .append(" ")
-                .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
-                .append(" ")
-                .append(year).toString())
+        val dateFrom = Calendar.getInstance() //current time by default
+        if (filter.startDate > 0L) dateFrom.timeInMillis = filter.startDate
 
-        if (getLongFromDate(dayOfMonth, monthOfYear, year) < getLongFromDate(dayOfMonthEnd, monthOfYearEnd, yearEnd)) {
-            dateToValue.setText(StringBuilder(" ")
-                    .append(dayOfMonthEnd)
-                    .append(" ")
-                    .append(context.resources.getStringArray(R.array.months_array)[monthOfYearEnd])
-                    .append(" ")
-                    .append(yearEnd).toString())
-            filter.endDate = getLongFromDate(dayOfMonthEnd, monthOfYearEnd, yearEnd)
-        } else {
-            Toast.makeText(context, R.string.date_error_set, Toast.LENGTH_SHORT).show()
-            dateToValue.setText(StringBuilder(" ")
+        dateDialog = CalendarDatePickerDialogFragment()
+                .setFirstDayOfWeek(Calendar.MONDAY)
+                .setThemeCustom(R.style.BythewayDatePickerDialogTheme)
+                .setPreselectedDate(dateFrom.get(Calendar.YEAR), dateFrom.get(Calendar.MONTH), dateFrom.get(Calendar.DAY_OF_MONTH))
+
+        dateDialog.setDateRange(MonthAdapter.CalendarDay(System.currentTimeMillis()), null)
+        dateDialog.setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
+            dateFromValue.text = StringBuilder(" ")
                     .append(dayOfMonth)
                     .append(" ")
                     .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
                     .append(" ")
-                    .append(year).toString())
+                    .append(year).toString()
+            filter.startDate = getLongFromDate(dayOfMonth, monthOfYear, year)
         }
-        filter.startDate = getLongFromDate(dayOfMonth, monthOfYear, year)
+        dateDialog.show(activity.supportFragmentManager, "")
     }
 
-    private fun getLongFromDate(day: Int, month: Int, year: Int): Long {
-        val dateString = "$day $month $year"
-        val dateFormat = SimpleDateFormat("dd MM yyyy", Locale.US)
-        val date = dateFormat.parse(dateString)
-        val unixTime = date.time.toLong()
-        return unixTime
+    private fun openDateToDialog() {
+        val dateTo = Calendar.getInstance() //current time by default
+        if (filter.endDate > 0L) dateTo.timeInMillis = filter.endDate
+
+        dateDialog = CalendarDatePickerDialogFragment()
+                .setFirstDayOfWeek(Calendar.MONDAY)
+                .setThemeCustom(R.style.BythewayDatePickerDialogTheme)
+                .setPreselectedDate(dateTo.get(Calendar.YEAR), dateTo.get(Calendar.MONTH), dateTo.get(Calendar.DAY_OF_MONTH))
+
+        dateDialog.setDateRange(
+                MonthAdapter.CalendarDay(
+                        if (filter.startDate > 0L) filter.startDate
+                        else System.currentTimeMillis()),
+                null)
+        dateDialog.setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
+
+            dateToValue.text = StringBuilder(" ")
+                    .append(dayOfMonth)
+                    .append(" ")
+                    .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
+                    .append(" ")
+                    .append(year).toString()
+            filter.endDate = getLongFromDate(dayOfMonth, monthOfYear, year)
+        }
+        dateDialog.show(activity.supportFragmentManager, "")
     }
+
 
     override fun onStart() {
         super.onStart()
         val now = Calendar.getInstance()
 
-        dateDialog = DatePickerDialog.newInstance(
-                this@SearchFragment,
-                now.get(Calendar.YEAR),
-                now.get(Calendar.MONTH),
-                now.get(Calendar.DAY_OF_MONTH)
-        )
+        dateDialog = CalendarDatePickerDialogFragment()
+                .setFirstDayOfWeek(Calendar.MONDAY)
+                .setThemeCustom(R.style.BythewayDatePickerDialogTheme)
+                .setPreselectedDate(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH))
 
         dateFromValue.setOnClickListener {
-            openDateDialog()
+            openDateFromDialog()
             mFirebaseAnalytics.logEvent("Search_fragment_str_date_dialog", null)
         }
 
         dateToValue.setOnClickListener {
-            openDateDialog()
+            openDateToDialog()
             mFirebaseAnalytics.logEvent("Search_fragment_end_date_dialog", null)
         }
     }
@@ -269,10 +284,9 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                     text_from_city.text = place.name
                     firstPoint = place.latLng
                     filter.startCity = place.name.toString()
-                    filter.locationEndCity = place.latLng
+                    filter.locationStartCity = place.latLng
                     text_from_city.error = null
                     manageErrorCityEquals(secondPoint)
-
                     firstPoint?.let { latLng -> (activity as OnFragmentInteractionListener).onSetPoint(latLng, FIRST_MARKER_POSITION) }
                 }
                 else -> {
@@ -289,7 +303,7 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
                     val place = PlaceAutocomplete.getPlace(activity, data);
                     text_to_city.text = place.name
                     secondPoint = place.latLng
-                    filter.locationStartCity = place.latLng
+                    filter.locationEndCity = place.latLng
                     filter.endCity = place.name.toString()
                     text_to_city.error = null
                     manageErrorCityEquals(firstPoint)
@@ -328,6 +342,9 @@ class SearchFragment : Fragment(), DatePickerDialog.OnDateSetListener {
         }
     }
 }
+
+private fun String.getIntOrNothing(): Int = if (this.toString().isBlank()) 0 else this.toInt()
+
 
 private val Long.toStringOrEmpty: String
     get() {

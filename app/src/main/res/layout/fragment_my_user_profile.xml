@@ -3,16 +3,12 @@
     android:id="@+id/scrollProfile"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
-
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
         tools:context="ru.a1024bits.bytheway.ui.fragments.MyProfileFragment">
-
         <include layout="@layout/profile_main_image" />
-
         <LinearLayout
             android:id="@+id/headerprofile"
             android:layout_width="wrap_content"
@@ -523,7 +519,7 @@
 
         <Button
             android:id="@+id/buttonSaveTravelInfo"
-            android:layout_width="150dp"
+            android:layout_width="160dp"
             android:layout_height="match_parent"
             android:layout_alignEnd="@+id/grayLine"
             android:layout_alignParentBottom="true"
@@ -537,7 +533,7 @@
 
         <Button
             android:id="@+id/buttonRemoveTravelInfo"
-            android:layout_width="150dp"
+            android:layout_width="140dp"
             android:layout_height="match_parent"
             android:layout_alignTop="@+id/grayLine"
             android:layout_toStartOf="@+id/buttonSaveTravelInfo"
@@ -549,6 +545,4 @@
             android:visibility="gone"
             tools:visibility="visible" />
     </RelativeLayout>
-
-
 </ScrollView>

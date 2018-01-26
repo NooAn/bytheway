@@ -22,6 +22,6 @@ interface IUsersRepository {
     // RX Wrapper
     fun getUser(id: String): Single<User>
 
-    fun changeUserProfile(map: HashMap<String, Any>, id: String): Completable?
+    fun changeUserProfile(map: HashMap<String, Any>, id: String): Completable
     fun getRoute(cityFromLatLng: GeoPoint, cityToLatLng: GeoPoint): Single<RoutesList>
 }

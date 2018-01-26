@@ -5,7 +5,13 @@ import android.arch.lifecycle.ViewModelProviders
 import android.os.Build
 import android.os.Bundle
 import android.support.annotation.LayoutRes
+import android.support.annotation.NonNull
+import android.support.annotation.Nullable
+import android.support.design.R.id.container
 import android.support.v4.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -26,8 +32,14 @@ abstract class BaseFragment<T : BaseViewModel> : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         glide = Glide.with(this)
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(context)
         viewModel = ViewModelProviders.of(this, getViewFactoryClass()).get(getViewModelClass())
         viewModel?.addObserver(lifecycle)
+    }
+
+    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val view = inflater?.inflate(getLayoutRes(), container, false)
+        return view
     }
 
     fun showPrompt(nameScreenPrompt: String, dismissText: String?, titleText: String?, contentText: String?) {
@@ -53,8 +65,12 @@ abstract class BaseFragment<T : BaseViewModel> : Fragment() {
     protected abstract fun getViewFactoryClass(): ViewModelProvider.Factory
 
     override fun onDestroy() {
-        viewModel?.removeObserver(lifecycle)
         super.onDestroy()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewModel?.removeObserver(lifecycle)
     }
 
     @LayoutRes

@@ -7,10 +7,10 @@ import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
 import android.os.Bundle
-import android.os.Handler
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -21,6 +21,8 @@ import com.google.android.gms.common.api.GoogleApiClient
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.crash.FirebaseCrash
+import kotlinx.android.synthetic.main.activity_splash.*
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.viewmodel.RegistrationViewModel
@@ -34,7 +36,8 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
     }
 
     private var viewModel: RegistrationViewModel? = null
-    @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
 
     private val RC_SIGN_IN = 9001
     private val mAuth = FirebaseAuth.getInstance()
@@ -70,6 +73,7 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
                     startActivity(Intent(this@RegistrationActivity, MenuActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
                 } else {
                     mFirebaseAnalytics.logEvent("RegistrationScreen_Error_Checkin", null)
+                    updateUI(false)
                     Toast.makeText(this@RegistrationActivity, "Error for registration", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -108,6 +112,8 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
             val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
             if (result != null)
                 handleSignInResult(result)
+        } else {
+            updateUI(false)
         }
     }
 
@@ -132,21 +138,34 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
         Log.d("LOG", "firebaseAuthWithGoogle: ${acct.id}  ${acct.idToken}")
 
         val credential = GoogleAuthProvider.getCredential(acct.idToken, null)
-
-        mAuth?.signInWithCredential(credential)
-                ?.addOnCompleteListener(this) { task ->
-                    if (task.isSuccessful) {
-                        // Sign in success, update UI with the signed-in user's information
-                        Log.d("LOG", "signInWithCredential:success")
-                        updateUI(true)
-                    } else {
-                        // If sign in fails, display a message to the user.
-                        Log.w("LOG", "signInWithCredential:failure", task.exception)
+        try {
+            mAuth?.signInWithCredential(credential)
+                    ?.addOnCompleteListener(this) { task ->
+                        if (task.isSuccessful) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d("LOG", "signInWithCredential:success")
+                            updateUI(true)
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w("LOG", "signInWithCredential:failure", task.exception)
+                            Toast.makeText(this, "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show()
+                            mFirebaseAnalytics.logEvent("RegistrationScreen_Error_Login", null)
+                            updateUI(false)
+                        }
+                    }
+                    ?.addOnFailureListener {
+                        Log.w("LOG", "signInWithCredential:failure")
                         Toast.makeText(this, "Authentication failed.",
                                 Toast.LENGTH_SHORT).show()
                         mFirebaseAnalytics.logEvent("RegistrationScreen_Error_Login", null)
+                        FirebaseCrash.report(it)
+                        showErrorText()
                     }
-                }
+        } catch (e: Exception) {
+            FirebaseCrash.report(e)
+            showErrorText()
+        }
     }
 
     private fun updateUI(signedIn: Boolean) {
@@ -154,7 +173,12 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
             mFirebaseAnalytics.logEvent("RegistrationScreen_Success_Login", null)
             viewModel?.ifUserNotExistThenSave(mAuth.currentUser)
         } else {
-            Toast.makeText(this, "Not allowed Google", Toast.LENGTH_SHORT).show()
+            showErrorText()
+            Toast.makeText(this, "Проблемы с гугл аккаунтом", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun showErrorText() {
+        textError.visibility = View.VISIBLE
     }
 }

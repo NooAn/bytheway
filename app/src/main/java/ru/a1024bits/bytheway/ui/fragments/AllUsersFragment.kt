@@ -6,13 +6,13 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
 import android.content.Context
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.v7.widget.SearchView
 import android.util.Log
 import android.view.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import com.borax12.materialdaterangepicker.date.DatePickerDialog
+import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment
+import com.codetroopers.betterpickers.calendardatepicker.MonthAdapter
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crash.FirebaseCrash
 import kotlinx.android.synthetic.main.fragment_display_all_users.*
@@ -28,20 +28,39 @@ import ru.a1024bits.bytheway.repository.M_SEX
 import ru.a1024bits.bytheway.repository.W_SEX
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.a1024bits.bytheway.util.DecimalInputFilter
+import ru.a1024bits.bytheway.util.getLongFromDate
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
-import ru.a1024bits.bytheway.viewmodel.OnUpdateDialog
+import java.util.*
 import javax.inject.Inject
 
 
-class AllUsersFragment : BaseFragment<DisplayUsersViewModel>(), OnUpdateDialog {
-    private val SIZE_INITIAL_ELEMENTS = 2
-    private val TAG_ANALYTICS = "AllUsersFragment_"
+class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
+    companion object {
+        const val SIZE_INITIAL_ELEMENTS = 2
+        const val TAG_ANALYTICS = "AllUsersFragment_"
+        fun newInstance(): AllUsersFragment = AllUsersFragment()
+    }
+
     private lateinit var filter: Filter
-    private var dateDialog: DatePickerDialog? = null
     private lateinit var displayUsersAdapter: DisplayAllUsersAdapter
-    @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
     private var countInitialElements = 0
     private lateinit var analytics: FirebaseAnalytics
+
+    private val usersObservers: Observer<Response<List<User>>> = Observer { response ->
+        when (response?.status) {
+            Status.SUCCESS -> if (response.data == null) showErrorLoading() else {
+                if (response.data.isNotEmpty())
+                    displayUsersAdapter.setItems(response.data)
+                updateViewsAfterSearch(isNotEmptyListUsers = response.data.isNotEmpty())
+            }
+            Status.ERROR -> {
+                Log.e("LOG", "log e:" + response.error)
+                showErrorLoading()
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,26 +68,8 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>(), OnUpdateDialog {
         analytics = FirebaseAnalytics.getInstance(this.context)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-            inflater.inflate(R.layout.fragment_display_all_users, container, false)
-
-    private val usersObservers: Observer<Response<List<User>>> = Observer<Response<List<User>>> { response ->
-        when (response?.status) {
-            Status.SUCCESS -> if (response.data == null) showErrorLoading() else {
-                if (response.data.isNotEmpty())
-                    displayUsersAdapter.setItems(response.data)
-                updateViewsAfterSearch(response.data.isNotEmpty())
-            }
-            Status.ERROR -> {
-                Log.e("LOG", "log e:" + response.error)
-                showErrorLoading()
-            }
-        }
-
-    }
-
     private fun showErrorLoading() {
-
+        //todo set here sent report to firebase analyticks
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -85,8 +86,8 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>(), OnUpdateDialog {
             displayAllUsers.adapter = displayUsersAdapter
 
             viewModel?.response?.observe(this, usersObservers)
-            viewModel?.loadingStatus?.observe(this, (activity as MenuActivity).progressBarLoad)
-            loadingWhereLoadUsers.visibility = View.VISIBLE
+            viewModel?.loadingStatus?.observe(this, (activity?.let { it as MenuActivity })?.progressBarLoad
+                    ?: return)
             viewModel?.getAllUsers()
 
             showPrompt("isFirstEnterAllUsersFragment", context.resources.getString(R.string.close_hint),
@@ -96,6 +97,8 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>(), OnUpdateDialog {
             FirebaseCrash.report(e)
         }
     }
+
+    private lateinit var dateDialog: CalendarDatePickerDialogFragment
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
@@ -123,6 +126,60 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>(), OnUpdateDialog {
         })
     }
 
+    override fun onStart() {
+        super.onStart()
+
+        val now = Calendar.getInstance()
+
+        dateDialog = CalendarDatePickerDialogFragment()
+                .setFirstDayOfWeek(Calendar.MONDAY)
+                .setThemeCustom(R.style.BythewayDatePickerDialogTheme)
+                .setPreselectedDate(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH))
+    }
+
+    private fun openDateArrivedDialog() {
+        val dateTo = Calendar.getInstance() //current time by default
+        if (filter.endDate > 0L) dateTo.timeInMillis = filter.endDate
+        dateDialog = CalendarDatePickerDialogFragment()
+                .setFirstDayOfWeek(Calendar.MONDAY)
+                .setThemeCustom(R.style.BythewayDatePickerDialogTheme)
+                .setPreselectedDate(dateTo.get(Calendar.YEAR), dateTo.get(Calendar.MONTH), dateTo.get(Calendar.DAY_OF_MONTH))
+
+        dateDialog.setDateRange(MonthAdapter.CalendarDay(if (filter.startDate == 0L) System.currentTimeMillis() else filter.startDate), null)
+        dateDialog.setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
+            choseDateEnd.text = StringBuilder(" ")
+                    .append(dayOfMonth)
+                    .append(" ")
+                    .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
+                    .toString()
+            filter.endDate = getLongFromDate(year = year, month = monthOfYear, day = dayOfMonth)
+
+        }
+        dateDialog.show(activity.supportFragmentManager, "")
+    }
+
+    private fun openDateFromDialog() {
+        val dateFrom = Calendar.getInstance() //current time by default
+        if (filter.startDate > 0L) dateFrom.timeInMillis = filter.startDate
+
+        dateDialog = CalendarDatePickerDialogFragment()
+                .setFirstDayOfWeek(Calendar.MONDAY)
+                .setThemeCustom(R.style.BythewayDatePickerDialogTheme)
+                .setPreselectedDate(dateFrom.get(Calendar.YEAR), dateFrom.get(Calendar.MONTH), dateFrom.get(Calendar.DAY_OF_MONTH))
+
+        dateDialog.setDateRange(MonthAdapter.CalendarDay(System.currentTimeMillis()), null)
+        dateDialog.setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
+            choseDateStart.text = StringBuilder(" ")
+                    .append(dayOfMonth)
+                    .append(" ")
+                    .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
+                    .toString()
+            filter.startDate = getLongFromDate(year = year, month = monthOfYear, day = dayOfMonth)
+
+        }
+        dateDialog.show(activity.supportFragmentManager, "")
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
         R.id.search_all_users_item -> {
             true
@@ -135,14 +192,6 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>(), OnUpdateDialog {
     override fun getLayoutRes() = R.layout.fragment_display_all_users
 
     override fun getViewModelClass(): Class<DisplayUsersViewModel> = DisplayUsersViewModel::class.java
-
-    override fun notSuchSetDate() {
-        Snackbar.make(activity.findViewById(android.R.id.content), context.getString(R.string.dates_has_been_incorrect), Snackbar.LENGTH_LONG).show()
-    }
-
-    override fun onSuchSetDate() {
-        updateChoseDateButtons()
-    }
 
     private fun installLogicToUI() {
         startBudget.filters = arrayOf(DecimalInputFilter())
@@ -171,10 +220,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>(), OnUpdateDialog {
                     filter.endAge = position
             }
         }
-        dateDialog = viewModel?.updateDateDialog(this)
-        choseDate.setOnClickListener {
-            dateDialog?.show(activity.fragmentManager, "")
-        }
+
         sexButtons.setOnCheckedChangeListener { _, id ->
             filter.sex = when (id) {
                 sexM.id -> M_SEX
@@ -188,13 +234,26 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>(), OnUpdateDialog {
             else -> sexAny.id
         })
         updateChoseDateButtons()
-
+        choseDateStart.setOnClickListener {
+            openDateFromDialog()
+        }
+        choseDateEnd.setOnClickListener {
+            openDateArrivedDialog()
+        }
         view_contain_block_parameters.layoutTransition.setDuration(700L)
         saveParameters.setOnClickListener {
             analytics.logEvent(TAG_ANALYTICS + "CLICK_ON_SEARCH", null)
 
-            filter.startBudget = if (startBudget.text.isNotEmpty()) Integer.parseInt(startBudget.text.toString()) else -1
-            filter.endBudget = if (endBudget.text.isNotEmpty()) Integer.parseInt(endBudget.text.toString()) else -1
+            try {
+                filter.startBudget = if (startBudget.text.isNotEmpty()) Integer.parseInt(startBudget.text.toString()) else -1
+                filter.endBudget = if (endBudget.text.isNotEmpty()) Integer.parseInt(endBudget.text.toString()) else -1
+            } catch (e: Exception) {
+                e.printStackTrace()
+                filter.endBudget = -1
+                filter.startBudget = 0
+
+            }
+
             filter.startCity = startCity.text.toString()
             filter.endCity = endCity.text.toString()
 
@@ -223,9 +282,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>(), OnUpdateDialog {
             startCity.setText("")
             endCity.setText("")
 
-            dateDialog = viewModel?.updateDateDialog(this)
             updateChoseDateButtons()
-
             sexButtons.check(sexAny.id)
         }
 
@@ -280,12 +337,11 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>(), OnUpdateDialog {
     }
 
     private fun updateChoseDateButtons() {
-        choseDate.text = if (filter.startDate > 0L && filter.endDate > 0L)
-            viewModel?.getTextFromDates(filter.startDate, filter.endDate, 0)
-        else context.getString(R.string.filters_all_users_empty_date)
-    }
+        choseDateStart.text = if (filter.startDate > 0L)
+            viewModel?.getTextFromDates(date = filter.startDate) else getString(R.string.filters_all_users_empty_date_start)
 
-    companion object {
-        fun newInstance(): AllUsersFragment = AllUsersFragment()
+        choseDateEnd.text = if (filter.endDate > 0L)
+            viewModel?.getTextFromDates(date = filter.endDate) else getString(R.string.filters_all_users_empty_date_end)
+
     }
 }

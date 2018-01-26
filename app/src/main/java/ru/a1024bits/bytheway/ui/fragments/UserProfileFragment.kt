@@ -24,7 +24,6 @@ import com.bumptech.glide.request.RequestOptions
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
-import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.maps.android.PolyUtil
 import kotlinx.android.synthetic.main.profilte_user_direction.*
 import kotlinx.android.synthetic.main.profile_main_image.*
@@ -56,7 +55,6 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         App.component.inject(this)
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(context)
     }
 
     private val TAG_ANALYTICS: String = "UserProfile_"
@@ -199,7 +197,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
             if (userAge > 0) {
                 sexAndAge.text = StringBuilder(gender).append(", ").append(userAge)
             } else {
-                sexAndAge.text = StringBuilder(gender).append(", Возраст ").append(userAge)
+                sexAndAge.text = StringBuilder(gender).append(", Бессмертный ").append(userAge)
             }
         }
 
@@ -229,7 +227,8 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
 
     override fun getViewFactoryClass(): ViewModelProvider.Factory = viewModelFactory
 
-    @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
 
     @LayoutRes
     override fun getLayoutRes(): Int {
@@ -262,7 +261,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
     private var googleMap: GoogleMap? = null
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater?.inflate(R.layout.fragment_user_profile, container, false)
+        val view = super.onCreateView(inflater, container, savedInstanceState)
 
         mMapView = view?.findViewById<MapView>(R.id.mapView)
         try {
@@ -372,8 +371,6 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
     }
 
     fun intentMessageTelegram(id: String?) {
-//        val appName = "org.telegram.messenger";
-//        val isAppInstalled = isAppAvailable(activity.getApplicationContext(), appName);
         if (id?.isNumberPhone() == false) {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/${id?.replace("@", "")}")))
             mFirebaseAnalytics.logEvent(TAG_ANALYTICS + "OPEN_TG", null)
@@ -381,27 +378,6 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
             mFirebaseAnalytics.logEvent(TAG_ANALYTICS + "NOT_OPEN_TG", null)
             val dialog = SocNetworkdialog(activity, id)
             dialog.show()
-        }
-    }
-
-    /**
-     * Indicates whether the specified app ins installed and can used as an intent. This
-     * method checks the package manager for installed packages that can
-     * respond to an intent with the specified app. If no suitable package is
-     * found, this method returns false.
-     *
-     * @param context The application's environment.
-     * @param appName The name of the package you want to check
-     *
-     * @return True if app is installed
-     */
-    fun isAppAvailable(context: Context, appName: String): Boolean {
-        val pm = context.getPackageManager();
-        try {
-            pm.getPackageInfo(appName, PackageManager.GET_ACTIVITIES);
-            return true;
-        } catch (e: PackageManager.NameNotFoundException) {
-            return false;
         }
     }
 

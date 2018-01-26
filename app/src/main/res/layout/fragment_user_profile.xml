@@ -39,10 +39,9 @@
                 android:layout_marginTop="10dp"
                 android:fontFamily="sans-serif"
                 android:freezesText="true"
-                android:text="@string/city"
+                android:text="@string/city_in_the_world"
                 android:textAlignment="center"
-                android:textSize="16sp"
-                tools:text="Москва, Россия" />
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/sexAndAge"
@@ -274,6 +273,7 @@
                 android:layout_height="match_parent"
                 android:layout_toStartOf="@+id/travelWayImagesContainer"
                 android:fontFamily="sans-serif-medium"
+                android:paddingBottom="16dp"
                 android:text="@string/method_move"
                 android:textSize="16sp" />
 
@@ -288,9 +288,9 @@
                     android:id="@+id/directions_car"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="6dp"
-                    android:layout_marginStart="6dp"
-                    android:src="@drawable/ic_directions_car"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="10dp"
+                    android:src="@drawable/ic_car_activated"
                     android:visibility="gone"
                     tools:ignore="ContentDescription" />
 
@@ -298,9 +298,9 @@
                     android:id="@+id/directions_railway"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="6dp"
-                    android:layout_marginStart="6dp"
-                    android:src="@drawable/ic_directions_railway"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="10dp"
+                    android:src="@drawable/ic_train_activated"
                     android:visibility="gone"
                     tools:ignore="ContentDescription"
                     tools:visibility="visible" />
@@ -309,29 +309,29 @@
                     android:id="@+id/directions_bus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="6dp"
-                    android:layout_marginStart="6dp"
-                    android:src="@drawable/ic_directions_bus"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="10dp"
+                    android:src="@drawable/ic_bus_activated"
                     android:visibility="gone"
                     tools:ignore="ContentDescription" />
 
                 <ImageView
                     android:id="@+id/directions_flight"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginEnd="6dp"
-                    android:layout_marginStart="6dp"
-                    android:src="@drawable/ic_flight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="10dp"
+                    android:src="@drawable/ic_plane_activated"
                     android:visibility="gone"
                     tools:ignore="ContentDescription" />
 
                 <ImageView
                     android:id="@+id/direction_hitchiking"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginEnd="6dp"
-                    android:layout_marginStart="6dp"
-                    android:src="@drawable/ic_directions_hitchhiking"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="10dp"
+                    android:src="@drawable/ic_hitch_hiking_activated"
                     android:visibility="gone"
                     tools:ignore="ContentDescription" />
 
@@ -356,6 +356,7 @@
                 android:layout_height="match_parent"
                 android:layout_toStartOf="@+id/displayPriceTravel"
                 android:fontFamily="sans-serif-medium"
+                android:paddingBottom="16dp"
                 android:text="@string/money"
                 android:textSize="16sp" />
 
@@ -399,6 +400,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/imageQuoteDescription"
                 android:layout_toEndOf="@+id/imageQuoteDescription"
+                android:paddingBottom="16dp"
                 android:textColor="@color/black"
                 android:textSize="@dimen/standard_text_size"
                 tools:text="Собираюсь провести отпуск в Ижевске. Шутка))) Еду в Карловы Вары" />

@@ -2,7 +2,6 @@ package ru.a1024bits.bytheway.viewmodel
 
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
-import com.borax12.materialdaterangepicker.date.DatePickerDialog
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.QuerySnapshot
 import io.reactivex.Single
@@ -25,14 +24,17 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
     var yearsOldUsers = (0..MAX_AGE).mapTo(ArrayList<String>()) { it.toString() }
     val filter = Filter()
 
-    val TAG = "showUserViewModel"
+    companion object {
+        const val TAG = "showUserViewModel"
+    }
 
     fun getAllUsers() {
         userRepository?.installAllUsers(this)
     }
 
     override fun filterAndInstallUsers(snapshot: QuerySnapshot) {
-        Single.create<MutableList<User>> { owner ->
+        Single.create<MutableList<User>> { stream ->
+            try {
             Log.e("LOG get all users", Thread.currentThread().name)
             val result: MutableList<User> = ArrayList()
             for (document in snapshot) {
@@ -45,10 +47,14 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
                 }
             }
             filterUsersByFilter(result, filter)
-            owner.onSuccess(result)
+                stream.onSuccess(result)
+            } catch (exp: Exception) {
+                stream.onError(exp) // for fix bugs FirebaseFirestoreException: DEADLINE_EXCEEDED
+            }
         }
                 .subscribeOn(getBackgroundScheduler())
-                .observeOn(getMainThreadScheduler())
+                .timeout(TIMEOUT_SECONDS, timeoutUnit)
+                .retry(2)
                 .doOnSubscribe({ loadingStatus.postValue(true) })
                 .doAfterTerminate({ loadingStatus.postValue(false) })
                 .subscribe({ resultUsers ->
@@ -59,83 +65,65 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
     }
 
     fun sendUserData(map: HashMap<String, Any>, id: String) {
-        loadingStatus.setValue(true)
-        //fixme
-        userRepository?.changeUserProfile(map, id)?.subscribe()
+        userRepository?.let {
+            loadingStatus.setValue(true)
+            disposables.add(it.changeUserProfile(map, id)
+                    .timeout(TIMEOUT_SECONDS, timeoutUnit)
+                    .retry(2)
+                    .doAfterTerminate({ loadingStatus.setValue(false) })
+                    .subscribe(
+                            { Log.e("LOG", "complete") },
+                            { t ->
+                                response.setValue(Response.error(t))
+                                Log.e("LOG view model", "send User Data", t)
+                            }
+                    ))
+        }
     }
 
     fun getUsersWithSimilarTravel(paramSearch: Filter) {
-        loadingStatus.setValue(true)
-        disposables.add(userRepository!!.getReallUsers(paramSearch)
-                .subscribeOn(getBackgroundScheduler())
-                .observeOn(getMainThreadScheduler())
-                .doAfterTerminate({ loadingStatus.setValue(false) })
-                .subscribe(
-                        { list -> response.setValue(Response.success(list)) },
-                        { throwable -> response.setValue(Response.error(throwable)) }
-                )
-        )
-    }
-
-    fun updateDateDialog(listener: OnUpdateDialog?): DatePickerDialog {
-        val currentStartDate = Calendar.getInstance()
-        if (filter.startDate > 0L) currentStartDate.timeInMillis = filter.startDate
-        val currentEndDate = Calendar.getInstance()
-        currentEndDate.timeInMillis = currentEndDate.timeInMillis + 1000L * 60 * 60 * 24
-        if (filter.endDate > 0L) currentEndDate.timeInMillis = filter.endDate
-
-        val dateDialog = DatePickerDialog.newInstance(
-                { _, year, monthOfYear, dayOfMonth, yearEnd, monthOfYearEnd, dayOfMonthEnd ->
-                    val calendarStartDate = Calendar.getInstance()
-                    calendarStartDate.set(Calendar.YEAR, year)
-                    calendarStartDate.set(Calendar.MONTH, monthOfYear)
-                    calendarStartDate.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-
-                    val calendarEndDate = Calendar.getInstance()
-                    calendarEndDate.set(Calendar.YEAR, yearEnd)
-                    calendarEndDate.set(Calendar.MONTH, monthOfYearEnd)
-                    calendarEndDate.set(Calendar.DAY_OF_MONTH, dayOfMonthEnd)
-
-                    if (calendarStartDate.timeInMillis >= calendarEndDate.timeInMillis) {
-                        listener?.notSuchSetDate()
-                        return@newInstance
-                    }
-                    filter.startDate = calendarStartDate.timeInMillis
-                    filter.endDate = calendarEndDate.timeInMillis
-                    listener?.onSuchSetDate()
-                },
-                currentStartDate.get(Calendar.YEAR),
-                currentStartDate.get(Calendar.MONTH),
-                currentStartDate.get(Calendar.DAY_OF_MONTH),
-                currentEndDate.get(Calendar.YEAR),
-                currentEndDate.get(Calendar.MONTH),
-                currentEndDate.get(Calendar.DAY_OF_MONTH))
-        dateDialog.setStartTitle(INSTANCE.applicationContext.resources.getString(R.string.date_start))
-        dateDialog.setEndTitle(INSTANCE.applicationContext.resources.getString(R.string.date_end))
-        return dateDialog
-    }
-
-    fun getTextFromDates(startDate: Long?, endDate: Long?, variant: Int): String {
-        var toWord = INSTANCE.applicationContext.getString(R.string.to_date_filter)
-        if (variant == 1) {
-            toWord = " - "
+        userRepository?.let {
+            loadingStatus.setValue(true)
+            disposables.add(it.getReallUsers(paramSearch)
+                    .timeout(TIMEOUT_SECONDS, timeoutUnit)
+                    .retry(2)
+                    .subscribeOn(getBackgroundScheduler())
+                    .observeOn(getMainThreadScheduler())
+                    .doAfterTerminate({ loadingStatus.setValue(false) })
+                    .subscribe(
+                            { list -> response.setValue(Response.success(list)) },
+                            { throwable -> response.setValue(Response.error(throwable)) }
+                    )
+            )
         }
+    }
+
+    fun getTextFromDates(date: Long?): String {
+        val calendarStartDate = Calendar.getInstance()
+        calendarStartDate.timeInMillis = date ?: 0L
+        return getTextDateDayAndMonth(calendarStartDate)
+    }
+
+    fun getTextFromDates(startDate: Long?, endDate: Long?): String {
+        val toWord = " - "
+
         val calendarStartDate = Calendar.getInstance()
         calendarStartDate.timeInMillis = startDate ?: 0L
         val calendarEndDate = Calendar.getInstance()
         calendarEndDate.timeInMillis = endDate ?: 0L
+
+        if (calendarEndDate.timeInMillis == 0L)
+            return getTextDateDayAndMonth(calendarStartDate)
+
+        if (calendarStartDate.timeInMillis == 0L)
+            return getTextDateDayAndMonth(calendarEndDate)
+
         var yearStart = ""
         var yearEnd = ""
         if (calendarStartDate.get(Calendar.YEAR) != calendarEndDate.get(Calendar.YEAR)) {
             yearStart = calendarStartDate.get(Calendar.YEAR).toString()
             yearEnd = calendarEndDate.get(Calendar.YEAR).toString()
         }
-        if (calendarEndDate.timeInMillis == 0L)
-            return getTextDate(calendarStartDate, yearStart)
-
-        if (calendarStartDate.timeInMillis == 0L)
-            return getTextDate(calendarEndDate, yearEnd)
-
         return getTextDate(calendarStartDate, yearStart) + toWord + getTextDate(calendarEndDate, yearEnd)
     }
 
@@ -148,11 +136,16 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
             }
 
     private fun getTextDate(calendarStartDate: Calendar, yearStart: String): String {
+        return StringBuilder("").append(getTextDateDayAndMonth(calendarStartDate))
+                .append(" ")
+                .append(yearStart)
+                .toString()
+    }
+
+    private fun getTextDateDayAndMonth(calendarStartDate: Calendar): String {
         return StringBuilder("").append(calendarStartDate.get(Calendar.DAY_OF_MONTH))
                 .append(" ")
                 .append(INSTANCE.applicationContext.resources.getStringArray(R.array.months_array)[calendarStartDate.get(Calendar.MONTH)])
-                .append(" ")
-                .append(yearStart)
                 .toString()
     }
 
