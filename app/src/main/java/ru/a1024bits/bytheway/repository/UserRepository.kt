@@ -23,7 +23,10 @@ const val COLLECTION_USERS = "users"
  */
 class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapService: MapWebService) : IUsersRepository {
 
-    var TAG = "LOG UserRepository"
+    companion object {
+        const val TAG = "LOG UserRepository"
+        const val MIN_LIMIT = 1
+    }
 
     override fun getUser(id: String): Single<User> =
             Single.create<User> { stream ->
@@ -70,8 +73,6 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
         }
     }
 
-    private val MIN_LIMIT = 1
-
     override fun getReallUsers(paramSearch: Filter): Single<List<User>> =
             Single.create<List<User>> { stream ->
                 try {
@@ -96,7 +97,10 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                                         val search = SearchTravelers(filter = paramSearch, user = user)
                                         val s = search.getEstimation()
                                         user.percentsSimilarTravel = if (s > 100) 100 else s
-                                        if (user.percentsSimilarTravel > MIN_LIMIT) result.add(user)
+                                        if (user.percentsSimilarTravel > MIN_LIMIT &&
+                                                user.id != FirebaseAuth.getInstance().currentUser?.uid) {
+                                            result.add(user)
+                                        }
                                     }
                                 } catch (ex: Exception) {
                                     stream.onError(ex)

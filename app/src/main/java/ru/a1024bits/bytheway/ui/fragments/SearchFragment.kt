@@ -32,6 +32,7 @@ import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT
 import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO
 import ru.a1024bits.bytheway.util.Constants.START_DATE
 import ru.a1024bits.bytheway.util.DecimalInputFilter
+import ru.a1024bits.bytheway.util.getLongFromDate
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -249,47 +250,6 @@ class SearchFragment : Fragment() {
         dateDialog.show(activity.supportFragmentManager, "")
     }
 
-    /*override fun onDateSet(view: DatePickerDialog?, year: Int, monthOfYear: Int, dayOfMonth: Int, yearEnd: Int, monthOfYearEnd: Int, dayOfMonthEnd: Int) {
-        try {
-            dateFromValue.setText(StringBuilder(" ")
-                    .append(dayOfMonth)
-                    .append(" ")
-                    .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
-                    .append(" ")
-                    .append(year).toString())
-
-            if (getLongFromDate(dayOfMonth, monthOfYear, year) < getLongFromDate(dayOfMonthEnd, monthOfYearEnd, yearEnd)) {
-                dateToValue.setText(StringBuilder(" ")
-                        .append(dayOfMonthEnd)
-                        .append(" ")
-                        .append(context.resources.getStringArray(R.array.months_array)[monthOfYearEnd])
-                        .append(" ")
-                        .append(yearEnd).toString())
-                filter.endDate = getLongFromDate(dayOfMonthEnd, monthOfYearEnd, yearEnd)
-            } else {
-                Toast.makeText(context, R.string.date_error_set, Toast.LENGTH_SHORT).show()
-                dateToValue.setText(StringBuilder(" ")
-                        .append(dayOfMonth)
-                        .append(" ")
-                        .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
-                        .append(" ")
-                        .append(year).toString())
-            }
-            filter.startDate = getLongFromDate(dayOfMonth, monthOfYear, year)
-        } catch (e: Exception) {
-            filter.startDate = 0
-            filter.endDate = 0
-            e.printStackTrace()
-        }
-    }*/
-
-    private fun getLongFromDate(day: Int, month: Int, year: Int): Long {
-        val dateString = "$day ${month + 1} $year"
-        val dateFormat = SimpleDateFormat("dd MM yyyy", Locale.US)
-        val date = dateFormat.parse(dateString)
-        val unixTime = date.time.toLong()
-        return unixTime
-    }
 
     override fun onStart() {
         super.onStart()

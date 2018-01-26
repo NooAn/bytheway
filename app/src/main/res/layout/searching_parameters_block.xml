@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/custom_rec"
@@ -45,13 +45,52 @@
             android:textSize="@dimen/standard_text_size" />
 
         <TextView
-            android:id="@+id/choseDate"
+            android:id="@+id/choseDateStart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/endCity"
+            android:layout_toEndOf="@+id/fromAgeText"
+            android:layout_toStartOf="@+id/byDateText"
+            android:text="@string/filters_all_users_empty_date_start"
+            android:textSize="@dimen/standard_text_size"
+            android:theme="@style/UsersTextInFilters" />
+
+        <TextView
+            android:id="@+id/fromDateText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/endCity"
+            android:layout_marginEnd="8dp"
             android:layout_toEndOf="@id/dateText"
-            android:text="@string/filters_all_users_empty_date"
+            android:text="@string/from_in"
             android:textSize="@dimen/standard_text_size" />
+
+        <TextView
+            android:id="@+id/byDateText"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:layout_alignBaseline="@+id/choseDateEnd"
+            android:layout_alignBottom="@+id/choseDateEnd"
+            android:layout_alignStart="@+id/byAgeText"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:gravity="top"
+            android:text="@string/to_date"
+            android:textSize="@dimen/standard_text_size" />
+
+        <TextView
+            android:id="@+id/choseDateEnd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/choseDateStart"
+            android:layout_alignBottom="@+id/choseDateStart"
+            android:layout_alignParentEnd="true"
+            android:layout_alignStart="@+id/endAge"
+            android:saveEnabled="true"
+            android:text="@string/filters_all_users_empty_date_end"
+            android:textSize="@dimen/standard_text_size"
+            android:theme="@style/UsersTextInFilters" />
+
 
         <TextView
             android:id="@+id/sexText"
@@ -120,7 +159,7 @@
             android:id="@+id/fromAgeText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignStart="@id/choseDate"
+            android:layout_alignStart="@id/fromDateText"
             android:layout_below="@id/sexText"
             android:text="@string/from"
             android:textSize="@dimen/standard_text_size" />
@@ -139,9 +178,10 @@
             android:id="@+id/byAgeText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/sexText"
-            android:layout_marginStart="@dimen/standard_margin"
-            android:layout_toEndOf="@id/startAge"
+            android:layout_alignTop="@+id/endAge"
+            android:layout_marginEnd="4dp"
+            android:layout_marginStart="4dp"
+            android:layout_toStartOf="@+id/saveParameters"
             android:text="@string/to"
             android:textSize="@dimen/standard_text_size" />
 
@@ -170,7 +210,7 @@
             android:id="@+id/fromBudgetText"
             android:layout_width="wrap_content"
             android:layout_height="35dp"
-            android:layout_alignStart="@id/choseDate"
+            android:layout_alignStart="@id/fromDateText"
             android:layout_below="@id/ageText"
             android:gravity="top"
             android:text="@string/from"
@@ -194,6 +234,8 @@
             android:layout_height="35dp"
             android:layout_alignStart="@id/byAgeText"
             android:layout_below="@id/ageText"
+            android:layout_marginEnd="4dp"
+            android:layout_marginStart="4dp"
             android:gravity="top"
             android:text="@string/to"
             android:textSize="@dimen/standard_text_size" />

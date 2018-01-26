@@ -2,7 +2,6 @@ package ru.a1024bits.bytheway.viewmodel
 
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
-import com.borax12.materialdaterangepicker.date.DatePickerDialog
 import ru.a1024bits.bytheway.App.Companion.INSTANCE
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.Response
@@ -10,7 +9,6 @@ import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.repository.MAX_AGE
 import ru.a1024bits.bytheway.repository.UserRepository
-import ru.a1024bits.bytheway.ui.fragments.AllUsersFragment
 import java.util.*
 import javax.inject.Inject
 
@@ -22,11 +20,15 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
     var yearsOldUsers = (0..MAX_AGE).mapTo(ArrayList<String>()) { it.toString() }
     val filter = Filter()
 
-    val TAG = "showUserViewModel"
+    companion object {
+        const val TAG = "showUserViewModel"
+    }
 
     fun getAllUsers(filter: Filter) {
         disposables.add(userRepository.getAllUsers()
                 .subscribeOn(getBackgroundScheduler())
+                .timeout(TIMEOUT_SECONDS, timeoutUnit)
+                .retry(2)
                 .doOnSubscribe({ loadingStatus.postValue(true) })
                 .doAfterTerminate({ loadingStatus.postValue(false) })
                 .doAfterSuccess { resultUsers -> filterUsersByFilter(resultUsers, filter) }
@@ -44,6 +46,8 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
     fun sendUserData(map: HashMap<String, Any>, id: String) {
         loadingStatus.setValue(true)
         disposables.add(userRepository.changeUserProfile(map, id)
+                .timeout(TIMEOUT_SECONDS, timeoutUnit)
+                .retry(2)
                 .doAfterTerminate({ loadingStatus.setValue(false) })
                 .subscribe(
                         { Log.e("LOG", "complete") },
@@ -57,6 +61,8 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
     fun getUsersWithSimilarTravel(paramSearch: Filter) {
         loadingStatus.setValue(true)
         disposables.add(userRepository.getReallUsers(paramSearch)
+                .timeout(TIMEOUT_SECONDS, timeoutUnit)
+                .retry(2)
                 .subscribeOn(getBackgroundScheduler())
                 .observeOn(getMainThreadScheduler())
                 .doAfterTerminate({ loadingStatus.setValue(false) })
@@ -67,66 +73,32 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
         )
     }
 
-    fun updateDateDialog(fragment: AllUsersFragment): DatePickerDialog {
-        val currentStartDate = Calendar.getInstance()
-        if (filter.startDate > 0L) currentStartDate.timeInMillis = filter.startDate
-        val currentEndDate = Calendar.getInstance()
-        currentEndDate.timeInMillis = currentEndDate.timeInMillis + 1000L * 60 * 60 * 24
-        if (filter.endDate > 0L) currentEndDate.timeInMillis = filter.endDate
-
-        val dateDialog = DatePickerDialog.newInstance(
-                { _, year, monthOfYear, dayOfMonth, yearEnd, monthOfYearEnd, dayOfMonthEnd ->
-                    val calendarStartDate = Calendar.getInstance()
-                    calendarStartDate.set(Calendar.YEAR, year)
-                    calendarStartDate.set(Calendar.MONTH, monthOfYear)
-                    calendarStartDate.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-
-                    val calendarEndDate = Calendar.getInstance()
-                    calendarEndDate.set(Calendar.YEAR, yearEnd)
-                    calendarEndDate.set(Calendar.MONTH, monthOfYearEnd)
-                    calendarEndDate.set(Calendar.DAY_OF_MONTH, dayOfMonthEnd)
-
-                    if (calendarStartDate.timeInMillis >= calendarEndDate.timeInMillis) {
-                        fragment.nonSuchSetDate()
-                        return@newInstance
-                    }
-                    filter.startDate = calendarStartDate.timeInMillis
-                    filter.endDate = calendarEndDate.timeInMillis
-                    fragment.suchSetDate()
-                },
-                currentStartDate.get(Calendar.YEAR),
-                currentStartDate.get(Calendar.MONTH),
-                currentStartDate.get(Calendar.DAY_OF_MONTH),
-                currentEndDate.get(Calendar.YEAR),
-                currentEndDate.get(Calendar.MONTH),
-                currentEndDate.get(Calendar.DAY_OF_MONTH))
-        dateDialog.setStartTitle(INSTANCE.applicationContext.resources.getString(R.string.date_start))
-        dateDialog.setEndTitle(INSTANCE.applicationContext.resources.getString(R.string.date_end))
-        return dateDialog
+    fun getTextFromDates(date: Long?): String {
+        val calendarStartDate = Calendar.getInstance()
+        calendarStartDate.timeInMillis = date ?: 0L
+        return getTextDateDayAndMonth(calendarStartDate)
     }
 
-    fun getTextFromDates(startDate: Long?, endDate: Long?, variant: Int): String {
-        var fromWord = INSTANCE.applicationContext.getString(R.string.from_date_filter)
-        var toWord = INSTANCE.applicationContext.getString(R.string.to_date_filter)
-        if (variant == 1) {
-            toWord = " - "
-        }
+    fun getTextFromDates(startDate: Long?, endDate: Long?): String {
+        val toWord = " - "
+
         val calendarStartDate = Calendar.getInstance()
         calendarStartDate.timeInMillis = startDate ?: 0L
         val calendarEndDate = Calendar.getInstance()
         calendarEndDate.timeInMillis = endDate ?: 0L
+
+        if (calendarEndDate.timeInMillis == 0L)
+            return getTextDateDayAndMonth(calendarStartDate)
+
+        if (calendarStartDate.timeInMillis == 0L)
+            return getTextDateDayAndMonth(calendarEndDate)
+
         var yearStart = ""
         var yearEnd = ""
         if (calendarStartDate.get(Calendar.YEAR) != calendarEndDate.get(Calendar.YEAR)) {
             yearStart = calendarStartDate.get(Calendar.YEAR).toString()
             yearEnd = calendarEndDate.get(Calendar.YEAR).toString()
         }
-        if (calendarEndDate.timeInMillis == 0L)
-            return getTextDate(calendarStartDate, yearStart)
-
-        if (calendarStartDate.timeInMillis == 0L)
-            return getTextDate(calendarEndDate, yearEnd)
-
         return getTextDate(calendarStartDate, yearStart) + toWord + getTextDate(calendarEndDate, yearEnd)
     }
 
@@ -139,11 +111,16 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
             }
 
     private fun getTextDate(calendarStartDate: Calendar, yearStart: String): String {
+        return StringBuilder("").append(getTextDateDayAndMonth(calendarStartDate))
+                .append(" ")
+                .append(yearStart)
+                .toString()
+    }
+
+    private fun getTextDateDayAndMonth(calendarStartDate: Calendar): String {
         return StringBuilder("").append(calendarStartDate.get(Calendar.DAY_OF_MONTH))
                 .append(" ")
                 .append(INSTANCE.applicationContext.resources.getStringArray(R.array.months_array)[calendarStartDate.get(Calendar.MONTH)])
-                .append(" ")
-                .append(yearStart)
                 .toString()
     }
 

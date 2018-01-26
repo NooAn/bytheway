@@ -33,6 +33,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.GeoPoint
 import com.google.maps.android.PolyUtil
 import kotlinx.android.synthetic.main.confirm_dialog.view.*
@@ -56,6 +57,7 @@ import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT
 import ru.a1024bits.bytheway.util.Constants.START_DATE
 import ru.a1024bits.bytheway.util.DecimalInputFilter
 import ru.a1024bits.bytheway.util.getBearing
+import ru.a1024bits.bytheway.util.getLongFromDate
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import ru.terrakok.cicerone.commands.Replace
 import uk.co.deanwild.materialshowcaseview.IShowcaseListener
@@ -222,7 +224,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(context)
 
         methodIcons.put(Method.CAR.link, iconCar)
         methodIcons.put(Method.TRAIN.link, iconTrain)
@@ -253,51 +254,55 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     @LayoutRes
     override fun getLayoutRes(): Int {
-        return R.layout.fragment_user_profile
+        return R.layout.fragment_my_user_profile
     }
 
     override fun getViewModelClass(): Class<MyProfileViewModel> = MyProfileViewModel::class.java
 
-    var showView: MaterialShowcaseView? = null
+//    var showView: MaterialShowcaseView? = null
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if ((activity as MenuActivity).preferences.getBoolean("isFirstEnterMyProfileFragment", true)) {
-            showView = MaterialShowcaseView.Builder(activity)
-                    .setTarget(newTripText)
-                    .renderOverNavigationBar()
-                    .setDismissText(getString(R.string.close_hint))
-                    .setTitleText(getString(R.string.hint_create_travel))
-                    .setContentText(getString(R.string.hint_create_travel_description))
-                    .withCircleShape()
-                    .setListener(object : IShowcaseListener {
-                        override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {
-                            val mHandler = Handler()
-                            val time = 10000L // 10 sec after we can hide tips
-                            try {
-                                mHandler.postDelayed({ hide() }, time)
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                            }
-                        }
+        showPrompt("isFirstEnterMyProfileFragment", context.resources.getString(R.string.close_hint),
+                getString(R.string.hint_create_travel), getString(R.string.hint_create_travel_description))
 
-                        override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
-                            if (activity != null && !activity.isDestroyed) {
-                                (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterMyProfileFragment", false).apply()
-                            }
-                        }
-                    }).build()
-            showView?.show(activity)
-        }
+//        if ((activity as MenuActivity).preferences.getBoolean("isFirstEnterMyProfileFragment", true)) {
+//            showView = MaterialShowcaseView.Builder(activity)
+//                    .setTarget(newTripText)
+//                    .renderOverNavigationBar()
+//                    .setDismissText(getString(R.string.close_hint))
+//                    .setTitleText(getString(R.string.hint_create_travel))
+//                    .setContentText(getString(R.string.hint_create_travel_description))
+//                    .withCircleShape()
+//                    .setListener(object : IShowcaseListener {
+//                        override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {
+//                            val mHandler = Handler()
+//                            val time = 10000L // 10 sec after we can hide tips
+//                            try {
+//                                mHandler.postDelayed({ hide() }, time)
+//                            } catch (e: Exception) {
+//                                e.printStackTrace()
+//                            }
+//                        }
+//
+//                        override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
+//                            if (activity != null && !activity.isDestroyed) {
+//                                (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterMyProfileFragment", false).apply()
+//                            }
+//                        }
+//                    }).build()
+//            showView?.show(activity)
+        //       }
     }
 
-    private fun hide() {
-        try {
-            showView?.hide()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
+//    private fun hide() {
+//        try {
+//            showView?.hide()
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//            FirebaseCrash.report(e)
+//        }
+//    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -451,7 +456,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater?.inflate(R.layout.fragment_my_user_profile, container, false)
+        val view = super.onCreateView(inflater, container, savedInstanceState)
         mapView = view?.findViewById(R.id.mapView)
 
         try {
@@ -615,45 +620,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         mapView?.onLowMemory()
     }
 
-    /*override fun onDateSet(view: DatePickerDialog?, year: Int, monthOfYear: Int, dayOfMonth: Int, yearEnd: Int, monthOfYearEnd: Int, dayOfMonthEnd: Int) {
-        Log.e("LOG Date", "$year  $monthOfYear $dayOfMonth - $yearEnd $monthOfYearEnd $dayOfMonthEnd")
-        textDateFrom.setText(StringBuilder(" ")
-                .append(dayOfMonth)
-                .append(" ")
-                .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
-                .append(" ")
-                .append(year).toString())
-
-
-        if (getLongFromDate(dayOfMonth, monthOfYear, year) < getLongFromDate(dayOfMonthEnd, monthOfYearEnd, yearEnd)) {
-            dateArrived.setText(StringBuilder(" ")
-                    .append(dayOfMonthEnd)
-                    .append(" ")
-                    .append(context.resources.getStringArray(R.array.months_array)[monthOfYearEnd])
-                    .append(" ")
-                    .append(yearEnd).toString())
-            dates[END_DATE] = getLongFromDate(dayOfMonthEnd, monthOfYearEnd, yearEnd)
-        } else {
-            Toast.makeText(context, R.string.date_error_set, Toast.LENGTH_SHORT).show()
-            dateArrived.setText(StringBuilder(" ")
-                    .append(dayOfMonth)
-                    .append(" ")
-                    .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
-                    .append(" ")
-                    .append(year).toString())
-        }
-
-        dates[START_DATE] = getLongFromDate(dayOfMonth, monthOfYear, year)
-        profileStateHashMap[DATES] = dates.toString()
-        profileChanged()
-    }*/
-
-    private fun getLongFromDate(day: Int, month: Int, year: Int): Long {
-        val dateString = "$day ${month + 1} $year"
-        val dateFormat = SimpleDateFormat("dd MM yyyy", Locale.US)
-        val date = dateFormat.parse(dateString)
-        return date.time
-    }
 
     private fun TextView.afterTextChanged(afterTextChanged: (String) -> Unit) {
         this.addTextChangedListener(object : TextWatcher {
@@ -684,7 +650,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     private fun openDateFromDialog() {
         val dateFrom = Calendar.getInstance() //current time by default
-        if(dates[START_DATE]?:0L > 0L) dateFrom.timeInMillis = dates[START_DATE]?: dateFrom.timeInMillis
+        if (dates[START_DATE] ?: 0L > 0L) dateFrom.timeInMillis = dates[START_DATE] ?: dateFrom.timeInMillis
 
         dateDialog = CalendarDatePickerDialogFragment()
                 .setFirstDayOfWeek(Calendar.MONDAY)
@@ -709,14 +675,15 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     private fun openDateArrivedDialog() {
         val dateTo = Calendar.getInstance() //current time by default
-        if(dates[END_DATE]?:0L > 0L) dateTo.timeInMillis = dates[END_DATE]?: dateTo.timeInMillis
+        if (dates[END_DATE] ?: 0L > 0L) dateTo.timeInMillis = dates[END_DATE] ?: dateTo.timeInMillis
 
         dateDialog = CalendarDatePickerDialogFragment()
                 .setFirstDayOfWeek(Calendar.MONDAY)
                 .setThemeCustom(R.style.BythewayDatePickerDialogTheme)
                 .setPreselectedDate(dateTo.get(Calendar.YEAR), dateTo.get(Calendar.MONTH), dateTo.get(Calendar.DAY_OF_MONTH))
 
-        dateDialog.setDateRange(MonthAdapter.CalendarDay(dates[START_DATE] ?: System.currentTimeMillis()), null)
+        dateDialog.setDateRange(MonthAdapter.CalendarDay(dates[START_DATE]
+                ?: System.currentTimeMillis()), null)
         dateDialog.setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
             dateArrived.setText(StringBuilder(" ")
                     .append(dayOfMonth)
@@ -829,7 +796,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             name = (nameChoose.text.toString()).capitalize()
             lastName = (lastNameChoose.text.toString()).capitalize()
             city = (cityChoose.text.toString()).capitalize()
-            age = (yearsView.text.toString()).toInt()
+            age = (yearsView.text.toStringOrNill()).toInt()
 
             username.text = StringBuilder(name).append(" ").append(lastName)
             cityview.text = if (city.isNotEmpty()) city else getString(R.string.native_city)
@@ -1000,7 +967,9 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         methodTextViews.values.map {
             it?.isActivated = false
         }
-
+        methodIcons.values.map {
+            it?.isActivated = false
+        }
         appinTheAirEnter.visibility = View.GONE
         layoutTravelMethod.visibility = View.GONE
         moneyfortrip.visibility = View.GONE
@@ -1046,13 +1015,11 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     }
 
     private fun fillProfile(user: User) {
-        val navigationView = activity.findViewById<NavigationView>(R.id.nav_view)
-        val hView = navigationView.getHeaderView(0)
-        val cityName = hView.findViewById<TextView>(R.id.menu_city_name)
-        cityName.text = user.city
-        val fullName = hView.findViewById<TextView>(R.id.menu_fullname)
-        fullName.text = StringBuilder().append(user.name).append(" ").append(user.lastName)
-        username.text = StringBuilder(user.name).append(" ").append(user.lastName)
+        glide?.load(user.urlPhoto)
+                ?.apply(RequestOptions.circleCropTransform())
+                ?.into(image_avatar)
+
+
 
         cityFromLatLng = user.cityFromLatLng
         cityToLatLng = user.cityToLatLng
@@ -1109,9 +1076,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
         age = user.age
 
-        glide?.load(user.urlPhoto)
-                ?.apply(RequestOptions.circleCropTransform())
-                ?.into(image_avatar)
+
 
         for (name in user.socialNetwork) {
             socNet[name.key] = name.value
@@ -1148,6 +1113,14 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         saveProfileState()
         addInfoUser.setText(user.addInformation)
         addInfoUser.clearFocus()
+
+        val navigationView = activity.findViewById<NavigationView>(R.id.nav_view)
+        val hView = navigationView.getHeaderView(0)
+        val cityName = hView.findViewById<TextView>(R.id.menu_city_name)
+        cityName.text = user.city
+        val fullName = hView.findViewById<TextView>(R.id.menu_fullname)
+        fullName.text = StringBuilder().append(user.name).append(" ").append(user.lastName)
+        username.text = StringBuilder(user.name).append(" ").append(user.lastName)
     }
 
     private fun showTipsForEmptySocialLink() {
@@ -1220,3 +1193,5 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         viewModel?.getRoute(cityFromLatLng = cityFromLatLng, cityToLatLng = cityToLatLng)
     }
 }
+
+private fun Editable.toStringOrNill(): String = if (this.toString().isBlank()) "0" else this.toString()

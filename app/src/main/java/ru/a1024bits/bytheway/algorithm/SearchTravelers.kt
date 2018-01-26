@@ -1,5 +1,6 @@
 package ru.a1024bits.bytheway.algorithm
 
+import android.location.Location
 import android.util.Log
 import ru.a1024bits.bytheway.model.Method
 import ru.a1024bits.bytheway.model.User
@@ -22,8 +23,8 @@ class SearchTravelers(val filter: Filter = Filter(), val user: User) {
 //        val m = calculateDate() * WeightDate
 //        val c = calculateMethod() * WeightMethod
 //        val p = calculateBudget() * WeightBudget
-
-//        Log.e("LOG", "name:${user.name} -  route:$n  date:$m  method:$c  budget:$p")
+//
+//        Log.e("LOG", "name:${user.name} -  route:$n  date:$m  method:$c  budget:$p sum:${m + n + c + p}")
 
         return ((calculateRoute() * WeightRoute
                 + calculateDate() * WeightDate
@@ -84,13 +85,34 @@ class SearchTravelers(val filter: Filter = Filter(), val user: User) {
         val startPoint = (user.cityFromLatLng.latitude - filter.locationStartCity.latitude) * (user.cityFromLatLng.latitude - filter.locationStartCity.latitude)
         +((user.cityFromLatLng.longitude - filter.locationStartCity.longitude) * (user.cityFromLatLng.longitude - filter.locationStartCity.longitude))
 
-        val endPoint = (user.cityToLatLng.latitude - filter.locationEndCity.latitude) * (user.cityToLatLng.latitude - filter.locationEndCity.latitude)
+        val distanceEndPoints = (user.cityToLatLng.latitude - filter.locationEndCity.latitude) * (user.cityToLatLng.latitude - filter.locationEndCity.latitude)
         +((user.cityToLatLng.longitude - filter.locationEndCity.longitude) * (user.cityToLatLng.longitude - filter.locationEndCity.longitude))
 
+        return computePercentBeetwenTwoLocation(distanceEndPoints, user.cityFromLatLng.latitude, filter.locationStartCity.latitude, user.cityFromLatLng.longitude, filter.locationStartCity.longitude)
+    }
+
+    fun valuationAngel(latitudeStart: Double, longitudeStart: Double, latitudeEnd: Double, longitudeEnd: Double): Double {
+        var locationUser = Location("Start")
+        locationUser.longitude = longitudeStart
+        locationUser.latitude = latitudeStart
+        var locationFilter = Location("End")
+        locationFilter.latitude = latitudeEnd
+        locationFilter.longitude = longitudeEnd
+        return locationUser.bearingTo(locationFilter).toDouble()
+    }
+
+    fun valuationDeltaTwoAngel(): Double {
+        val userAngel = valuationAngel(user.cityFromLatLng.latitude, user.cityFromLatLng.longitude, user.cityToLatLng.latitude, user.cityToLatLng.longitude)
+        val filterAngel = valuationAngel(filter.locationStartCity.latitude, filter.locationStartCity.longitude, filter.locationEndCity.latitude, filter.locationEndCity.longitude)
+        return Math.abs(userAngel - filterAngel)
+    }
+
+
+    private fun computePercentBeetwenTwoLocation(endPoint: Double, latitudeUser: Double, latitudeFilter: Double, longitudeUser: Double, longitude1Filter: Double): Double {
         var R = 0
         var indexFirst = 0.0
         var indexLast = 0.500
-        val radiusStart = distance(user.cityFromLatLng.latitude, filter.locationStartCity.latitude, user.cityFromLatLng.longitude, filter.locationStartCity.longitude)
+        val radiusStart = distance(latitudeUser, latitudeFilter, longitudeUser, longitude1Filter)
         if (radiusStart < 10) indexFirst = 1.0
         else if (radiusStart < 100) {
             indexFirst = (9800 - 90 * radiusStart) / 9000
@@ -100,11 +122,6 @@ class SearchTravelers(val filter: Filter = Filter(), val user: User) {
             indexFirst = (5000 - 5 * radiusStart) / 900000
         } else indexFirst = 0.0
 
-//        for (i in 6..20) {
-//            R = fibbonaci(i)
-//            indexFirst = Math.abs((0.4 * R - 73.1) / (126 + (R * R * (i - 4)) / 26))
-//            if (startPoint <= R * R) break
-//        }
         R = 0
         for (i in 1..20) {
             if (endPoint <= R * R) break

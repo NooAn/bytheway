@@ -27,8 +27,6 @@
     <string name="date_to">Дата</string>
     <string name="date_start">Начало</string>
     <string name="date_end">Конец</string>
-    <string name="from_date_filter">"c   "</string>
-    <string name="to_date_filter">"   по   "</string>
     <string name="date_trip">Дата путешествия</string>
     <string name="method_move">Способ передвижения</string>
     <string name="budget">1000 </string>
@@ -99,7 +97,9 @@
     <string name="textBodyDisaster">Мы не смогли найти ваши предстоящие поездки.</string>
     <string name="textHeadAirDisaster">Ваш аккаунт синхронизирован!</string>
     <string name="item_all_users_empty_date"> </string>
-    <string name="filters_all_users_empty_date">с\t\t\t_____\t\t\tпо\t\t\t_____</string>
+    <string name="filters_all_users_empty_date_start">____</string>
+    <string name="filters_all_users_text_date_from">с</string>
+    <string name="filters_all_users_empty_date_end">____</string>
     <string name="not_cities">Пока ничего не ищет</string>
     <string name="optionSearch">+ Параметры поиска</string>
     <string name="to">до</string>
@@ -136,4 +136,6 @@
     <string name="ok_I_understand">Хорошо, я понял.</string>
     <string name="start">Старт</string>
     <string name="finish">Финиш</string>
+    <string name="to_date">по</string>
+    <string name="from_in">c</string>
 </resources>
