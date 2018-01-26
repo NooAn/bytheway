@@ -35,18 +35,18 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
     override fun filterAndInstallUsers(snapshot: QuerySnapshot) {
         Single.create<MutableList<User>> { stream ->
             try {
-            Log.e("LOG get all users", Thread.currentThread().name)
-            val result: MutableList<User> = ArrayList()
-            for (document in snapshot) {
-                try {
-                    val user = document.toObject(User::class.java)
-                    if (user.cities.size > 0 && user.id != FirebaseAuth.getInstance().currentUser?.uid) {
-                        result.add(user)
+                Log.e("LOG get all users", Thread.currentThread().name)
+                val result: MutableList<User> = ArrayList()
+                for (document in snapshot) {
+                    try {
+                        val user = document.toObject(User::class.java)
+                        if (user.cities.size > 0 && user.id != FirebaseAuth.getInstance().currentUser?.uid) {
+                            result.add(user)
+                        }
+                    } catch (e: Exception) {
                     }
-                } catch (e: Exception) {
                 }
-            }
-            filterUsersByFilter(result, filter)
+                filterUsersByFilter(result, filter)
                 stream.onSuccess(result)
             } catch (exp: Exception) {
                 stream.onError(exp) // for fix bugs FirebaseFirestoreException: DEADLINE_EXCEEDED
@@ -151,24 +151,25 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
 
     private fun filterUsersByFilter(resultUsers: MutableList<User>, filter: Filter) {
         Log.e("LOG filter", Thread.currentThread().name)
+        val endCity = filter.endCity.toLowerCase()
+        val startCity = filter.startCity.toLowerCase()
         resultUsers.retainAll {
-            (!((filter.startBudget >= 0) && (filter.endBudget > 0)) || (it.budget >= filter.startBudget && it.budget <= filter.endBudget)) &&
+            (!((filter.startBudget >= 0) && (filter.endBudget > 0)) ||
+                    (it.budget >= filter.startBudget && it.budget <= filter.endBudget)) &&
                     (!((filter.startDate > 0L) && (filter.endDate > 0L)) ||
                             ((it.dates["start_date"] ?: filter.startDate) >= filter.startDate &&
                                     (it.dates["end_date"] ?: filter.endDate) <= filter.endDate)) &&
                     ((it.age >= filter.startAge && it.age <= filter.endAge)) &&
                     ((filter.sex == 0) || (it.sex == filter.sex)) &&
-                    ((filter.startCity.isEmpty()) || (it.cities.containsValue(filter.startCity))) &&
-                    ((filter.endCity.isEmpty()) || (it.cities.containsValue(filter.endCity)))
+                    ((startCity.isEmpty()) ||
+                            (it.cities.filterValues { it1 -> it1.toLowerCase().contains(startCity) }.isNotEmpty())) &&
+                    ((endCity.isEmpty()) ||
+                            (it.cities.filterValues { it1 -> it1.toLowerCase().contains(endCity) }.isNotEmpty()))
+
         }
     }
 }
 
 interface FilterAndInstallListener {
     fun filterAndInstallUsers(snapshot: QuerySnapshot)
-}
-
-interface OnUpdateDialog {
-    fun onSuchSetDate()
-    fun notSuchSetDate()
 }
