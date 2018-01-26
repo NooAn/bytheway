@@ -94,6 +94,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                                 try {
                                     if (user.cities.size > 0) {
                                         // run search algorithm
+                                        Log.e("LOG", "RUN ALGO")
                                         val search = SearchTravelers(filter = paramSearch, user = user)
                                         val s = search.getEstimation()
                                         user.percentsSimilarTravel = if (s > 100) 100 else s

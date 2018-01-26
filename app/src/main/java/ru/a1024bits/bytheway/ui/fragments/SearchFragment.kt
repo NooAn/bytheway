@@ -179,7 +179,7 @@ class SearchFragment : Fragment() {
             }
 
             override fun afterTextChanged(text: Editable?) {
-
+                filter.endBudget = text.toString().getIntOrNothing()
             }
 
         })
@@ -342,6 +342,9 @@ class SearchFragment : Fragment() {
         }
     }
 }
+
+private fun String.getIntOrNothing(): Int = if (this.toString().isBlank()) 0 else this.toInt()
+
 
 private val Long.toStringOrEmpty: String
     get() {

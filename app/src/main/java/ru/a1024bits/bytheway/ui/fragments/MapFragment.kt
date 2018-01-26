@@ -109,10 +109,12 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         App.component.inject(this)
     }
+
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = super.onCreateView(inflater, container, savedInstanceState)
 
@@ -169,7 +171,7 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
     private val listUsers: android.arch.lifecycle.Observer<ru.a1024bits.bytheway.model.Response<List<User>>> = android.arch.lifecycle.Observer { response ->
 
         when (response?.status) {
-            Status.SUCCESS -> if (response.data == null) showErrorLoading() else (activity as MenuActivity).navigator.applyCommand(Forward(Screens.SIMILAR_TRAVELS_SCREEN, response.data))
+            Status.SUCCESS -> if (response.data == null && activity != null) showErrorLoading() else (activity as MenuActivity).navigator.applyCommand(Forward(Screens.SIMILAR_TRAVELS_SCREEN, response.data))
 
             Status.ERROR -> {
                 Log.e("LOG", "log e:" + response.error)
@@ -270,7 +272,6 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
 //        }
     }
 
-    var show = false;
     private fun openDialogSave() {
         val dialog = TravelSearchSaveDialog(this)
         dialog.show()
@@ -284,8 +285,6 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
             e.printStackTrace()
         }
     }
-
-    var showView: MaterialShowcaseView? = null
 
     private fun getHashMapUser(): HashMap<String, Any> {
         val hashMap = HashMap<String, Any>()
@@ -411,8 +410,6 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
                     LatLngInterpolator.CurveBezie(),
                     onAnimationEnd = {
                         viewModel?.response?.observe(this@MapFragment, listUsers)
-                        //  searchFragment?.filter?.endBudget = parseInt(budgetFromValue.toString())
-                        // Log.d("LOG", budgetFromValue.toString())
                         viewModel?.getUsersWithSimilarTravel(searchFragment?.filter ?: Filter())
                         //  mMap?.clear()
                         listPointPath.clear()
