@@ -31,15 +31,17 @@ class SimilarTravelsAdapter(val context: Context, val users: List<User>) : Recyc
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
         Log.d("LOG", "onBindViewHolder on position: " + position)
         val currentUser = users[position]
-        if (currentUser.cities.size > 0)
-            holder.cities.text = StringBuilder().append(getShortCity(currentUser.cities.get(FIRST_INDEX_CITY) ?: ""))
+        holder.cities.text = if (currentUser.cities["first_city"] != null && currentUser.cities["last_city"] != null)
+            StringBuilder(getShortCity(currentUser.cities.get(FIRST_INDEX_CITY)
+                    ?: ""))
                     .append(" - ")
                     .append(getShortCity(currentUser.cities.get(LAST_INDEX_CITY) ?: ""))
-        
+        else
+            context.getString(R.string.not_cities)
+
         val nameText = StringBuilder().append(currentUser.name).append(" ").append(currentUser.lastName)
         if (currentUser.age > 0) nameText.append(", ").append(currentUser.age)
         holder.name.text = nameText
-
 
         holder.percentSimilarTravel.text = StringBuilder().append(currentUser.percentsSimilarTravel).append(" %")
 
