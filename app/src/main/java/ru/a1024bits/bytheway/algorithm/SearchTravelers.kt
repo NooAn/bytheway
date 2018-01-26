@@ -26,7 +26,7 @@ class SearchTravelers(val filter: Filter = Filter(), val user: User) {
 //        val c = calculateMethod() * WeightMethod
 //        val p = calculateBudget() * WeightBudget
 //
-//        Log.e("LOG", "name:${user.name} -  route:$n  date:$m  method:$c  budget:$p")
+//        Log.e("LOG", "name:${user.name} -  route:$n  date:$m  method:$c  budget:${p} and ${calculateBudget()}  summa:${n + m + c + p}")
 
         return ((calculateRoute() * WeightRoute
                 + calculateDate() * WeightDate
@@ -63,19 +63,6 @@ class SearchTravelers(val filter: Filter = Filter(), val user: User) {
         return n
     }
 
-    fun fibbonaci(n: Int): Int {
-        var prev: Long = 0
-        var next: Long = 1
-        var result: Long = 0
-        for (i in 0 until n) {
-            result = prev + next
-            prev = next
-            next = result
-        }
-        return result.toInt()
-    }
-
-
     /*
     K = 2.83 * | A1- A0| - 100
 
@@ -111,13 +98,10 @@ class SearchTravelers(val filter: Filter = Filter(), val user: User) {
             // 10 it's sqrt radius
             if (distanceFromStartToAnotherStart < 10 || distanceFromEndUserToEndFilter < 10) {
 
-                Log.e("LOG","${user.name} " +  (Math.abs(distanceUser - distanceFilter).toDouble() / max(distanceUser, distanceFilter)).toString() + " " + (Math.abs(distanceUser - distanceFilter).toDouble() / max(distanceUser, distanceFilter)) * K)
-                return (Math.abs(distanceUser - distanceFilter).toDouble() / max(distanceUser, distanceFilter)) * K
+              //  Log.e("LOG", "${user.name} " + ((min(distanceUser, distanceFilter).toDouble() / max(distanceUser, distanceFilter)) * K).toString() + " " + (Math.abs(distanceUser - distanceFilter).toDouble() / max(distanceUser, distanceFilter)) * K)
+                return (min(distanceUser, distanceFilter).toDouble() / max(distanceUser, distanceFilter)) * K
             }
-//
-//            if (distanceFromEndUserToEndFilter < 10 && (distanceFilter.compareTo(0.0) != 0 && distanceUser.compareTo(0.0) != 0)) {
-//                return (Math.abs(distanceUser - distanceFilter).toDouble() / max(distanceUser, distanceFilter)) * K
-//            }
+
             return classificationRouteDistance(K, distanceEndPoints, distanceUser, distanceFilter)
         }
     }
@@ -128,7 +112,7 @@ class SearchTravelers(val filter: Filter = Filter(), val user: User) {
         if (factorFilter == factorUser) {
             return computePercentBeetwenTwoLocation(K, distanceEndPoints, user.cityFromLatLng.latitude, filter.locationStartCity.latitude, user.cityFromLatLng.longitude, filter.locationStartCity.longitude, factorFilter)
         } else {
-            return (min(distanceUser, distanceFilter) / max(distanceUser, distanceFilter)) * K
+            return (min(distanceUser, distanceFilter).toDouble() / max(distanceUser, distanceFilter)) * K
         }
     }
 

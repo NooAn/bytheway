@@ -135,7 +135,7 @@
 
             <RadioButton
                 android:id="@+id/sexAny"
-                android:layout_width="wrap_content"
+                android:layout_width="99dp"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/colorPrimary"
                 android:checked="true"
@@ -179,8 +179,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignTop="@+id/endAge"
-            android:layout_marginEnd="4dp"
-            android:layout_marginStart="4dp"
+
             android:layout_toStartOf="@+id/saveParameters"
             android:text="@string/to"
             android:textSize="@dimen/standard_text_size" />
@@ -190,6 +189,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@id/ageText"
+            android:layout_alignEnd="@+id/saveParameters"
             android:layout_alignTop="@id/ageText"
             android:layout_marginStart="@dimen/standard_margin"
             android:layout_toEndOf="@id/byAgeText"
@@ -218,10 +218,9 @@
 
         <EditText
             android:id="@+id/startBudget"
-            android:layout_width="wrap_content"
+            android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@id/fromBudgetText"
-            android:layout_alignEnd="@id/startAge"
             android:layout_alignStart="@id/startAge"
             android:layout_toEndOf="@id/fromBudgetText"
             android:inputType="number"
@@ -231,22 +230,19 @@
         <TextView
             android:id="@+id/byBudgetText"
             android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:layout_alignStart="@id/byAgeText"
+            android:layout_height="wrap_content"
             android:layout_below="@id/ageText"
-            android:layout_marginEnd="4dp"
-            android:layout_marginStart="4dp"
-            android:gravity="top"
+            android:layout_toEndOf="@+id/choseDateStart"
             android:text="@string/to"
             android:textSize="@dimen/standard_text_size" />
 
         <EditText
             android:id="@+id/endBudget"
-            android:layout_width="wrap_content"
+            android:layout_width="50dp"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@id/byBudgetText"
-            android:layout_alignEnd="@id/endAge"
-            android:layout_alignStart="@id/endAge"
+            android:layout_alignBaseline="@+id/startBudget"
+            android:layout_alignBottom="@+id/startBudget"
+            android:layout_toEndOf="@+id/byDateText"
             android:inputType="number"
             android:saveEnabled="true"
             android:theme="@style/UsersTextInFilters" />
