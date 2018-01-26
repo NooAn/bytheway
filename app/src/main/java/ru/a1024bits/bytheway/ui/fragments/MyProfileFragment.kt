@@ -602,7 +602,11 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     override fun onStop() {
         super.onStop()
-        mapView?.onStop()
+        try {
+            mapView?.onStop()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     override fun onDestroyView() {
