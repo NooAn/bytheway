@@ -39,10 +39,9 @@
                 android:layout_marginTop="10dp"
                 android:fontFamily="sans-serif"
                 android:freezesText="true"
-                android:text="@string/city"
+                android:text="@string/city_in_the_world"
                 android:textAlignment="center"
-                android:textSize="16sp"
-                tools:text="Москва, Россия" />
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/sexAndAge"

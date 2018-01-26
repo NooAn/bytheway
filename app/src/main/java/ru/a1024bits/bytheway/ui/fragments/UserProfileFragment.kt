@@ -197,7 +197,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
             if (userAge > 0) {
                 sexAndAge.text = StringBuilder(gender).append(", ").append(userAge)
             } else {
-                sexAndAge.text = StringBuilder(gender).append(", Возраст ").append(userAge)
+                sexAndAge.text = StringBuilder(gender).append(", Бессмертный ").append(userAge)
             }
         }
 
@@ -227,7 +227,8 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
 
     override fun getViewFactoryClass(): ViewModelProvider.Factory = viewModelFactory
 
-    @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
 
     @LayoutRes
     override fun getLayoutRes(): Int {
