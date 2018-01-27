@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
 import android.support.annotation.LayoutRes
 import android.support.design.widget.NavigationView
 import android.support.v7.app.AlertDialog
@@ -33,9 +32,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
-import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.GeoPoint
 import com.google.maps.android.PolyUtil
 import kotlinx.android.synthetic.main.confirm_dialog.view.*
@@ -62,8 +59,6 @@ import ru.a1024bits.bytheway.util.getBearing
 import ru.a1024bits.bytheway.util.getLongFromDate
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import ru.terrakok.cicerone.commands.Replace
-import uk.co.deanwild.materialshowcaseview.IShowcaseListener
-import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -176,7 +171,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     }
 
     private fun showErrorUploadImage() {
-
+        Toast.makeText(activity, R.string.error_upload_image, Toast.LENGTH_SHORT).show()
     }
 
     private val usersObservers: Observer<User> = Observer { user ->
@@ -260,7 +255,9 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         viewModel?.response?.observe(this, responseObserver)
         viewModel?.user?.observe(this, usersObservers)
         viewModel?.loadingStatus?.observe(this, (activity as MenuActivity).progressBarLoad)
+
         viewModel?.photoUrl?.observe(this, photoUrlObserver)
+
         if (viewModel?.saveSocial?.hasObservers() == false) {
             viewModel?.saveSocial?.observe(this, observerSaveSocial)
         }

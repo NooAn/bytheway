@@ -4,8 +4,11 @@ import android.arch.lifecycle.MutableLiveData
 import android.net.Uri
 import android.util.Log
 import com.google.firebase.firestore.GeoPoint
-import com.google.firebase.storage.FirebaseStorage
-import ru.a1024bits.bytheway.model.*
+import io.reactivex.Completable
+import ru.a1024bits.bytheway.model.AirUser
+import ru.a1024bits.bytheway.model.Response
+import ru.a1024bits.bytheway.model.SocialResponse
+import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.model.map_directions.RoutesList
 import ru.a1024bits.bytheway.repository.UserRepository
 import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment
@@ -29,17 +32,6 @@ import ru.a1024bits.bytheway.util.Constants.FIRST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.START_DATE
 import javax.inject.Inject
-import com.google.firebase.storage.UploadTask
-import com.google.android.gms.tasks.OnSuccessListener
-import com.google.android.gms.tasks.OnFailureListener
-import com.google.firebase.storage.StorageReference
-import io.reactivex.Completable
-import io.reactivex.Single
-import io.reactivex.SingleObserver
-import io.reactivex.disposables.Disposable
-import io.reactivex.subscribers.DisposableSubscriber
-import ru.a1024bits.bytheway.repository.IUsersRepository
-import java.io.File
 
 
 /**
@@ -55,18 +47,20 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
 
     fun loadImage(pathFile: Uri, userId: String) {
         var url: String = ""
-        userRepository.uploadPhotoLink(path = pathFile, id = userId)
+        disposables.add(userRepository.uploadPhotoLink(path = pathFile, id = userId)
                 .subscribeOn(getBackgroundScheduler())
                 .doOnSubscribe({ _ -> loadingStatus.setValue(true) })
                 .doAfterTerminate({ loadingStatus.setValue(false) })
                 .doOnSuccess { url = it }
-                //.flatMap { urlPhoto: String -> savePhotoLink(urlPhoto, userId).toMaybe<String>() }
+                .doOnSuccess { Log.e("LOG", "onSuc $url") }
+                //  .flatMap({ urlPhoto -> SingleSource<String> { savePhotoLink(urlPhoto, userId).subscribeOn(getBackgroundScheduler()).subscribe() } })
                 .observeOn(getMainThreadScheduler())
-                .subscribe(
-                        { t -> photoUrl.setValue(Response.success(url)) },
-                        { throwable ->
-                            photoUrl.setValue(Response.error(throwable))
-                        })
+                .subscribe({
+                    photoUrl.setValue(Response.success(url))
+                    disposables.add(savePhotoLink(url, userId).subscribeOn(getBackgroundScheduler()).subscribe())
+                }, { throwable ->
+                    photoUrl.setValue(Response.error(throwable))
+                }))
     }
 
     private fun savePhotoLink(downloadUrl: String, id: String): Completable {

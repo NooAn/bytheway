@@ -139,4 +139,5 @@
     <string name="to_date">по</string>
     <string name="from_in">c</string>
     <string name="city_in_the_world">Человек мира</string>
+    <string name="error_upload_image">Ошибка загрузки</string>
 </resources>
