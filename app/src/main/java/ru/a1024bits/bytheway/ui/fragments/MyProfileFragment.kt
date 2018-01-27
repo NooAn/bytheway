@@ -185,6 +185,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                 if (response.data != null) {
                     if (activity != null) {
                         fillProfile(response.data)
+                        viewModel?.loadingStatus?.setValue(false)
                         mListener?.onFragmentInteraction(response.data)
                         mainUser = response.data
                     }

@@ -9,6 +9,8 @@ import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.repository.MAX_AGE
 import ru.a1024bits.bytheway.repository.UserRepository
+import ru.a1024bits.bytheway.util.Constants.FIRST_INDEX_CITY
+import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
 import java.util.*
 import javax.inject.Inject
 
@@ -133,8 +135,8 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
                                     (it.dates["end_date"] ?: filter.endDate) <= filter.endDate)) &&
                     ((it.age >= filter.startAge && it.age <= filter.endAge)) &&
                     ((filter.sex == 0) || (it.sex == filter.sex)) &&
-                    ((filter.startCity.isEmpty()) || (it.cities.containsValue(filter.startCity))) &&
-                    ((filter.endCity.isEmpty()) || (it.cities.containsValue(filter.endCity)))
+                    ((filter.startCity.isEmpty()) || (it.cities[FIRST_INDEX_CITY]?.contains(filter.startCity, true) == true)) &&
+                    ((filter.endCity.isEmpty()) || (it.cities[LAST_INDEX_CITY]?.contains(filter.endCity, true) == true))
         }
     }
 }

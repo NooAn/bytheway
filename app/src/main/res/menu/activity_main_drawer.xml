@@ -6,15 +6,15 @@
         <item
             android:id="@+id/profile_item"
             android:icon="@drawable/ic_profile"
-            android:title="Профиль" />
+            android:title="@string/drawer_item_profile" />
         <item
             android:id="@+id/search_item"
             android:icon="@drawable/ic_search_companions"
-            android:title="Поиск попутчиков" />
+            android:title="@string/drawer_item_map_search" />
         <item
             android:id="@+id/all_users_item"
             android:icon="@drawable/ic_all_users"
-            android:title="Все пользователи" />
+            android:title="@string/drawer_item_allusers" />
         <item
             android:icon="@android:color/transparent"
             android:title="" />
