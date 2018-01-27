@@ -2,6 +2,9 @@ package ru.a1024bits.bytheway.viewmodel
 
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.QuerySnapshot
+import io.reactivex.Single
 import ru.a1024bits.bytheway.App.Companion.INSTANCE
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.Response
@@ -15,7 +18,8 @@ import javax.inject.Inject
 /**
  * Created by andrey.gusenkov on 25/09/2017.
  */
-class DisplayUsersViewModel @Inject constructor(var userRepository: UserRepository) : BaseViewModel() {
+
+class DisplayUsersViewModel @Inject constructor(var userRepository: UserRepository?) : BaseViewModel(), FilterAndInstallListener {
     var response: MutableLiveData<Response<List<User>>> = MutableLiveData()
     var yearsOldUsers = (0..MAX_AGE).mapTo(ArrayList<String>()) { it.toString() }
     val filter = Filter()
@@ -24,53 +28,74 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
         const val TAG = "showUserViewModel"
     }
 
-    fun getAllUsers(filter: Filter) {
-        disposables.add(userRepository.getAllUsers()
+    fun getAllUsers() {
+        userRepository?.installAllUsers(this)
+    }
+
+    override fun filterAndInstallUsers(snapshot: QuerySnapshot) {
+        Single.create<MutableList<User>> { stream ->
+            try {
+                Log.e("LOG get all users", Thread.currentThread().name)
+                val result: MutableList<User> = ArrayList()
+                for (document in snapshot) {
+                    try {
+                        val user = document.toObject(User::class.java)
+                        if (user.cities.size > 0 && user.id != FirebaseAuth.getInstance().currentUser?.uid) {
+                            result.add(user)
+                        }
+                    } catch (e: Exception) {
+                    }
+                }
+                filterUsersByFilter(result, filter)
+                stream.onSuccess(result)
+            } catch (exp: Exception) {
+                stream.onError(exp) // for fix bugs FirebaseFirestoreException: DEADLINE_EXCEEDED
+            }
+        }
                 .subscribeOn(getBackgroundScheduler())
                 .timeout(TIMEOUT_SECONDS, timeoutUnit)
                 .retry(2)
                 .doOnSubscribe({ loadingStatus.postValue(true) })
                 .doAfterTerminate({ loadingStatus.postValue(false) })
-                .doAfterSuccess { resultUsers -> filterUsersByFilter(resultUsers, filter) }
-                .observeOn(getMainThreadScheduler())
-                .subscribe(
-                        { resultUsers ->
-                            Log.e("LOG subscribe", Thread.currentThread().name)
-                            response.postValue(Response.success(resultUsers))
-                        },
-                        { throwable -> response.postValue(Response.error(throwable)) }
-                )
-        )
+                .subscribe({ resultUsers ->
+                    Log.e("LOG subscribe", Thread.currentThread().name)
+                    response.postValue(Response.success(resultUsers))
+                },
+                        { throwable -> response.postValue(Response.error(throwable)) })
     }
 
     fun sendUserData(map: HashMap<String, Any>, id: String) {
-        loadingStatus.setValue(true)
-        disposables.add(userRepository.changeUserProfile(map, id)
-                .timeout(TIMEOUT_SECONDS, timeoutUnit)
-                .retry(2)
-                .doAfterTerminate({ loadingStatus.setValue(false) })
-                .subscribe(
-                        { Log.e("LOG", "complete") },
-                        { t ->
-                            response.setValue(Response.error(t))
-                            Log.e("LOG view model", "send User Data", t)
-                        }
-                ))
+        userRepository?.let {
+            loadingStatus.setValue(true)
+            disposables.add(it.changeUserProfile(map, id)
+                    .timeout(TIMEOUT_SECONDS, timeoutUnit)
+                    .retry(2)
+                    .doAfterTerminate({ loadingStatus.setValue(false) })
+                    .subscribe(
+                            { Log.e("LOG", "complete") },
+                            { t ->
+                                response.setValue(Response.error(t))
+                                Log.e("LOG view model", "send User Data", t)
+                            }
+                    ))
+        }
     }
 
     fun getUsersWithSimilarTravel(paramSearch: Filter) {
-        loadingStatus.setValue(true)
-        disposables.add(userRepository.getReallUsers(paramSearch)
-                .timeout(TIMEOUT_SECONDS, timeoutUnit)
-                .retry(2)
-                .subscribeOn(getBackgroundScheduler())
-                .observeOn(getMainThreadScheduler())
-                .doAfterTerminate({ loadingStatus.setValue(false) })
-                .subscribe(
-                        { list -> response.setValue(Response.success(list)) },
-                        { throwable -> response.setValue(Response.error(throwable)) }
-                )
-        )
+        userRepository?.let {
+            loadingStatus.setValue(true)
+            disposables.add(it.getReallUsers(paramSearch)
+                    .timeout(TIMEOUT_SECONDS, timeoutUnit)
+                    .retry(2)
+                    .subscribeOn(getBackgroundScheduler())
+                    .observeOn(getMainThreadScheduler())
+                    .doAfterTerminate({ loadingStatus.setValue(false) })
+                    .subscribe(
+                            { list -> response.setValue(Response.success(list)) },
+                            { throwable -> response.setValue(Response.error(throwable)) }
+                    )
+            )
+        }
     }
 
     fun getTextFromDates(date: Long?): String {
@@ -126,15 +151,25 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
 
     private fun filterUsersByFilter(resultUsers: MutableList<User>, filter: Filter) {
         Log.e("LOG filter", Thread.currentThread().name)
+        val endCity = filter.endCity.toLowerCase()
+        val startCity = filter.startCity.toLowerCase()
         resultUsers.retainAll {
-            (!((filter.startBudget >= 0) && (filter.endBudget > 0)) || (it.budget >= filter.startBudget && it.budget <= filter.endBudget)) &&
+            (!((filter.startBudget >= 0) && (filter.endBudget > 0)) ||
+                    (it.budget >= filter.startBudget && it.budget <= filter.endBudget)) &&
                     (!((filter.startDate > 0L) && (filter.endDate > 0L)) ||
                             ((it.dates["start_date"] ?: filter.startDate) >= filter.startDate &&
                                     (it.dates["end_date"] ?: filter.endDate) <= filter.endDate)) &&
                     ((it.age >= filter.startAge && it.age <= filter.endAge)) &&
                     ((filter.sex == 0) || (it.sex == filter.sex)) &&
-                    ((filter.startCity.isEmpty()) || (it.cities.containsValue(filter.startCity))) &&
-                    ((filter.endCity.isEmpty()) || (it.cities.containsValue(filter.endCity)))
+                    ((startCity.isEmpty()) ||
+                            (it.cities.filterValues { it1 -> it1.toLowerCase().contains(startCity) }.isNotEmpty())) &&
+                    ((endCity.isEmpty()) ||
+                            (it.cities.filterValues { it1 -> it1.toLowerCase().contains(endCity) }.isNotEmpty()))
+
         }
     }
+}
+
+interface FilterAndInstallListener {
+    fun filterAndInstallUsers(snapshot: QuerySnapshot)
 }
