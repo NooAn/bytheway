@@ -157,6 +157,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             }
         }
     }
+
     private val photoUrlObserver: Observer<ResponseBtw<String>> = Observer {
         when (it?.status) {
             Status.SUCCESS -> {
@@ -1043,7 +1044,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     private fun fillProfile(user: User) {
         updateImageProfile(user.urlPhoto)
         image_avatar.setOnClickListener {
-            performFileSearch()
+            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_click_avatar", null)
+            //  performFileSearch()
         }
 
 

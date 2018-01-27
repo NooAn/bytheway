@@ -1,39 +1,38 @@
 package ru.a1024bits.bytheway.ui.fragments
 
 import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProvider
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.annotation.LayoutRes
+import android.support.v4.content.ContextCompat
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.google.android.gms.maps.*
-import com.google.android.gms.maps.model.LatLng
-import kotlinx.android.synthetic.main.fragment_user_profile.*
-import ru.a1024bits.bytheway.R
-import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
-import ru.a1024bits.bytheway.viewmodel.UserProfileViewModel
 import android.widget.Toast
-import android.arch.lifecycle.ViewModelProvider
-import android.content.pm.PackageManager
-import android.support.v4.content.ContextCompat
-import android.util.Log
 import com.bumptech.glide.request.RequestOptions
+import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.firebase.crash.FirebaseCrash
 import com.google.maps.android.PolyUtil
-import kotlinx.android.synthetic.main.profilte_user_direction.*
+import kotlinx.android.synthetic.main.fragment_user_profile.*
 import kotlinx.android.synthetic.main.profile_main_image.*
+import kotlinx.android.synthetic.main.profilte_user_direction.*
 import ru.a1024bits.bytheway.App
+import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.*
+import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.a1024bits.bytheway.ui.dialogs.SocNetworkdialog
 import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.util.getBearing
+import ru.a1024bits.bytheway.viewmodel.UserProfileViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -126,7 +125,11 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
                     fbcon.setImageResource(R.drawable.ic_fb_color)
                     fbcon.setOnClickListener {
                         mFirebaseAnalytics.logEvent(TAG_ANALYTICS + "OPEN_FB", null)
-                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("${user.socialNetwork.get(name.key)}")))
+                        try {
+                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("${user.socialNetwork.get(name.key)}")))
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
                     }
                 }
                 SocialNetwork.WHATSAPP.link -> {
@@ -376,13 +379,17 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
     }
 
     fun intentMessageTelegram(id: String?) {
-        if (id?.isNumberPhone() == false) {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/${id?.replace("@", "")}")))
-            mFirebaseAnalytics.logEvent(TAG_ANALYTICS + "OPEN_TG", null)
-        } else {
-            mFirebaseAnalytics.logEvent(TAG_ANALYTICS + "NOT_OPEN_TG", null)
-            val dialog = SocNetworkdialog(activity, id)
-            dialog.show()
+        try {
+            if (id?.isNumberPhone() == false) {
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/${id?.replace("@", "")}")))
+                mFirebaseAnalytics.logEvent(TAG_ANALYTICS + "OPEN_TG", null)
+            } else {
+                mFirebaseAnalytics.logEvent(TAG_ANALYTICS + "NOT_OPEN_TG", null)
+                val dialog = SocNetworkdialog(activity, id)
+                dialog.show()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
