@@ -162,9 +162,12 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             Status.SUCCESS -> {
                 if (it.data != null && !activity.isDestroyed) {
                     updateImageProfile(it.data)
+                    mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_upload_image", null)
+
                 }
             }
             Status.ERROR -> {
+                mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_error_upload", null)
                 showErrorUploadImage()
             }
         }
