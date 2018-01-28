@@ -12,6 +12,10 @@ import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.repository.MAX_AGE
 import ru.a1024bits.bytheway.repository.UserRepository
+import ru.a1024bits.bytheway.util.Constants.END_DATE
+import ru.a1024bits.bytheway.util.Constants.FIRST_INDEX_CITY
+import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
+import ru.a1024bits.bytheway.util.Constants.START_DATE
 import java.util.*
 import javax.inject.Inject
 
@@ -62,6 +66,10 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
                     response.postValue(Response.success(resultUsers))
                 },
                         { throwable -> response.postValue(Response.error(throwable)) })
+    }
+
+    override fun onFailure(e: Throwable) {
+        response.postValue(Response.error(e))
     }
 
     fun sendUserData(map: HashMap<String, Any>, id: String) {
@@ -151,25 +159,29 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
 
     private fun filterUsersByFilter(resultUsers: MutableList<User>, filter: Filter) {
         Log.e("LOG filter", Thread.currentThread().name)
-        val endCity = filter.endCity.toLowerCase()
-        val startCity = filter.startCity.toLowerCase()
         resultUsers.retainAll {
-            (!((filter.startBudget >= 0) && (filter.endBudget > 0)) ||
+            var found = (!((filter.startBudget >= 0) && (filter.endBudget > 0)) ||
                     (it.budget >= filter.startBudget && it.budget <= filter.endBudget)) &&
-                    (!((filter.startDate > 0L) && (filter.endDate > 0L)) ||
-                            ((it.dates["start_date"] ?: filter.startDate) >= filter.startDate &&
-                                    (it.dates["end_date"] ?: filter.endDate) <= filter.endDate)) &&
                     ((it.age >= filter.startAge && it.age <= filter.endAge)) &&
                     ((filter.sex == 0) || (it.sex == filter.sex)) &&
-                    ((startCity.isEmpty()) ||
-                            (it.cities.filterValues { it1 -> it1.toLowerCase().contains(startCity) }.isNotEmpty())) &&
-                    ((endCity.isEmpty()) ||
-                            (it.cities.filterValues { it1 -> it1.toLowerCase().contains(endCity) }.isNotEmpty()))
-
+                    ((filter.startCity.isEmpty()) ||
+                            (it.cities[FIRST_INDEX_CITY]?.contains(filter.startCity, true) == true)) &&
+                    ((filter.endCity.isEmpty()) ||
+                            (it.cities[LAST_INDEX_CITY]?.contains(filter.endCity, true) == true))
+            if (found && filter.startDate > 0L) {
+                found = (it.dates[START_DATE] != null && it.dates[START_DATE] != 0L &&
+                        it.dates[START_DATE] ?: 0 >= filter.startDate)
+            }
+            if (found && filter.endDate > 0L) {
+                found = (it.dates[END_DATE] != null && it.dates[END_DATE] != 0L &&
+                        it.dates[END_DATE] ?: 0 <= filter.endDate)
+            }
+            found
         }
     }
 }
 
 interface FilterAndInstallListener {
     fun filterAndInstallUsers(snapshot: QuerySnapshot)
+    fun onFailure(e: Throwable)
 }

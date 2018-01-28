@@ -1,9 +1,14 @@
 package ru.a1024bits.bytheway.viewmodel
 
 import android.arch.lifecycle.MutableLiveData
+import android.net.Uri
 import android.util.Log
 import com.google.firebase.firestore.GeoPoint
-import ru.a1024bits.bytheway.model.*
+import io.reactivex.Completable
+import ru.a1024bits.bytheway.model.AirUser
+import ru.a1024bits.bytheway.model.Response
+import ru.a1024bits.bytheway.model.SocialResponse
+import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.model.map_directions.RoutesList
 import ru.a1024bits.bytheway.repository.UserRepository
 import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment
@@ -28,6 +33,7 @@ import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.START_DATE
 import javax.inject.Inject
 
+
 /**
  * Created by andrey.gusenkov on 25/09/2017.
  */
@@ -37,6 +43,33 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
     var routes = MutableLiveData<Response<RoutesList>>()
     val saveSocial = MutableLiveData<SocialResponse>()
     val saveProfile = MutableLiveData<Response<Boolean>>()
+    val photoUrl = MutableLiveData<Response<String>>()
+
+    fun loadImage(pathFile: Uri, userId: String) {
+        var url: String = ""
+        disposables.add(userRepository.uploadPhotoLink(path = pathFile, id = userId)
+                .subscribeOn(getBackgroundScheduler())
+                .doOnSubscribe({ _ -> loadingStatus.setValue(true) })
+                .doAfterTerminate({ loadingStatus.setValue(false) })
+                .doOnSuccess { url = it }
+                .doOnSuccess { Log.e("LOG", "onSuc $url") }
+                //  .flatMap({ urlPhoto -> SingleSource<String> { savePhotoLink(urlPhoto, userId).subscribeOn(getBackgroundScheduler()).subscribe() } })
+                .observeOn(getMainThreadScheduler())
+                .subscribe({
+                    photoUrl.setValue(Response.success(url))
+                    disposables.add(savePhotoLink(url, userId).subscribeOn(getBackgroundScheduler()).subscribe())
+                }, { throwable ->
+                    photoUrl.setValue(Response.error(throwable))
+                }))
+    }
+
+    private fun savePhotoLink(downloadUrl: String, id: String): Completable {
+        val map: HashMap<String, Any> = hashMapOf()
+        map.put("urlPhoto", downloadUrl)
+        return userRepository.changeUserProfile(map, id)
+                .timeout(TIMEOUT_SECONDS, timeoutUnit)
+                .retry(2)
+    }
 
     fun load(userId: String) {
         disposables.add(userRepository.getUser(userId)
@@ -44,7 +77,7 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                 .retry(2)
                 .subscribeOn(getBackgroundScheduler())
                 .doOnSubscribe({ _ -> loadingStatus.setValue(true) })
-                .doAfterTerminate({ loadingStatus.setValue(false) })
+                .doOnError({ loadingStatus.setValue(false) })
                 .observeOn(getMainThreadScheduler())
                 .subscribe(
                         { user -> response.setValue(Response.success(user)) },

@@ -1,11 +1,14 @@
 package ru.a1024bits.bytheway.repository
 
 import android.arch.lifecycle.Observer
+import android.net.Uri
 import android.util.Log
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.*
+import com.google.firebase.storage.FirebaseStorage
 import io.reactivex.Completable
 import io.reactivex.Single
 import ru.a1024bits.bytheway.MapWebService
@@ -23,6 +26,7 @@ const val COLLECTION_USERS = "users"
  * Created by andrey.gusenkov on 19/09/2017
  */
 class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapService: MapWebService) : IUsersRepository {
+
 
     companion object {
         const val TAG = "LOG UserRepository"
@@ -43,12 +47,31 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                 }
             }
 
-    override fun getSimilarUsersTravels(data: Filter, observer: Observer<List<User>>): Task<QuerySnapshot> {
-        return store.collection(COLLECTION_USERS).get()
+    override fun uploadPhotoLink(path: Uri, id: String): Single<String> = Single.create { stream ->
+        try {
+            Log.e("LOG get all users", Thread.currentThread().name)
+            // Create a storage reference from our app
+            val storageRef = FirebaseStorage.getInstance().getReference()
+            val riversRef = storageRef.child("images/" + id)
+            val uploadTask = riversRef.putFile(path)
+            // Register observers to listen for when the download is done or if it fails
+            uploadTask.addOnFailureListener {
+                // Handle unsuccessful uploads
+                Log.e("LOG", "file fail", it)
+                stream.onError(it)
+            }.addOnSuccessListener { taskSnapshot ->
+                        // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+                        stream.onSuccess(taskSnapshot.downloadUrl.toString())
+                    }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            stream.onError(e)
+        }
     }
 
     override fun installAllUsers(listener: FilterAndInstallListener) {
         store.collection(COLLECTION_USERS).get().addOnCompleteListener({ task -> listener.filterAndInstallUsers(task.result) })
+                .addOnFailureListener({e -> listener.onFailure(e)})
     }
 
     override fun getReallUsers(paramSearch: Filter): Single<List<User>> =
@@ -66,13 +89,12 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                                 try {
                                     user = document.toObject(User::class.java)
                                 } catch (ex2: Exception) {
-                                    Log.e(TAG, "Error!: " + document.id + " => " + document.data, ex2)
                                     ex2.printStackTrace()
+                                    FirebaseCrash.report(ex2)
                                 }
                                 try {
                                     if (user.cities.size > 0) {
                                         // run search algorithm
-                                        Log.e("LOG", "RUN ALGO")
                                         val search = SearchTravelers(filter = paramSearch, user = user)
                                         val s = search.getEstimation()
                                         user.percentsSimilarTravel = if (s > 100) 100 else s
@@ -83,6 +105,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                                     }
                                 } catch (ex: Exception) {
                                     stream.onError(ex)
+                                    FirebaseCrash.report(ex)
                                 }
                             }
                             result.sortByDescending { it.percentsSimilarTravel } // перед отправкой сортируем по степени похожести маршрута.
@@ -108,7 +131,6 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
 
     override fun changeUserProfile(map: HashMap<String, Any>, id: String): Completable =
             Completable.create { stream ->
-                Log.d("LOG", "change user profile send....")
                 try {
                     val documentRef = store.collection(COLLECTION_USERS).document(id)
                     store.runTransaction(object : Transaction.Function<Void> {
@@ -117,11 +139,9 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                             documentRef.update(map)
                             return null
                         }
-                    }).addOnCompleteListener {
-                        Log.e("LOG", "finish update user profile")
-                    }.addOnFailureListener {
-                                stream.onError(it)
-                            }.addOnSuccessListener { _ ->
+                    }).addOnFailureListener {
+                        stream.onError(it)
+                    }.addOnSuccessListener { _ ->
                                 stream.onComplete()
                             }
                 } catch (e: Exception) {
