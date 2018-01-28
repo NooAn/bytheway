@@ -14,10 +14,7 @@ import android.support.v7.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
-import android.view.KeyEvent
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import com.bumptech.glide.request.RequestOptions
@@ -562,13 +559,17 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_save", null)
         }
         dateArrived.setOnClickListener {
-            openDateArrivedDialog()
+            openDateDialog(END_DATE, dateArrived)
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_date_to_click", null)
         }
+        dateArrived.setOnTouchListener(onDateTouch)
+
         textDateFrom.setOnClickListener {
-            openDateFromDialog()
+            openDateDialog(START_DATE, textDateFrom)
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_date_from_click", null)
         }
+        textDateFrom.setOnTouchListener(onDateTouch)
+
         addInfoUser.afterTextChanged({
             profileStateHashMap[ADD_INFO] = it
             profileChanged(null, false)
@@ -592,6 +593,18 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             openAlertDialog(this::removeTrip)
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_remove_trip", null)
         }
+    }
+
+    private val onDateTouch = View.OnTouchListener { view, event ->
+        val drawableRight = 2
+        (view as EditText)
+        if (event.action == MotionEvent.ACTION_UP && view.compoundDrawables[drawableRight] != null) {
+            if (event.rawX >= (view.right - view.compoundDrawables[drawableRight].bounds.width())) {
+                view.setText("  ")
+                false
+            }
+        }
+        false
     }
 
     override fun onStop() {
@@ -646,53 +659,37 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         }
     }
 
-    private fun openDateFromDialog() {
-        val dateFrom = Calendar.getInstance() //current time by default
-        if (dates[START_DATE] ?: 0L > 0L) dateFrom.timeInMillis = dates[START_DATE] ?: dateFrom.timeInMillis
-
-        dateDialog = CalendarDatePickerDialogFragment()
-                .setFirstDayOfWeek(Calendar.MONDAY)
-                .setThemeCustom(R.style.BythewayDatePickerDialogTheme)
-                .setPreselectedDate(dateFrom.get(Calendar.YEAR), dateFrom.get(Calendar.MONTH), dateFrom.get(Calendar.DAY_OF_MONTH))
-
-        dateDialog.setDateRange(MonthAdapter.CalendarDay(System.currentTimeMillis()), null)
-        dateDialog.setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
-            textDateFrom.setText(StringBuilder(" ")
-                    .append(dayOfMonth)
-                    .append(" ")
-                    .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
-                    .append(" ")
-                    .append(year).toString())
-            dates[START_DATE] = getLongFromDate(dayOfMonth, monthOfYear, year)
-
-            profileStateHashMap[DATES] = dates.toString()
-            profileChanged()
+    private fun openDateDialog(key: String, view: EditText) {
+        if (view.text.contains("  ")) {
+            view.setText("")
+            dates[key] = 0L
+            view.setCompoundDrawables(null, null, null, null)
+            return
         }
-        dateDialog.show(activity.supportFragmentManager, "")
-    }
-
-    private fun openDateArrivedDialog() {
-        val dateTo = Calendar.getInstance() //current time by default
-        if (dates[END_DATE] ?: 0L > 0L) dateTo.timeInMillis = dates[END_DATE] ?: dateTo.timeInMillis
+        val date = Calendar.getInstance() //current time by default
+        if (dates[key] ?: 0L > 0L) date.timeInMillis = dates[key] ?: date.timeInMillis
 
         dateDialog = CalendarDatePickerDialogFragment()
                 .setFirstDayOfWeek(Calendar.MONDAY)
                 .setThemeCustom(R.style.BythewayDatePickerDialogTheme)
-                .setPreselectedDate(dateTo.get(Calendar.YEAR), dateTo.get(Calendar.MONTH), dateTo.get(Calendar.DAY_OF_MONTH))
-
-        dateDialog.setDateRange(MonthAdapter.CalendarDay(dates[START_DATE]
-                ?: System.currentTimeMillis()), null)
+                .setPreselectedDate(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH))
+        var currentDate = System.currentTimeMillis()
+        if (key.contentEquals(START_DATE)) {
+            if (dates[key] ?: 0L > 0L) currentDate = dates[key] ?: currentDate
+        }
+        dateDialog.setDateRange(MonthAdapter.CalendarDay(currentDate), null)
         dateDialog.setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
-            dateArrived.setText(StringBuilder(" ")
+            view.setText(StringBuilder(" ")
                     .append(dayOfMonth)
                     .append(" ")
                     .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
                     .append(" ")
                     .append(year).toString())
-            dates[END_DATE] = getLongFromDate(dayOfMonth, monthOfYear, year)
+            dates[key] = getLongFromDate(dayOfMonth, monthOfYear, year)
 
             profileStateHashMap[DATES] = dates.toString()
             profileChanged()
+            view.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector, 0)
         }
         dateDialog.show(activity.supportFragmentManager, "")
     }
@@ -1087,9 +1084,12 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         if (user.dates.size > 0) {
             if (user.dates[START_DATE] != null && user.dates[START_DATE] != 0L) {
                 textDateFrom.setText(formatDate.format(Date(user.dates[START_DATE] ?: 0)))
+                textDateFrom.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector, 0)
             }
-            if (user.dates[END_DATE] != null && user.dates[END_DATE] != 0L)
+            if (user.dates[END_DATE] != null && user.dates[END_DATE] != 0L) {
                 dateArrived.setText(formatDate.format(Date(user.dates[END_DATE] ?: 0)))
+                dateArrived.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector, 0)
+            }
             dates = user.dates
         }
 
