@@ -5,9 +5,6 @@ import android.arch.lifecycle.ViewModelProviders
 import android.os.Build
 import android.os.Bundle
 import android.support.annotation.LayoutRes
-import android.support.annotation.NonNull
-import android.support.annotation.Nullable
-import android.support.design.R.id.container
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +12,7 @@ import android.view.ViewGroup
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.crash.FirebaseCrash
 import kotlinx.android.synthetic.main.fragment_display_all_users.*
 import ru.a1024bits.bytheway.viewmodel.BaseViewModel
 import uk.co.deanwild.materialshowcaseview.IShowcaseListener
@@ -43,23 +41,28 @@ abstract class BaseFragment<T : BaseViewModel> : Fragment() {
     }
 
     fun showPrompt(nameScreenPrompt: String, dismissText: String?, titleText: String?, contentText: String?) {
-        if (viewModel?.promptNotShowing(nameScreenPrompt) == true && Build.VERSION.SDK_INT < Build.VERSION_CODES.N && (activity != null) && !activity.isDestroyed)
-            MaterialShowcaseView.Builder(activity)
-                    .setTarget(searchParametersText)
-                    .renderOverNavigationBar()
-                    .setDismissText(dismissText)
-                    .setTitleText(titleText)
-                    .setContentText(contentText)
-                    .withCircleShape()
-                    .setListener(object : IShowcaseListener {
-                        override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {
-                        }
+        try {
+            if (viewModel?.promptNotShowing(nameScreenPrompt) == true && Build.VERSION.SDK_INT < Build.VERSION_CODES.N && (activity != null) && !activity.isDestroyed)
+                MaterialShowcaseView.Builder(activity)
+                        .setTarget(searchParametersText)
+                        .renderOverNavigationBar()
+                        .setDismissText(dismissText)
+                        .setTitleText(titleText)
+                        .setContentText(contentText)
+                        .withCircleShape()
+                        .setListener(object : IShowcaseListener {
+                            override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {
+                            }
 
-                        override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
-                            viewModel?.markPromptIsShowing(nameScreenPrompt)
-                        }
-                    })
-                    .show()
+                            override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
+                                viewModel?.markPromptIsShowing(nameScreenPrompt)
+                            }
+                        })
+                        .show()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            FirebaseCrash.report(e)
+        }
     }
 
     protected abstract fun getViewFactoryClass(): ViewModelProvider.Factory
