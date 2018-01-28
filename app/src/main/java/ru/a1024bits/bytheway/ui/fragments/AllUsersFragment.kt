@@ -275,7 +275,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             filter.startDate = 0L
             filter.endDate = 0L
 
-            startAge.setSelection(filter.startAge)
+            startAge.setSelection(if (filter.startAge < 0) 0 else filter.startAge)
             endAge.setSelection(filter.endAge)
             startBudget.setText("")
             endBudget.setText("")
