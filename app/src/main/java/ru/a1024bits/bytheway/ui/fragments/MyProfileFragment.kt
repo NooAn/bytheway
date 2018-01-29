@@ -277,12 +277,10 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     override fun getViewModelClass(): Class<MyProfileViewModel> = MyProfileViewModel::class.java
 
-//    var showView: MaterialShowcaseView? = null
-
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         showPrompt("isFirstEnterMyProfileFragment", context.resources.getString(R.string.close_hint),
-                getString(R.string.hint_create_travel), getString(R.string.hint_create_travel_description))
+                getString(R.string.hint_create_travel), getString(R.string.hint_create_travel_description), addNewTrip)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

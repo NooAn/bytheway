@@ -91,7 +91,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             viewModel?.getAllUsers()
 
             showPrompt("isFirstEnterAllUsersFragment", context.resources.getString(R.string.close_hint),
-                    context.resources.getString(R.string.hint_all_travelers), context.resources.getString(R.string.hint_all_travelers_description))
+                    context.resources.getString(R.string.hint_all_travelers), context.resources.getString(R.string.hint_all_travelers_description), searchParametersText)
         } catch (e: Throwable) {
             Log.e("LOG_AUF", e.toString())
             FirebaseCrash.report(e)
