@@ -15,6 +15,7 @@ import ru.a1024bits.bytheway.MapWebService
 import ru.a1024bits.bytheway.algorithm.SearchTravelers
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.util.toJsonString
+import ru.a1024bits.bytheway.viewmodel.FilterAndInstallListener
 import java.util.*
 import javax.inject.Inject
 
@@ -68,32 +69,9 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
         }
     }
 
-
-    override fun getAllUsers(): Single<MutableList<User>> {
-        Log.e("LOG get all users", Thread.currentThread().name)
-        return Single.create<MutableList<User>> { stream ->
-            try {
-                store.collection(COLLECTION_USERS)
-                        .get()
-                        .addOnCompleteListener({ task ->
-                            Log.e("LOG completeListener", Thread.currentThread().name)
-                            val result: MutableList<User> = arrayListOf()
-                            for (document in task.result) {
-                                try {
-                                    val user = document.toObject(User::class.java)
-                                    if (user.cities.size > 0 && user.id != FirebaseAuth.getInstance().currentUser?.uid) {
-                                        result.add(user)
-                                    }
-                                } catch (e: Exception) {
-                                    e.printStackTrace()
-                                }
-                            }
-                            stream.onSuccess(result)
-                        }).addOnFailureListener({ exception -> stream.onError(exception) })
-            } catch (exp: Exception) {
-                stream.onError(exp) // for fix bugs FirebaseFirestoreException: DEADLINE_EXCEEDED
-            }
-        }
+    override fun installAllUsers(listener: FilterAndInstallListener) {
+        store.collection(COLLECTION_USERS).get().addOnCompleteListener({ task -> listener.filterAndInstallUsers(task.result) })
+                .addOnFailureListener({e -> listener.onFailure(e)})
     }
 
     override fun getReallUsers(paramSearch: Filter): Single<List<User>> =
