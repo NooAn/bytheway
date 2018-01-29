@@ -6,11 +6,13 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
 import android.content.Context
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v7.widget.SearchView
 import android.util.Log
 import android.view.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.TextView
 import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment
 import com.codetroopers.betterpickers.calendardatepicker.MonthAdapter
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -27,8 +29,8 @@ import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.repository.M_SEX
 import ru.a1024bits.bytheway.repository.W_SEX
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
+import ru.a1024bits.bytheway.util.DateUtils
 import ru.a1024bits.bytheway.util.DecimalInputFilter
-import ru.a1024bits.bytheway.util.getLongFromDate
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
 import java.util.*
 import javax.inject.Inject
@@ -69,7 +71,6 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
     }
 
     private fun showErrorLoading() {
-        //todo set here sent report to firebase analyticks
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -88,7 +89,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             viewModel?.response?.observe(this, usersObservers)
             viewModel?.loadingStatus?.observe(this, (activity?.let { it as MenuActivity })?.progressBarLoad
                     ?: return)
-            viewModel?.getAllUsers()
+            viewModel?.getAllUsers(filter)
 
             showPrompt("isFirstEnterAllUsersFragment", context.resources.getString(R.string.close_hint),
                     context.resources.getString(R.string.hint_all_travelers), context.resources.getString(R.string.hint_all_travelers_description), searchParametersText)
@@ -118,7 +119,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             override fun onQueryTextChange(newText: String): Boolean {
                 if (newText.isEmpty() && isNotStartSearch && this@AllUsersFragment.view != null) {
                     updateViewsBeforeSearch()
-                    viewModel?.getAllUsers()
+                    viewModel?.getAllUsers(filter)
                 }
                 isNotStartSearch = true
                 return false
@@ -137,7 +138,13 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
                 .setPreselectedDate(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH))
     }
 
-    private fun openDateArrivedDialog() {
+    private fun openDateArrivedDialog(view: TextView) {
+        if (view.text.contains("  ")) {
+            view.text = getString(R.string.filters_all_users_empty_date)
+            filter.endDate = 0L
+            view.setCompoundDrawables(null, null, null, null)
+            return
+        }
         val dateTo = Calendar.getInstance() //current time by default
         if (filter.endDate > 0L) dateTo.timeInMillis = filter.endDate
         dateDialog = CalendarDatePickerDialogFragment()
@@ -147,18 +154,24 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
 
         dateDialog.setDateRange(MonthAdapter.CalendarDay(if (filter.startDate == 0L) System.currentTimeMillis() else filter.startDate), null)
         dateDialog.setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
-            choseDateEnd.text = StringBuilder(" ")
+            view.text = StringBuilder(" ")
                     .append(dayOfMonth)
                     .append(" ")
                     .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
                     .toString()
-            filter.endDate = getLongFromDate(year = year, month = monthOfYear, day = dayOfMonth)
-
+            filter.endDate = DateUtils.getLongFromDate(year = year, month = monthOfYear, day = dayOfMonth)
+            view.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector_black, 0)
         }
         dateDialog.show(activity.supportFragmentManager, "")
     }
 
-    private fun openDateFromDialog() {
+    private fun openDateFromDialog(view: TextView) {
+        if (view.text.contains("  ")) {
+            view.text = getString(R.string.filters_all_users_empty_date)
+            filter.startDate = 0L
+            view.setCompoundDrawables(null, null, null, null)
+            return
+        }
         val dateFrom = Calendar.getInstance() //current time by default
         if (filter.startDate > 0L) dateFrom.timeInMillis = filter.startDate
 
@@ -169,13 +182,13 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
 
         dateDialog.setDateRange(MonthAdapter.CalendarDay(System.currentTimeMillis()), null)
         dateDialog.setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
-            choseDateStart.text = StringBuilder(" ")
+            view.text = StringBuilder(" ")
                     .append(dayOfMonth)
                     .append(" ")
                     .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
                     .toString()
-            filter.startDate = getLongFromDate(year = year, month = monthOfYear, day = dayOfMonth)
-
+            filter.startDate = DateUtils.getLongFromDate(year = year, month = monthOfYear, day = dayOfMonth)
+            view.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector_black, 0)
         }
         dateDialog.show(activity.supportFragmentManager, "")
     }
@@ -192,6 +205,11 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
     override fun getLayoutRes() = R.layout.fragment_display_all_users
 
     override fun getViewModelClass(): Class<DisplayUsersViewModel> = DisplayUsersViewModel::class.java
+
+    fun nonSuchSetDate() {
+        Snackbar.make(activity.findViewById(android.R.id.content), context.getString(R.string.dates_has_been_incorrect), Snackbar.LENGTH_LONG).show()
+    }
+
 
     private fun installLogicToUI() {
         startBudget.filters = arrayOf(DecimalInputFilter())
@@ -235,11 +253,14 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
         })
         updateChoseDateButtons()
         choseDateStart.setOnClickListener {
-            openDateFromDialog()
+            openDateFromDialog(choseDateStart)
         }
+        choseDateStart.setOnTouchListener(DateUtils.onDateTouch)
+
         choseDateEnd.setOnClickListener {
-            openDateArrivedDialog()
+            openDateArrivedDialog(choseDateEnd)
         }
+        choseDateEnd.setOnTouchListener(DateUtils.onDateTouch)
         view_contain_block_parameters.layoutTransition.setDuration(700L)
         saveParameters.setOnClickListener {
             analytics.logEvent(TAG_ANALYTICS + "CLICK_ON_SEARCH", null)
@@ -275,7 +296,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             filter.startDate = 0L
             filter.endDate = 0L
 
-            startAge.setSelection(if (filter.startAge < 0) 0 else filter.startAge)
+            startAge.setSelection(filter.startAge)
             endAge.setSelection(filter.endAge)
             startBudget.setText("")
             endBudget.setText("")
@@ -286,6 +307,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             sexButtons.check(sexAny.id)
         }
 
+        view_contain_block_parameters.layoutTransition.setDuration(700L)
         searchParametersText.setOnClickListener {
             if (block_search_parameters.visibility == View.GONE) {
                 block_search_parameters.visibility = View.VISIBLE
@@ -315,7 +337,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             override fun endTransition(p0: LayoutTransition?, p1: ViewGroup?, view: View, p3: Int) {
                 if ((view.id == block_search_parameters.id) && (block_search_parameters.visibility == View.GONE)) {
                     updateViewsBeforeSearch()
-                    viewModel?.getAllUsers()
+                    viewModel?.getAllUsers(filter)
                     view_contain_block_parameters.layoutTransition.removeTransitionListener(this)
                 }
             }
@@ -338,10 +360,10 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
 
     private fun updateChoseDateButtons() {
         choseDateStart.text = if (filter.startDate > 0L)
-            viewModel?.getTextFromDates(date = filter.startDate) else getString(R.string.filters_all_users_empty_date_start)
-
+            viewModel?.getTextFromDates(date = filter.startDate) else getString(R.string.filters_all_users_empty_date)
+        if (filter.startDate > 0L) choseDateStart.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector_black, 0)
         choseDateEnd.text = if (filter.endDate > 0L)
-            viewModel?.getTextFromDates(date = filter.endDate) else getString(R.string.filters_all_users_empty_date_end)
-
+            viewModel?.getTextFromDates(date = filter.endDate) else getString(R.string.filters_all_users_empty_date)
+        if (filter.endDate > 0L) choseDateEnd.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector_black, 0)
     }
 }

@@ -51,9 +51,9 @@ import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM
 import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO
 import ru.a1024bits.bytheway.util.Constants.START_DATE
+import ru.a1024bits.bytheway.util.DateUtils
 import ru.a1024bits.bytheway.util.DecimalInputFilter
 import ru.a1024bits.bytheway.util.getBearing
-import ru.a1024bits.bytheway.util.getLongFromDate
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import ru.terrakok.cicerone.commands.Replace
 import java.text.SimpleDateFormat
@@ -560,13 +560,13 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             openDateDialog(END_DATE, dateArrived)
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_date_to_click", null)
         }
-        dateArrived.setOnTouchListener(onDateTouch)
+        dateArrived.setOnTouchListener(DateUtils.onDateTouch)
 
         textDateFrom.setOnClickListener {
             openDateDialog(START_DATE, textDateFrom)
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_date_from_click", null)
         }
-        textDateFrom.setOnTouchListener(onDateTouch)
+        textDateFrom.setOnTouchListener(DateUtils.onDateTouch)
 
         addInfoUser.afterTextChanged({
             profileStateHashMap[ADD_INFO] = it
@@ -591,18 +591,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             openAlertDialog(this::removeTrip)
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_remove_trip", null)
         }
-    }
-
-    private val onDateTouch = View.OnTouchListener { view, event ->
-        val drawableRight = 2
-        (view as EditText)
-        if (event.action == MotionEvent.ACTION_UP && view.compoundDrawables[drawableRight] != null) {
-            if (event.rawX >= (view.right - view.compoundDrawables[drawableRight].bounds.width())) {
-                view.setText("  ")
-                false
-            }
-        }
-        false
     }
 
     override fun onStop() {
@@ -683,7 +671,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                     .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
                     .append(" ")
                     .append(year).toString())
-            dates[key] = getLongFromDate(dayOfMonth, monthOfYear, year)
+            dates[key] = DateUtils.getLongFromDate(dayOfMonth, monthOfYear, year)
 
             profileStateHashMap[DATES] = dates.toString()
             profileChanged()

@@ -31,8 +31,8 @@ import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM
 import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO
 import ru.a1024bits.bytheway.util.Constants.START_DATE
+import ru.a1024bits.bytheway.util.DateUtils.Companion.getLongFromDate
 import ru.a1024bits.bytheway.util.DecimalInputFilter
-import ru.a1024bits.bytheway.util.getLongFromDate
 import java.text.SimpleDateFormat
 import java.util.*
 

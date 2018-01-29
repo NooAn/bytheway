@@ -26,13 +26,14 @@ import javax.inject.Inject
 class DisplayUsersViewModel @Inject constructor(var userRepository: UserRepository?) : BaseViewModel(), FilterAndInstallListener {
     var response: MutableLiveData<Response<List<User>>> = MutableLiveData()
     var yearsOldUsers = (0..MAX_AGE).mapTo(ArrayList<String>()) { it.toString() }
-    val filter = Filter()
+    var filter = Filter()
 
     companion object {
         const val TAG = "showUserViewModel"
     }
 
-    fun getAllUsers() {
+    fun getAllUsers(f: Filter) {
+        this.filter = f
         userRepository?.installAllUsers(this)
     }
 
