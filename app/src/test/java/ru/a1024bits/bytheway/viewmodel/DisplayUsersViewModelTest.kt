@@ -1,6 +1,5 @@
 package ru.a1024bits.bytheway.viewmodel
 
-import android.content.Context
 import android.util.Log
 import org.junit.Assert
 import org.junit.Before
