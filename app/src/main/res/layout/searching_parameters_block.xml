@@ -49,9 +49,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/endCity"
+            android:layout_marginRight="10dp"
             android:layout_toEndOf="@+id/fromAgeText"
             android:layout_toStartOf="@+id/byDateText"
-            android:text="@string/filters_all_users_empty_date_start"
+            android:text="@string/filters_all_users_empty_date"
             android:textSize="@dimen/standard_text_size"
             android:theme="@style/UsersTextInFilters" />
 
@@ -86,8 +87,9 @@
             android:layout_alignBottom="@+id/choseDateStart"
             android:layout_alignParentEnd="true"
             android:layout_alignStart="@+id/endAge"
+            android:layout_marginRight="5dp"
             android:saveEnabled="true"
-            android:text="@string/filters_all_users_empty_date_end"
+            android:text="@string/filters_all_users_empty_date"
             android:textSize="@dimen/standard_text_size"
             android:theme="@style/UsersTextInFilters" />
 

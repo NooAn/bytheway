@@ -1,17 +1,14 @@
 package ru.a1024bits.bytheway.ui.fragments
 
 import android.arch.lifecycle.ViewModelProvider
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.os.Bundle
-import android.os.Handler
 import android.support.annotation.LayoutRes
 import android.support.design.widget.AppBarLayout
 import android.support.design.widget.CoordinatorLayout
-import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v4.util.ArrayMap
 import android.util.Log
@@ -50,10 +47,7 @@ import ru.a1024bits.bytheway.util.Constants.START_DATE
 import ru.a1024bits.bytheway.util.createMarker
 import ru.a1024bits.bytheway.util.toJsonString
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
-import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import ru.terrakok.cicerone.commands.Forward
-import uk.co.deanwild.materialshowcaseview.IShowcaseListener
-import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
@@ -238,38 +232,9 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
                 goFlyPlan()
             }
         }
-        showPrompt("isFirstEnterMyProfileFragment", context.resources.getString(R.string.close_hint),
-                getString(R.string.hint_save_and_search), getString(R.string.hint_save_and_search_description))
+        showPrompt("isFirstEnterMapFragment", context.resources.getString(R.string.close_hint),
+                getString(R.string.hint_save_and_search), getString(R.string.hint_save_and_search_description), buttonSaveTravelInfo)
 
-//        if (activity != null && (activity as MenuActivity).preferences.getBoolean("isFirstEnterMapFragment", true)) {
-//            showView = MaterialShowcaseView.Builder(activity)
-//                    .setTarget(buttonSaveTravelInfo)
-//                    .renderOverNavigationBar()
-//                    .setDismissText(getString(R.string.close_hint))
-//                    .setTitleText(getString(R.string.hint_save_and_search))
-//                    .setContentText(getString(R.string.hint_save_and_search_description))
-//                    .withCircleShape()
-//                    .setListener(object : IShowcaseListener {
-//                        override fun onShowcaseDisplayed(p0: MaterialShowcaseView?) {
-//                            show = true
-//                            try {
-//                                val mHandler = Handler()
-//                                val time = 10000L // 10 sec after we can hide tips
-//                                mHandler.postDelayed({ if (show) showView?.hide() }, time)
-//                            } catch (e: Exception) {
-//                                e.printStackTrace()
-//                            }
-//                        }
-//
-//                        override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
-//                            if (activity != null && !activity.isDestroyed) {
-//                                (activity as MenuActivity).preferences.edit().putBoolean("isFirstEnterMapFragment", false).apply()
-//                                show = false;
-//                            }
-//                        }
-//                    })
-//                    .show()
-//        }
     }
 
     private fun openDialogSave() {
@@ -334,6 +299,8 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
     }
 
     private fun logEvents() {
+        mFirebaseAnalytics.logEvent("Search_screen_search", null)
+
         if (searchFragment?.filter?.method?.equals(user.method) == false) {
             mFirebaseAnalytics.logEvent("Search_screen_method_change", null)
         }
