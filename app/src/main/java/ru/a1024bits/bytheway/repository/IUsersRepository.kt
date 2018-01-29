@@ -10,11 +10,12 @@ import com.google.firebase.firestore.QuerySnapshot
 import io.reactivex.Completable
 import io.reactivex.Single
 import ru.a1024bits.bytheway.model.User
+import ru.a1024bits.bytheway.viewmodel.FilterAndInstallListener
 import ru.a1024bits.bytheway.model.map_directions.RoutesList
 
 interface IUsersRepository {
     fun getReallUsers(paramSearch: Filter): Single<List<User>>
-    fun getAllUsers(): Single<MutableList<User>>
+    fun installAllUsers(listener: FilterAndInstallListener)
     fun getUserById(userID: String): Task<DocumentSnapshot>
     fun addUser(user: User): Task<Void>
     fun uploadPhotoLink(path: Uri, id: String): Single<String>

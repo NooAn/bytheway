@@ -233,7 +233,7 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
             }
         }
         showPrompt("isFirstEnterMapFragment", context.resources.getString(R.string.close_hint),
-                getString(R.string.hint_save_and_search), getString(R.string.hint_save_and_search_description))
+                getString(R.string.hint_save_and_search), getString(R.string.hint_save_and_search_description), buttonSaveTravelInfo)
 
     }
 

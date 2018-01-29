@@ -98,9 +98,8 @@
     <string name="textBodyDisaster">Мы не смогли найти ваши предстоящие поездки.</string>
     <string name="textHeadAirDisaster">Ваш аккаунт синхронизирован!</string>
     <string name="item_all_users_empty_date"> </string>
-    <string name="filters_all_users_empty_date_start">____</string>
+    <string name="filters_all_users_empty_date">____</string>
     <string name="filters_all_users_text_date_from">с</string>
-    <string name="filters_all_users_empty_date_end">____</string>
     <string name="not_cities">Пока ничего не ищет</string>
     <string name="optionSearch">+ Параметры поиска</string>
     <string name="to">до</string>
@@ -141,4 +140,5 @@
     <string name="from_in">c</string>
     <string name="city_in_the_world">Человек мира</string>
     <string name="error_upload_image">Ошибка загрузки</string>
+    <string name="error_link_open">Мы не смогли открыть ссылку. Возможно она некорректная.</string>
 </resources>
