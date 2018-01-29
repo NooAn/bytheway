@@ -53,7 +53,7 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                 .doAfterTerminate({ loadingStatus.setValue(false) })
                 .doOnSuccess { url = it }
                 .doOnSuccess { Log.e("LOG", "onSuc $url") }
-                //  .flatMap({ urlPhoto -> SingleSource<String> { savePhotoLink(urlPhoto, userId).subscribeOn(getBackgroundScheduler()).subscribe() } })
+                .flatMap({ urlPhoto -> savePhotoLink(urlPhoto, userId).subscribeOn(getBackgroundScheduler()).subscribe() })
                 .observeOn(getMainThreadScheduler())
                 .subscribe({
                     photoUrl.setValue(Response.success(url))

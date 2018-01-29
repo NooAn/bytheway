@@ -1,6 +1,5 @@
 package ru.a1024bits.bytheway.repository
 
-import android.arch.lifecycle.Observer
 import android.net.Uri
 import android.util.Log
 import com.google.android.gms.maps.model.LatLng
@@ -9,6 +8,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.*
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageException
 import io.reactivex.Completable
 import io.reactivex.Single
 import ru.a1024bits.bytheway.MapWebService
@@ -56,12 +56,19 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
             // Register observers to listen for when the download is done or if it fails
             uploadTask.addOnFailureListener {
                 // Handle unsuccessful uploads
-                Log.e("LOG", "file fail", it)
+                try {
+                    val errorCode = (it as StorageException).errorCode
+                    val errorMessage = it.message
+                    Log.e("LOG", "file fail $errorMessage and $errorCode", it)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+                FirebaseCrash.report(it)
                 stream.onError(it)
             }.addOnSuccessListener { taskSnapshot ->
-                        // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-                        stream.onSuccess(taskSnapshot.downloadUrl.toString())
-                    }
+                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+                stream.onSuccess(taskSnapshot.downloadUrl.toString())
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             stream.onError(e)
@@ -164,8 +171,8 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                     }).addOnFailureListener {
                         stream.onError(it)
                     }.addOnSuccessListener { _ ->
-                                stream.onComplete()
-                            }
+                        stream.onComplete()
+                    }
                 } catch (e: Exception) {
                     stream.onError(e)
                 }

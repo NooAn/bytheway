@@ -1042,7 +1042,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         updateImageProfile(user.urlPhoto)
         image_avatar.setOnClickListener {
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_click_avatar", null)
-            //  performFileSearch()
+             performFileSearch()
         }
 
 
