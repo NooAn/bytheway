@@ -18,6 +18,7 @@ import ru.a1024bits.bytheway.util.toJsonString
 import ru.a1024bits.bytheway.viewmodel.FilterAndInstallListener
 import java.util.*
 import javax.inject.Inject
+import kotlin.collections.HashMap
 
 
 const val COLLECTION_USERS = "users"
@@ -71,7 +72,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
 
     override fun installAllUsers(listener: FilterAndInstallListener) {
         store.collection(COLLECTION_USERS).get().addOnCompleteListener({ task -> listener.filterAndInstallUsers(task.result) })
-                .addOnFailureListener({e -> listener.onFailure(e)})
+                .addOnFailureListener({ e -> listener.onFailure(e) })
     }
 
     override fun getReallUsers(paramSearch: Filter): Single<List<User>> =
@@ -96,8 +97,8 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                                     if (user.cities.size > 0) {
                                         // run search algorithm
                                         val search = SearchTravelers(filter = paramSearch, user = user)
-                                        val s = search.getEstimation()
-                                        user.percentsSimilarTravel = if (s > 100) 100 else s
+
+                                        user.percentsSimilarTravel = search.getEstimation()
                                         if (user.percentsSimilarTravel > MIN_LIMIT &&
                                                 user.id != FirebaseAuth.getInstance().currentUser?.uid) {
                                             result.add(user)
@@ -154,4 +155,22 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                     "origin" to LatLng(cityFromLatLng.latitude, cityFromLatLng.longitude).toJsonString(),
                     "destination" to LatLng(cityToLatLng.latitude, cityToLatLng.longitude).toJsonString(),
                     "sensor" to "false"))
+
+    fun sendTime(id: String): Completable = Completable.create { stream ->
+        try {
+            val documentRef = store.collection(COLLECTION_USERS).document(id)
+            store.runTransaction {
+                val map = hashMapOf<String, Any>()
+                map.put("timestamp", FieldValue.serverTimestamp())
+                documentRef.update(map)
+                null
+            }.addOnFailureListener {
+                        stream.onError(it)
+                    }.addOnSuccessListener { _ ->
+                        stream.onComplete()
+                    }
+        } catch (e: Exception) {
+            stream.onError(e)
+        }
+    }
 }

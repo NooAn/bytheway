@@ -21,17 +21,17 @@ class SearchTravelers(val filter: Filter = Filter(), val user: User) {
     val WeightDate: Int = 10
 
     fun getEstimation(): Int {
-        val n = calculateRoute() * WeightRoute
-        val m = calculateDate() * WeightDate
-        val c = calculateMethod() * WeightMethod
-        val p = calculateBudget() * WeightBudget
-
-        Log.e("LOG", "name:${user.name} -  route:$n  date:$m  method:$c  budget:${p} and ${calculateBudget()}  summa:${n + m + c + p}")
+//        val n = calculateRoute() * WeightRoute
+//        val m = calculateDate() * WeightDate
+//        val c = calculateMethod() * WeightMethod
+//        val p = calculateBudget() * WeightBudget
+//
+//        Log.e("LOG", "name:${user.name} -  route:$n  date:$m  method:$c  budget:${p} and ${calculateBudget()}  summa:${n + m + c + p}")
 
         return ((calculateRoute() * WeightRoute
                 + calculateDate() * WeightDate
                 + calculateMethod() * WeightMethod
-                + calculateBudget() * WeightBudget)).toInt()
+                + calculateBudget() * WeightBudget)).toInt().coerceIn(0, 100)
     }
 
     fun calculateBudget(): Double {

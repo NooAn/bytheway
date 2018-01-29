@@ -139,14 +139,22 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
                         } catch (e: Exception) {
                             e.printStackTrace()
                             FirebaseCrash.report(e)
+                            showErrorFroWrongSocValue(user, name)
+
                         }
                     }
                 }
                 SocialNetwork.CS.link -> {
                     csIcon.setImageResource(R.drawable.ic_cs_color)
                     csIcon.setOnClickListener {
-                        mFirebaseAnalytics.logEvent(TAG_ANALYTICS + "OPEN_CS", null)
-                        startActivity(createBrowserIntent(user.socialNetwork[name.key] ?: ""))
+                        try {
+                            startActivity(createBrowserIntent(user.socialNetwork[name.key] ?: ""))
+                            mFirebaseAnalytics.logEvent(TAG_ANALYTICS + "OPEN_CS", null)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            FirebaseCrash.report(e)
+                            showErrorFroWrongSocValue(user, name)
+                        }
                     }
                 }
                 SocialNetwork.FB.link -> {
@@ -157,6 +165,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
                             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("${user.socialNetwork[name.key]}")))
                         } catch (e: Exception) {
                             e.printStackTrace()
+                            showErrorFroWrongSocValue(user, name)
                         }
                     }
                 }
@@ -167,9 +176,8 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
                         try {
                             startActivity(createBrowserIntent("whatsapp://send?text=Привет, я нашел тебя в ByTheWay.&phone=+${user.socialNetwork[name.key]}&abid = +${user.socialNetwork[name.key]})}"))
                         } catch (e: Exception) {
-                            val dialog = SocNetworkdialog(activity, user.socialNetwork[name.key])
-                            dialog.show()
                             e.printStackTrace()
+                            showErrorFroWrongSocValue(user, name)
                         }
                     }
                 }
@@ -214,6 +222,12 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
 
         addInfoUser.text = user.addInformation
         if (user.addInformation.isBlank()) descriptionProfile.visibility = View.GONE
+    }
+
+    private fun showErrorFroWrongSocValue(user: User, name: MutableMap.MutableEntry<String, String>) {
+        Toast.makeText(activity.applicationContext, R.string.error_link_open, Toast.LENGTH_SHORT).show()
+        val dialog = SocNetworkdialog(activity, user.socialNetwork[name.key])
+        dialog.show()
     }
 
     private fun clickForIconDateEmpty() {
@@ -381,7 +395,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
     private fun intentMessageTelegram(id: String?) {
         try {
             if (id?.isNumberPhone() == false) {
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/${id?.replace("@", "")}")))
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/${id.replace("@", "")}")))
                 mFirebaseAnalytics.logEvent(TAG_ANALYTICS + "OPEN_TG", null)
             } else {
                 mFirebaseAnalytics.logEvent(TAG_ANALYTICS + "NOT_OPEN_TG", null)
@@ -390,6 +404,10 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
             }
         } catch (e: Exception) {
             e.printStackTrace()
+            FirebaseCrash.report(e)
+            Toast.makeText(activity.applicationContext, R.string.error_link_open, Toast.LENGTH_SHORT).show()
+            val dialog = SocNetworkdialog(activity, "https://t.me/${id?.replace("@", "")}")
+            dialog.show()
         }
     }
 

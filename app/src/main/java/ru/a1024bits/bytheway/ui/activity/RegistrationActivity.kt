@@ -32,7 +32,8 @@ import javax.inject.Inject
 class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener {
 
     override fun onConnectionFailed(p0: ConnectionResult) {
-
+        mFirebaseAnalytics.logEvent("RegistrationScreen_Connect_Fail", null)
+        FirebaseCrash.report(Exception(p0.errorMessage + " " + p0.errorCode))
     }
 
     private var viewModel: RegistrationViewModel? = null
@@ -156,8 +157,7 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
                     }
                     ?.addOnFailureListener {
                         Log.w("LOG", "signInWithCredential:failure")
-                        Toast.makeText(this, "Authentication failed.",
-                                Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Authentication failed.", Toast.LENGTH_SHORT).show()
                         mFirebaseAnalytics.logEvent("RegistrationScreen_Error_Login", null)
                         FirebaseCrash.report(it)
                         showErrorText()

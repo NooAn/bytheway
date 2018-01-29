@@ -1,19 +1,38 @@
 package ru.a1024bits.bytheway.ui.activity
 
 import android.app.Activity
+import android.arch.lifecycle.ViewModelProvider
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.support.v4.app.FragmentActivity
+import android.support.v7.app.AppCompatActivity
+import android.util.Log
+import com.google.firebase.auth.FirebaseAuth
+import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.util.Constants
+import ru.a1024bits.bytheway.viewmodel.RegistrationViewModel
+import javax.inject.Inject
 
-class SplashActivity : Activity() {
+class SplashActivity : AppCompatActivity() {
 
     private val preferences by lazy { getSharedPreferences(Constants.APP_PREFERENCES, Context.MODE_PRIVATE) }
+
+    private var viewModel: RegistrationViewModel? = null
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
+        App.component.inject(this)
+
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(RegistrationViewModel::class.java)
+        viewModel?.setTimestamp(FirebaseAuth.getInstance().currentUser?.uid ?: return)
+        Log.e("LOG", "on ")
     }
 
     override fun onResume() {
