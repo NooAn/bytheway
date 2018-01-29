@@ -1,11 +1,12 @@
 package ru.a1024bits.bytheway.viewmodel
 
 import android.arch.lifecycle.MutableLiveData
+import android.content.Context
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.QuerySnapshot
 import io.reactivex.Single
-import ru.a1024bits.bytheway.App.Companion.INSTANCE
+import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.Response
 import ru.a1024bits.bytheway.model.User
@@ -27,6 +28,13 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
     var response: MutableLiveData<Response<List<User>>> = MutableLiveData()
     var yearsOldUsers = (0..MAX_AGE).mapTo(ArrayList<String>()) { it.toString() }
     val filter = Filter()
+    lateinit var context: Context
+
+    init {
+        try {
+            context = App.INSTANCE
+        } catch (e: Throwable) { }
+    }
 
     companion object {
         const val TAG = "showUserViewModel"
@@ -135,13 +143,16 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
         return getTextDate(calendarStartDate, yearStart) + toWord + getTextDate(calendarEndDate, yearEnd)
     }
 
-    fun filterUsersByString(queryCustomRegister: String, primaryQuery: String, primaryList: MutableList<User>): MutableList<User> =
-            primaryList.filterTo(ArrayList()) {
-                it.cities.filterValues { it1 -> it1.toLowerCase().contains(queryCustomRegister) }.isNotEmpty() || it.name.toLowerCase().contains(queryCustomRegister) ||
-                        it.email.toLowerCase().contains(queryCustomRegister) || it.age.toString().contains(queryCustomRegister) ||
-                        it.budget.toString().contains(queryCustomRegister) || it.lastName.toLowerCase().contains(queryCustomRegister) ||
-                        it.phone.contains(primaryQuery) || it.route.contains(queryCustomRegister)
-            }
+    fun filterUsersByString( primaryQuery: String = "", primaryList: MutableList<User>): MutableList<User> {
+        val queryLowerCase: String = primaryQuery.toLowerCase()
+        return primaryList.filterTo(ArrayList()) {
+            it.cities.filterValues { it1 -> it1.toLowerCase().contains(queryLowerCase) }.isNotEmpty() ||
+                    it.name.toLowerCase().contains(queryLowerCase) || it.email.toLowerCase().contains(queryLowerCase) ||
+                    it.age.toString().contains(queryLowerCase) || it.budget.toString().contains(queryLowerCase) ||
+                    it.lastName.toLowerCase().contains(queryLowerCase) || it.phone.contains(primaryQuery) ||
+                    it.route.contains(queryLowerCase) || it.addInformation.toLowerCase().contains(primaryQuery)
+        }
+    }
 
     private fun getTextDate(calendarStartDate: Calendar, yearStart: String): String {
         return StringBuilder("").append(getTextDateDayAndMonth(calendarStartDate))
@@ -153,7 +164,8 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
     private fun getTextDateDayAndMonth(calendarStartDate: Calendar): String {
         return StringBuilder("").append(calendarStartDate.get(Calendar.DAY_OF_MONTH))
                 .append(" ")
-                .append(INSTANCE.applicationContext.resources.getStringArray(R.array.months_array)[calendarStartDate.get(Calendar.MONTH)])
+                .append(context.resources.getStringArray(R.array.months_array)[calendarStartDate.get(Calendar.MONTH)])
+//                .append(month)
                 .toString()
     }
 

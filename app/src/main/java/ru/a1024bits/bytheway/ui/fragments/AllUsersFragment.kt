@@ -110,7 +110,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             var isNotStartSearch = false
             override fun onQueryTextSubmit(query: String): Boolean {
-                displayUsersAdapter.setItems(viewModel?.filterUsersByString(query.toLowerCase(), query, displayUsersAdapter.users))
+                displayUsersAdapter.setItems(viewModel?.filterUsersByString(query, displayUsersAdapter.users))
                 analytics.logEvent(TAG_ANALYTICS + "SEARCH_QUERY", null)
                 return true
             }
