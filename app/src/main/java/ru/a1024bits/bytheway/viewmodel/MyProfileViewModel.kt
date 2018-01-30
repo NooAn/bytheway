@@ -5,6 +5,8 @@ import android.net.Uri
 import android.util.Log
 import com.google.firebase.firestore.GeoPoint
 import io.reactivex.Completable
+import io.reactivex.Single
+import io.reactivex.rxkotlin.toSingle
 import ru.a1024bits.bytheway.model.AirUser
 import ru.a1024bits.bytheway.model.Response
 import ru.a1024bits.bytheway.model.SocialResponse
@@ -31,6 +33,7 @@ import ru.a1024bits.bytheway.util.Constants.END_DATE
 import ru.a1024bits.bytheway.util.Constants.FIRST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.START_DATE
+import java.util.concurrent.Callable
 import javax.inject.Inject
 
 
@@ -44,31 +47,34 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
     val saveSocial = MutableLiveData<SocialResponse>()
     val saveProfile = MutableLiveData<Response<Boolean>>()
     val photoUrl = MutableLiveData<Response<String>>()
-
-    fun loadImage(pathFile: Uri, userId: String) {
-        var url: String = ""
+    fun loadImage(pathFile: Uri, userId: String, oldUser: User?) {
         disposables.add(userRepository.uploadPhotoLink(path = pathFile, id = userId)
                 .subscribeOn(getBackgroundScheduler())
                 .doOnSubscribe({ _ -> loadingStatus.setValue(true) })
                 .doAfterTerminate({ loadingStatus.setValue(false) })
-                .doOnSuccess { url = it }
-                .doOnSuccess { Log.e("LOG", "onSuc $url") }
-                .flatMap({ urlPhoto -> savePhotoLink(urlPhoto, userId).subscribeOn(getBackgroundScheduler()).subscribe() })
+                .flatMap({ urlPhoto -> savePhotoLink(urlPhoto, userId).subscribeOn(getBackgroundScheduler()) })
                 .observeOn(getMainThreadScheduler())
                 .subscribe({
-                    photoUrl.setValue(Response.success(url))
-                    disposables.add(savePhotoLink(url, userId).subscribeOn(getBackgroundScheduler()).subscribe())
+                    Log.e("LOG S :", Thread.currentThread().name)
+                    photoUrl.setValue(Response.success(it))
+                    oldUser?.urlPhoto = it
+                    user.value = oldUser
                 }, { throwable ->
                     photoUrl.setValue(Response.error(throwable))
                 }))
     }
 
-    private fun savePhotoLink(downloadUrl: String, id: String): Completable {
+    private fun savePhotoLink(downloadUrl: String, id: String): Single<String> {
         val map: HashMap<String, Any> = hashMapOf()
         map.put("urlPhoto", downloadUrl)
         return userRepository.changeUserProfile(map, id)
                 .timeout(TIMEOUT_SECONDS, timeoutUnit)
                 .retry(2)
+                .toSingle(object : Callable<String> {
+                    override fun call(): String {
+                        return downloadUrl
+                    }
+                })
     }
 
     fun load(userId: String) {

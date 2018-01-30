@@ -40,7 +40,7 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
     override fun filterAndInstallUsers(snapshot: QuerySnapshot) {
         Single.create<MutableList<User>> { stream ->
             try {
-                Log.e("LOG get all users", Thread.currentThread().name)
+                Log.e("LOG get filter users", Thread.currentThread().name)
                 val result: MutableList<User> = ArrayList()
                 for (document in snapshot) {
                     try {

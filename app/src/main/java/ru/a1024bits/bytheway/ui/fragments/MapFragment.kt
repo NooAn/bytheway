@@ -154,7 +154,6 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
         //Stop tracking current location
         mMap?.clear()
         mMapView = null
-
     }
 
     override fun onLowMemory() {

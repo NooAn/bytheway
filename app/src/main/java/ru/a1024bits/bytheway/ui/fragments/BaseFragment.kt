@@ -72,8 +72,8 @@ abstract class BaseFragment<T : BaseViewModel> : Fragment() {
     }
 
     override fun onDestroyView() {
-        super.onDestroyView()
         viewModel?.removeObserver(lifecycle)
+        super.onDestroyView()
     }
 
     @LayoutRes

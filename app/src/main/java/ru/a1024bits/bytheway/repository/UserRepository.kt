@@ -28,7 +28,6 @@ const val COLLECTION_USERS = "users"
  */
 class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapService: MapWebService) : IUsersRepository {
 
-
     companion object {
         const val TAG = "LOG UserRepository"
         const val MIN_LIMIT = 1
@@ -37,6 +36,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
     override fun getUser(id: String): Single<User> =
             Single.create<User> { stream ->
                 try {
+                    Log.e("LOG get user R", Thread.currentThread().name)
                     store.collection(COLLECTION_USERS).document(id).get().addOnSuccessListener({ document ->
                         val user = document.toObject(User::class.java)
                         stream.onSuccess(user)
@@ -50,7 +50,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
 
     override fun uploadPhotoLink(path: Uri, id: String): Single<String> = Single.create { stream ->
         try {
-            Log.e("LOG get all users", Thread.currentThread().name)
+            Log.e("LOG uploadPhotoLink R", Thread.currentThread().name)
             // Create a storage reference from our app
             val storageRef = FirebaseStorage.getInstance().getReference()
             val riversRef = storageRef.child("images/" + id)
@@ -65,12 +65,11 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
-                FirebaseCrash.report(it)
                 stream.onError(it)
             }.addOnSuccessListener { taskSnapshot ->
-                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-                stream.onSuccess(taskSnapshot.downloadUrl.toString())
-            }
+                        // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+                        stream.onSuccess(taskSnapshot.downloadUrl.toString())
+                    }
         } catch (e: Exception) {
             e.printStackTrace()
             stream.onError(e)
@@ -87,7 +86,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                 try {
                     store.collection(COLLECTION_USERS).get().addOnCompleteListener({ task ->
                         if (task.isSuccessful) {
-                            Log.e("LOG get all users", Thread.currentThread().name)
+                            Log.e("LOG get real users R", Thread.currentThread().name)
 
                             val result: MutableList<User> = ArrayList()
                             for (document in task.result) {
@@ -140,6 +139,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
     override fun changeUserProfile(map: HashMap<String, Any>, id: String): Completable =
             Completable.create { stream ->
                 try {
+                    Log.e("LOG change Profile R :", Thread.currentThread().name)
                     val documentRef = store.collection(COLLECTION_USERS).document(id)
                     store.runTransaction(object : Transaction.Function<Void> {
                         override fun apply(transaction: Transaction): Void? {
@@ -150,8 +150,8 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                     }).addOnFailureListener {
                         stream.onError(it)
                     }.addOnSuccessListener { _ ->
-                        stream.onComplete()
-                    }
+                                stream.onComplete()
+                            }
                 } catch (e: Exception) {
                     stream.onError(e)
                 }
@@ -165,6 +165,8 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
 
     fun sendTime(id: String): Completable = Completable.create { stream ->
         try {
+            Log.e("LOG send time R :", Thread.currentThread().name)
+
             val documentRef = store.collection(COLLECTION_USERS).document(id)
             store.runTransaction {
                 val map = hashMapOf<String, Any>()
