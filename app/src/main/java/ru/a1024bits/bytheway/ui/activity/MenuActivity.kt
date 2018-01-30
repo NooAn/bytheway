@@ -127,17 +127,7 @@ class MenuActivity : AppCompatActivity(),
         drawer.addDrawerListener(toggle)
         toggle.syncState()
 
-        val navigationView = findViewById<NavigationView>(R.id.nav_view)
-        navigationView.setNavigationItemSelectedListener(this)
-        val hView = navigationView.getHeaderView(0)
-        hView.setOnClickListener {
-            openProfile()
-        }
-        val image = hView.findViewById<ImageView>(R.id.menu_image_avatar)
 
-        glide?.load(FirebaseAuth.getInstance().currentUser?.photoUrl)
-                ?.apply(RequestOptions.circleCropTransform())
-                ?.into(image)
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
 
         if (savedInstanceState == null) {
@@ -277,6 +267,20 @@ class MenuActivity : AppCompatActivity(),
 
     override fun onFragmentInteraction(user: User?) {
         mainUser = user
+        updateUsersInfo(user?.urlPhoto ?: return)
+    }
+
+    private fun updateUsersInfo(url: String) {
+        val navigationView = findViewById<NavigationView>(R.id.nav_view)
+        navigationView.setNavigationItemSelectedListener(this)
+        val hView = navigationView.getHeaderView(0)
+        hView.setOnClickListener {
+            openProfile()
+        }
+        val image = hView.findViewById<ImageView>(R.id.menu_image_avatar)
+        glide?.load(url)
+                ?.apply(RequestOptions.circleCropTransform())
+                ?.into(image)
     }
 
     override fun onResume() {
@@ -451,5 +455,4 @@ class MenuActivity : AppCompatActivity(),
         val dialog = FeedbackDialog(this)
         dialog.show()
     }
-
 }

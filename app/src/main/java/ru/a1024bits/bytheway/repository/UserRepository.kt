@@ -1,6 +1,5 @@
 package ru.a1024bits.bytheway.repository
 
-import android.arch.lifecycle.Observer
 import android.net.Uri
 import android.util.Log
 import com.google.android.gms.maps.model.LatLng
@@ -9,6 +8,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.*
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageException
 import io.reactivex.Completable
 import io.reactivex.Single
 import ru.a1024bits.bytheway.MapWebService
@@ -18,6 +18,7 @@ import ru.a1024bits.bytheway.util.toJsonString
 import ru.a1024bits.bytheway.viewmodel.FilterAndInstallListener
 import java.util.*
 import javax.inject.Inject
+import kotlin.collections.HashMap
 
 
 const val COLLECTION_USERS = "users"
@@ -27,7 +28,6 @@ const val COLLECTION_USERS = "users"
  */
 class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapService: MapWebService) : IUsersRepository {
 
-
     companion object {
         const val TAG = "LOG UserRepository"
         const val MIN_LIMIT = 1
@@ -36,6 +36,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
     override fun getUser(id: String): Single<User> =
             Single.create<User> { stream ->
                 try {
+                    Log.e("LOG get user R", Thread.currentThread().name)
                     store.collection(COLLECTION_USERS).document(id).get().addOnSuccessListener({ document ->
                         val user = document.toObject(User::class.java)
                         stream.onSuccess(user)
@@ -49,7 +50,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
 
     override fun uploadPhotoLink(path: Uri, id: String): Single<String> = Single.create { stream ->
         try {
-            Log.e("LOG get all users", Thread.currentThread().name)
+            Log.e("LOG uploadPhotoLink R", Thread.currentThread().name)
             // Create a storage reference from our app
             val storageRef = FirebaseStorage.getInstance().getReference()
             val riversRef = storageRef.child("images/" + id)
@@ -57,7 +58,13 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
             // Register observers to listen for when the download is done or if it fails
             uploadTask.addOnFailureListener {
                 // Handle unsuccessful uploads
-                Log.e("LOG", "file fail", it)
+                try {
+                    val errorCode = (it as StorageException).errorCode
+                    val errorMessage = it.message
+                    Log.e("LOG", "file fail $errorMessage and $errorCode", it)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
                 stream.onError(it)
             }.addOnSuccessListener { taskSnapshot ->
                         // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
@@ -71,7 +78,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
 
     override fun installAllUsers(listener: FilterAndInstallListener) {
         store.collection(COLLECTION_USERS).get().addOnCompleteListener({ task -> listener.filterAndInstallUsers(task.result) })
-                .addOnFailureListener({e -> listener.onFailure(e)})
+                .addOnFailureListener({ e -> listener.onFailure(e) })
     }
 
     override fun getReallUsers(paramSearch: Filter): Single<List<User>> =
@@ -79,7 +86,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                 try {
                     store.collection(COLLECTION_USERS).get().addOnCompleteListener({ task ->
                         if (task.isSuccessful) {
-                            Log.e("LOG get all users", Thread.currentThread().name)
+                            Log.e("LOG get real users R", Thread.currentThread().name)
 
                             val result: MutableList<User> = ArrayList()
                             for (document in task.result) {
@@ -96,8 +103,8 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                                     if (user.cities.size > 0) {
                                         // run search algorithm
                                         val search = SearchTravelers(filter = paramSearch, user = user)
-                                        val s = search.getEstimation()
-                                        user.percentsSimilarTravel = if (s > 100) 100 else s
+
+                                        user.percentsSimilarTravel = search.getEstimation()
                                         if (user.percentsSimilarTravel > MIN_LIMIT &&
                                                 user.id != FirebaseAuth.getInstance().currentUser?.uid) {
                                             result.add(user)
@@ -132,6 +139,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
     override fun changeUserProfile(map: HashMap<String, Any>, id: String): Completable =
             Completable.create { stream ->
                 try {
+                    Log.e("LOG change Profile R :", Thread.currentThread().name)
                     val documentRef = store.collection(COLLECTION_USERS).document(id)
                     store.runTransaction(object : Transaction.Function<Void> {
                         override fun apply(transaction: Transaction): Void? {
@@ -154,4 +162,24 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                     "origin" to LatLng(cityFromLatLng.latitude, cityFromLatLng.longitude).toJsonString(),
                     "destination" to LatLng(cityToLatLng.latitude, cityToLatLng.longitude).toJsonString(),
                     "sensor" to "false"))
+
+    fun sendTime(id: String): Completable = Completable.create { stream ->
+        try {
+            Log.e("LOG send time R :", Thread.currentThread().name)
+
+            val documentRef = store.collection(COLLECTION_USERS).document(id)
+            store.runTransaction {
+                val map = hashMapOf<String, Any>()
+                map.put("timestamp", FieldValue.serverTimestamp())
+                documentRef.update(map)
+                null
+            }.addOnFailureListener {
+                        stream.onError(it)
+                    }.addOnSuccessListener { _ ->
+                        stream.onComplete()
+                    }
+        } catch (e: Exception) {
+            stream.onError(e)
+        }
+    }
 }

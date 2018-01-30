@@ -5,13 +5,59 @@
     android:layout_height="match_parent"
     android:background="@color/white"
     tools:context=".ui.activity.SplashActivity">
-    <TextView
-        android:layout_width="wrap_content"
-        android:id="@+id/textError"
-        android:text="@string/registration_error"
-        android:visibility="invisible"
-        android:padding="24dp"
-        android:textColor="@color/colorAccent"
-        android:layout_height="wrap_content" />
 
+    <TextView
+        android:id="@+id/textError"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="24dp"
+        android:text="@string/registration_error"
+        android:textColor="@color/colorAccent"
+        android:visibility="invisible" />
+
+    <TextView
+        android:id="@+id/textPhone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textError"
+        android:padding="24dp"
+        android:text="Давайте попробуем войти с помощью вашего номера телефона"
+        android:textColor="@color/colorAccent"
+        android:visibility="invisible"
+        tools:visibility="visible" />
+
+    <EditText
+        android:id="@+id/phone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textPhone"
+        android:hint="Телефон"
+        android:visibility="invisible"
+        tools:visibility="visible" />
+    <EditText
+        android:id="@+id/textFromSms"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/phone"
+        android:hint="sms code"
+        android:visibility="invisible"
+        tools:visibility="visible" />
+    <Button
+        android:layout_width="match_parent"
+        android:id="@+id/sendButtonCode"
+        android:text="@string/button_send"
+        android:visibility="invisible"
+        tools:visibility="visible"
+        android:theme="@style/WhiteButton"
+        android:layout_below="@id/textFromSms"
+        android:layout_height="wrap_content" />
+    <Button
+        android:layout_width="match_parent"
+        android:id="@+id/sendButtonPhone"
+        android:visibility="invisible"
+        tools:visibility="visible"
+        android:text="Отправить телефон"
+        android:theme="@style/WhiteButton"
+        android:layout_below="@id/sendButtonCode"
+        android:layout_height="wrap_content" />
 </RelativeLayout>

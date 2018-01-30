@@ -79,11 +79,13 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
         analytics.setCurrentScreen(this.activity, "AllUsersFragment", this.javaClass.simpleName)
 
         try {
-            filter = viewModel?.filter ?: Filter()
 
+            viewModel?.let {
+                filter = it.filter
+            }
+
+            displayUsersAdapter = DisplayAllUsersAdapter(this.context, viewModel ?: return)
             installLogicToUI()
-
-            displayUsersAdapter = DisplayAllUsersAdapter(this.context, viewModel!!)
             displayAllUsers.adapter = displayUsersAdapter
 
             viewModel?.response?.observe(this, usersObservers)

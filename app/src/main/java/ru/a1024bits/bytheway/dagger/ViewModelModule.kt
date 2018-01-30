@@ -24,7 +24,7 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(MyProfileViewModel::class)
     abstract fun bindMyProfileViewModel(mainViewModel: MyProfileViewModel): ViewModel
-
+    
     @Binds
     @IntoMap
     @ViewModelKey(RegistrationViewModel::class)

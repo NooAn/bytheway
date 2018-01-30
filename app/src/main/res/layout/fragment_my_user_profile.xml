@@ -27,6 +27,7 @@
                 android:textAlignment="center"
                 android:textColor="@color/black"
                 android:textSize="24sp"
+                android:text="@string/name"
                 tools:text="@string/fullname" />
 
             <TextView

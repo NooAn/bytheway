@@ -350,8 +350,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                     var uri: Uri? = null
                     if (data != null) {
                         uri = data.getData()
-                        Log.i("LOG", "Uri: ${uri.path} ${uri.encodedPath}" + uri!!.toString())
-                        viewModel?.loadImage(uri, FirebaseAuth.getInstance().currentUser?.uid!!)
+                        Log.i("LOG", "Uri: ${uri.path} ${uri.encodedPath}" + uri?.toString())
+                        viewModel?.loadImage(uri, FirebaseAuth.getInstance().currentUser?.uid!!, mainUser)
                     }
                 }
             }
@@ -863,7 +863,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
         simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.save), { _, _ ->
             val newLink = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString()
-            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_save_links", null)
 
             var valid = true
             var errorText = ""
@@ -877,9 +876,10 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                 //openDialog(socialNetwork, errorText)
                 dialogView.findViewById<EditText>(R.id.socLinkText).error = errorText
             } else {
+                if (newLink in defaultSocialValues.values) return@setButton
                 socNet[socialNetwork.link] = newLink
-                viewModel?.saveLinks(socNet, uid, SocialResponse(socialNetwork.link, newLink)
-                )
+                viewModel?.saveLinks(socNet, uid, SocialResponse(socialNetwork.link, newLink))
+                mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_save_links", null)
             }
         })
 
@@ -1028,9 +1028,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         updateImageProfile(user.urlPhoto)
         image_avatar.setOnClickListener {
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_click_avatar", null)
-            //  performFileSearch()
+            performFileSearch()
         }
-
 
         cityFromLatLng = user.cityFromLatLng
         cityToLatLng = user.cityToLatLng
@@ -1050,7 +1049,9 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             cityview.text = user.city
             city = user.city
         }
+
         countTrip = user.countTrip
+
         if (countTrip == 0) {
             showBlockAddTrip()
             hideBlockTravelInforamtion()
