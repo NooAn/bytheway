@@ -9,6 +9,7 @@ import android.net.ConnectivityManager
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
+import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -18,14 +19,16 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.auth.api.signin.GoogleSignInResult
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
+import com.google.firebase.FirebaseException
+import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.*
 import com.google.firebase.crash.FirebaseCrash
 import kotlinx.android.synthetic.main.activity_splash.*
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.viewmodel.RegistrationViewModel
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 
@@ -50,6 +53,7 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
         setContentView(R.layout.activity_splash)
         App.component.inject(this)
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
+        mAuth.useAppLanguage()
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(resources.getString(R.string.default_web_client_id))
                 .requestId()
@@ -105,14 +109,14 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
         super.onStart()
     }
 
-    //fixme Status{statusCode=NETWORK_ERROR, resolution=null}
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
         super.onActivityResult(requestCode, resultCode, data)
         Log.e("LOG", "result activity registration")
         if (requestCode == RC_SIGN_IN) {
             val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
-            if (result != null)
-                handleSignInResult(result)
+            result?.let {
+                handleSignInResult(it)
+            }
         } else {
             updateUI(false)
         }
@@ -139,6 +143,10 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
         Log.d("LOG", "firebaseAuthWithGoogle: ${acct.id}  ${acct.idToken}")
 
         val credential = GoogleAuthProvider.getCredential(acct.idToken, null)
+        signInGoogle(credential)
+    }
+
+    private fun signInGoogle(credential: AuthCredential) {
         try {
             mAuth?.signInWithCredential(credential)
                     ?.addOnCompleteListener(this) { task ->
@@ -180,5 +188,82 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
 
     private fun showErrorText() {
         textError.visibility = View.VISIBLE
+        phone.visibility = View.VISIBLE
+        textPhone.visibility = View.VISIBLE
+        sendButtonCode.setOnClickListener({
+            mVerificationId?.let {
+                val credential = PhoneAuthProvider.getCredential(it, textFromSms.text.toString())
+                signInGoogle(credential)
+            }
+        })
+        sendButtonPhone.visibility = View.VISIBLE
+        sendButtonPhone.setOnClickListener({
+            if (!validatePhoneNumber())
+                return@setOnClickListener
+
+            textFromSms.visibility = View.VISIBLE
+            sendButtonCode.visibility = View.VISIBLE
+            authPhone()
+        })
+    }
+
+    private fun validatePhoneNumber(): Boolean {
+        val phoneNumber = phone.getText().toString();
+        if (phoneNumber.isBlank()) {
+            phone.error = "Invalid phone number.";
+            return false;
+        }
+        return true;
+    }
+
+
+    private var mVerificationId: String? = null
+
+    private fun authPhone() {
+        PhoneAuthProvider.getInstance().verifyPhoneNumber(
+                phone.text.toString(),        // Phone number to verify
+                60,                 // Timeout duration
+                TimeUnit.SECONDS,   // Unit of timeout
+                this,               // Activity (for callback binding)
+                object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+                    override fun onVerificationCompleted(authCred: PhoneAuthCredential?) {
+                        // This callback will be invoked in two situations:
+                        // 1 - Instant verification. In some cases the phone number can be instantly
+                        //     verified without needing to send or enter a verification code.
+                        // 2 - Auto-retrieval. On some devices Google Play services can automatically
+                        //     detect the incoming verification SMS and perform verification without
+                        //     user action.
+                        Log.d("LOG", "onVerificationCompleted:" + authCred)
+                        if (authCred is AuthCredential)
+                            signInGoogle(authCred)
+                    }
+
+                    override fun onVerificationFailed(e: FirebaseException?) {
+                        // This callback is invoked in an invalid request for verification is made,
+                        // for instance if the the phone number format is not valid.
+                        Log.w("LOG", "onVerificationFailed", e);
+
+                        if (e is FirebaseAuthInvalidCredentialsException) {
+                            // Invalid request
+                            Log.w("LOG", "Invalid Credintial");
+                        } else if (e is FirebaseTooManyRequestsException) {
+                            // The SMS quota for the project has been exceeded
+                            Log.w("LOG", "many request", e);
+                        }
+                    }
+
+                    override fun onCodeSent(verificationId: String?, token: PhoneAuthProvider.ForceResendingToken?) {
+                        super.onCodeSent(verificationId, token)
+                        // The SMS verification code has been sent to the provided phone number, we
+                        // now need to ask the user to enter the code and then construct a credential
+                        // by combining the code with a verification ID.
+                        Log.d("LOG", "onCodeSent: ${token}" + verificationId)
+                        mVerificationId = verificationId;
+
+
+                        // Save verification ID and resending token so we can use them later
+
+                    }
+                });
     }
 }

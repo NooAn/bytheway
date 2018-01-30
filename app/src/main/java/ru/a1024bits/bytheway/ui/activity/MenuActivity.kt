@@ -455,5 +455,4 @@ class MenuActivity : AppCompatActivity(),
         val dialog = FeedbackDialog(this)
         dialog.show()
     }
-
 }
