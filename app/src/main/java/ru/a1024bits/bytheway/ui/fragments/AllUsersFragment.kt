@@ -359,11 +359,16 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
     }
 
     private fun updateChoseDateButtons() {
+        val calendar = Calendar.getInstance()
+        calendar.timeInMillis = filter.startDate
         choseDateStart.text = if (filter.startDate > 0L)
-            viewModel?.getTextFromDates(date = filter.startDate) else getString(R.string.filters_all_users_empty_date)
-        if (filter.startDate > 0L) choseDateStart.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector_black, 0)
+            viewModel?.getTextFromDates(filter.startDate, context) else getString(R.string.filters_all_users_empty_date)
+        if (filter.startDate > 0L)
+            choseDateStart.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector_black, 0)
+        calendar.timeInMillis = filter.endDate
         choseDateEnd.text = if (filter.endDate > 0L)
-            viewModel?.getTextFromDates(date = filter.endDate) else getString(R.string.filters_all_users_empty_date)
-        if (filter.endDate > 0L) choseDateEnd.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector_black, 0)
+            viewModel?.getTextFromDates(filter.endDate, context) else getString(R.string.filters_all_users_empty_date)
+        if (filter.endDate > 0L)
+            choseDateEnd.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector_black, 0)
     }
 }

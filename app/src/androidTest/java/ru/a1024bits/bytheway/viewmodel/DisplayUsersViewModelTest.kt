@@ -21,14 +21,13 @@ class DisplayUsersViewModelInstrumentalTest {
     fun initialize() {
         context = InstrumentationRegistry.getTargetContext().applicationContext
         displayUsersViewModel = DisplayUsersViewModel(null)
-        displayUsersViewModel.context = context
         currentTime = Calendar.getInstance()
         Log.d("testing", "start fun \"initialize\" in DisplayUsersViewModelTest(instrumental)")
     }
 
     @Test
     fun testGetTextFromDates() {
-        Assert.assertTrue(displayUsersViewModel.getTextFromDates(currentTime.timeInMillis, 0L).isNotEmpty())
+        Assert.assertTrue(displayUsersViewModel.getTextFromDates(currentTime.timeInMillis, 0L, context).isNotEmpty())
     }
 
 }

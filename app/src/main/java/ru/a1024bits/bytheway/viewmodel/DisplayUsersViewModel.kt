@@ -28,13 +28,6 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
     var response: MutableLiveData<Response<List<User>>> = MutableLiveData()
     var yearsOldUsers = (0..MAX_AGE).mapTo(ArrayList<String>()) { it.toString() }
     var filter = Filter()
-    lateinit var context: Context
-
-    init {
-        try {
-            context = App.INSTANCE
-        } catch (e: Throwable) { }
-    }
 
     companion object {
         const val TAG = "showUserViewModel"
@@ -115,13 +108,13 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
         }
     }
 
-    fun getTextFromDates(date: Long?): String {
+    fun getTextFromDates(date: Long?, context: Context): String {
         val calendarStartDate = Calendar.getInstance()
         calendarStartDate.timeInMillis = date ?: 0L
-        return getTextDateDayAndMonth(calendarStartDate)
+        return getTextDateDayAndMonth(calendarStartDate, context)
     }
 
-    fun getTextFromDates(startDate: Long?, endDate: Long?): String {
+    fun getTextFromDates(startDate: Long?, endDate: Long?, context: Context): String {
         val toWord = " - "
 
         val calendarStartDate = Calendar.getInstance()
@@ -130,10 +123,10 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
         calendarEndDate.timeInMillis = endDate ?: 0L
 
         if (calendarEndDate.timeInMillis == 0L)
-            return getTextDateDayAndMonth(calendarStartDate)
+            return getTextDateDayAndMonth(calendarStartDate, context)
 
         if (calendarStartDate.timeInMillis == 0L)
-            return getTextDateDayAndMonth(calendarEndDate)
+            return getTextDateDayAndMonth(calendarEndDate, context)
 
         var yearStart = ""
         var yearEnd = ""
@@ -141,7 +134,7 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
             yearStart = calendarStartDate.get(Calendar.YEAR).toString()
             yearEnd = calendarEndDate.get(Calendar.YEAR).toString()
         }
-        return getTextDate(calendarStartDate, yearStart) + toWord + getTextDate(calendarEndDate, yearEnd)
+        return getTextDate(calendarStartDate, yearStart, context) + toWord + getTextDate(calendarEndDate, yearEnd, context)
     }
 
     fun filterUsersByString( primaryQuery: String = "", primaryList: MutableList<User>): MutableList<User> {
@@ -155,14 +148,14 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
         }
     }
 
-    private fun getTextDate(calendarStartDate: Calendar, yearStart: String): String {
-        return StringBuilder("").append(getTextDateDayAndMonth(calendarStartDate))
+    private fun getTextDate(calendarStartDate: Calendar, yearStart: String, context: Context): String {
+        return StringBuilder("").append(getTextDateDayAndMonth(calendarStartDate, context))
                 .append(" ")
                 .append(yearStart)
                 .toString()
     }
 
-    private fun getTextDateDayAndMonth(calendarStartDate: Calendar): String {
+    private fun getTextDateDayAndMonth(calendarStartDate: Calendar, context: Context): String {
         return StringBuilder("").append(calendarStartDate.get(Calendar.DAY_OF_MONTH))
                 .append(" ")
                 .append(context.resources.getStringArray(R.array.months_array)[calendarStartDate.get(Calendar.MONTH)])

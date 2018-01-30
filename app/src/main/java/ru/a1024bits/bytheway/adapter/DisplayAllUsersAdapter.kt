@@ -11,6 +11,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.analytics.FirebaseAnalytics
+import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
@@ -33,7 +34,7 @@ class DisplayAllUsersAdapter(val context: Context, val viewModel: DisplayUsersVi
         val currentUser = users[position]
         holder?.name?.text = currentUser.name
         holder?.dates?.text = if (currentUser.dates["start_date"] != null && currentUser.dates["end_date"] != null)
-            viewModel.getTextFromDates(currentUser.dates["start_date"], currentUser.dates["end_date"])
+            viewModel.getTextFromDates(currentUser.dates["start_date"], currentUser.dates["end_date"], context)
         else ""
         if (currentUser.age >= 0)
             holder?.age?.text = if (currentUser.age > 0) StringBuilder(", ").append(currentUser.age.toString()) else ""
