@@ -863,7 +863,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
         simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.save), { _, _ ->
             val newLink = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString()
-            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_save_links", null)
 
             var valid = true
             var errorText = ""
@@ -877,9 +876,10 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                 //openDialog(socialNetwork, errorText)
                 dialogView.findViewById<EditText>(R.id.socLinkText).error = errorText
             } else {
+                if (newLink in defaultSocialValues.values) return@setButton
                 socNet[socialNetwork.link] = newLink
-                viewModel?.saveLinks(socNet, uid, SocialResponse(socialNetwork.link, newLink)
-                )
+                viewModel?.saveLinks(socNet, uid, SocialResponse(socialNetwork.link, newLink))
+                mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_save_links", null)
             }
         })
 
