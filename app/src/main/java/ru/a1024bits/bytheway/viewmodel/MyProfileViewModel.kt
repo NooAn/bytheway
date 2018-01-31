@@ -164,9 +164,7 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
     fun updateFeatureTrips(body: AirUser?, uid: String, user: User?) {
         val map = HashMap<String, Any>()
         val currentTime = System.currentTimeMillis()
-//        if (user.value?.cities?.isEmpty() == false) { // I don't know why it here
-//            return
-//        }
+
         if (body?.data?.trips?.isEmpty() == false && body?.data?.trips?.get(0)?.flights != null) {
             for (flight in body?.data?.trips?.get(0)?.flights) {
                 Log.d("LOG", (flight.departureUtc.toLong().toString() + " " + currentTime / 1000 + " " + (flight.departureLocale.toLong() > currentTime)))

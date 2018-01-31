@@ -2,6 +2,7 @@ package ru.a1024bits.bytheway.viewmodel
 
 import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.MutableLiveData
+import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModel
 import android.util.Log
 import com.google.android.gms.tasks.OnCompleteListener
@@ -11,6 +12,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import ru.a1024bits.bytheway.model.Response
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.COLLECTION_USERS
 import ru.a1024bits.bytheway.repository.UserRepository
@@ -29,7 +31,11 @@ class RegistrationViewModel @Inject constructor(var userRepository: UserReposito
                 .timeout(10, TimeUnit.SECONDS)
                 .retry(2)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe()
+                .subscribe(
+                        { Log.e("LOG", "complete") },
+                        { throwable ->
+                            Log.e("LOG", "Error", throwable)
+                        })
     }
 
     fun ifUserNotExistThenSave(currentUser: FirebaseUser?) {

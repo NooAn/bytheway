@@ -29,6 +29,7 @@ import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.places.Places
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_menu.*
 import kotlinx.android.synthetic.main.confirm_dialog.view.*
@@ -113,10 +114,12 @@ class MenuActivity : AppCompatActivity(),
         super.onCreate(savedInstanceState)
         App.component.inject(this)
         glide = Glide.with(this)
+        FirebaseCrash.setCrashCollectionEnabled(false)
+        FirebaseFirestore.setLoggingEnabled(false)
+
         if (FirebaseAuth.getInstance().currentUser == null) {
             startActivity(Intent(this, RegistrationActivity::class.java))
         }
-        FirebaseFirestore.setLoggingEnabled(true)
 
         setContentView(R.layout.activity_menu)
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
@@ -313,26 +316,22 @@ class MenuActivity : AppCompatActivity(),
                         val loginService = generator.createService(AirWebService::class.java, accessToken?.getTokenType() + " " + accessToken?.accessToken)
                         loginService.getUserProfile().enqueue(object : Callback<AirUser?> {
                             override fun onFailure(call: Call<AirUser?>?, t: Throwable?) {
-                                Log.e("LOGI", "fail", t)
                                 showSnack(getString(R.string.error_sinchronized))
                             }
 
                             override fun onResponse(call: Call<AirUser?>?, response: Response<AirUser?>?) {
-                                Log.e("LOGI", response?.message().toString())
                                 viewModel?.updateStaticalInfo(response?.body(), FirebaseAuth.getInstance().currentUser?.uid.toString(), mainUser)
                             }
                         })
                         loginService.getMyTrips().enqueue(object : Callback<AirUser?> {
                             override fun onResponse(call: Call<AirUser?>?, response: Response<AirUser?>?) {
                                 viewModel?.updateFeatureTrips(response?.body(), FirebaseAuth.getInstance().currentUser?.uid.toString(), mainUser)
-                                Log.e("LOG", "${response?.body()?.data?.trips?.get(0)?.flights}")
-                                if (response?.body() != null && response?.body()?.data?.trips?.isEmpty() == false) {
-                                    navigator.applyCommand(Replace(Screens.AIR_SUCCES_SCREEN, response?.body()?.data?.trips?.get(0)?.flights))
+                                if (response?.body() != null && response.body()?.data?.trips?.isEmpty() == false) {
+                                    navigator.applyCommand(Replace(Screens.AIR_SUCCES_SCREEN, response.body()?.data?.trips?.get(0)?.flights))
                                 }
                             }
 
                             override fun onFailure(call: Call<AirUser?>?, t: Throwable?) {
-                                Log.e("LOGI", "fail", t)
                                 showSnack(getString(R.string.error_sinchronized))
                             }
                         })
@@ -341,7 +340,6 @@ class MenuActivity : AppCompatActivity(),
 
             } else if (uri.getQueryParameter("error") != null) {
                 // show an error message here
-                Log.e("LOGI:", "error: ${uri.getQueryParameter("error")}")
                 showSnack(getString(R.string.error_sinchronized))
             }
         }
@@ -353,10 +351,6 @@ class MenuActivity : AppCompatActivity(),
         preferences.edit().putString(Constants.ACCESS_TOKEN, accessToken?.accessToken).apply()
         preferences.edit().putString(Constants.TYPE_TOKEN, accessToken?.getTokenType()).apply()
     }
-
-    fun getAccessToken(): String = preferences.getString(Constants.ACCESS_TOKEN, "")
-    fun getTypeToken(): String = preferences.getString(Constants.TYPE_TOKEN, "")
-    fun getRefreshToken(): String = preferences.getString(Constants.REFRESH_TOKEN, "")
 
     override fun onBackPressed() {
         navigator.applyCommand(Back())
