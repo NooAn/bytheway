@@ -20,6 +20,7 @@ class DateUtils {
             val date = dateFormat.parse(dateString)
             return date.time
         }
+
         val onDateTouch = View.OnTouchListener { view, event ->
             val drawableRight = 2
             (view as TextView)

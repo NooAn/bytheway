@@ -222,6 +222,8 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
 
         addInfoUser.text = user.addInformation
         if (user.addInformation.isBlank()) descriptionProfile.visibility = View.GONE
+        val t = formatDate.format(user.timestamp)
+        userLastTime.text = if (user.timestamp != null) formatDate.format(user.timestamp) else "Очень давно"
     }
 
     private fun showErrorFroWrongSocValue(user: User, name: MutableMap.MutableEntry<String, String>) {

@@ -1,6 +1,8 @@
 package ru.a1024bits.bytheway.model
 
 import com.google.firebase.firestore.GeoPoint
+import com.google.firebase.firestore.ServerTimestamp
+import java.util.*
 
 enum class Method(var link: String) {
     TRAIN("train"),
@@ -18,6 +20,7 @@ enum class SocialNetwork(var link: String) {
     FB("FB"),
     TG("TG")
 }
+
 class SocialResponse(var link: String = "", var value: String = "")
 /**
  *
@@ -50,4 +53,5 @@ data class User(var name: String = "",
                 var sex: Int = 0,
                 var socialNetwork: HashMap<String, String> = hashMapOf<String, String>(),
                 var data: Long = 0,
-                var urlPhoto: String = "https://www.ischool.berkeley.edu/sites/default/files/default_images/avatar.jpeg")
+                var urlPhoto: String = "https://www.ischool.berkeley.edu/sites/default/files/default_images/avatar.jpeg",
+                @ServerTimestamp var timestamp: Date? = Date())
