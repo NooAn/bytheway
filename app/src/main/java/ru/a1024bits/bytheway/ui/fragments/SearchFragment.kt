@@ -212,7 +212,7 @@ class SearchFragment : Fragment() {
 
         dateDialog.setDateRange(MonthAdapter.CalendarDay(System.currentTimeMillis()), null)
         dateDialog.setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
-            dateFromValue.text = StringBuilder(" ")
+            dateFromValue?.text = StringBuilder(" ")
                     .append(dayOfMonth)
                     .append(" ")
                     .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
@@ -235,11 +235,10 @@ class SearchFragment : Fragment() {
         dateDialog.setDateRange(
                 MonthAdapter.CalendarDay(
                         if (filter.startDate > 0L) filter.startDate
-                        else System.currentTimeMillis()),
-                null)
+                        else System.currentTimeMillis()), null)
         dateDialog.setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
 
-            dateToValue.text = StringBuilder(" ")
+            dateToValue?.text = StringBuilder(" ")
                     .append(dayOfMonth)
                     .append(" ")
                     .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
