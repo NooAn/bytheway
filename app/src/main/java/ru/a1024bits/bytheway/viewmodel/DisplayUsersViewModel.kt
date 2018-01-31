@@ -163,7 +163,7 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
                 .toString()
     }
 
-    private fun filterUsersByFilter(resultUsers: MutableList<User>, filter: Filter) {
+    fun filterUsersByFilter(resultUsers: MutableList<User>, filter: Filter) {
         Log.e("LOG filter", Thread.currentThread().name)
         resultUsers.retainAll {
             var found = (!((filter.startBudget >= 0) && (filter.endBudget > 0)) ||
