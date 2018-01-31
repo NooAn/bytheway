@@ -30,10 +30,7 @@ abstract class ViewModelModule {
     @ViewModelKey(RegistrationViewModel::class)
     abstract fun bindRegistrationViewModel(mainViewModel: RegistrationViewModel): ViewModel
 
-    @Binds
-    @IntoMap
-    @ViewModelKey(MapViewModel::class)
-    abstract fun bindMapViewModel(mainViewModel: MapViewModel): ViewModel
+
 
     @Binds
     @IntoMap
