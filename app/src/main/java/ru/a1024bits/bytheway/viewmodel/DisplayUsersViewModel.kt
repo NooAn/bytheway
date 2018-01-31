@@ -1,13 +1,10 @@
 package ru.a1024bits.bytheway.viewmodel
 
 import android.arch.lifecycle.MutableLiveData
-import android.content.Context
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.QuerySnapshot
 import io.reactivex.Single
-import ru.a1024bits.bytheway.App
-import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.Response
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
@@ -108,13 +105,13 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
         }
     }
 
-    fun getTextFromDates(date: Long?, context: Context): String {
+    fun getTextFromDates(date: Long?, months: Array<String>): String {
         val calendarStartDate = Calendar.getInstance()
         calendarStartDate.timeInMillis = date ?: 0L
-        return getTextDateDayAndMonth(calendarStartDate, context)
+        return getTextDateDayAndMonth(calendarStartDate, months)
     }
 
-    fun getTextFromDates(startDate: Long?, endDate: Long?, context: Context): String {
+    fun getTextFromDates(startDate: Long?, endDate: Long?, months: Array<String>): String {
         val toWord = " - "
 
         val calendarStartDate = Calendar.getInstance()
@@ -123,10 +120,10 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
         calendarEndDate.timeInMillis = endDate ?: 0L
 
         if (calendarEndDate.timeInMillis == 0L)
-            return getTextDateDayAndMonth(calendarStartDate, context)
+            return getTextDateDayAndMonth(calendarStartDate, months)
 
         if (calendarStartDate.timeInMillis == 0L)
-            return getTextDateDayAndMonth(calendarEndDate, context)
+            return getTextDateDayAndMonth(calendarEndDate, months)
 
         var yearStart = ""
         var yearEnd = ""
@@ -134,10 +131,10 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
             yearStart = calendarStartDate.get(Calendar.YEAR).toString()
             yearEnd = calendarEndDate.get(Calendar.YEAR).toString()
         }
-        return getTextDate(calendarStartDate, yearStart, context) + toWord + getTextDate(calendarEndDate, yearEnd, context)
+        return getTextDate(calendarStartDate, yearStart, months) + toWord + getTextDate(calendarEndDate, yearEnd, months)
     }
 
-    fun filterUsersByString( primaryQuery: String = "", primaryList: MutableList<User>): MutableList<User> {
+    fun filterUsersByString(primaryQuery: String = "", primaryList: MutableList<User>): MutableList<User> {
         val queryLowerCase: String = primaryQuery.toLowerCase()
         return primaryList.filterTo(ArrayList()) {
             it.cities.filterValues { it1 -> it1.toLowerCase().contains(queryLowerCase) }.isNotEmpty() ||
@@ -148,18 +145,18 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
         }
     }
 
-    private fun getTextDate(calendarStartDate: Calendar, yearStart: String, context: Context): String {
-        return StringBuilder("").append(getTextDateDayAndMonth(calendarStartDate, context))
+    private fun getTextDate(calendarStartDate: Calendar, yearStart: String, months: Array<String>): String {
+        return StringBuilder("").append(getTextDateDayAndMonth(calendarStartDate, months))
                 .append(" ")
                 .append(yearStart)
                 .toString()
     }
 
-    private fun getTextDateDayAndMonth(calendarStartDate: Calendar, context: Context): String {
+    private fun getTextDateDayAndMonth(calendarStartDate: Calendar, months: Array<String>): String {
         return StringBuilder("").append(calendarStartDate.get(Calendar.DAY_OF_MONTH))
                 .append(" ")
-                .append(context.resources.getStringArray(R.array.months_array)[calendarStartDate.get(Calendar.MONTH)])
-//                .append(month)
+//                .append(context.resources.getStringArray(R.array.months_array)[calendarStartDate.get(Calendar.MONTH)])
+                .append(months[calendarStartDate.get(Calendar.MONTH)])
                 .toString()
     }
 

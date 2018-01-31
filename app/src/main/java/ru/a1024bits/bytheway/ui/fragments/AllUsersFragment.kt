@@ -364,12 +364,12 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
         val calendar = Calendar.getInstance()
         calendar.timeInMillis = filter.startDate
         choseDateStart.text = if (filter.startDate > 0L)
-            viewModel?.getTextFromDates(filter.startDate, context) else getString(R.string.filters_all_users_empty_date)
+            viewModel?.getTextFromDates(filter.startDate, context.resources.getStringArray(R.array.months_array)) else getString(R.string.filters_all_users_empty_date)
         if (filter.startDate > 0L)
             choseDateStart.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector_black, 0)
         calendar.timeInMillis = filter.endDate
         choseDateEnd.text = if (filter.endDate > 0L)
-            viewModel?.getTextFromDates(filter.endDate, context) else getString(R.string.filters_all_users_empty_date)
+            viewModel?.getTextFromDates(filter.endDate, context.resources.getStringArray(R.array.months_array)) else getString(R.string.filters_all_users_empty_date)
         if (filter.endDate > 0L)
             choseDateEnd.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector_black, 0)
     }

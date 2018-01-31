@@ -8,6 +8,7 @@ import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import ru.a1024bits.bytheway.R
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
@@ -27,7 +28,7 @@ class DisplayUsersViewModelInstrumentalTest {
 
     @Test
     fun testGetTextFromDates() {
-        Assert.assertTrue(displayUsersViewModel.getTextFromDates(currentTime.timeInMillis, 0L, context).isNotEmpty())
+        Assert.assertTrue(displayUsersViewModel.getTextFromDates(currentTime.timeInMillis, 0L, context.resources.getStringArray(R.array.months_array)).isNotEmpty())
     }
 
 }
