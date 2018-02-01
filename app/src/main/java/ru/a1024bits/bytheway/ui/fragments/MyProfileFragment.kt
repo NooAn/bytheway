@@ -1157,6 +1157,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         viewModel?.sendUserData(getHashMapUser(), uid, mainUser)
         hideBlockTravelInforamtion()
         showBlockAddTrip()
+        dateArrived.setCompoundDrawables(null, null, null, null)
+        textDateFrom.setCompoundDrawables(null, null, null, null)
     }
 
     private fun saveProfileState() {
