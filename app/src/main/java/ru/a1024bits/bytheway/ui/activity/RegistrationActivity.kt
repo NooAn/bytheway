@@ -65,7 +65,6 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build()
 
-        Log.e("LOG", mAuth?.currentUser.toString())
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(RegistrationViewModel::class.java)
         mFirebaseAnalytics.setUserId(mAuth?.currentUser.toString())
         mFirebaseAnalytics.setCurrentScreen(this, "Registration", this.javaClass.getSimpleName())
@@ -112,12 +111,17 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
         super.onActivityResult(requestCode, resultCode, data)
         Log.e("LOG", "result activity registration")
-        if (requestCode == RC_SIGN_IN) {
-            val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
-            result?.let {
-                handleSignInResult(it)
+        try {
+            if (requestCode == RC_SIGN_IN) {
+                val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
+                result?.let {
+                    handleSignInResult(it)
+                }
+            } else {
+                updateUI(false)
             }
-        } else {
+        } catch (e: Exception) {
+            e.printStackTrace()
             updateUI(false)
         }
     }
@@ -140,7 +144,6 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
     }
 
     private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount) {
-        Log.d("LOG", "firebaseAuthWithGoogle: ${acct.id}  ${acct.idToken}")
 
         val credential = GoogleAuthProvider.getCredential(acct.idToken, null)
         signInGoogle(credential)
@@ -233,7 +236,6 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
                         // 2 - Auto-retrieval. On some devices Google Play services can automatically
                         //     detect the incoming verification SMS and perform verification without
                         //     user action.
-                        Log.d("LOG", "onVerificationCompleted:" + authCred)
                         if (authCred is AuthCredential)
                             signInGoogle(authCred)
                     }
@@ -257,7 +259,6 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
                         // The SMS verification code has been sent to the provided phone number, we
                         // now need to ask the user to enter the code and then construct a credential
                         // by combining the code with a verification ID.
-                        Log.d("LOG", "onCodeSent: ${token}" + verificationId)
                         mVerificationId = verificationId;
 
 

@@ -1019,9 +1019,10 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     }
 
     private fun updateImageProfile(link: String) {
-        glide?.load(link)
-                ?.apply(RequestOptions.circleCropTransform())
-                ?.into(image_avatar)
+        if (link.isNotBlank())
+            glide?.load(link)
+                    ?.apply(RequestOptions.circleCropTransform())
+                    ?.into(image_avatar)
     }
 
     private fun fillProfile(user: User) {

@@ -85,7 +85,7 @@ class MenuActivity : AppCompatActivity(),
     }
 
     override fun onConnectionFailed(p0: ConnectionResult) {
-
+        Log.e("LOG", p0.errorMessage)
     }
 
     var screenNames: ArrayList<String> = arrayListOf()
@@ -193,7 +193,6 @@ class MenuActivity : AppCompatActivity(),
 
     val navigator = object : SupportFragmentNavigator(supportFragmentManager, R.id.fragment_container) {
         override fun createFragment(screenKey: String?, data: Any?): Fragment {
-            Log.e("LOG", screenKey + " " + data)
             return if (data is User) {
                 return UserProfileFragment.newInstance(data.id)
             } else
@@ -274,16 +273,19 @@ class MenuActivity : AppCompatActivity(),
     }
 
     private fun updateUsersInfo(url: String) {
+
         val navigationView = findViewById<NavigationView>(R.id.nav_view)
         navigationView.setNavigationItemSelectedListener(this)
         val hView = navigationView.getHeaderView(0)
         hView.setOnClickListener {
             openProfile()
         }
-        val image = hView.findViewById<ImageView>(R.id.menu_image_avatar)
-        glide?.load(url)
-                ?.apply(RequestOptions.circleCropTransform())
-                ?.into(image)
+        if (url.isNotBlank()) {
+            val image = hView.findViewById<ImageView>(R.id.menu_image_avatar)
+            glide?.load(url)
+                    ?.apply(RequestOptions.circleCropTransform())
+                    ?.into(image)
+        }
     }
 
     override fun onResume() {

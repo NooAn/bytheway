@@ -128,7 +128,7 @@
     <string name="date_error_set">Дата окончания поездки не может быть раньше чем начала.</string>
     <string name="error_sinchronized">Очень жаль.... Но не получилось синхронизироваться с app in the air.</string>
     <string name="this_date_is_not_set">Дата еще не установлена.</string>
-    <string name="copy_done">Телефон скопирован</string>
+    <string name="copy_done">Скопировали</string>
     <string name="search_change">Ваша поездка будет изменена.</string>
     <string name="search_change_text1">Вы уверены, что хотите сохранить текущую информацию?</string>
     <string name="registration_error">В данный момент приложение поддерживает только вход через ГуглАккаунт. И сейчас видать что-то не получилось.\nПроверьте интернет и запустите приложение заново.</string>
@@ -141,4 +141,5 @@
     <string name="city_in_the_world">Человек мира</string>
     <string name="error_upload_image">Ошибка загрузки</string>
     <string name="error_link_open">Мы не смогли открыть ссылку. Возможно она некорректная.</string>
+    <string name="last_see">Последний раз был</string>
 </resources>

@@ -46,7 +46,6 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
             Status.SUCCESS -> if (response.data == null) showErrorLoading() else fillProfile(response.data)
 
             Status.ERROR -> {
-                Log.e("LOG", "log e:" + response.error)
                 showErrorLoading()
             }
         }
@@ -189,6 +188,20 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
                 }
             }
         }
+        if (user.socialNetwork.isEmpty() && user.email.contains("@")) {
+            //tgIcon there is will be Email field
+            whatsAppIcon.visibility = View.INVISIBLE
+            vkIcon.visibility = View.INVISIBLE
+            csIcon.visibility = View.INVISIBLE
+            fbcon.visibility = View.INVISIBLE
+            line1.visibility = View.INVISIBLE
+            line4.visibility = View.INVISIBLE
+            emailIcon.visibility = View.VISIBLE
+            tgIcon.visibility = View.GONE
+            emailIcon.setOnClickListener {
+                openEmail(user.email)
+            }
+        }
         for (method in user.method.keys) {
             when (method) {
                 Method.CAR.link -> {
@@ -208,7 +221,6 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
                 }
             }
         }
-
         if (!user.method.containsValue(true)) {
             layout_method_moving.visibility = View.GONE
         }
@@ -222,8 +234,25 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
 
         addInfoUser.text = user.addInformation
         if (user.addInformation.isBlank()) descriptionProfile.visibility = View.GONE
-        val t = formatDate.format(user.timestamp)
         userLastTime.text = if (user.timestamp != null) formatDate.format(user.timestamp) else "Очень давно"
+    }
+
+    private fun openEmail(email: String) {
+        val emailIntent = Intent(Intent.ACTION_SEND)
+        emailIntent.setType("message/rfc822")
+        emailIntent.setData(Uri.parse("mailto:default@recipient.com"));
+        emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, arrayOf(email))
+        emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "ByTheWay - поиск попутчиков")
+        emailIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        if (emailIntent.resolveActivity(activity.packageManager) == null) {
+            val dialog = SocNetworkdialog(activity, email)
+            dialog.show()
+        } else
+            try {
+                context.startActivity(Intent.createChooser(emailIntent, "Отправка письма. Выберите почтовый клиент"))
+            } catch (e: Exception) {
+                Toast.makeText(activity, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+            }
     }
 
     private fun showErrorFroWrongSocValue(user: User, name: MutableMap.MutableEntry<String, String>) {
@@ -249,7 +278,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
             if (userAge > 0) {
                 sexAndAge.text = StringBuilder(gender).append(", ").append(userAge)
             } else {
-                sexAndAge.text = StringBuilder(gender).append(", Бессмертный ").append(userAge)
+                sexAndAge.text = StringBuilder(gender).append(", Бессмертный ")
             }
         }
 
@@ -259,6 +288,9 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
             } else {
                 sexAndAge.text = StringBuilder("Пол, ").append(userAge)
             }
+        }
+        if (userAge == 0 && userSex == 0) {
+            sexAndAge.text = "Бессмертный"
         }
     }
 
@@ -273,7 +305,6 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
     }
 
     private fun showErrorLoading() {
-        Log.e("LOg", "ERROR")
         Toast.makeText(activity, "Ошибка загрузки", Toast.LENGTH_SHORT).show()
     }
 

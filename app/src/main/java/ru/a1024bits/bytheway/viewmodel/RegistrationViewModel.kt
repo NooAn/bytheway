@@ -60,15 +60,12 @@ class RegistrationViewModel @Inject constructor(var userRepository: UserReposito
                         }.addOnFailureListener {
                                     load.value = false
                                 }
-                        Log.d("LOG", "No such document and create new doc");
                     } else {
                         // Пользователь уже существует и не нужно тогда добавлять его
-                        Log.d("LOG", "DocumentSnapshot data: " + task.getResult().getData());
                         load.value = true
                     }
                 } else {
                     load.value = false
-                    Log.d("LOG", "get failed with ", task.getException());
                 }
             }
         })

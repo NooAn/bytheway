@@ -41,7 +41,6 @@ class ServiceGenerator {
             serviceClass: Class<S>, authToken: String): S {
         if (!TextUtils.isEmpty(authToken)) {
             val interceptor = AuthenticationInterceptor(authToken)
-            Log.e("LOG", authToken.toString())
             if (!httpClient.interceptors().contains(interceptor)) {
                 httpClient.addInterceptor(interceptor)
                 httpClient.addInterceptor(HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY })
