@@ -194,8 +194,8 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
 
     fun validatePhoneNumber(phone: EditText): Boolean {
         val phoneNumber = phone.text.toString()
-        if (phoneNumber.isBlank() || !phoneNumber.matches(Regex("^\\+\\d{10,12}$"))) {
-            phone.error = "Invalid phone number."//380635158029
+        if (phoneNumber.isBlank() || !phoneNumber.matches(Regex("^\\+?\\d{10,12}$"))) {
+            phone.error = "Invalid phone number."//falseui
             return false
         }
         return true

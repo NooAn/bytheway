@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">bytheway</string>
     <string name="password">Пароль</string>
-    <string name="button_send">Отправить</string>
+    <string name="button_send">Отправить КОД</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="fullname">Andrey Petrov</string>
@@ -142,4 +142,8 @@
     <string name="error_upload_image">Ошибка загрузки</string>
     <string name="error_link_open">Мы не смогли открыть ссылку. Возможно она некорректная.</string>
     <string name="last_see">Последний раз был</string>
+    <string name="sms_code">код из sms</string>
+    <string name="connect">Подключиться</string>
+    <string name="phone">Телефон</string>
+    <string name="alternate_entry">Давайте попробуем войти с помощью вашего номера телефона (не забудьте указать код вашей страны)</string>
 </resources>
