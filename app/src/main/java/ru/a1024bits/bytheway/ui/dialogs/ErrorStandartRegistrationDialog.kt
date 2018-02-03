@@ -29,7 +29,7 @@ class ErrorStandartRegistrationDialog : DialogFragment() {
             }
         })
         view?.sendButtonPhone?.setOnClickListener({
-            if (verificationsData.text.toString().contains(Regex("^(380)")))
+            if (verificationsData.text.toString().contains(Regex("^((380)|(7))")))
                 verificationsData.setText(StringBuilder("+").append(verificationsData.text.toString()))
             if (!activity.validatePhoneNumber(verificationsData))
                 return@setOnClickListener
