@@ -23,8 +23,8 @@ import javax.inject.Inject
 
 class DisplayUsersViewModel @Inject constructor(var userRepository: UserRepository?) : BaseViewModel(), FilterAndInstallListener {
     var response: MutableLiveData<Response<List<User>>> = MutableLiveData()
-    var yearsOldUsers = (0..MAX_AGE).mapTo(ArrayList<String>()) { it.toString() }
-    var filter = Filter()
+    var yearsOldUsers = (0..MAX_AGE).mapTo(ArrayList()) { it.toString() }
+    override var filter = Filter()
 
     companion object {
         const val TAG = "showUserViewModel"
@@ -35,18 +35,21 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
         userRepository?.installAllUsers(this)
     }
 
-    override fun filterAndInstallUsers(snapshot: QuerySnapshot) {
+    override fun filterAndInstallUsers(vararg snapshots: QuerySnapshot) {
         Single.create<MutableList<User>> { stream ->
             try {
                 Log.e("LOG get filter users", Thread.currentThread().name)
                 val result: MutableList<User> = ArrayList()
-                for (document in snapshot) {
-                    try {
-                        val user = document.toObject(User::class.java)
-                        if (user.cities.size > 0 && user.id != FirebaseAuth.getInstance().currentUser?.uid) {
-                            result.add(user)
+                snapshots.map {
+                    for (document in it) {
+                        try {
+                            val user = document.toObject(User::class.java)
+                            Log.e("LOG get filter users", "${user.dates}")
+                            if (user.cities.size > 0 && user.id != FirebaseAuth.getInstance().currentUser?.uid) {
+                                result.add(user)
+                            }
+                        } catch (e: Exception) {
                         }
-                    } catch (e: Exception) {
                     }
                 }
                 filterUsersByFilter(result, filter)
@@ -185,6 +188,7 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
 }
 
 interface FilterAndInstallListener {
-    fun filterAndInstallUsers(snapshot: QuerySnapshot)
+    var filter: Filter
+    fun filterAndInstallUsers(vararg snapshots: QuerySnapshot)
     fun onFailure(e: Throwable)
 }

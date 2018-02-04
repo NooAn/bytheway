@@ -7,6 +7,7 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.*
+import com.google.firebase.firestore.EventListener
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageException
 import io.reactivex.Completable
@@ -19,6 +20,7 @@ import ru.a1024bits.bytheway.viewmodel.FilterAndInstallListener
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.HashMap
+import com.google.firebase.firestore.FirebaseFirestoreException
 
 
 const val COLLECTION_USERS = "users"
@@ -52,7 +54,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
         try {
             Log.e("LOG uploadPhotoLink R", Thread.currentThread().name)
             // Create a storage reference from our app
-            val storageRef = FirebaseStorage.getInstance().getReference()
+            val storageRef = FirebaseStorage.getInstance().reference
             val riversRef = storageRef.child("images/" + id)
             val uploadTask = riversRef.putFile(path)
             // Register observers to listen for when the download is done or if it fails
@@ -77,8 +79,30 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
     }
 
     override fun installAllUsers(listener: FilterAndInstallListener) {
-        store.collection(COLLECTION_USERS).get().addOnCompleteListener({ task -> listener.filterAndInstallUsers(task.result) })
-                .addOnFailureListener({ e -> listener.onFailure(e) })
+        var lastTime = listener.filter.endDate
+        if (listener.filter.endDate == 0L) {
+            lastTime = System.currentTimeMillis()
+        }
+        var query = store.collection(COLLECTION_USERS).orderBy("dates.end_date")
+        if (listener.filter.endDate == 0L) {
+            query = query.whereGreaterThanOrEqualTo("dates.end_date", lastTime).orderBy("dates.start_date")
+        } else {
+            query = query.whereLessThanOrEqualTo("dates.end_date", lastTime)
+        }
+        query.addSnapshotListener(EventListener { snapshot, error ->
+            if (error != null) {
+                listener.onFailure(error)
+                return@EventListener
+            }
+            if (listener.filter.endDate != 0L) {
+                listener.filterAndInstallUsers(snapshot)
+                return@EventListener
+            }
+            store.collection(COLLECTION_USERS)
+                    .whereEqualTo("dates.end_date", 0).get().addOnCompleteListener({ task ->
+                listener.filterAndInstallUsers(snapshot, task.result)
+            }).addOnFailureListener({ e -> listener.onFailure(e) })
+        })
     }
 
     override fun getReallUsers(paramSearch: Filter): Single<List<User>> =
@@ -143,7 +167,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                     val documentRef = store.collection(COLLECTION_USERS).document(id)
                     store.runTransaction(object : Transaction.Function<Void> {
                         override fun apply(transaction: Transaction): Void? {
-                            map.put("timestamp", FieldValue.serverTimestamp())
+                            map["timestamp"] = FieldValue.serverTimestamp()
                             documentRef.update(map)
                             return null
                         }
@@ -170,7 +194,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
             val documentRef = store.collection(COLLECTION_USERS).document(id)
             store.runTransaction {
                 val map = hashMapOf<String, Any>()
-                map.put("timestamp", FieldValue.serverTimestamp())
+                map["timestamp"] = FieldValue.serverTimestamp()
                 documentRef.update(map)
                 null
             }.addOnFailureListener {
