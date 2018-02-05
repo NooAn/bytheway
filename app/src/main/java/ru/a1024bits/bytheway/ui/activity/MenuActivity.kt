@@ -87,7 +87,7 @@ class MenuActivity : AppCompatActivity(),
     }
 
     override fun onConnectionFailed(p0: ConnectionResult) {
-        Log.e("LOG", p0.errorMessage)
+        Log.e("LOG", "${p0.errorMessage}")
     }
 
     var screenNames: ArrayList<String> = arrayListOf()
