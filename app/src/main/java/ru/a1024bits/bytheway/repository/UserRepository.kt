@@ -86,7 +86,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
             }
             var query = store.collection(COLLECTION_USERS).orderBy("dates.end_date")
             if (listener.filter.endDate == 0L) {
-                query = query.whereGreaterThanOrEqualTo("dates.end_date", lastTime).orderBy("dates.start_date")
+                query = query.whereGreaterThanOrEqualTo("dates.end_date", lastTime)
             } else {
                 query = query.whereLessThanOrEqualTo("dates.end_date", lastTime)
             }
@@ -100,7 +100,8 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                     return@EventListener
                 }
                 store.collection(COLLECTION_USERS)
-                        .whereEqualTo("dates.end_date", 0).whereGreaterThan("cities.first_city", "").get().addOnCompleteListener({ task ->
+                        .whereEqualTo("dates.end_date", 0).whereGreaterThan("cities.first_city", "")
+                        .get().addOnCompleteListener({ task ->
                     listener.filterAndInstallUsers(snapshot, task.result)
                 }).addOnFailureListener({ e -> listener.onFailure(e) })
             })
