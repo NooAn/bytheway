@@ -24,16 +24,13 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(MyProfileViewModel::class)
     abstract fun bindMyProfileViewModel(mainViewModel: MyProfileViewModel): ViewModel
-
+    
     @Binds
     @IntoMap
     @ViewModelKey(RegistrationViewModel::class)
     abstract fun bindRegistrationViewModel(mainViewModel: RegistrationViewModel): ViewModel
 
-    @Binds
-    @IntoMap
-    @ViewModelKey(MapViewModel::class)
-    abstract fun bindMapViewModel(mainViewModel: MapViewModel): ViewModel
+
 
     @Binds
     @IntoMap

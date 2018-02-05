@@ -1,12 +1,14 @@
 package ru.a1024bits.bytheway;
 
 import com.squareup.okhttp.ResponseBody
+import io.reactivex.Single
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.model.AccessToken
 import ru.a1024bits.bytheway.model.AirUser
+import ru.a1024bits.bytheway.model.Airport
 
 
 interface AirWebService {
@@ -23,6 +25,11 @@ interface AirWebService {
     fun getUserProfile(): Call<AirUser>
 
     @GET("/api/v1/me/trips")
-    fun getMyTrips(): Call <AirUser>
+    fun getMyTrips(): Call<AirUser>
+
+    //https://yasen.hotellook.com/autocomplete?term=LED&lang=ru
+    @GET("https://yasen.hotellook.com/autocomplete")
+    fun getLatLngByCode(@Query("term") term: String,
+                        @Query("lang") lang: String = "ru"): Single<Airport>
 
 }

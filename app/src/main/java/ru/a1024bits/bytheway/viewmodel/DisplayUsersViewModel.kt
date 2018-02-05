@@ -2,8 +2,9 @@ package ru.a1024bits.bytheway.viewmodel
 
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
-import ru.a1024bits.bytheway.App.Companion.INSTANCE
-import ru.a1024bits.bytheway.R
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.QuerySnapshot
+import io.reactivex.Single
 import ru.a1024bits.bytheway.model.Response
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
@@ -19,71 +20,101 @@ import javax.inject.Inject
 /**
  * Created by andrey.gusenkov on 25/09/2017.
  */
-class DisplayUsersViewModel @Inject constructor(var userRepository: UserRepository) : BaseViewModel() {
+
+class DisplayUsersViewModel @Inject constructor(var userRepository: UserRepository?) : BaseViewModel(), FilterAndInstallListener {
     var response: MutableLiveData<Response<List<User>>> = MutableLiveData()
-    var yearsOldUsers = (0..MAX_AGE).mapTo(ArrayList<String>()) { it.toString() }
-    val filter = Filter()
+    var yearsOldUsers = (0..MAX_AGE).mapTo(ArrayList()) { it.toString() }
+    override var filter = Filter()
 
     companion object {
         const val TAG = "showUserViewModel"
     }
 
-    fun getAllUsers(filter: Filter) {
-        disposables.add(userRepository.getAllUsers()
+    fun getAllUsers(f: Filter) {
+        this.filter = f
+        userRepository?.installAllUsers(this)
+    }
+
+    override fun filterAndInstallUsers(vararg snapshots: QuerySnapshot) {
+        Single.create<MutableList<User>> { stream ->
+            try {
+                Log.e("LOG get filter users", Thread.currentThread().name)
+                val result: MutableList<User> = ArrayList()
+                snapshots.map {
+                    for (document in it) {
+                        try {
+                            val user = document.toObject(User::class.java)
+                            Log.e("LOG get filter users", "${user.dates}")
+                            if (user.cities.size > 0 && user.id != FirebaseAuth.getInstance().currentUser?.uid) {
+                                result.add(user)
+                            }
+                        } catch (e: Exception) {
+                        }
+                    }
+                }
+                filterUsersByFilter(result, filter)
+                stream.onSuccess(result)
+            } catch (exp: Exception) {
+                stream.onError(exp) // for fix bugs FirebaseFirestoreException: DEADLINE_EXCEEDED
+            }
+        }
                 .subscribeOn(getBackgroundScheduler())
                 .timeout(TIMEOUT_SECONDS, timeoutUnit)
                 .retry(2)
                 .doOnSubscribe({ loadingStatus.postValue(true) })
                 .doAfterTerminate({ loadingStatus.postValue(false) })
-                .doAfterSuccess { resultUsers -> filterUsersByFilter(resultUsers, filter) }
-                .observeOn(getMainThreadScheduler())
-                .subscribe(
-                        { resultUsers ->
-                            Log.e("LOG subscribe", Thread.currentThread().name)
-                            response.postValue(Response.success(resultUsers))
-                        },
-                        { throwable -> response.postValue(Response.error(throwable)) }
-                )
-        )
+                .subscribe({ resultUsers ->
+                    Log.e("LOG subscribe", Thread.currentThread().name)
+                    response.postValue(Response.success(resultUsers))
+                },
+                        { throwable -> response.postValue(Response.error(throwable)) })
+    }
+
+    override fun onFailure(e: Throwable) {
+        response.postValue(Response.error(e))
     }
 
     fun sendUserData(map: HashMap<String, Any>, id: String) {
-        loadingStatus.setValue(true)
-        disposables.add(userRepository.changeUserProfile(map, id)
-                .timeout(TIMEOUT_SECONDS, timeoutUnit)
-                .retry(2)
-                .doAfterTerminate({ loadingStatus.setValue(false) })
-                .subscribe(
-                        { Log.e("LOG", "complete") },
-                        { t ->
-                            response.setValue(Response.error(t))
-                            Log.e("LOG view model", "send User Data", t)
-                        }
-                ))
+        userRepository?.let {
+            loadingStatus.setValue(true)
+            disposables.add(it.changeUserProfile(map, id)
+                    .timeout(TIMEOUT_SECONDS, timeoutUnit)
+                    .retry(2)
+                    .doAfterTerminate({ loadingStatus.setValue(false) })
+                    .subscribe(
+                            { Log.e("LOG", "complete") },
+                            { t ->
+                                response.setValue(Response.error(t))
+                                Log.e("LOG view model", "send User Data", t)
+                            }
+                    ))
+        }
     }
 
     fun getUsersWithSimilarTravel(paramSearch: Filter) {
-        loadingStatus.setValue(true)
-        disposables.add(userRepository.getReallUsers(paramSearch)
-                .timeout(TIMEOUT_SECONDS, timeoutUnit)
-                .retry(2)
-                .subscribeOn(getBackgroundScheduler())
-                .observeOn(getMainThreadScheduler())
-                .doAfterTerminate({ loadingStatus.setValue(false) })
-                .subscribe(
-                        { list -> response.setValue(Response.success(list)) },
-                        { throwable -> response.setValue(Response.error(throwable)) }
-                )
-        )
+        userRepository?.let {
+            loadingStatus.setValue(true)
+            disposables.add(it.getReallUsers(paramSearch)
+                    .timeout(TIMEOUT_SECONDS, timeoutUnit)
+                    .retry(2)
+                    .subscribeOn(getBackgroundScheduler())
+                    .observeOn(getMainThreadScheduler())
+                    .doAfterTerminate({ loadingStatus.setValue(false) })
+                    .subscribe(
+                            { list -> response.setValue(Response.success(list)) },
+                            { throwable -> response.setValue(Response.error(throwable)) }
+                    )
+            )
+        }
     }
 
-    fun getTextFromDates(date: Long?): String {
+    fun getTextFromDates(date: Long?, months: Array<String>): String {
         val calendarStartDate = Calendar.getInstance()
         calendarStartDate.timeInMillis = date ?: 0L
-        return getTextDateDayAndMonth(calendarStartDate)
+        return getTextDateDayAndMonth(calendarStartDate, months)
     }
 
-    fun getTextFromDates(startDate: Long?, endDate: Long?): String {
+    fun getTextFromDates(startDate: Long?, endDate: Long?, months: Array<String>): String {
         val toWord = " - "
 
         val calendarStartDate = Calendar.getInstance()
@@ -92,10 +123,10 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
         calendarEndDate.timeInMillis = endDate ?: 0L
 
         if (calendarEndDate.timeInMillis == 0L)
-            return getTextDateDayAndMonth(calendarStartDate)
+            return getTextDateDayAndMonth(calendarStartDate, months)
 
         if (calendarStartDate.timeInMillis == 0L)
-            return getTextDateDayAndMonth(calendarEndDate)
+            return getTextDateDayAndMonth(calendarEndDate, months)
 
         var yearStart = ""
         var yearEnd = ""
@@ -103,32 +134,36 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
             yearStart = calendarStartDate.get(Calendar.YEAR).toString()
             yearEnd = calendarEndDate.get(Calendar.YEAR).toString()
         }
-        return getTextDate(calendarStartDate, yearStart) + toWord + getTextDate(calendarEndDate, yearEnd)
+        return getTextDate(calendarStartDate, yearStart, months) + toWord + getTextDate(calendarEndDate, yearEnd, months)
     }
 
-    fun filterUsersByString(queryCustomRegister: String, primaryQuery: String, primaryList: MutableList<User>): MutableList<User> =
-            primaryList.filterTo(ArrayList()) {
-                it.cities.filterValues { it1 -> it1.toLowerCase().contains(queryCustomRegister) }.isNotEmpty() || it.name.toLowerCase().contains(queryCustomRegister) ||
-                        it.email.toLowerCase().contains(queryCustomRegister) || it.age.toString().contains(queryCustomRegister) ||
-                        it.budget.toString().contains(queryCustomRegister) || it.lastName.toLowerCase().contains(queryCustomRegister) ||
-                        it.phone.contains(primaryQuery) || it.route.contains(queryCustomRegister)
-            }
+    fun filterUsersByString(primaryQuery: String = "", primaryList: MutableList<User>): MutableList<User> {
+        val queryLowerCase: String = primaryQuery.toLowerCase()
+        return primaryList.filterTo(ArrayList()) {
+            it.cities.filterValues { it1 -> it1.toLowerCase().contains(queryLowerCase) }.isNotEmpty() ||
+                    it.name.toLowerCase().contains(queryLowerCase) || it.email.toLowerCase().contains(queryLowerCase) ||
+                    it.age.toString().contains(queryLowerCase) || it.budget.toString().contains(queryLowerCase) ||
+                    it.lastName.toLowerCase().contains(queryLowerCase) || it.phone.contains(primaryQuery) ||
+                    it.route.contains(queryLowerCase) || it.addInformation.toLowerCase().contains(primaryQuery)
+        }
+    }
 
-    private fun getTextDate(calendarStartDate: Calendar, yearStart: String): String {
-        return StringBuilder("").append(getTextDateDayAndMonth(calendarStartDate))
+    private fun getTextDate(calendarStartDate: Calendar, yearStart: String, months: Array<String>): String {
+        return StringBuilder("").append(getTextDateDayAndMonth(calendarStartDate, months))
                 .append(" ")
                 .append(yearStart)
                 .toString()
     }
 
-    private fun getTextDateDayAndMonth(calendarStartDate: Calendar): String {
+    private fun getTextDateDayAndMonth(calendarStartDate: Calendar, months: Array<String>): String {
         return StringBuilder("").append(calendarStartDate.get(Calendar.DAY_OF_MONTH))
                 .append(" ")
-                .append(INSTANCE.applicationContext.resources.getStringArray(R.array.months_array)[calendarStartDate.get(Calendar.MONTH)])
+//                .append(context.resources.getStringArray(R.array.months_array)[calendarStartDate.get(Calendar.MONTH)])
+                .append(months[calendarStartDate.get(Calendar.MONTH)])
                 .toString()
     }
 
-    private fun filterUsersByFilter(resultUsers: MutableList<User>, filter: Filter) {
+    fun filterUsersByFilter(resultUsers: MutableList<User>, filter: Filter) {
         Log.e("LOG filter", Thread.currentThread().name)
         resultUsers.retainAll {
             var found = (!((filter.startBudget >= 0) && (filter.endBudget > 0)) ||
@@ -150,4 +185,10 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
             found
         }
     }
+}
+
+interface FilterAndInstallListener {
+    var filter: Filter
+    fun filterAndInstallUsers(vararg snapshots: QuerySnapshot)
+    fun onFailure(e: Throwable)
 }

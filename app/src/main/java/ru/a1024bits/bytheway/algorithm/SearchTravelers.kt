@@ -31,7 +31,7 @@ class SearchTravelers(val filter: Filter = Filter(), val user: User) {
         return ((calculateRoute() * WeightRoute
                 + calculateDate() * WeightDate
                 + calculateMethod() * WeightMethod
-                + calculateBudget() * WeightBudget)).toInt()
+                + calculateBudget() * WeightBudget)).toInt().coerceIn(0, 100)
     }
 
     fun calculateBudget(): Double {
@@ -45,8 +45,12 @@ class SearchTravelers(val filter: Filter = Filter(), val user: User) {
         if (start == 0L || end == 0L) return 0.0
         if (filter.startDate > start && filter.startDate > end && filter.endDate > start && filter.startDate > end) return 0.0
         if (filter.startDate < start && filter.endDate < end && filter.endDate < start && filter.startDate < end) return 0.0
-        return ((1000.0 / Math.abs(filter.startDate.toDouble() - start.toDouble()))
-                + (1000.0 / Math.abs(filter.endDate.toDouble() - end.toDouble()))) / 2.0
+        val dStart = Math.abs(filter.startDate.toDouble() - start.toDouble())
+        val dEnd = Math.abs(filter.endDate.toDouble() - end.toDouble())
+        if (dStart == 0.0 || dEnd == 0.0) return 0.5
+        val p = ((1000.0 / dStart)
+                + (1000.0 / dEnd))
+        return p / 2.0
     }
 
     fun calculateMethod(): Double {
@@ -59,6 +63,7 @@ class SearchTravelers(val filter: Filter = Filter(), val user: User) {
             if (user.method.get(value.link) == filter.method.get(value.link) && filter.method.get(value.link) == true) ++p
         }
         maxCountUser = max(maxCountFilter, maxCountUser)
+        if (maxCountUser == 0) return 0.0
         val n = p * (1.0 / maxCountUser.toDouble())
         return n
     }
@@ -98,7 +103,7 @@ class SearchTravelers(val filter: Filter = Filter(), val user: User) {
             // 10 it's sqrt radius
             if (distanceFromStartToAnotherStart < 10 || distanceFromEndUserToEndFilter < 10) {
 
-              //  Log.e("LOG", "${user.name} " + ((min(distanceUser, distanceFilter).toDouble() / max(distanceUser, distanceFilter)) * K).toString() + " " + (Math.abs(distanceUser - distanceFilter).toDouble() / max(distanceUser, distanceFilter)) * K)
+                //  Log.e("LOG", "${user.name} " + ((min(distanceUser, distanceFilter).toDouble() / max(distanceUser, distanceFilter)) * K).toString() + " " + (Math.abs(distanceUser - distanceFilter).toDouble() / max(distanceUser, distanceFilter)) * K)
                 return (min(distanceUser, distanceFilter).toDouble() / max(distanceUser, distanceFilter)) * K
             }
 

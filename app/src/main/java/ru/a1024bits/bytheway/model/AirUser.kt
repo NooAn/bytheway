@@ -13,7 +13,7 @@ data class Data(val id: String, @SerializedName("last_year_kilometers") val last
                 val trips: List<Trips>,
                 val name: String, val kilometers: String)
 
-data class Place(val country: String, val country_full: String, val name: String)
+data class Place(val country: String, val country_full: String, val name: String, val code: String)
 
 data class Trips(val id: String, val flights: List<Fligths>)
 

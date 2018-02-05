@@ -79,6 +79,7 @@
                 tools:src="@drawable/ic_vk_gray" />
 
             <View
+                android:id="@+id/line1"
                 android:layout_width="1dp"
                 android:layout_height="30dp"
                 android:background="@color/greyTravelTypeDivider" />
@@ -111,7 +112,22 @@
                 android:src="@drawable/tg_grey"
                 android:visibility="visible"
                 tools:ignore="ContentDescription"
-                tools:src="@drawable/ic_tg_color" />
+                tools:src="@drawable/ic_tg_color"
+                tools:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/emailIcon"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="6dp"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1.0"
+                android:scaleType="center"
+                android:src="@drawable/ic_mail_white_24px"
+                android:visibility="gone"
+                tools:ignore="ContentDescription"
+                tools:src="@drawable/ic_mail_white_24px"
+                tools:visibility="visible" />
 
             <View
                 android:layout_width="1dp"
@@ -131,6 +147,7 @@
                 tools:src="@drawable/ic_fb_color" />
 
             <View
+                android:id="@+id/line4"
                 android:layout_width="1dp"
                 android:layout_height="30dp"
                 android:background="@color/greyTravelTypeDivider" />
@@ -405,6 +422,28 @@
                 android:textSize="@dimen/standard_text_size"
                 tools:text="Собираюсь провести отпуск в Ижевске. Шутка))) Еду в Карловы Вары" />
         </RelativeLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/descriptionProfile"
+            android:layout_toStartOf="@+id/userLastTime"
+            android:fontFamily="sans-serif-medium"
+            android:padding="4dp"
+            android:paddingBottom="16dp"
+            android:text="@string/last_see"
+            android:textSize="9sp" />
+
+        <TextView
+            android:id="@+id/userLastTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/descriptionProfile"
+            android:padding="4dp"
+            android:textSize="9sp"
+            tools:text="10 янв 2018" />
+
     </RelativeLayout>
 
 

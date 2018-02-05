@@ -10,7 +10,6 @@ import javax.inject.Inject
  * Created by x220 on 28.11.2017.
  */
 class ViewModelFeedback @Inject constructor(var userRepository: UserRepository): ViewModel() {
-    var user: MutableLiveData<User>? = MutableLiveData()
     fun sendFeedback(toString: String) {
 
     }

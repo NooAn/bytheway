@@ -29,7 +29,10 @@ import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.places.Places
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.FirebaseFirestore
+import io.reactivex.SingleObserver
+import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_menu.*
 import kotlinx.android.synthetic.main.confirm_dialog.view.*
 import retrofit2.Call
@@ -84,7 +87,7 @@ class MenuActivity : AppCompatActivity(),
     }
 
     override fun onConnectionFailed(p0: ConnectionResult) {
-
+        Log.e("LOG", "${p0.errorMessage}")
     }
 
     var screenNames: ArrayList<String> = arrayListOf()
@@ -113,10 +116,12 @@ class MenuActivity : AppCompatActivity(),
         super.onCreate(savedInstanceState)
         App.component.inject(this)
         glide = Glide.with(this)
+        FirebaseCrash.setCrashCollectionEnabled(false)
+        FirebaseFirestore.setLoggingEnabled(false)
+
         if (FirebaseAuth.getInstance().currentUser == null) {
             startActivity(Intent(this, RegistrationActivity::class.java))
         }
-        FirebaseFirestore.setLoggingEnabled(true)
 
         setContentView(R.layout.activity_menu)
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
@@ -127,17 +132,7 @@ class MenuActivity : AppCompatActivity(),
         drawer.addDrawerListener(toggle)
         toggle.syncState()
 
-        val navigationView = findViewById<NavigationView>(R.id.nav_view)
-        navigationView.setNavigationItemSelectedListener(this)
-        val hView = navigationView.getHeaderView(0)
-        hView.setOnClickListener {
-            openProfile()
-        }
-        val image = hView.findViewById<ImageView>(R.id.menu_image_avatar)
 
-        glide?.load(FirebaseAuth.getInstance().currentUser?.photoUrl)
-                ?.apply(RequestOptions.circleCropTransform())
-                ?.into(image)
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
 
         if (savedInstanceState == null) {
@@ -200,7 +195,6 @@ class MenuActivity : AppCompatActivity(),
 
     val navigator = object : SupportFragmentNavigator(supportFragmentManager, R.id.fragment_container) {
         override fun createFragment(screenKey: String?, data: Any?): Fragment {
-            Log.e("LOG", screenKey + " " + data)
             return if (data is User) {
                 return UserProfileFragment.newInstance(data.id)
             } else
@@ -277,6 +271,23 @@ class MenuActivity : AppCompatActivity(),
 
     override fun onFragmentInteraction(user: User?) {
         mainUser = user
+        updateUsersInfo(user?.urlPhoto ?: return)
+    }
+
+    private fun updateUsersInfo(url: String) {
+
+        val navigationView = findViewById<NavigationView>(R.id.nav_view)
+        navigationView.setNavigationItemSelectedListener(this)
+        val hView = navigationView.getHeaderView(0)
+        hView.setOnClickListener {
+            openProfile()
+        }
+        if (url.isNotBlank()) {
+            val image = hView.findViewById<ImageView>(R.id.menu_image_avatar)
+            glide?.load(url)
+                    ?.apply(RequestOptions.circleCropTransform())
+                    ?.into(image)
+        }
     }
 
     override fun onResume() {
@@ -309,26 +320,27 @@ class MenuActivity : AppCompatActivity(),
                         val loginService = generator.createService(AirWebService::class.java, accessToken?.getTokenType() + " " + accessToken?.accessToken)
                         loginService.getUserProfile().enqueue(object : Callback<AirUser?> {
                             override fun onFailure(call: Call<AirUser?>?, t: Throwable?) {
-                                Log.e("LOGI", "fail", t)
                                 showSnack(getString(R.string.error_sinchronized))
                             }
 
                             override fun onResponse(call: Call<AirUser?>?, response: Response<AirUser?>?) {
-                                Log.e("LOGI", response?.message().toString())
                                 viewModel?.updateStaticalInfo(response?.body(), FirebaseAuth.getInstance().currentUser?.uid.toString(), mainUser)
                             }
                         })
                         loginService.getMyTrips().enqueue(object : Callback<AirUser?> {
                             override fun onResponse(call: Call<AirUser?>?, response: Response<AirUser?>?) {
+
+//                                getLatLngForAirports(response?.body()?.data?.trips?.get(0)?.flights?.get(0)?.origin?.code)
+//                                getLatLngForAirports(response?.body()?.data?.trips?.get(0)?.flights?.get(0)?.destination?.code)
+
                                 viewModel?.updateFeatureTrips(response?.body(), FirebaseAuth.getInstance().currentUser?.uid.toString(), mainUser)
-                                Log.e("LOG", "${response?.body()?.data?.trips?.get(0)?.flights}")
-                                if (response?.body() != null && response?.body()?.data?.trips?.isEmpty() == false) {
-                                    navigator.applyCommand(Replace(Screens.AIR_SUCCES_SCREEN, response?.body()?.data?.trips?.get(0)?.flights))
+
+                                if (response?.body() != null && response.body()?.data?.trips?.isEmpty() == false) {
+                                    navigator.applyCommand(Replace(Screens.AIR_SUCCES_SCREEN, response.body()?.data?.trips?.get(0)?.flights))
                                 }
                             }
 
                             override fun onFailure(call: Call<AirUser?>?, t: Throwable?) {
-                                Log.e("LOGI", "fail", t)
                                 showSnack(getString(R.string.error_sinchronized))
                             }
                         })
@@ -337,11 +349,30 @@ class MenuActivity : AppCompatActivity(),
 
             } else if (uri.getQueryParameter("error") != null) {
                 // show an error message here
-                Log.e("LOGI:", "error: ${uri.getQueryParameter("error")}")
                 showSnack(getString(R.string.error_sinchronized))
             }
         }
         navigatorHolder.setNavigator(navigator)
+    }
+
+    private fun getLatLngForAirports(code: String?) {
+        code?.let {
+            val generator = ServiceGenerator()
+            generator.createService(AirWebService::class.java)
+                    .getLatLngByCode(term = code)
+                    .subscribe(object : SingleObserver<Airport?> {
+                        override fun onSuccess(airport: Airport) {
+                            Log.e("LOG", airport.toString())
+                        }
+
+                        override fun onSubscribe(d: Disposable) {
+                        }
+
+                        override fun onError(e: Throwable) {
+                        }
+                    })
+
+        }
     }
 
     private fun saveToken(accessToken: AccessToken?) {
@@ -349,10 +380,6 @@ class MenuActivity : AppCompatActivity(),
         preferences.edit().putString(Constants.ACCESS_TOKEN, accessToken?.accessToken).apply()
         preferences.edit().putString(Constants.TYPE_TOKEN, accessToken?.getTokenType()).apply()
     }
-
-    fun getAccessToken(): String = preferences.getString(Constants.ACCESS_TOKEN, "")
-    fun getTypeToken(): String = preferences.getString(Constants.TYPE_TOKEN, "")
-    fun getRefreshToken(): String = preferences.getString(Constants.REFRESH_TOKEN, "")
 
     override fun onBackPressed() {
         navigator.applyCommand(Back())
@@ -451,5 +478,4 @@ class MenuActivity : AppCompatActivity(),
         val dialog = FeedbackDialog(this)
         dialog.show()
     }
-
 }
