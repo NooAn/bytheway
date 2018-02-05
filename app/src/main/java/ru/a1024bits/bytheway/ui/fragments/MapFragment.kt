@@ -21,6 +21,7 @@ import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.GeoPoint
 import kotlinx.android.synthetic.main.fragment_maps.*
 import kotlinx.android.synthetic.main.fragment_search_block.*
@@ -133,27 +134,39 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
 
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
-        mMapView?.onSaveInstanceState(outState)
+        try {
+            mMapView?.onSaveInstanceState(outState)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     override fun onPause() {
         super.onPause()
-        mMapView?.onPause()
+//        mMapView?.onPause()
     }
 
     override fun onStop() {
         super.onStop()
-        mMapView?.onStop()
+        try {
+            mMapView?.onStop()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
 
     override fun onDestroyView() {
         super.onDestroyView()
-        mMapView?.onDestroy()
-        //Clean up resources from google map to prevent memory leaks.
-        //Stop tracking current location
-        mMap?.clear()
-        mMapView = null
+        try {
+            mMapView?.onDestroy()
+            //Clean up resources from google map to prevent memory leaks.
+            //Stop tracking current location
+            mMap?.clear()
+            mMapView = null
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     override fun onLowMemory() {
@@ -281,13 +294,17 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         this.mMap = googleMap
         var constLocation = LatLng(50.0, 50.0)
-
-        if (points.size > 0) {
-            setMarker(points.valueAt(0).position, 1)
-            setMarker(points.valueAt(1).position, 2)
-        } else {
-            mMap?.moveCamera(CameraUpdateFactory.newLatLng(constLocation))
-            mMap?.animateCamera(CameraUpdateFactory.zoomTo(3F))
+        try {
+            if (points.size > 0) {
+                setMarker(points.valueAt(0).position, 1)
+                setMarker(points.valueAt(1).position, 2)
+            } else {
+                mMap?.moveCamera(CameraUpdateFactory.newLatLng(constLocation))
+                mMap?.animateCamera(CameraUpdateFactory.zoomTo(3F))
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            FirebaseCrash.report(e)
         }
     }
 
@@ -434,13 +451,18 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
         //add markers on map
         points.map { it.value }.map { marker -> mMap?.addMarker(marker) }
         //animate camera to show markers
-        when (points.size) {
-            1 -> mMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(points.valueAt(0).position, 7F/* zoom level */))
-            else -> {
-                mMap?.animateCamera(CameraUpdateFactory.newLatLngBounds(createLatLngBounds(points), resources.getDimensionPixelSize(R.dimen.latLngBoundsPadding)))
-                if (!swap)
-                    obtainDirection()
+        try {
+            when (points.size) {
+                1 -> mMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(points.valueAt(0).position, 7F/* zoom level */))
+                else -> {
+                    mMap?.animateCamera(CameraUpdateFactory.newLatLngBounds(createLatLngBounds(points), resources.getDimensionPixelSize(R.dimen.latLngBoundsPadding)))
+                    if (!swap)
+                        obtainDirection()
+                }
             }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            FirebaseCrash.report(e)
         }
     }
 

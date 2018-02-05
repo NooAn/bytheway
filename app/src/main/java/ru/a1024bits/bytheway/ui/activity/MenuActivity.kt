@@ -31,6 +31,8 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.FirebaseFirestore
+import io.reactivex.SingleObserver
+import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_menu.*
 import kotlinx.android.synthetic.main.confirm_dialog.view.*
 import retrofit2.Call
@@ -85,7 +87,7 @@ class MenuActivity : AppCompatActivity(),
     }
 
     override fun onConnectionFailed(p0: ConnectionResult) {
-        Log.e("LOG", p0.errorMessage)
+        Log.e("LOG", "${p0.errorMessage}")
     }
 
     var screenNames: ArrayList<String> = arrayListOf()
@@ -327,7 +329,12 @@ class MenuActivity : AppCompatActivity(),
                         })
                         loginService.getMyTrips().enqueue(object : Callback<AirUser?> {
                             override fun onResponse(call: Call<AirUser?>?, response: Response<AirUser?>?) {
+
+//                                getLatLngForAirports(response?.body()?.data?.trips?.get(0)?.flights?.get(0)?.origin?.code)
+//                                getLatLngForAirports(response?.body()?.data?.trips?.get(0)?.flights?.get(0)?.destination?.code)
+
                                 viewModel?.updateFeatureTrips(response?.body(), FirebaseAuth.getInstance().currentUser?.uid.toString(), mainUser)
+
                                 if (response?.body() != null && response.body()?.data?.trips?.isEmpty() == false) {
                                     navigator.applyCommand(Replace(Screens.AIR_SUCCES_SCREEN, response.body()?.data?.trips?.get(0)?.flights))
                                 }
@@ -346,6 +353,26 @@ class MenuActivity : AppCompatActivity(),
             }
         }
         navigatorHolder.setNavigator(navigator)
+    }
+
+    private fun getLatLngForAirports(code: String?) {
+        code?.let {
+            val generator = ServiceGenerator()
+            generator.createService(AirWebService::class.java)
+                    .getLatLngByCode(term = code)
+                    .subscribe(object : SingleObserver<Airport?> {
+                        override fun onSuccess(airport: Airport) {
+                            Log.e("LOG", airport.toString())
+                        }
+
+                        override fun onSubscribe(d: Disposable) {
+                        }
+
+                        override fun onError(e: Throwable) {
+                        }
+                    })
+
+        }
     }
 
     private fun saveToken(accessToken: AccessToken?) {

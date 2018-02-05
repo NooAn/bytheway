@@ -131,9 +131,9 @@
     <string name="copy_done">Скопировали</string>
     <string name="search_change">Ваша поездка будет изменена.</string>
     <string name="search_change_text1">Вы уверены, что хотите сохранить текущую информацию?</string>
-    <string name="registration_error">В данный момент приложение поддерживает только вход через ГуглАккаунт. И сейчас видать что-то не получилось.\nПроверьте интернет и запустите приложение заново.</string>
-    <string name="tips_for_blank_social">Привет! Мы обнаружили, что Вы создали поездку и собираетесь искать попутчика, но не указали свои контактные данные. Советуем добавить ссылки на вк, номер в whatsapp или ник для телеграмма.</string>
-    <string name="ok_I_understand">Хорошо, я понял.</string>
+    <string name="registration_error">Дорогой путешественник!\n\nПроизошла ошибка с подключением Вашего Google-аккаунта :(\n</string>
+    <string name="tips_for_blank_social">Привет! Мы обнаружили, что Вы создали поездку, но не указали контактные данные. \n\nДобавьте ссылку на VK, номер в WhatsApp или ник для телеграмма.</string>
+    <string name="ok_I_understand">Хорошо, я молодец</string>
     <string name="start">Старт</string>
     <string name="finish">Финиш</string>
     <string name="to_date">по</string>
@@ -142,8 +142,9 @@
     <string name="error_upload_image">Ошибка загрузки</string>
     <string name="error_link_open">Мы не смогли открыть ссылку. Возможно она некорректная.</string>
     <string name="last_see">Последний раз был</string>
-    <string name="sms_code">код из sms</string>
+    <string name="sms_code">Код из sms</string>
     <string name="connect">Подключиться</string>
     <string name="phone">Телефон</string>
-    <string name="alternate_entry">Давайте попробуем войти с помощью вашего номера телефона (не забудьте указать код вашей страны)</string>
+    <string name="alternate_entry">Если проблема не в отсутствии интернета, то войдите с помощью номера телефона (не забудьте указать код вашей страны), на который будет отправлено SMS о подтверждении.</string>
+    <string name="attention">Внимание</string>
 </resources>

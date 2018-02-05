@@ -122,10 +122,10 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
         iconDateFromEmpty.setOnClickListener { clickForIconDateEmpty() }
 
         fillAgeSex(user.age, user.sex)
-
-        glide?.load(user.urlPhoto)
-                ?.apply(RequestOptions.circleCropTransform())
-                ?.into(image_avatar)
+        if (user.urlPhoto.isNotBlank())
+            glide?.load(user.urlPhoto)
+                    ?.apply(RequestOptions.circleCropTransform())
+                    ?.into(image_avatar)
 
         for (name in user.socialNetwork) {
             when (name.key) {

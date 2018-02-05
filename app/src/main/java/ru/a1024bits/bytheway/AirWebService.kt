@@ -25,11 +25,11 @@ interface AirWebService {
     fun getUserProfile(): Call<AirUser>
 
     @GET("/api/v1/me/trips")
-    fun getMyTrips(): Call <AirUser>
+    fun getMyTrips(): Call<AirUser>
 
     //https://yasen.hotellook.com/autocomplete?term=LED&lang=ru
     @GET("https://yasen.hotellook.com/autocomplete")
-    fun getLatLngByCode(@Query("term") code: String,
-                        @Query("lang") id: String): Single<Airport>
+    fun getLatLngByCode(@Query("term") term: String,
+                        @Query("lang") lang: String = "ru"): Single<Airport>
 
 }

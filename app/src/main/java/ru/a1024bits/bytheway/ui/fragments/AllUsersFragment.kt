@@ -304,7 +304,8 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             endBudget.setText("")
             startCity.setText("")
             endCity.setText("")
-
+            choseDateStart.setCompoundDrawables(null, null, null, null)
+            choseDateEnd.setCompoundDrawables(null, null, null, null)
             updateChoseDateButtons()
             sexButtons.check(sexAny.id)
         }
