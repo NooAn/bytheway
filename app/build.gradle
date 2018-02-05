@@ -48,8 +48,8 @@ android {
 
     buildTypes {
         release {
-            applicationIdSuffix ".release"
-               signingConfig signingConfigs.release
+//            applicationIdSuffix ".release"
+//               signingConfig signingConfigs.release
             //minifyEnabled true
             //   proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -118,6 +118,12 @@ dependencies {
     compile 'com.github.deano2390:MaterialShowcaseView:1.2.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.3.0'
     implementation 'com.android.support:cardview-v7:26.1.0'
+
+    androidTestCompile('com.android.support.test.espresso:espresso-contrib:3.0.1') {
+        exclude group: 'com.android.support', module: 'appcompat'
+        exclude group: 'com.android.support', module: 'support-v4'
+        exclude module: 'recyclerview-v7'
+    }
 }
 configurations.all {
     resolutionStrategy.eachDependency { DependencyResolveDetails details ->
