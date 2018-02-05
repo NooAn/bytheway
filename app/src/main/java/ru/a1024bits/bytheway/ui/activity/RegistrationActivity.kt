@@ -9,9 +9,8 @@ import android.net.ConnectivityManager
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
-import android.text.TextUtils
 import android.util.Log
-import android.view.View
+import android.widget.EditText
 import android.widget.Toast
 import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -24,9 +23,9 @@ import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.*
 import com.google.firebase.crash.FirebaseCrash
-import kotlinx.android.synthetic.main.activity_splash.*
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
+import ru.a1024bits.bytheway.ui.dialogs.ErrorStandartRegistrationDialog
 import ru.a1024bits.bytheway.viewmodel.RegistrationViewModel
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -149,7 +148,7 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
         signInGoogle(credential)
     }
 
-    private fun signInGoogle(credential: AuthCredential) {
+    fun signInGoogle(credential: AuthCredential) {
         try {
             mAuth?.signInWithCredential(credential)
                     ?.addOnCompleteListener(this) { task ->
@@ -190,39 +189,22 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
     }
 
     private fun showErrorText() {
-        textError.visibility = View.VISIBLE
-        phone.visibility = View.VISIBLE
-        textPhone.visibility = View.VISIBLE
-        sendButtonCode.setOnClickListener({
-            mVerificationId?.let {
-                val credential = PhoneAuthProvider.getCredential(it, textFromSms.text.toString())
-                signInGoogle(credential)
-            }
-        })
-        sendButtonPhone.visibility = View.VISIBLE
-        sendButtonPhone.setOnClickListener({
-            if (!validatePhoneNumber())
-                return@setOnClickListener
-
-            textFromSms.visibility = View.VISIBLE
-            sendButtonCode.visibility = View.VISIBLE
-            authPhone()
-        })
+        ErrorStandartRegistrationDialog.newInstance(this).show(supportFragmentManager, "dialogRegistrationOnNumber")
     }
 
-    private fun validatePhoneNumber(): Boolean {
-        val phoneNumber = phone.getText().toString();
-        if (phoneNumber.isBlank()) {
-            phone.error = "Invalid phone number.";
-            return false;
+    fun validatePhoneNumber(phone: EditText): Boolean {
+        val phoneNumber = phone.text.toString()
+        if (phoneNumber.isBlank() || !phoneNumber.matches(Regex("^\\+?\\d{10,12}$"))) {
+            phone.error = "Invalid phone number."//falseui
+            return false
         }
-        return true;
+        return true
     }
 
 
-    private var mVerificationId: String? = null
+    var mVerificationId: String? = null
 
-    private fun authPhone() {
+    fun authPhone(phone: EditText) {
         PhoneAuthProvider.getInstance().verifyPhoneNumber(
                 phone.text.toString(),        // Phone number to verify
                 60,                 // Timeout duration
