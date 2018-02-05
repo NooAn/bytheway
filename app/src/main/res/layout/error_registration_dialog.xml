@@ -17,7 +17,8 @@
         android:id="@+id/textPhone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="24dp"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
         android:text="@string/alternate_entry"
         android:textColor="@color/colorAccent" />
 
@@ -27,6 +28,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
         android:hint="@string/phone" />
 
     <Button

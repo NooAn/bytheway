@@ -134,27 +134,39 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
 
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
-        mMapView?.onSaveInstanceState(outState)
+        try {
+            mMapView?.onSaveInstanceState(outState)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     override fun onPause() {
         super.onPause()
-        mMapView?.onPause()
+//        mMapView?.onPause()
     }
 
     override fun onStop() {
         super.onStop()
-        mMapView?.onStop()
+        try {
+            mMapView?.onStop()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
 
     override fun onDestroyView() {
         super.onDestroyView()
-        mMapView?.onDestroy()
-        //Clean up resources from google map to prevent memory leaks.
-        //Stop tracking current location
-        mMap?.clear()
-        mMapView = null
+        try {
+            mMapView?.onDestroy()
+            //Clean up resources from google map to prevent memory leaks.
+            //Stop tracking current location
+            mMap?.clear()
+            mMapView = null
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     override fun onLowMemory() {

@@ -123,10 +123,10 @@
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
                 android:scaleType="center"
-                android:src="@drawable/tg_grey"
+                android:src="@drawable/ic_mail_white_24px"
                 android:visibility="gone"
                 tools:ignore="ContentDescription"
-                tools:src="@drawable/tg_grey"
+                tools:src="@drawable/ic_mail_white_24px"
                 tools:visibility="visible" />
 
             <View

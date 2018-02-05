@@ -30,6 +30,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.GeoPoint
 import com.google.maps.android.PolyUtil
 import kotlinx.android.synthetic.main.confirm_dialog.view.*
@@ -604,11 +605,17 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     override fun onDestroyView() {
         super.onDestroyView()
-        mapView?.onDestroy()
-        //Clean up resources from google map to prevent memory leaks.
-        //Stop tracking current location
-        if (googleMap != null) {
-            googleMap?.clear()
+        try {
+
+            mapView?.onDestroy()
+            //Clean up resources from google map to prevent memory leaks.
+            //Stop tracking current location
+            if (googleMap != null) {
+                googleMap?.clear()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            FirebaseCrash.report(e)
         }
     }
 
@@ -710,7 +717,9 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             Toast.makeText(this@MyProfileFragment.context, errorString, Toast.LENGTH_LONG).show()
             return
         }
-
+        if (socNet.size == 0) {
+            showTipsForEmptySocialLink()
+        }
         countTrip = 1
 
         viewModel?.sendUserData(getHashMapUser(), uid, mainUser)

@@ -16,7 +16,7 @@ class SocialTipsDialog : DialogFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val rootView = inflater.inflate(R.layout.fragment_social_tips_dialog, container, false)
-        getDialog().setTitle("Внимание")
+        getDialog().setTitle(getString(R.string.attention))
         rootView.findViewById<Button>(R.id.dismiss).setOnClickListener{
             dismiss()
         }
