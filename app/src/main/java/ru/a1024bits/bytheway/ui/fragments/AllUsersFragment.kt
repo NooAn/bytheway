@@ -309,7 +309,6 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             sexButtons.check(sexAny.id)
         }
 
-        view_contain_block_parameters.layoutTransition.setDuration(700L)
         searchParametersText.setOnClickListener {
             if (block_search_parameters.visibility == View.GONE) {
                 block_search_parameters.visibility = View.VISIBLE

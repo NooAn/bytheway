@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/all_users_sv"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/custom_rec"
+        android:elevation="4dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="26dp"
+        android:paddingStart="26dp">
+
+        <EditText
+            android:id="@+id/startCity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/standard_margin"
+            android:hint="@string/city_from"
+            android:saveEnabled="true"
+            android:textColor="@color/black"
+            android:textSize="@dimen/standard_text_size" />
+
+        <EditText
+            android:id="@+id/endCity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/startCity"
+            android:layout_marginBottom="20dp"
+            android:hint="@string/city_to"
+            android:saveEnabled="true"
+            android:textColor="@color/black"
+            android:textSize="@dimen/standard_text_size" />
+
+        <TextView
+            android:id="@+id/dateText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/endCity"
+            android:layout_marginBottom="30dp"
+            android:layout_marginEnd="70dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/date"
+            android:textSize="@dimen/standard_text_size" />
+
+
+        <TextView
+            android:id="@+id/fromDateText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/endCity"
+            android:layout_toEndOf="@+id/dateText"
+            android:layout_marginEnd="8dp"
+            android:text="@string/from_in"
+            android:textSize="@dimen/standard_text_size" />
+
+        <TextView
+            android:id="@+id/choseDateStart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/endCity"
+            android:layout_marginEnd="@dimen/standard_margin"
+            android:layout_toEndOf="@id/fromDateText"
+            android:text="@string/filters_all_users_empty_date"
+            android:textSize="@dimen/standard_text_size"
+            android:theme="@style/UsersTextInFilters" />
+
+        <TextView
+            android:id="@+id/byDateText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/choseDateEnd"
+            android:layout_alignBottom="@+id/choseDateEnd"
+            android:layout_toEndOf="@+id/choseDateStart"
+            android:layout_marginEnd="8dp"
+            android:gravity="top"
+            android:text="@string/to_date"
+            android:textSize="@dimen/standard_text_size" />
+
+        <TextView
+            android:id="@+id/choseDateEnd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/byDateText"
+            android:layout_alignBaseline="@+id/choseDateStart"
+            android:layout_alignBottom="@+id/choseDateStart"
+            android:saveEnabled="true"
+            android:text="@string/filters_all_users_empty_date"
+            android:textSize="@dimen/standard_text_size"
+            android:theme="@style/UsersTextInFilters" />
+
+
+        <TextView
+            android:id="@+id/sexText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/dateText"
+            android:layout_marginBottom="26dp"
+            android:layout_marginEnd="75dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/sex"
+            android:textSize="@dimen/standard_text_size" />
+
+        <RadioGroup
+            android:id="@+id/sexButtons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/sexText"
+            android:layout_alignTop="@id/sexText"
+            android:layout_toEndOf="@id/sexText"
+            android:backgroundTint="@color/colorPrimary"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/sexM"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="24dp"
+                android:backgroundTint="@color/colorPrimary"
+                android:text="М"
+                android:textColor="@color/colorFiltersText"
+                android:textSize="@dimen/standard_text_size" />
+
+            <RadioButton
+                android:id="@+id/sexW"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="24dp"
+                android:backgroundTint="@color/colorPrimary"
+                android:text="Ж"
+                android:textColor="@color/colorFiltersText"
+                android:textSize="@dimen/standard_text_size" />
+
+            <RadioButton
+                android:id="@+id/sexAny"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/colorPrimary"
+                android:checked="true"
+                android:text="@string/any"
+                android:textColor="@color/colorFiltersText"
+                android:textSize="@dimen/standard_text_size" />
+        </RadioGroup>
+
+
+        <TextView
+            android:id="@+id/ageText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/sexText"
+            android:layout_marginBottom="26dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/age"
+            android:textSize="@dimen/standard_text_size" />
+
+        <TextView
+            android:id="@+id/fromAgeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@id/fromDateText"
+            android:layout_below="@id/sexText"
+            android:text="@string/from"
+            android:textSize="@dimen/standard_text_size" />
+
+        <Spinner
+            android:id="@+id/startAge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/ageText"
+            android:layout_alignTop="@id/ageText"
+            android:layout_marginStart="8dp"
+            android:layout_toEndOf="@id/fromAgeText"
+            android:theme="@style/UsersTextInFilters" />
+
+        <TextView
+            android:id="@+id/byAgeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/endAge"
+            android:layout_alignStart="@id/byDateText"
+            android:text="@string/to"
+            android:textSize="@dimen/standard_text_size" />
+
+        <Spinner
+            android:id="@+id/endAge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/ageText"
+            android:layout_alignTop="@id/ageText"
+            android:layout_marginStart="8dp"
+            android:layout_toEndOf="@id/byAgeText"
+            android:theme="@style/UsersTextInFilters" />
+
+
+        <TextView
+            android:id="@+id/budgetText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/ageText"
+            android:layout_marginBottom="16dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/budgetName"
+            android:textSize="@dimen/standard_text_size" />
+
+        <TextView
+            android:id="@+id/fromBudgetText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@id/fromDateText"
+            android:layout_below="@id/ageText"
+            android:gravity="top"
+            android:text="@string/from"
+            android:textSize="@dimen/standard_text_size" />
+
+        <EditText
+            android:id="@+id/startBudget"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/fromBudgetText"
+            android:layout_alignStart="@id/startAge"
+            android:layout_toEndOf="@id/fromBudgetText"
+            android:inputType="number"
+            android:saveEnabled="true"
+            android:theme="@style/UsersTextInFilters" />
+
+        <TextView
+            android:id="@+id/byBudgetText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/ageText"
+            android:text="@string/to"
+            android:layout_alignStart="@id/byDateText"
+            android:textSize="@dimen/standard_text_size" />
+
+        <EditText
+            android:id="@+id/endBudget"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/startBudget"
+            android:layout_alignBottom="@id/startBudget"
+            android:layout_toEndOf="@id/byDateText"
+            android:inputType="number"
+            android:saveEnabled="true"
+            android:theme="@style/UsersTextInFilters" />
+
+        <Button
+            android:id="@+id/saveParameters"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@id/budgetText"
+            android:layout_marginStart="16dp"
+            android:drawablePadding="10dp"
+            android:drawableStart="@drawable/ic_search_black_24dp"
+            android:gravity="end|center_vertical"
+            android:stateListAnimator="@null"
+            android:text="@string/search_users_text"
+            android:textSize="17sp"
+            android:theme="@style/WhiteButton" />
+
+        <Button
+            android:id="@+id/cancelParameters"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/budgetText"
+            android:layout_toStartOf="@id/saveParameters"
+            android:stateListAnimator="@null"
+            android:text="@string/cancel"
+            android:textSize="17sp"
+            android:theme="@style/WhiteButton" />
+
+    </RelativeLayout>
+</ScrollView>
