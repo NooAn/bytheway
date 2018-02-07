@@ -22,7 +22,7 @@
         android:paddingEnd="16dp"
         android:paddingStart="16dp"
         tools:visibility="visible"
-        tools:listitem="@layout/item_content_all_users"
+        tools:listitem="@layout/item_content_similar_travel"
         app:layoutManager="LinearLayoutManager" />
 
 </android.support.v7.widget.LinearLayoutCompat>

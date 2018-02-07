@@ -31,10 +31,9 @@ class SimilarTravelsAdapter(val context: Context, val users: List<User>) : Recyc
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
         val currentUser = users[position]
         holder.cities.text = if (currentUser.cities["first_city"] != null && currentUser.cities["last_city"] != null)
-            StringBuilder(getShortCity(currentUser.cities.get(FIRST_INDEX_CITY)
-                    ?: ""))
+            StringBuilder(getShortCity(currentUser.cities[FIRST_INDEX_CITY]?.trim() ?: ""))
                     .append(" - ")
-                    .append(getShortCity(currentUser.cities.get(LAST_INDEX_CITY) ?: ""))
+                    .append(getShortCity(currentUser.cities[LAST_INDEX_CITY]?.trim() ?: ""))
         else
             context.getString(R.string.not_cities)
 
