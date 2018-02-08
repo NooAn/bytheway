@@ -124,6 +124,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                                 var user = User()
                                 try {
                                     user = document.toObject(User::class.java)
+
                                 } catch (ex2: Exception) {
                                     ex2.printStackTrace()
                                     FirebaseCrash.report(ex2)
@@ -138,6 +139,9 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                                                 user.id != FirebaseAuth.getInstance().currentUser?.uid) {
                                             result.add(user)
                                         }
+                                        Log.e("LOG user", user.toString())
+                                    } else {
+                                        Log.e("LOG !user", user.toString())
                                     }
                                 } catch (ex: Exception) {
                                     stream.onError(ex)
@@ -146,6 +150,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                             }
                             result.sortByDescending { it.percentsSimilarTravel } // перед отправкой сортируем по степени похожести маршрута.
                             stream.onSuccess(result)
+                            Log.e("LOG", "result $result")
                         } else {
                             stream.onError(Exception("Not Successful load users"))
                         }
