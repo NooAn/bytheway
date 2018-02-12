@@ -21,5 +21,5 @@ interface IUsersRepository {
     fun uploadPhotoLink(path: Uri, id: String): Single<String>
     fun getUser(id: String): Single<User>
     fun changeUserProfile(map: HashMap<String, Any>, id: String): Completable
-    fun getRoute(cityFromLatLng: GeoPoint, cityToLatLng: GeoPoint): Single<RoutesList>
+    fun getRoute(cityFromLatLng: GeoPoint, cityToLatLng: GeoPoint, waypoints: GeoPoint?): Single<RoutesList>
 }
