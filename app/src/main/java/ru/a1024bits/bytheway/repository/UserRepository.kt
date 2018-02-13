@@ -123,6 +123,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                                 Log.d(TAG, document.id + " => " + document.data)
 
                                 var user = User()
+
                                 try {
                                     user = document.toObject(User::class.java)
 
@@ -130,6 +131,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                                     ex2.printStackTrace()
                                     FirebaseCrash.report(ex2)
                                 }
+
                                 try {
                                     if (user.cities.size > 0) {
                                         // run search algorithm
