@@ -21,6 +21,8 @@ import java.util.*
 import javax.inject.Inject
 import kotlin.collections.HashMap
 import com.google.firebase.firestore.FirebaseFirestoreException
+import ru.a1024bits.bytheway.model.map_directions.Route
+import ru.a1024bits.bytheway.model.map_directions.RoutesList
 
 
 const val COLLECTION_USERS = "users"
@@ -194,11 +196,14 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                 }
             }
 
-    override fun getRoute(cityFromLatLng: GeoPoint, cityToLatLng: GeoPoint) =
-            mapService.getDirection(hashMapOf(
-                    "origin" to LatLng(cityFromLatLng.latitude, cityFromLatLng.longitude).toJsonString(),
-                    "destination" to LatLng(cityToLatLng.latitude, cityToLatLng.longitude).toJsonString(),
-                    "sensor" to "false"))
+    override fun getRoute(cityFromLatLng: GeoPoint, cityToLatLng: GeoPoint, waypoints: GeoPoint?): Single<RoutesList> {
+        val latLngPoint = if (waypoints?.latitude == 0.0 || waypoints?.longitude == 0.0 || waypoints == null) "" else LatLng(waypoints.latitude, waypoints.longitude).toJsonString()
+        return mapService.getDirection(hashMapOf(
+                "origin" to LatLng(cityFromLatLng.latitude, cityFromLatLng.longitude).toJsonString(),
+                "destination" to LatLng(cityToLatLng.latitude, cityToLatLng.longitude).toJsonString(),
+                "waypoints" to latLngPoint,
+                "sensor" to "false"))
+    }
 
     fun sendTime(id: String): Completable = Completable.create { stream ->
         try {

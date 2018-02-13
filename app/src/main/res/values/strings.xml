@@ -130,4 +130,11 @@
     <string name="error_upload_image">Ошибка загрузки</string>
     <string name="error_link_open">Мы не смогли открыть ссылку. Возможно она некорректная.</string>
     <string name="last_see">Последний раз был</string>
+    <string name="sms_code">Код из sms</string>
+    <string name="connect">Подключиться</string>
+    <string name="phone">Телефон</string>
+    <string name="alternate_entry">Если проблема не в отсутствии интернета, то войдите с помощью номера телефона (не забудьте указать код вашей страны), на который будет отправлено SMS о подтверждении.</string>
+    <string name="attention">Внимание</string>
+    <string name="add_city">+ Добавить город</string>
+    <string name="remove_city">Удалить город</string>
 </resources>
