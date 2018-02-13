@@ -218,10 +218,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/new_cities_block"
-        android:padding="10dp">
+        android:paddingBottom="10dp">
 
         <TextView
             android:id="@+id/add_city"
+            android:layout_marginBottom="5dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/add_city"

@@ -195,7 +195,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
             }
 
     override fun getRoute(cityFromLatLng: GeoPoint, cityToLatLng: GeoPoint, waypoints: GeoPoint?): Single<RoutesList> {
-        val latLngPoint = if (waypoints == null) "null" else LatLng(waypoints.latitude, waypoints.longitude).toJsonString()
+        val latLngPoint = if (waypoints?.latitude == 0.0 || waypoints?.longitude == 0.0 || waypoints == null) "" else LatLng(waypoints.latitude, waypoints.longitude).toJsonString()
         return mapService.getDirection(hashMapOf(
                 "origin" to LatLng(cityFromLatLng.latitude, cityFromLatLng.longitude).toJsonString(),
                 "destination" to LatLng(cityToLatLng.latitude, cityToLatLng.longitude).toJsonString(),
