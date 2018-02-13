@@ -1,16 +1,20 @@
-package ru.a1024bits.bytheway.fragments
+package ru.a1024bits.bytheway.diaplayAllUsers
 
-import android.support.test.espresso.Espresso.*
-import android.support.test.espresso.action.ViewActions.*
+import android.support.test.espresso.Espresso.onData
+import android.support.test.espresso.Espresso.onView
+import android.support.test.espresso.action.ViewActions.click
 import android.support.test.espresso.assertion.ViewAssertions
-import android.support.test.espresso.assertion.ViewAssertions.*
-import android.support.test.espresso.contrib.*
+import android.support.test.espresso.assertion.ViewAssertions.matches
+import android.support.test.espresso.contrib.DrawerActions
+import android.support.test.espresso.contrib.DrawerMatchers
+import android.support.test.espresso.contrib.NavigationViewActions
 import android.support.test.espresso.matcher.ViewMatchers
 import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import android.view.Gravity
 import org.hamcrest.Matchers.*
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -18,13 +22,12 @@ import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
 
 @RunWith(AndroidJUnit4::class)
-
 class TestFilters {
     @Rule
     @JvmField
     val mActivityRule = ActivityTestRule<MenuActivity>(MenuActivity::class.java)
 
-    //    @Before
+    @Before
     fun init() {
         onView(ViewMatchers.withId(R.id.drawer_layout))
                 .check(ViewAssertions.matches(DrawerMatchers.isClosed(Gravity.LEFT)))
@@ -33,7 +36,7 @@ class TestFilters {
                 .perform(NavigationViewActions.navigateTo(R.id.all_users_item))
         onView(ViewMatchers.withId(R.id.displayAllUsers)).check(ViewAssertions.matches(ViewMatchers.isEnabled()))
         onView(withId(R.id.searchParametersText)).check(matches(isDisplayed())).perform(click())
-//        onView(withId(R.id.block_search_parameters)).check(matches(isDisplayed()))
+        onView(withId(R.id.block_search_parameters)).check(matches(isDisplayed()))
     }
 
 
@@ -44,13 +47,12 @@ class TestFilters {
     }
 
     @Test
-
     fun testAges() {
-        onView(withId(R.id.startAge)).check(matches(withSpinnerText("0")))
+        onView(withId(R.id.startAge)).check(matches(withSpinnerText("0"))).perform(click())
         onData(allOf(`is`(instanceOf(String::class.java)), `is`("12"))).perform(click())
         onView(withId(R.id.startAge)).check(matches(withSpinnerText(containsString("12"))))
 
-        onView(withId(R.id.endAge)).check(matches(withSpinnerText(containsString("80"))))
+        onView(withId(R.id.endAge)).check(matches(withSpinnerText(containsString("80")))).perform(click())
         onData(allOf(`is`(instanceOf(String::class.java)), `is`("80"))).perform(click())
         onView(withId(R.id.endAge)).check(matches(withSpinnerText(containsString("80"))))
     }
