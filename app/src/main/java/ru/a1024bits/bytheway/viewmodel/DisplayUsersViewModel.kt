@@ -41,6 +41,7 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
                 Log.e("LOG get filter users", Thread.currentThread().name)
                 val result: MutableList<User> = ArrayList()
                 snapshots.map {
+                    result.sortBy { it.dates[START_DATE] }
                     for (document in it) {
                         try {
                             val user = document.toObject(User::class.java)

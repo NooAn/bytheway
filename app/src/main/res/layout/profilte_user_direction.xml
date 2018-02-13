@@ -118,7 +118,7 @@
         tools:text="@string/date_from" />
 
     <TextView
-        android:id="@+id/dateArrived"
+        android:id="@+id/textDateArrived"
         android:layout_width="120dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
