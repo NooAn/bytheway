@@ -1,11 +1,9 @@
 <resources>
     <string name="app_name">bytheway</string>
-    <string name="password">Пароль</string>
-    <string name="button_send">Отправить КОД</string>
+    <string name="button_send">Отправить</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="fullname">Andrey Petrov</string>
-    <string name="datetrip">Дата</string>
     <string name="type_money"> </string>
     <string name="money">Бюджет поездки</string>
     <string name="description">Описание поездки</string>
@@ -18,23 +16,17 @@
     <string name="city_end">Пункт назначения</string>
     <string name="name_button_search">Поиск попутчиков</string>
     <string name="city_start">Пункт отправления</string>
-    <string name="action_example">Example action</string>
-    <string name="action_settings">Settings</string>
     <string name="city_fromSmall"><font size="13">Откуда</font></string>
     <string name="city_toSmall"><font size="13">Куда</font></string>
     <string name="city_from">Откуда</string>
     <string name="city_to">Куда</string>
     <string name="date_from">Дата</string>
     <string name="date_to">Дата</string>
-    <string name="date_start">Начало</string>
-    <string name="date_end">Конец</string>
-    <string name="date_trip">Дата путешествия</string>
     <string name="method_move">Способ передвижения</string>
     <string name="budget">1000 </string>
     <string name="budgetName">Бюджет</string>
     <string name="add_info_profile">Дополнительная информация</string>
     <string name="date">Дата</string>
-    <string name="save_filter">Сохранить фильтры</string>
     <string name="sex">Пол</string>
     <string name="name">Имя</string>
     <string name="default_phone_code">+7</string>
@@ -81,7 +73,6 @@
         <item>дек</item>
     </string-array>
 
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="air_next_profile">Перейти в профиль</string>
     <string name="text_air_succesful_add">Ваши поездки успешно добавлены !</string>
     <string name="exampleCity">Берлин - Москва</string>
@@ -91,7 +82,6 @@
     <string name="travelBus">Автобус</string>
     <string name="travelPlane">Самолет</string>
     <string name="travelHitchHicking">Автостоп</string>
-    <string name="mail">Электронный адрес</string>
     <string name="feedback_writte">Напишите отзыв или предложение</string>
     <string name="add_new_trip_from_app_in_the_air">+ Добавить поездку  App in the Air</string>
     <string name="feedback">Обратная связь</string>
@@ -99,7 +89,6 @@
     <string name="textHeadAirDisaster">Ваш аккаунт синхронизирован!</string>
     <string name="item_all_users_empty_date"> </string>
     <string name="filters_all_users_empty_date">____</string>
-    <string name="filters_all_users_text_date_from">с</string>
     <string name="not_cities">Пока ничего не ищет</string>
     <string name="optionSearch">+ Параметры поиска</string>
     <string name="to">до</string>
@@ -125,15 +114,14 @@
     <string name="hint_save_and_search_description">При нажатии на кнопку “СОХРАНИТЬ”, внесенные изменения о поездке автоматически сохранятся в Вашем профиле. Вы можете продолжить поиск попутчиков без сохранения поездки..</string>
     <string name="no_internet">У вас нет интернет соединения</string>
     <string name="date_empty">* пользователь не указал даты поездки</string>
-    <string name="date_error_set">Дата окончания поездки не может быть раньше чем начала.</string>
     <string name="error_sinchronized">Очень жаль.... Но не получилось синхронизироваться с app in the air.</string>
     <string name="this_date_is_not_set">Дата еще не установлена.</string>
     <string name="copy_done">Скопировали</string>
     <string name="search_change">Ваша поездка будет изменена.</string>
     <string name="search_change_text1">Вы уверены, что хотите сохранить текущую информацию?</string>
-    <string name="registration_error">Дорогой путешественник!\n\nПроизошла ошибка с подключением Вашего Google-аккаунта :(\n</string>
-    <string name="tips_for_blank_social">Привет! Мы обнаружили, что Вы создали поездку, но не указали контактные данные. \n\nДобавьте ссылку на VK, номер в WhatsApp или ник для телеграмма.</string>
-    <string name="ok_I_understand">Хорошо, я молодец</string>
+    <string name="registration_error">В данный момент приложение поддерживает только вход через ГуглАккаунт. И сейчас видать что-то не получилось.\nПроверьте интернет и запустите приложение заново.</string>
+    <string name="tips_for_blank_social">Привет! Мы обнаружили, что Вы создали поездку и собираетесь искать попутчика, но не указали свои контактные данные. Советуем добавить ссылки на вк, номер в whatsapp или ник для телеграмма.</string>
+    <string name="ok_I_understand">Хорошо, я понял.</string>
     <string name="start">Старт</string>
     <string name="finish">Финиш</string>
     <string name="to_date">по</string>
@@ -147,4 +135,6 @@
     <string name="phone">Телефон</string>
     <string name="alternate_entry">Если проблема не в отсутствии интернета, то войдите с помощью номера телефона (не забудьте указать код вашей страны), на который будет отправлено SMS о подтверждении.</string>
     <string name="attention">Внимание</string>
+    <string name="add_city">+ Добавить город</string>
+    <string name="remove_city">Удалить город</string>
 </resources>

@@ -48,8 +48,8 @@ android {
 
     buildTypes {
         release {
-            applicationIdSuffix ".release"
-               signingConfig signingConfigs.release
+//            applicationIdSuffix ".release"
+//               signingConfig signingConfigs.release
             //minifyEnabled true
             //   proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -124,6 +124,11 @@ dependencies {
     testCompile('com.nhaarman:mockito-kotlin:1.5.0') {
         exclude group: 'org.jetbrains.kotlin'
         exclude group: 'org.mockito'
+    }
+    androidTestCompile('com.android.support.test.espresso:espresso-contrib:3.0.1') {
+        exclude group: 'com.android.support', module: 'appcompat'
+        exclude group: 'com.android.support', module: 'support-v4'
+        exclude module: 'recyclerview-v7'
     }
 }
 configurations.all {

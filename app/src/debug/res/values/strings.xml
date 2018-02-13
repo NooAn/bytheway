@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">bythewayTest</string>
-    <string name="title_activity_menu"><font size="20">bythewaydebug</font></string>
+    <string name="title_activity_menu"></string>
 </resources>

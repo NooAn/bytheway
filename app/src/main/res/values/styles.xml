@@ -22,12 +22,6 @@
         <item name="colorAccent">@color/colorPrimary</item>
     </style>
 
-    <style name="PrimaryButton" parent="Theme.AppCompat">
-        <item name="colorButtonNormal">@color/colorPrimary</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="colorControlHighlight">@color/colorAccent</item>
-    </style>
-
     <style name="StyleLabelMenuActivity" parent="android:TextAppearance">
         <item name="android:fontFamily">@font/font_menu_activity</item>
         <item name="android:textSize">20sp</item>
