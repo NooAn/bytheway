@@ -11,6 +11,7 @@ import android.support.v4.content.ContextCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.gms.maps.*
@@ -22,6 +23,7 @@ import com.google.firebase.crash.FirebaseCrash
 import com.google.maps.android.PolyUtil
 import kotlinx.android.synthetic.main.fragment_user_profile.*
 import kotlinx.android.synthetic.main.profile_main_image.*
+import kotlinx.android.synthetic.main.profile_user_many_direction.*
 import kotlinx.android.synthetic.main.profilte_user_direction.*
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
@@ -30,6 +32,12 @@ import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.a1024bits.bytheway.ui.dialogs.SocNetworkdialog
 import ru.a1024bits.bytheway.util.Constants
+import ru.a1024bits.bytheway.util.Constants.END_DATE
+import ru.a1024bits.bytheway.util.Constants.FIRST_INDEX_CITY
+import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
+import ru.a1024bits.bytheway.util.Constants.START_DATE
+import ru.a1024bits.bytheway.util.Constants.TWO_DATE
+import ru.a1024bits.bytheway.util.Constants.TWO_INDEX_CITY
 import ru.a1024bits.bytheway.util.getBearing
 import ru.a1024bits.bytheway.viewmodel.UserProfileViewModel
 import java.text.SimpleDateFormat
@@ -92,33 +100,50 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
             cityview.text = user.city
         }
 
-        if (user.cities.size > 0) {
-            textCityFrom.text = user.cities[Constants.FIRST_INDEX_CITY]
-            textCityTo.text = user.cities[Constants.LAST_INDEX_CITY]
+        if (user.cities.size == 1 || user.cities.size == 2) {
+            textCityFrom.text = user.cities[FIRST_INDEX_CITY]
+            textCityTo.text = user.cities[LAST_INDEX_CITY]
+        } else if (user.cities.size == 3) {
+            direction2.visibility = View.VISIBLE
+            textCityFrom.text = user.cities[FIRST_INDEX_CITY]
+            textCityTo.text = user.cities[TWO_INDEX_CITY]
+            textCityFrom2.text = user.cities[TWO_INDEX_CITY]
+            textCityTo2.text = user.cities[LAST_INDEX_CITY]
         }
 
         val formatDate = SimpleDateFormat("dd.MM.yyyy", Locale.US)
 
-        if (user.dates.size > 0) {
+        if (user.dates.size == 1 || user.dates.size == 2) {
             val dayBegin = formatDate.format(Date(user.dates[Constants.START_DATE] ?: 0))
             val dayArrival = formatDate.format(Date(user.dates[Constants.END_DATE] ?: 0))
-            if (dayBegin.isNotBlank() && dayBegin.isNotEmpty()
-                    && dayBegin != "01.01.1970") {
-                textDateFrom.text = dayBegin
-            } else {
-                iconDateFromEmpty.visibility = View.VISIBLE
-            }
-            if (dayArrival.isNotBlank() && dayArrival.isNotEmpty() &&
-                    dayArrival != "01.01.1970") {
-                textDateArrived.text = dayArrival
-            } else {
-                iconDateArrivedEmpty.visibility = View.VISIBLE
-            }
-        } else {
+
+            correctText(dayBegin, textDateFrom, iconDateFromEmpty)
+            correctText(dayArrival, textDateArrived, iconDateArrivedEmpty)
+
+        } else if (user.dates.size == 0 || (user.dates[START_DATE]?.compareTo(0) == 0 && user.dates[END_DATE]?.compareTo(0) == 0)) {
             textDateEmpty.visibility = View.VISIBLE
+            textDateEmpty2.visibility = View.VISIBLE
+        } else if (user.dates.size == 3) {
+            val dayBegin = formatDate.format(Date(user.dates[Constants.START_DATE] ?: 0))
+            val middleDay = formatDate.format(Date(user.dates[Constants.TWO_DATE] ?: 0))
+            val dayArrival = formatDate.format(Date(user.dates[Constants.END_DATE] ?: 0))
+
+            correctText(dayBegin, textDateFrom, iconDateFromEmpty)
+            correctText(middleDay, textDateArrived, iconDateArrivedEmpty)
+            correctText(dayArrival, textDateArrived2, iconDateArrivedEmpty2)
+            correctText(middleDay, textDateFrom2, iconDateFromEmpty2)
+
         }
-        iconDateArrivedEmpty.setOnClickListener { clickForIconDateEmpty() }
-        iconDateFromEmpty.setOnClickListener { clickForIconDateEmpty() }
+        if (user.dates[TWO_DATE]?.compareTo(0) == 0 && user.dates[END_DATE]?.compareTo(0) == 0) {
+            textDateEmpty2.visibility = View.VISIBLE
+        }
+
+        iconDateArrivedEmpty.setOnClickListener {
+            clickForIconDateEmpty()
+        }
+        iconDateFromEmpty.setOnClickListener {
+            clickForIconDateEmpty()
+        }
 
         fillAgeSex(user.age, user.sex)
         if (user.urlPhoto.isNotBlank())
@@ -133,7 +158,8 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
                     vkIcon.setOnClickListener {
                         try {
                             mFirebaseAnalytics.logEvent(TAG_ANALYTICS + "OPEN_VK", null)
-                            startActivity(createBrowserIntent(user.socialNetwork[name.key] ?: ""))
+                            startActivity(createBrowserIntent(user.socialNetwork[name.key]
+                                    ?: ""))
                         } catch (e: Exception) {
                             e.printStackTrace()
                             FirebaseCrash.report(e)
@@ -146,7 +172,8 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
                     csIcon.setImageResource(R.drawable.ic_cs_color)
                     csIcon.setOnClickListener {
                         try {
-                            startActivity(createBrowserIntent(user.socialNetwork[name.key] ?: ""))
+                            startActivity(createBrowserIntent(user.socialNetwork[name.key]
+                                    ?: ""))
                             mFirebaseAnalytics.logEvent(TAG_ANALYTICS + "OPEN_CS", null)
                         } catch (e: Exception) {
                             e.printStackTrace()
@@ -234,6 +261,12 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
         addInfoUser.text = user.addInformation
         if (user.addInformation.isBlank()) descriptionProfile.visibility = View.GONE
         userLastTime.text = if (user.timestamp != null) formatDate.format(user.timestamp) else "Очень давно"
+    }
+
+    private fun correctText(day: String, textView: TextView, icon: View) {
+        if (day.isNotBlank() && day.isNotEmpty() && day != "01.01.1970")
+            textView.text = day
+        else icon.visibility = View.VISIBLE
     }
 
     private fun openEmail(email: String) {
@@ -395,6 +428,14 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
         val midPointLong = (coordFrom.longitude + coordTo.longitude) / 2
         val blueMarker = BitmapDescriptorFactory.fromResource(R.drawable.pin_blue)
 
+        if (user.cityTwoLatLng.latitude != 0.0 && user.cityTwoLatLng.longitude != 0.0) {
+            googleMap?.addMarker(MarkerOptions()
+                    .icon(blueMarker)
+                    .position(LatLng(user.cityTwoLatLng.latitude, user.cityTwoLatLng.longitude))
+                    .title(user.cities[Constants.TWO_INDEX_CITY])
+                    .anchor(0.5F, 1.0F)
+                    .flat(true))
+        }
         googleMap?.addMarker(MarkerOptions()
                 .icon(blueMarker)
                 .position(markerPositionStart)

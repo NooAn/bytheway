@@ -89,8 +89,12 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             displayAllUsers.adapter = displayUsersAdapter
 
             viewModel?.response?.observe(this, usersObservers)
-            viewModel?.loadingStatus?.observe(this, (activity?.let { it as MenuActivity })?.progressBarLoad
-                    ?: return)
+            viewModel?.loadingStatus?.observe(this, Observer<Boolean?> { t ->
+                if (t == true)
+                    loadingWhereLoadUsers.visibility = View.VISIBLE
+                else
+                    loadingWhereLoadUsers.visibility = View.GONE
+            })
             viewModel?.getAllUsers(filter)
 
             showPrompt("isFirstEnterAllUsersFragment", context.resources.getString(R.string.close_hint),
@@ -349,11 +353,10 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
     private fun updateViewsBeforeSearch() {
         displayAllUsers.visibility = View.GONE
         block_empty_users.visibility = View.GONE
-        loadingWhereLoadUsers.visibility = View.VISIBLE
     }
 
     private fun updateViewsAfterSearch(isNotEmptyListUsers: Boolean) {
-        loadingWhereLoadUsers.visibility = View.GONE
+
         if (isNotEmptyListUsers)
             displayAllUsers.visibility = View.VISIBLE
         else
