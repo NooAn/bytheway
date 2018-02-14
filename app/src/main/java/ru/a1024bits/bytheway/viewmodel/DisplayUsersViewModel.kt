@@ -30,16 +30,16 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
         const val TAG = "showUserViewModel"
     }
 
-    fun getAllUsers(f: Filter) {
+    fun getAllUsers(f: Filter, sortString: String) {
         this.filter = f
-        userRepository?.installAllUsers(this)
+        userRepository?.installAllUsers(this, sortString)
     }
 
-    override fun filterAndInstallUsers(vararg snapshots: QuerySnapshot) {
+    override fun filterAndInstallUsers(sortString: String, vararg snapshots: QuerySnapshot) {
         Single.create<MutableList<User>> { stream ->
             try {
                 Log.e("LOG get filter users", Thread.currentThread().name)
-                val result: MutableList<User> = ArrayList()
+                var result: MutableList<User> = ArrayList()
                 snapshots.map {
                     result.sortBy { it.dates[START_DATE] }
                     for (document in it) {
@@ -53,7 +53,8 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
                         }
                     }
                 }
-                filterUsersByFilter(result, filter)
+                if (sortString.isNotEmpty()) result = filterUsersByString(sortString, result)
+                else filterUsersByFilter(result, filter)
                 stream.onSuccess(result)
             } catch (exp: Exception) {
                 stream.onError(exp) // for fix bugs FirebaseFirestoreException: DEADLINE_EXCEEDED
@@ -190,6 +191,6 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
 
 interface FilterAndInstallListener {
     var filter: Filter
-    fun filterAndInstallUsers(vararg snapshots: QuerySnapshot)
+    fun filterAndInstallUsers(sortString: String, vararg snapshots: QuerySnapshot)
     fun onFailure(e: Throwable)
 }

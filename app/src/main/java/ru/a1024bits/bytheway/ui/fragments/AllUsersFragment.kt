@@ -1,22 +1,22 @@
 package ru.a1024bits.bytheway.ui.fragments
 
 import android.animation.LayoutTransition
-import android.app.SearchManager
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
-import android.content.Context
 import android.os.Bundle
 import android.support.design.widget.Snackbar
-import android.support.v7.widget.SearchView
 import android.util.Log
-import android.view.*
+import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.EditText
 import android.widget.TextView
 import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment
 import com.codetroopers.betterpickers.calendardatepicker.MonthAdapter
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crash.FirebaseCrash
+import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.fragment_display_all_users.*
 import kotlinx.android.synthetic.main.searching_parameters_block.*
 import ru.a1024bits.bytheway.App
@@ -47,8 +47,10 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
     private lateinit var displayUsersAdapter: DisplayAllUsersAdapter
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
+    private var sortString = ""
     private var countInitialElements = 0
     private lateinit var analytics: FirebaseAnalytics
+    private lateinit var dateDialog: CalendarDatePickerDialogFragment
 
     private val usersObservers: Observer<Response<List<User>>> = Observer { response ->
         when (response?.status) {
@@ -87,7 +89,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             viewModel?.response?.observe(this, usersObservers)
             viewModel?.loadingStatus?.observe(this, (activity?.let { it as MenuActivity })?.progressBarLoad
                     ?: return)
-            viewModel?.getAllUsers(filter)
+            viewModel?.getAllUsers(filter, sortString)
 
             showPrompt("isFirstEnterAllUsersFragment", context.resources.getString(R.string.close_hint),
                     context.resources.getString(R.string.hint_all_travelers), context.resources.getString(R.string.hint_all_travelers_description), searchParametersText)
@@ -309,7 +311,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             override fun endTransition(p0: LayoutTransition?, p1: ViewGroup?, view: View, p3: Int) {
                 if ((view.id == block_search_parameters.id) && (block_search_parameters.visibility == View.GONE)) {
                     updateViewsBeforeSearch()
-                    viewModel?.getAllUsers(filter)
+                    viewModel?.getAllUsers(filter, sortString)
                     view_contain_block_parameters.layoutTransition.removeTransitionListener(this)
                 }
             }
