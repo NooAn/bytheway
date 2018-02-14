@@ -39,13 +39,8 @@ abstract class BaseFragment<T : BaseViewModel> : Fragment() {
         viewModel?.addObserver(lifecycle)
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        (activity as MenuActivity).toolbar.findViewById<EditText>(R.id.searchUsers)?.let {
-            if (javaClass.simpleName == AllUsersFragment::class.java.simpleName) it.visibility = View.VISIBLE
-            else it.visibility = View.GONE
-        }
-        return inflater?.inflate(getLayoutRes(), container, false)
-    }
+    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?) =
+            inflater?.inflate(getLayoutRes(), container, false)
 
     fun showPrompt(nameScreenPrompt: String, dismissText: String?, titleText: String?, contentText: String?, button: View) {
         try {

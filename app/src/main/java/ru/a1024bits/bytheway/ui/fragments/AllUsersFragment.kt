@@ -75,6 +75,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         App.component.inject(this)
         super.onActivityCreated(savedInstanceState)
+        (activity as MenuActivity).toolbar.findViewById<EditText>(R.id.searchUsers).visibility = View.VISIBLE
         analytics.setCurrentScreen(this.activity, "AllUsersFragment", this.javaClass.simpleName)
 
         try {
@@ -120,6 +121,10 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
         Snackbar.make(activity.findViewById(android.R.id.content), context.getString(R.string.dates_has_been_incorrect), Snackbar.LENGTH_LONG).show()
     }
 
+    override fun onStop() {
+        super.onStop()
+        (activity as MenuActivity).toolbar.findViewById<EditText>(R.id.searchUsers).visibility = View.GONE
+    }
 
     private fun installLogicToUI() {
         (activity as MenuActivity).toolbar.findViewById<EditText>(R.id.searchUsers).setOnEditorActionListener { textView, _, _ ->
