@@ -30,7 +30,6 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.iid.FirebaseInstanceId
 import io.reactivex.SingleObserver
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_menu.*
@@ -42,7 +41,6 @@ import ru.a1024bits.bytheway.AirWebService
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.*
-import ru.a1024bits.bytheway.repository.COLLECTION_USERS
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.router.Screens.Companion.AIR_SUCCES_SCREEN
@@ -56,6 +54,7 @@ import ru.a1024bits.bytheway.ui.fragments.*
 import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.util.ProgressCustom
 import ru.a1024bits.bytheway.util.ServiceGenerator
+import ru.a1024bits.bytheway.util.Utils
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.Router
@@ -128,9 +127,6 @@ class MenuActivity : AppCompatActivity(),
 
         if (FirebaseAuth.getInstance().currentUser == null) {
             startActivity(Intent(this, RegistrationActivity::class.java))
-        } else {
-            val token = preferences.getString("fcm_token", "")
-            updateFcmToken(token)
         }
 
         setContentView(R.layout.activity_menu)
@@ -184,17 +180,6 @@ class MenuActivity : AppCompatActivity(),
 
     var snackbar: Snackbar? = null
 
-    private fun updateFcmToken(token: String?) {
-        if (token != null && token.isNotEmpty()) {
-            val currentUid = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
-            if (currentUid.isNotEmpty()) {
-                val docRef = FirebaseFirestore.getInstance().collection(COLLECTION_USERS)
-                        .document(currentUid)
-                docRef.update(Constants.FCM_TOKEN, token)
-                preferences.edit().putString(Constants.FCM_TOKEN, "").apply()
-            }
-        }
-    }
 
     private fun showSnack(string: String) {
         snackbar = Snackbar.make(this.findViewById(android.R.id.content), string, Snackbar.LENGTH_LONG)
@@ -401,6 +386,10 @@ class MenuActivity : AppCompatActivity(),
         }
     }
 
+    fun needUpdateToken() : Boolean {
+        return preferences.getBoolean(Constants.FCM_TOKEN, false)
+    }
+
     private fun saveToken(accessToken: AccessToken?) {
         preferences.edit().putString(Constants.REFRESH_TOKEN, accessToken?.refresToken).apply()
         preferences.edit().putString(Constants.ACCESS_TOKEN, accessToken?.accessToken).apply()
@@ -524,8 +513,7 @@ class MenuActivity : AppCompatActivity(),
                     showUserSimpleProfile(User(id = object_id))
                 }
                 Constants.FCM_CMD_UPDATE -> {
-                    val refreshedToken = FirebaseInstanceId.getInstance().token
-                    updateFcmToken(refreshedToken)
+                    Utils.updateFcmToken()
                 }
             }
         }

@@ -21,8 +21,8 @@ object Constants {
     val START_DATE = "start_date"
     val END_DATE = "end_date"
     val TWO_DATE = "two_date"
-    const val FCM_SRV = "notifyService"
-    const val FCM_TOKEN = "fcm_token"
+    const val FCM_SRV = "notify_service"
+    const val FCM_TOKEN = "token"
     const val FCM_CMD_UPDATE = "fcm_token_update"
-    const val FCM_CMD_SHOW_USER = "fcm_show_user"
+    const val FCM_CMD_SHOW_USER = "show_user"
 }

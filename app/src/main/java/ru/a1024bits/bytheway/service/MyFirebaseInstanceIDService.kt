@@ -52,6 +52,6 @@ class MyFirebaseInstanceIDService : FirebaseInstanceIdService() {
      * @param token The new token.
      */
     private fun sendRegistrationToServer(token: String?) {
-        preferences.edit().putString(Constants.FCM_TOKEN, token).apply()
+        preferences.edit().putBoolean(Constants.FCM_TOKEN, true).apply()
     }
 }

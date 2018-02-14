@@ -41,11 +41,14 @@ class FCMService : FirebaseMessagingService() {
             notificationTitle = remoteMessage.notification?.title
             notificationBody = remoteMessage.notification?.body
         }
-        //Log.e("applicationInForeground","${applicationInForeground()}");
 
-        if(notificationEnabled) {
-            if (applicationInForeground() && notify.isNullOrEmpty()) {
-                if(inAppNotificationEnabled) {
+        if (notificationEnabled) {
+            var foregroundMessage = applicationInForeground() && notify.isNullOrEmpty()
+            if (dataCmd?.startsWith("fcm_") == true) {
+                foregroundMessage = true
+            }
+            if (foregroundMessage) {
+                if (inAppNotificationEnabled) {
                     val intent = Intent(Constants.FCM_SRV)
                     intent.putExtra("cmd", dataCmd)
                     intent.putExtra("value", dataValue)
