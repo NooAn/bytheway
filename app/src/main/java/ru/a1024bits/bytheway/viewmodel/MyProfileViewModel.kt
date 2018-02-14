@@ -22,6 +22,7 @@ import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment.Companion.CITIES
 import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment.Companion.CITY
 import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment.Companion.CITY_FROM
 import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment.Companion.CITY_TO
+import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment.Companion.CITY_TWO
 import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment.Companion.COUNT_TRIP
 import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment.Companion.DATES
 import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment.Companion.LASTNAME
@@ -110,7 +111,6 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
     }
 
     fun sendUserData(map: HashMap<String, Any>, id: String, oldUser: User?) {
-        Log.e("LOG map: id = ", id + " " + map.toString())
         disposables.add(userRepository.changeUserProfile(map, id)
                 .timeout(TIMEOUT_SECONDS, timeoutUnit)
                 .retry(2)
@@ -136,6 +136,7 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
         if (map.containsKey(BUDGET)) user?.budget = map[BUDGET] as Long
         if (map.containsKey(BUDGET_POSITION)) user?.budgetPosition = map[BUDGET_POSITION] as Int
         if (map.containsKey(CITY_FROM)) user?.cityFromLatLng = map[CITY_FROM] as GeoPoint
+        if (map.containsKey(CITY_TWO)) user?.cityTwoLatLng = map[CITY_TWO] as GeoPoint
         if (map.containsKey(CITY_TO)) user?.cityToLatLng = map[CITY_TO] as GeoPoint
         if (map.containsKey(ADD_INFO)) user?.addInformation = map[ADD_INFO] as String
         if (map.containsKey(SEX)) user?.sex = map[SEX] as Int
@@ -185,8 +186,8 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
         }
     }
 
-    fun getRoute(cityFromLatLng: GeoPoint, cityToLatLng: GeoPoint) {
-        disposables.add(userRepository.getRoute(cityFromLatLng, cityToLatLng)
+    fun getRoute(cityFromLatLng: GeoPoint, cityToLatLng: GeoPoint, waypoint: GeoPoint?) {
+        disposables.add(userRepository.getRoute(cityFromLatLng, cityToLatLng, waypoint)
                 .timeout(TIMEOUT_SECONDS, timeoutUnit)
                 .retry(2)
                 .subscribeOn(getBackgroundScheduler())

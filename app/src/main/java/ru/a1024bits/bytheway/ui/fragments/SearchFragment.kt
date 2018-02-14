@@ -272,7 +272,6 @@ class SearchFragment : Fragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        Log.e("LOG code:", requestCode.toString() + " " + resultCode + " " + PlaceAutocomplete.getPlace(activity, data))
 
         // FIXME refactoring in viewModel
 
@@ -280,11 +279,11 @@ class SearchFragment : Fragment() {
             PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM -> when (resultCode) {
                 AppCompatActivity.RESULT_OK -> {
                     val place = PlaceAutocomplete.getPlace(activity, data);
-                    text_from_city.text = place.name
+                    text_from_city?.text = place.name
                     firstPoint = place.latLng
                     filter.startCity = place.name.toString()
                     filter.locationStartCity = place.latLng
-                    text_from_city.error = null
+                    text_from_city?.error = null
                     manageErrorCityEquals(secondPoint)
                     firstPoint?.let { latLng -> (activity as OnFragmentInteractionListener).onSetPoint(latLng, FIRST_MARKER_POSITION) }
                 }
@@ -300,11 +299,11 @@ class SearchFragment : Fragment() {
             PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO -> when (resultCode) {
                 AppCompatActivity.RESULT_OK -> {
                     val place = PlaceAutocomplete.getPlace(activity, data);
-                    text_to_city.text = place.name
+                    text_to_city?.text = place.name
                     secondPoint = place.latLng
                     filter.locationEndCity = place.latLng
                     filter.endCity = place.name.toString()
-                    text_to_city.error = null
+                    text_to_city?.error = null
                     manageErrorCityEquals(firstPoint)
                     secondPoint?.let { latLng -> (activity as OnFragmentInteractionListener).onSetPoint(latLng, SECOND_MARKER_POSITION) }
                 }
@@ -320,12 +319,12 @@ class SearchFragment : Fragment() {
 
     private fun manageErrorCityEquals(point: LatLng?) {
         if (point != null && this.firstPoint?.latitude == this.secondPoint?.latitude && this.firstPoint?.longitude == this.secondPoint?.longitude) {
-            text_to_city.error = "true"
-            text_from_city.error = "true"
+            text_to_city?.error = "true"
+            text_from_city?.error = "true"
             Toast.makeText(this@SearchFragment.context, getString(R.string.fill_diff_cities), Toast.LENGTH_SHORT).show()
         } else {
-            text_from_city.error = null
-            text_to_city.error = null
+            text_from_city?.error = null
+            text_to_city?.error = null
         }
     }
 

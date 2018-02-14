@@ -10,13 +10,13 @@ apply plugin: 'com.google.firebase.firebase-perf'
 
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 27
     buildToolsVersion "26.0.2"
     flavorDimensions "default"
     defaultConfig {
         applicationId "ru.a1024bits.bytheway"
         minSdkVersion 21
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode 1
 
         versionName "1.0"
@@ -41,15 +41,15 @@ android {
 //        }
         bytheway {
             versionCode 18
-            versionName "1.1.3"
+            versionName "1.2.0"
             dimension "default"
         }
     }
 
     buildTypes {
         release {
-            applicationIdSuffix ".release"
-               signingConfig signingConfigs.release
+//            applicationIdSuffix ".release"
+//               signingConfig signingConfigs.release
             //minifyEnabled true
             //   proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -118,6 +118,12 @@ dependencies {
     compile 'com.github.deano2390:MaterialShowcaseView:1.2.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.3.0'
     implementation 'com.android.support:cardview-v7:26.1.0'
+
+    androidTestCompile('com.android.support.test.espresso:espresso-contrib:3.0.1') {
+        exclude group: 'com.android.support', module: 'appcompat'
+        exclude group: 'com.android.support', module: 'support-v4'
+        exclude module: 'recyclerview-v7'
+    }
 }
 configurations.all {
     resolutionStrategy.eachDependency { DependencyResolveDetails details ->

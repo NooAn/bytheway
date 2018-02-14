@@ -7,6 +7,8 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.*
+import com.google.firebase.firestore.EventListener
+import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageException
 import io.reactivex.Completable
@@ -14,11 +16,11 @@ import io.reactivex.Single
 import ru.a1024bits.bytheway.MapWebService
 import ru.a1024bits.bytheway.algorithm.SearchTravelers
 import ru.a1024bits.bytheway.model.User
+import ru.a1024bits.bytheway.model.map_directions.RoutesList
 import ru.a1024bits.bytheway.util.toJsonString
 import ru.a1024bits.bytheway.viewmodel.FilterAndInstallListener
 import java.util.*
 import javax.inject.Inject
-import kotlin.collections.HashMap
 
 
 const val COLLECTION_USERS = "users"
@@ -52,7 +54,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
         try {
             Log.e("LOG uploadPhotoLink R", Thread.currentThread().name)
             // Create a storage reference from our app
-            val storageRef = FirebaseStorage.getInstance().getReference()
+            val storageRef = FirebaseStorage.getInstance().reference
             val riversRef = storageRef.child("images/" + id)
             val uploadTask = riversRef.putFile(path)
             // Register observers to listen for when the download is done or if it fails
@@ -76,9 +78,37 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
         }
     }
 
-    override fun installAllUsers(listener: FilterAndInstallListener) {
-        store.collection(COLLECTION_USERS).get().addOnCompleteListener({ task -> listener.filterAndInstallUsers(task.result) })
-                .addOnFailureListener({ e -> listener.onFailure(e) })
+    override fun installAllUsers(listener: FilterAndInstallListener, sortString: String) {
+        try {
+            var lastTime = listener.filter.endDate
+            if (listener.filter.endDate == 0L) {
+                lastTime = System.currentTimeMillis()
+            }
+            var query = store.collection(COLLECTION_USERS).orderBy("dates.end_date")
+            if (listener.filter.endDate == 0L) {
+                query = query.whereGreaterThanOrEqualTo("dates.end_date", lastTime)
+            } else {
+                query = query.whereLessThanOrEqualTo("dates.end_date", lastTime)
+            }
+            query.addSnapshotListener(EventListener { snapshot, error ->
+                if (error != null) {
+                    listener.onFailure(error)
+                    return@EventListener
+                }
+                if (listener.filter.endDate != 0L) {
+                    listener.filterAndInstallUsers(sortString, snapshot)
+                    return@EventListener
+                }
+                store.collection(COLLECTION_USERS)
+                        .whereEqualTo("dates.end_date", 0).whereGreaterThan("cities.first_city", "")
+                        .get().addOnCompleteListener({ task ->
+                    listener.filterAndInstallUsers(sortString, snapshot, task.result)
+                }).addOnFailureListener({ e -> listener.onFailure(e) })
+            })
+        } catch (e: Exception) {
+            e.printStackTrace()
+            FirebaseCrash.report(e)
+        }
     }
 
     override fun getReallUsers(paramSearch: Filter): Single<List<User>> =
@@ -96,6 +126,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
 
                                 try {
                                     user = document.toObject(User::class.java)
+
                                 } catch (ex2: Exception) {
                                     ex2.printStackTrace()
                                     FirebaseCrash.report(ex2)
@@ -111,6 +142,9 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                                                 user.id != FirebaseAuth.getInstance().currentUser?.uid) {
                                             result.add(user)
                                         }
+                                        Log.e("LOG user", user.toString())
+                                    } else {
+                                        Log.e("LOG !user", user.toString())
                                     }
                                 } catch (ex: Exception) {
                                     stream.onError(ex)
@@ -119,6 +153,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                             }
                             result.sortByDescending { it.percentsSimilarTravel } // перед отправкой сортируем по степени похожести маршрута.
                             stream.onSuccess(result)
+                            Log.e("LOG", "result $result")
                         } else {
                             stream.onError(Exception("Not Successful load users"))
                         }
@@ -145,7 +180,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                     val documentRef = store.collection(COLLECTION_USERS).document(id)
                     store.runTransaction(object : Transaction.Function<Void> {
                         override fun apply(transaction: Transaction): Void? {
-                            map.put("timestamp", FieldValue.serverTimestamp())
+                            map["timestamp"] = FieldValue.serverTimestamp()
                             documentRef.update(map)
                             return null
                         }
@@ -159,11 +194,14 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                 }
             }
 
-    override fun getRoute(cityFromLatLng: GeoPoint, cityToLatLng: GeoPoint) =
-            mapService.getDirection(hashMapOf(
-                    "origin" to LatLng(cityFromLatLng.latitude, cityFromLatLng.longitude).toJsonString(),
-                    "destination" to LatLng(cityToLatLng.latitude, cityToLatLng.longitude).toJsonString(),
-                    "sensor" to "false"))
+    override fun getRoute(cityFromLatLng: GeoPoint, cityToLatLng: GeoPoint, waypoints: GeoPoint?): Single<RoutesList> {
+        val latLngPoint = if (waypoints?.latitude == 0.0 || waypoints?.longitude == 0.0 || waypoints == null) "" else LatLng(waypoints.latitude, waypoints.longitude).toJsonString()
+        return mapService.getDirection(hashMapOf(
+                "origin" to LatLng(cityFromLatLng.latitude, cityFromLatLng.longitude).toJsonString(),
+                "destination" to LatLng(cityToLatLng.latitude, cityToLatLng.longitude).toJsonString(),
+                "waypoints" to latLngPoint,
+                "sensor" to "false"))
+    }
 
     fun sendTime(id: String): Completable = Completable.create { stream ->
         try {
@@ -172,7 +210,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
             val documentRef = store.collection(COLLECTION_USERS).document(id)
             store.runTransaction {
                 val map = hashMapOf<String, Any>()
-                map.put("timestamp", FieldValue.serverTimestamp())
+                map["timestamp"] = FieldValue.serverTimestamp()
                 documentRef.update(map)
                 null
             }.addOnFailureListener {

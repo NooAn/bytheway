@@ -49,7 +49,7 @@ class RegistrationViewModel @Inject constructor(var userRepository: UserReposito
                         userRepository.addUser(User().apply {
                             val list = currentUser?.displayName?.split(" ")
                             name = list?.get(0).orEmpty()
-                            lastName = list?.get(1).orEmpty()
+                            if (list?.getOrNull(1) != null) lastName = list[1]
                             id = currentUser?.uid.orEmpty()
                             email = currentUser?.email.toString()
                             phone = currentUser?.phoneNumber ?: "+7"

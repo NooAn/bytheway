@@ -11,9 +11,6 @@ import kotlinx.android.synthetic.main.error_registration_dialog.view.*
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.ui.activity.RegistrationActivity
 
-/**
- * Created by Олег on 02.02.2018.
- */
 class ErrorStandartRegistrationDialog : DialogFragment() {
     lateinit var activity: RegistrationActivity
 
@@ -26,20 +23,22 @@ class ErrorStandartRegistrationDialog : DialogFragment() {
         isCancelable = false
         view?.sendButtonCode?.setOnClickListener({
             activity.mVerificationId?.let {
-                PhoneAuthProvider.getCredential(it, textFromSms.text.toString())?.let { credentialIt ->
+                PhoneAuthProvider.getCredential(it, verificationsData.text.toString())?.let { credentialIt ->
                     activity.signInGoogle(credentialIt)
                 }
             }
         })
         view?.sendButtonPhone?.setOnClickListener({
-            if (!phone.text.toString().contains("+"))
-                phone.setText(StringBuilder("+").append(phone.text.toString()))
-            if (!activity.validatePhoneNumber(phone))
+            if (verificationsData.text.toString().contains(Regex("^((380)|(7))")))
+                verificationsData.setText(StringBuilder("+").append(verificationsData.text.toString()))
+            if (!activity.validatePhoneNumber(verificationsData))
                 return@setOnClickListener
 
-            view.textFromSms.visibility = View.VISIBLE
+            view.verificationsData.hint = activity.getString(R.string.sms_code)
             view.sendButtonCode.visibility = View.VISIBLE
-            activity.authPhone(phone)
+            view.sendButtonPhone.visibility = View.GONE
+            activity.authPhone(verificationsData)
+            verificationsData.setText("")
         })
     }
 

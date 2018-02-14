@@ -23,33 +23,38 @@ import javax.inject.Inject
 
 class DisplayUsersViewModel @Inject constructor(var userRepository: UserRepository?) : BaseViewModel(), FilterAndInstallListener {
     var response: MutableLiveData<Response<List<User>>> = MutableLiveData()
-    var yearsOldUsers = (0..MAX_AGE).mapTo(ArrayList<String>()) { it.toString() }
-    var filter = Filter()
+    var yearsOldUsers = (0..MAX_AGE).mapTo(ArrayList()) { it.toString() }
+    override var filter = Filter()
 
     companion object {
         const val TAG = "showUserViewModel"
     }
 
-    fun getAllUsers(f: Filter) {
+    fun getAllUsers(f: Filter, sortString: String) {
         this.filter = f
-        userRepository?.installAllUsers(this)
+        userRepository?.installAllUsers(this, sortString)
     }
 
-    override fun filterAndInstallUsers(snapshot: QuerySnapshot) {
+    override fun filterAndInstallUsers(sortString: String, vararg snapshots: QuerySnapshot) {
         Single.create<MutableList<User>> { stream ->
             try {
                 Log.e("LOG get filter users", Thread.currentThread().name)
-                val result: MutableList<User> = ArrayList()
-                for (document in snapshot) {
-                    try {
-                        val user = document.toObject(User::class.java)
-                        if (user.cities.size > 0 && user.id != FirebaseAuth.getInstance().currentUser?.uid) {
-                            result.add(user)
+                var result: MutableList<User> = ArrayList()
+                snapshots.map {
+                    result.sortBy { it.dates[START_DATE] }
+                    for (document in it) {
+                        try {
+                            val user = document.toObject(User::class.java)
+                            Log.e("LOG get filter users", "${user.dates}")
+                            if (user.cities.size > 0 && user.id != FirebaseAuth.getInstance().currentUser?.uid) {
+                                result.add(user)
+                            }
+                        } catch (e: Exception) {
                         }
-                    } catch (e: Exception) {
                     }
                 }
-                filterUsersByFilter(result, filter)
+                if (sortString.isNotEmpty()) result = filterUsersByString(sortString, result)
+                else filterUsersByFilter(result, filter)
                 stream.onSuccess(result)
             } catch (exp: Exception) {
                 stream.onError(exp) // for fix bugs FirebaseFirestoreException: DEADLINE_EXCEEDED
@@ -185,6 +190,7 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
 }
 
 interface FilterAndInstallListener {
-    fun filterAndInstallUsers(snapshot: QuerySnapshot)
+    var filter: Filter
+    fun filterAndInstallUsers(sortString: String, vararg snapshots: QuerySnapshot)
     fun onFailure(e: Throwable)
 }

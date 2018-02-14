@@ -5,6 +5,7 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
+import io.reactivex.schedulers.Schedulers
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -67,13 +68,13 @@ class NetworkModule {
         return Retrofit.Builder()
                 .baseUrl("https://iappintheair.appspot.com")
                 .addConverterFactory(GsonConverterFactory.create(gson))
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
                 .client(okHttpClient)
                 .build()
     }
 
     @Provides
     @Singleton
-    fun provideMapWebService(retrofit: Retrofit) : MapWebService =
+    fun provideMapWebService(retrofit: Retrofit): MapWebService =
             retrofit.create(MapWebService::class.java)
 }
