@@ -1,0 +1,257 @@
+<?xml version="1.0"?>
+
+<resources>
+
+    <string name="app_name">bytheway</string>
+
+    <string name="button_send">Send</string>
+
+    <string name="fullname">Andrey Petrov</string>
+
+    <string name="type_money"> </string>
+
+    <string name="money">Travel budget</string>
+
+    <string name="description">Travel description</string>
+
+    <string name="city">City of residence</string>
+
+    <string name="drawer_item_map_search">Search of travelers</string>
+
+    <string name="drawer_item_profile">Profile</string>
+
+    <string name="drawer_item_allusers">All users</string>
+
+    <string name="title_activity_menu"><font size="20">bytheway</font>
+    </string>
+    <string name="city_end">Destination</string>
+    <string name="name_button_search">Find fellow travellers</string>
+    <string name="city_start">Point of departure</string>
+    <string name="city_fromSmall"><font size="13">From</font> </string>
+    <string name="city_toSmall">
+
+<font size="13">To</font>
+
+</string>
+
+    <string name="city_from">From</string>
+
+    <string name="city_to">To</string>
+
+    <string name="date_from">Date</string>
+
+    <string name="date_to">Date</string>
+
+    <string name="method_move">Way to travel</string>
+
+    <string name="budget">1000 </string>
+
+    <string name="budgetName">Budget</string>
+
+    <string name="add_info_profile">Additional information</string>
+
+    <string name="date">Date</string>
+
+    <string name="sex">Sex</string>
+
+    <string name="name">Name</string>
+
+    <string name="default_phone_code">+7</string>
+
+    <string name="gender_male">M</string>
+
+    <string name="gender_female">F</string>
+
+    <string name="save">Save</string>
+
+    <string name="exit">Exit</string>
+
+    <string name="search_users_text">Search</string>
+
+    <string name="text_away_from_profile">Save changed data?</string>
+
+    <string name="fill_required_fields">Fill mandatory fields please:</string>
+
+    <string name="fill_phone_invalid">Incorrect phone format</string>
+
+    <string name="fill_diff_cities">Cities should not match</string>
+
+    <string name="fill_all_location">No point chosen</string>
+
+    <string name="fill_from_location">Point of departure not selected</string>
+
+    <string name="fill_to_location">Destination not selected</string>
+
+    <string name="social_links">Links to social networks</string>
+
+    <string name="error_update">Update error</string>
+
+    <string name="just_error">Server error. Maybe later?</string>
+
+    <string name="text_confirm_remove_trip">All changes will be lost. \n Are you sure to delete travel?</string>
+
+    <string name="sex_and_age">Sex, age</string>
+
+    <string name="age">Age</string>
+
+    <string name="add_new_trip">+ Create new trip</string>
+
+    <string name="app_in_the_air">App in the Air</string>
+
+    <string name="personal_flight_assistant">Personal flight assistant</string>
+
+    <string name="app_sinchronized">Sync with App in the Air</string>
+
+    <string name="text_sinch_app_air">We can add your flights from App in the Air for automatic trip creating and fast search of fellow travellers.</string>
+
+    <string name="sinch_button">SYNCHRONIZE</string>
+
+    <string name="miss">miss</string>
+
+    <string name="hint_all_travelers_description">If you want to connect to other trips, you can use this screen. Filter will help you :)</string>
+
+    <string name="close_hint">NEXT</string>
+
+
+
+    <string-array name="months_array">
+
+        <item>Jan</item>
+
+        <item>Feb</item>
+
+        <item>Mar</item>
+
+        <item>Apr</item>
+
+        <item>May</item>
+
+        <item>Jun</item>
+
+        <item>Jul</item>
+
+        <item>Aug</item>
+
+        <item>Sep</item>
+
+        <item>Oct</item>
+
+        <item>Nov</item>
+
+        <item>Dec</item>
+
+    </string-array>
+
+    <string name="air_next_profile">To profile</string>
+
+    <string name="text_air_succesful_add">Your trips have been added successfully!</string>
+
+    <string name="exampleCity">Berlin - Moscow</string>
+
+    <string name="travelCar">Car</string>
+
+    <string name="travelTrain">Train</string>
+
+    <string name="travelBus">Bus</string>
+
+    <string name="travelPlane">Plaine</string>
+
+    <string name="travelHitchHicking">Hitch-hiking</string>
+
+    <string name="feedback_writte">Write comment or suggestion</string>
+
+    <string name="add_new_trip_from_app_in_the_air">+ Add trip into App in the Air</string>
+
+    <string name="feedback">Feedback</string>
+
+    <string name="textBodyDisaster">We were unable to find your upcoming trips.</string>
+
+    <string name="textHeadAirDisaster">Your account has been synchronized!</string>
+
+    <string name="item_all_users_empty_date"> </string>
+
+    <string name="filters_all_users_empty_date">____</string>
+
+    <string name="not_cities">Not searching yet</string>
+
+    <string name="optionSearch">+ Search options</string>
+
+    <string name="to">to</string>
+
+    <string name="from">from</string>
+
+    <string name="social_text">Add your contact details in order for other travellers to find you</string>
+
+    <string name="save_succesfull">Profile changed successfully</string>
+
+    <string name="cancel">Cancel</string>
+
+    <string name="any">Any</string>
+
+    <string name="native_city">Hometown</string>
+
+    <string name="remove">Delete</string>
+
+    <string name="yes">Yes</string>
+
+    <string name="no">No</string>
+
+    <string name="year_born">Age</string>
+
+    <string name="dates_has_been_incorrect">dates are incorrect, please enter them again</string>
+
+    <string name="lastname">Surname</string>
+
+    <string name="feedback_text1">We would appreciate if you leave a comment.</string>
+
+    <string name="feedback_text2">We'll make our app better together! :)</string>
+
+    <string name="email">Email</string>
+
+    <string name="hint_all_travelers">All travelers</string>
+
+    <string name="hint_create_travel">Create new trip!</string>
+
+    <string name="hint_create_travel_description">Enter as much information as possible to find fellow travellers effectively and to make other users find you :)</string>
+
+    <string name="hint_save_and_search">Save and find</string>
+
+    <string name="hint_save_and_search_description">Clicking "SAVE" button, all changed data will be saved in your profile. You can continue searching fellow travellers without saving a trip.</string>
+
+    <string name="no_internet">You have no Internet connection</string>
+
+    <string name="date_empty">* user didn't enter trip dates</string>
+
+    <string name="error_sinchronized">We are very sorry.... Didn't sync up with app in the air.</string>
+
+    <string name="this_date_is_not_set">Date is not set yet.</string>
+
+    <string name="copy_done">Copied</string>
+
+    <string name="search_change">Your trip will be changed.</string>
+
+    <string name="search_change_text1">Are you sure to save current info?</string>
+
+    <string name="registration_error">The app supports only Google Accounts. Oops something didn't work out. Please check your Internet connections and relaunch the app</string>
+
+    <string name="tips_for_blank_social">Hi! We found that you've created a trip and are going to search a fellow traveller, but you haven't entered your contact details, add links on FB, WhatsApp phone number or Telegram nickname.</string>
+
+    <string name="ok_I_understand">got it.</string>
+
+    <string name="start">Start</string>
+
+    <string name="finish">Finish</string>
+
+    <string name="to_date">по</string>
+
+    <string name="from_in">c</string>
+
+    <string name="city_in_the_world">World citizen. </string>
+
+    <string name="error_upload_image">Error upload</string>
+
+    <string name="error_link_open">We were unable to open the link. It may be incorrect.</string>
+
+    <string name="last_see">Was online .. </string>
+
+</resources>
