@@ -3,14 +3,13 @@ package ru.a1024bits.bytheway.ui.activity
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.arch.lifecycle.Observer
-import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
+import android.content.*
 import android.net.ConnectivityManager
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
+import android.support.v4.content.LocalBroadcastManager
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
@@ -31,6 +30,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.iid.FirebaseInstanceId
 import io.reactivex.SingleObserver
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_menu.*
@@ -42,6 +42,7 @@ import ru.a1024bits.bytheway.AirWebService
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.*
+import ru.a1024bits.bytheway.repository.COLLECTION_USERS
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.router.Screens.Companion.AIR_SUCCES_SCREEN
@@ -78,6 +79,12 @@ class MenuActivity : AppCompatActivity(),
             pLoader?.show()
         } else {
             pLoader?.hide()
+        }
+    }
+    private val mMessageReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            //todo
+            notificationWork(intent)
         }
     }
 
@@ -121,6 +128,9 @@ class MenuActivity : AppCompatActivity(),
 
         if (FirebaseAuth.getInstance().currentUser == null) {
             startActivity(Intent(this, RegistrationActivity::class.java))
+        } else {
+            val token = preferences.getString("fcm_token", "")
+            updateFcmToken(token)
         }
 
         setContentView(R.layout.activity_menu)
@@ -134,6 +144,8 @@ class MenuActivity : AppCompatActivity(),
 
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
+
+        notificationWork(intent)
 
         if (savedInstanceState == null) {
             if (preferences.getBoolean(Constants.FIRST_ENTER, true)) {
@@ -171,6 +183,18 @@ class MenuActivity : AppCompatActivity(),
     }
 
     var snackbar: Snackbar? = null
+
+    private fun updateFcmToken(token: String?) {
+        if (token != null && token.isNotEmpty()) {
+            val currentUid = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
+            if (currentUid.isNotEmpty()) {
+                val docRef = FirebaseFirestore.getInstance().collection(COLLECTION_USERS)
+                        .document(currentUid)
+                docRef.update(Constants.FCM_TOKEN, token)
+                preferences.edit().putString(Constants.FCM_TOKEN, "").apply()
+            }
+        }
+    }
 
     private fun showSnack(string: String) {
         snackbar = Snackbar.make(this.findViewById(android.R.id.content), string, Snackbar.LENGTH_LONG)
@@ -353,6 +377,8 @@ class MenuActivity : AppCompatActivity(),
             }
         }
         navigatorHolder.setNavigator(navigator)
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
+                IntentFilter(Constants.FCM_SRV))
     }
 
     private fun getLatLngForAirports(code: String?) {
@@ -389,8 +415,8 @@ class MenuActivity : AppCompatActivity(),
     override fun onPause() {
         super.onPause()
         navigatorHolder.removeNavigator()
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver)
         Log.e("LOG", "onPause")
-
     }
 
     override fun onStop() {
@@ -477,5 +503,31 @@ class MenuActivity : AppCompatActivity(),
     private fun openDialogFeedback() {
         val dialog = FeedbackDialog(this)
         dialog.show()
+    }
+
+    private fun notificationWork(intent: Intent) {
+        if (intent.extras != null) {
+            var cmd = ""
+            var object_id = ""
+            for (key in intent.extras.keySet()) {
+                val value = intent.extras.get(key)
+                if (key == "cmd" && value is String) {
+                    cmd = value
+                }
+                if (key == "value" && value is String) {
+                    object_id = value
+                }
+            }
+            Log.e("notificationWork", "Command: $cmd Value: $object_id")
+            when (cmd) {
+                Constants.FCM_CMD_SHOW_USER -> {
+                    showUserSimpleProfile(User(id = object_id))
+                }
+                Constants.FCM_CMD_UPDATE -> {
+                    val refreshedToken = FirebaseInstanceId.getInstance().token
+                    updateFcmToken(refreshedToken)
+                }
+            }
+        }
     }
 }
