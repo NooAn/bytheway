@@ -21,8 +21,9 @@ import java.util.*
 import javax.inject.Inject
 import kotlin.collections.HashMap
 import com.google.firebase.firestore.FirebaseFirestoreException
-import ru.a1024bits.bytheway.model.map_directions.Route
+import com.google.firebase.iid.FirebaseInstanceId
 import ru.a1024bits.bytheway.model.map_directions.RoutesList
+import ru.a1024bits.bytheway.util.Constants
 
 
 const val COLLECTION_USERS = "users"
@@ -222,6 +223,18 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                     }
         } catch (e: Exception) {
             stream.onError(e)
+        }
+    }
+
+    fun updateFcmToken() {
+        val token = FirebaseInstanceId.getInstance().token
+        if (token != null && token.isNotEmpty()) {
+            val currentUid = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
+            if (currentUid.isNotEmpty()) {
+                val docRef = FirebaseFirestore.getInstance().collection(COLLECTION_USERS)
+                        .document(currentUid)
+                docRef.update(Constants.FCM_TOKEN, token)
+            }
         }
     }
 }

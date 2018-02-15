@@ -54,7 +54,6 @@ import ru.a1024bits.bytheway.ui.fragments.*
 import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.util.ProgressCustom
 import ru.a1024bits.bytheway.util.ServiceGenerator
-import ru.a1024bits.bytheway.util.Utils
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.Router
@@ -513,7 +512,7 @@ class MenuActivity : AppCompatActivity(),
                     showUserSimpleProfile(User(id = object_id))
                 }
                 Constants.FCM_CMD_UPDATE -> {
-                    Utils.updateFcmToken()
+                    viewModel?.updateFcmToken()
                 }
             }
         }

@@ -1322,7 +1322,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             }
         }
         if (user.token.isEmpty() || (activity as MenuActivity).needUpdateToken()) {
-            Utils.updateFcmToken()
+            viewModel?.updateFcmToken()
         }
         if (user.socialNetwork.size == 0 && user.countTrip > 0) {
             showTipsForEmptySocialLink()
