@@ -56,7 +56,6 @@ import ru.a1024bits.bytheway.util.Constants.NOTIFICATION_CMD
 import ru.a1024bits.bytheway.util.Constants.NOTIFICATION_VALUE
 import ru.a1024bits.bytheway.util.ProgressCustom
 import ru.a1024bits.bytheway.util.ServiceGenerator
-import ru.a1024bits.bytheway.util.Utils
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.Router
@@ -510,7 +509,7 @@ class MenuActivity : AppCompatActivity(),
                     }
                 }
                 Constants.FCM_CMD_UPDATE -> {
-                    Utils.updateFcmToken()
+                    viewModel?.updateFcmToken()
                 }
                 else -> {
                     Log.e("LOG", "error open notification")
