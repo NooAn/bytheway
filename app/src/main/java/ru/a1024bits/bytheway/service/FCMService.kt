@@ -10,6 +10,7 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
 import android.app.ActivityManager
+import android.graphics.BitmapFactory
 import android.support.v4.content.LocalBroadcastManager
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
@@ -75,7 +76,7 @@ class FCMService : FirebaseMessagingService() {
         val channelId = getString(R.string.app_name)
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
-                .setSmallIcon(R.drawable.icon_logo)
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.icon_logo))
                 .setContentTitle(notificationTitle)
                 .setContentText(notificationBody)
                 .setAutoCancel(true)

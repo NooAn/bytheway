@@ -33,12 +33,7 @@ android {
         }
     }
     productFlavors {
-//        fake {
-//            applicationId "fake.ru.a1024bits.bytheway"
-//            versionCode 1
-//            versionName "0.1"
-//            dimension "default"
-//        }
+
         bytheway {
             versionCode 18
             versionName "1.2.0"
@@ -48,7 +43,7 @@ android {
 
     buildTypes {
         release {
-//            applicationIdSuffix ".release"
+            applicationIdSuffix ".release"
 //               signingConfig signingConfigs.release
             //minifyEnabled true
             //   proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'

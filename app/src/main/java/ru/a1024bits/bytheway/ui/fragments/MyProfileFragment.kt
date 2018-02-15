@@ -602,7 +602,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                 textCityMiddleTwo.visibility = View.GONE
                 dateStartTwo.visibility = View.GONE
 
-
                 cities[TWO_INDEX_CITY]?.let {
                     cities[LAST_INDEX_CITY] = it
                 }
