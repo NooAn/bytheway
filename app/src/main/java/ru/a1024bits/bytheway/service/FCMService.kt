@@ -11,10 +11,12 @@ import com.google.firebase.messaging.RemoteMessage
 
 import android.app.ActivityManager
 import android.support.v4.content.LocalBroadcastManager
-import android.util.Log
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.a1024bits.bytheway.util.Constants
+import ru.a1024bits.bytheway.util.Constants.NOTIFICATION_CMD
+import ru.a1024bits.bytheway.util.Constants.NOTIFICATION_RUN
+import ru.a1024bits.bytheway.util.Constants.NOTIFICATION_VALUE
 
 class FCMService : FirebaseMessagingService() {
 
@@ -30,10 +32,11 @@ class FCMService : FirebaseMessagingService() {
         val inAppNotificationEnabled = true //todo
         val data = remoteMessage?.getData()
 
+
         if (data != null) {
-            dataCmd = data["cmd"]
-            dataValue = data["value"]
-            notify = data["notify"]
+            dataCmd = data[NOTIFICATION_CMD]
+            dataValue = data[NOTIFICATION_VALUE]
+            notify = data[NOTIFICATION_RUN]
             notificationTitle = data["title"]
         }
 
@@ -50,20 +53,20 @@ class FCMService : FirebaseMessagingService() {
             if (foregroundMessage) {
                 if (inAppNotificationEnabled) {
                     val intent = Intent(Constants.FCM_SRV)
-                    intent.putExtra("cmd", dataCmd)
-                    intent.putExtra("value", dataValue)
+                    intent.putExtra(NOTIFICATION_CMD, dataCmd)
+                    intent.putExtra(NOTIFICATION_VALUE, dataValue)
                     LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
                 }
             } else {
                 val intent = Intent(this, MenuActivity::class.java)
-                intent.putExtra("cmd", dataCmd)
-                intent.putExtra("value", dataValue)
-                sendNotification(notificationTitle, notificationBody, intent)
+                intent.putExtra(NOTIFICATION_CMD, dataCmd)
+                intent.putExtra(NOTIFICATION_VALUE, dataValue)
+                createNotification(notificationTitle, notificationBody, intent)
             }
         }
     }
 
-    private fun sendNotification(notificationTitle: String?, notificationBody: String?, intent: Intent) {
+    private fun createNotification(notificationTitle: String?, notificationBody: String?, intent: Intent) {
 
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         val pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
@@ -72,7 +75,7 @@ class FCMService : FirebaseMessagingService() {
         val channelId = getString(R.string.app_name)
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
-                .setSmallIcon(R.drawable.ic_car_grey)
+                .setSmallIcon(R.drawable.icon_logo)
                 .setContentTitle(notificationTitle)
                 .setContentText(notificationBody)
                 .setAutoCancel(true)

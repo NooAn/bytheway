@@ -253,5 +253,7 @@
     <string name="error_link_open">We were unable to open the link. It may be incorrect.</string>
 
     <string name="last_see">Was online .. </string>
+    <string name="add_city">+ Add city</string>
+    <string name="remove_city">Remove city</string>
 
 </resources>

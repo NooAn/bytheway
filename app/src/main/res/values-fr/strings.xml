@@ -35,12 +35,10 @@
 
 
     <string name="city_fromSmall">
-
 <font size="13">Depuis</font>
-
 </string>
-
-
+    <string name="add_city">+ Ajouter une ville</string>
+    <string name="remove_city">Supprimer la ville</string>
     <string name="city_toSmall">
 
 <font size="13">Vers</font>

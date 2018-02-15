@@ -52,6 +52,8 @@ import ru.a1024bits.bytheway.router.Screens.Companion.USER_SINHRONIZED_SCREEN
 import ru.a1024bits.bytheway.ui.dialogs.FeedbackDialog
 import ru.a1024bits.bytheway.ui.fragments.*
 import ru.a1024bits.bytheway.util.Constants
+import ru.a1024bits.bytheway.util.Constants.NOTIFICATION_CMD
+import ru.a1024bits.bytheway.util.Constants.NOTIFICATION_VALUE
 import ru.a1024bits.bytheway.util.ProgressCustom
 import ru.a1024bits.bytheway.util.ServiceGenerator
 import ru.a1024bits.bytheway.util.Utils
@@ -204,7 +206,7 @@ class MenuActivity : AppCompatActivity(),
 
     val navigator = object : SupportFragmentNavigator(supportFragmentManager, R.id.fragment_container) {
         override fun createFragment(screenKey: String?, data: Any?): Fragment {
-            return if (data is User) {
+            return if (data is User && screenKey.equals(Screens.USER_PROFILE_SCREEN)) {
                 return UserProfileFragment.newInstance(data.id)
             } else
                 when (screenKey) {
@@ -386,7 +388,7 @@ class MenuActivity : AppCompatActivity(),
         }
     }
 
-    fun needUpdateToken() : Boolean {
+    fun needUpdateToken(): Boolean {
         return preferences.getBoolean(Constants.FCM_TOKEN, false)
     }
 
@@ -496,24 +498,22 @@ class MenuActivity : AppCompatActivity(),
 
     private fun notificationWork(intent: Intent) {
         if (intent.extras != null) {
-            var cmd = ""
-            var object_id = ""
-            for (key in intent.extras.keySet()) {
-                val value = intent.extras.get(key)
-                if (key == "cmd" && value is String) {
-                    cmd = value
-                }
-                if (key == "value" && value is String) {
-                    object_id = value
-                }
-            }
-            Log.e("notificationWork", "Command: $cmd Value: $object_id")
+            val userId: String? = intent.getStringExtra(NOTIFICATION_VALUE)
+            val cmd: String? = intent.getStringExtra(NOTIFICATION_CMD)
+
+            Log.e("notificationWork", "Command: $cmd Value: $userId")
             when (cmd) {
                 Constants.FCM_CMD_SHOW_USER -> {
-                    showUserSimpleProfile(User(id = object_id))
+                    userId?.let {
+
+                        showUserSimpleProfile(User(id = userId))
+                    }
                 }
                 Constants.FCM_CMD_UPDATE -> {
                     Utils.updateFcmToken()
+                }
+                else -> {
+                    Log.e("LOG", "error open notification")
                 }
             }
         }
