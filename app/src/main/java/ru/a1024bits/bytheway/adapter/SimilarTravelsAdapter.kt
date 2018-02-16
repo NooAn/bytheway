@@ -78,12 +78,12 @@ class SimilarTravelsAdapter(val context: Context, val users: List<User>) : Recyc
         var percentSimilarTravel = view.findViewById<TextView>(R.id.percent_similar_travel)
 
         init {
-            view.setOnClickListener({ _ ->
+            view.setOnClickListener {
                 if (adapterPosition != RecyclerView.NO_POSITION && context is MenuActivity) {
                     FirebaseAnalytics.getInstance(context.applicationContext).logEvent("SimilarTravelsFragment_SELECT_USER_" + adapterPosition, null)
                     context.showUserSimpleProfile(users[adapterPosition])
                 }
-            })
+            }
         }
     }
 }

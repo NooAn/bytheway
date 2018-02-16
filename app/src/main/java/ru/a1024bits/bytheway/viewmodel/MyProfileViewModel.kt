@@ -4,9 +4,7 @@ import android.arch.lifecycle.MutableLiveData
 import android.net.Uri
 import android.util.Log
 import com.google.firebase.firestore.GeoPoint
-import io.reactivex.Completable
 import io.reactivex.Single
-import io.reactivex.rxkotlin.toSingle
 import ru.a1024bits.bytheway.model.AirUser
 import ru.a1024bits.bytheway.model.Response
 import ru.a1024bits.bytheway.model.SocialResponse
@@ -198,5 +196,9 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                     routes.setValue(Response.error(throwable))
                 })
         )
+    }
+
+    fun updateFcmToken() {
+        userRepository.updateFcmToken()
     }
 }

@@ -21,4 +21,12 @@ object Constants {
     val START_DATE = "start_date"
     val END_DATE = "end_date"
     val TWO_DATE = "two_date"
+    const val FCM_SRV = "notify_service"
+    const val FCM_TOKEN = "token"
+    const val FCM_CMD_UPDATE = "fcm_token_update"
+    const val FCM_CMD_SHOW_USER = "show_user"
+
+    val NOTIFICATION_VALUE = "value"
+    val NOTIFICATION_CMD = "cmd"
+    val NOTIFICATION_RUN = "notify"
 }

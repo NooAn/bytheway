@@ -3,14 +3,13 @@ package ru.a1024bits.bytheway.ui.activity
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.arch.lifecycle.Observer
-import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
+import android.content.*
 import android.net.ConnectivityManager
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
+import android.support.v4.content.LocalBroadcastManager
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
@@ -53,6 +52,8 @@ import ru.a1024bits.bytheway.router.Screens.Companion.USER_SINHRONIZED_SCREEN
 import ru.a1024bits.bytheway.ui.dialogs.FeedbackDialog
 import ru.a1024bits.bytheway.ui.fragments.*
 import ru.a1024bits.bytheway.util.Constants
+import ru.a1024bits.bytheway.util.Constants.NOTIFICATION_CMD
+import ru.a1024bits.bytheway.util.Constants.NOTIFICATION_VALUE
 import ru.a1024bits.bytheway.util.ProgressCustom
 import ru.a1024bits.bytheway.util.ServiceGenerator
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
@@ -78,6 +79,12 @@ class MenuActivity : AppCompatActivity(),
             pLoader?.show()
         } else {
             pLoader?.hide()
+        }
+    }
+    private val mMessageReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            //todo
+            notificationWork(intent)
         }
     }
 
@@ -135,6 +142,8 @@ class MenuActivity : AppCompatActivity(),
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
 
+        notificationWork(intent)
+
         if (savedInstanceState == null) {
             if (preferences.getBoolean(Constants.FIRST_ENTER, true)) {
                 navigator.applyCommand(Replace(Screens.USER_SINHRONIZED_SCREEN, 1))
@@ -172,6 +181,7 @@ class MenuActivity : AppCompatActivity(),
 
     var snackbar: Snackbar? = null
 
+
     private fun showSnack(string: String) {
         snackbar = Snackbar.make(this.findViewById(android.R.id.content), string, Snackbar.LENGTH_LONG)
         snackbar?.show()
@@ -195,7 +205,7 @@ class MenuActivity : AppCompatActivity(),
 
     val navigator = object : SupportFragmentNavigator(supportFragmentManager, R.id.fragment_container) {
         override fun createFragment(screenKey: String?, data: Any?): Fragment {
-            return if (data is User) {
+            return if (data is User && screenKey.equals(Screens.USER_PROFILE_SCREEN)) {
                 return UserProfileFragment.newInstance(data.id)
             } else
                 when (screenKey) {
@@ -353,6 +363,8 @@ class MenuActivity : AppCompatActivity(),
             }
         }
         navigatorHolder.setNavigator(navigator)
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
+                IntentFilter(Constants.FCM_SRV))
     }
 
     private fun getLatLngForAirports(code: String?) {
@@ -375,6 +387,10 @@ class MenuActivity : AppCompatActivity(),
         }
     }
 
+    fun needUpdateToken(): Boolean {
+        return preferences.getBoolean(Constants.FCM_TOKEN, false)
+    }
+
     private fun saveToken(accessToken: AccessToken?) {
         preferences.edit().putString(Constants.REFRESH_TOKEN, accessToken?.refresToken).apply()
         preferences.edit().putString(Constants.ACCESS_TOKEN, accessToken?.accessToken).apply()
@@ -389,8 +405,8 @@ class MenuActivity : AppCompatActivity(),
     override fun onPause() {
         super.onPause()
         navigatorHolder.removeNavigator()
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver)
         Log.e("LOG", "onPause")
-
     }
 
     override fun onStop() {
@@ -477,5 +493,28 @@ class MenuActivity : AppCompatActivity(),
     private fun openDialogFeedback() {
         val dialog = FeedbackDialog(this)
         dialog.show()
+    }
+
+    private fun notificationWork(intent: Intent) {
+        if (intent.extras != null) {
+            val userId: String? = intent.getStringExtra(NOTIFICATION_VALUE)
+            val cmd: String? = intent.getStringExtra(NOTIFICATION_CMD)
+
+            Log.e("notificationWork", "Command: $cmd Value: $userId")
+            when (cmd) {
+                Constants.FCM_CMD_SHOW_USER -> {
+                    userId?.let {
+
+                        showUserSimpleProfile(User(id = userId))
+                    }
+                }
+                Constants.FCM_CMD_UPDATE -> {
+                    viewModel?.updateFcmToken()
+                }
+                else -> {
+                    Log.e("LOG", "error open notification")
+                }
+            }
+        }
     }
 }

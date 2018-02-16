@@ -25,10 +25,7 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException
 import com.google.android.gms.location.places.AutocompleteFilter
 import com.google.android.gms.location.places.ui.PlaceAutocomplete
 import com.google.android.gms.maps.*
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.PolylineOptions
+import com.google.android.gms.maps.model.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.GeoPoint
@@ -46,6 +43,7 @@ import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.a1024bits.bytheway.ui.dialogs.SocialTipsDialog
+import ru.a1024bits.bytheway.util.*
 import ru.a1024bits.bytheway.util.Constants.END_DATE
 import ru.a1024bits.bytheway.util.Constants.FIRST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
@@ -56,9 +54,6 @@ import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT
 import ru.a1024bits.bytheway.util.Constants.START_DATE
 import ru.a1024bits.bytheway.util.Constants.TWO_DATE
 import ru.a1024bits.bytheway.util.Constants.TWO_INDEX_CITY
-import ru.a1024bits.bytheway.util.DateUtils
-import ru.a1024bits.bytheway.util.DecimalInputFilter
-import ru.a1024bits.bytheway.util.getBearing
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import ru.terrakok.cicerone.commands.Replace
 import java.text.SimpleDateFormat
@@ -478,6 +473,14 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         val midPointLong = (coordFrom.longitude + coordTo.longitude) / 2
         val blueMarker = BitmapDescriptorFactory.fromResource(R.drawable.pin_blue)
 
+        if (cityTwoLatLng.latitude != 0.0 && cityTwoLatLng.longitude != 0.0) {
+            googleMap?.addMarker(MarkerOptions()
+                    .icon(blueMarker)
+                    .position(LatLng(cityTwoLatLng.latitude, cityTwoLatLng.longitude))
+                    .title(cities[Constants.TWO_INDEX_CITY])
+                    .anchor(0.5F, 1.0F)
+                    .flat(true))
+        }
         if (markerPositionStart != LatLng(0.0, 0.0)) {
             googleMap?.addMarker(MarkerOptions()
                     .icon(blueMarker)
@@ -598,7 +601,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
                 textCityMiddleTwo.visibility = View.GONE
                 dateStartTwo.visibility = View.GONE
-
 
                 cities[TWO_INDEX_CITY]?.let {
                     cities[LAST_INDEX_CITY] = it
@@ -1318,7 +1320,9 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                 socialValues[name.key] = name.value
             }
         }
-
+        if (user.token.isEmpty() || (activity as MenuActivity).needUpdateToken()) {
+            viewModel?.updateFcmToken()
+        }
         if (user.socialNetwork.size == 0 && user.countTrip > 0) {
             showTipsForEmptySocialLink()
         }
