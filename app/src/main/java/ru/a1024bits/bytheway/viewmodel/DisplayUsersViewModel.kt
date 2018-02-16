@@ -41,7 +41,6 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
                 Log.e("LOG get filter users", Thread.currentThread().name)
                 var result: MutableList<User> = ArrayList()
                 snapshots.map {
-                    result.sortBy { it.dates[START_DATE] }
                     for (document in it) {
                         try {
                             val user = document.toObject(User::class.java)
@@ -54,7 +53,8 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
                     }
                 }
                 if (sortString.isNotEmpty()) result = filterUsersByString(sortString, result)
-                else filterUsersByFilter(result, filter)
+                /*todo if filter by string XOR filter? then add: else*/filterUsersByFilter(result, filter)
+                result.sortBy { it.dates[START_DATE] }
                 stream.onSuccess(result)
             } catch (exp: Exception) {
                 stream.onError(exp) // for fix bugs FirebaseFirestoreException: DEADLINE_EXCEEDED
@@ -140,14 +140,13 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
     }
 
     fun filterUsersByString(primaryQuery: String = "", primaryList: MutableList<User>): MutableList<User> {
-        val queryLowerCase: String = primaryQuery.toLowerCase()
         return primaryList.filterTo(ArrayList()) {
-            it.cities.filterValues { it1 -> it1.toLowerCase().contains(queryLowerCase) }.isNotEmpty() ||
-                    it.name.toLowerCase().contains(queryLowerCase) || it.email.toLowerCase().contains(queryLowerCase) ||
-                    it.age.toString().contains(queryLowerCase) || it.budget.toString().contains(queryLowerCase) ||
-                    it.lastName.toLowerCase().contains(queryLowerCase) || it.phone.contains(primaryQuery) ||
-                    it.route.contains(queryLowerCase) || it.addInformation.toLowerCase().contains(primaryQuery)
-        }
+            it.cities.filterValues { it1 -> it1.contains(primaryQuery, true) }.isNotEmpty() ||
+                    it.name.contains(primaryQuery, true) || it.email.contains(primaryQuery, true) ||
+                    it.age.toString().contains(primaryQuery) || it.budget.toString().contains(primaryQuery) ||
+                    it.lastName.contains(primaryQuery, true) || it.phone.contains(primaryQuery) ||
+                    it.route.contains(primaryQuery, true) || it.addInformation.contains(primaryQuery, true)
+        } //.stream().sorted({userOne, UserTwo -> userOne.dates[START_DATE] - UserTwo.dates[START_DATE]}).
     }
 
     private fun getTextDate(calendarStartDate: Calendar, yearStart: String, months: Array<String>): String {
