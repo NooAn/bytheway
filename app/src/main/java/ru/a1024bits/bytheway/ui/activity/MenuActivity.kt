@@ -196,6 +196,9 @@ class MenuActivity : AppCompatActivity(),
     private fun markFirstEnter() = preferences.edit()
             .putBoolean(Constants.FIRST_ENTER, false).apply()
 
+    fun tokenUpdated() = preferences.edit()
+            .putBoolean(Constants.FCM_TOKEN, false).apply()
+
     fun showUserSimpleProfile(displayingUser: User) {
         navigator.applyCommand(Forward(Screens.USER_PROFILE_SCREEN, displayingUser))
     }
