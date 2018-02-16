@@ -75,7 +75,6 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         App.component.inject(this)
         super.onActivityCreated(savedInstanceState)
-        (activity as MenuActivity).toolbar.findViewById<EditText>(R.id.searchUsers).visibility = View.VISIBLE
         analytics.setCurrentScreen(this.activity, "AllUsersFragment", this.javaClass.simpleName)
 
         try {
@@ -117,12 +116,13 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
 
     override fun getViewModelClass(): Class<DisplayUsersViewModel> = DisplayUsersViewModel::class.java
 
-    fun nonSuchSetDate() {
-        Snackbar.make(activity.findViewById(android.R.id.content), context.getString(R.string.dates_has_been_incorrect), Snackbar.LENGTH_LONG).show()
+    override fun onResume() {
+        super.onResume()
+        (activity as MenuActivity).toolbar.findViewById<EditText>(R.id.searchUsers).visibility = View.VISIBLE
     }
 
-    override fun onStop() {
-        super.onStop()
+    override fun onPause() {
+        super.onPause()
         (activity as MenuActivity).toolbar.findViewById<EditText>(R.id.searchUsers).visibility = View.GONE
     }
 

@@ -15,7 +15,6 @@ import ru.a1024bits.bytheway.util.Constants.START_DATE
 import java.util.*
 
 private val AGE_PARAMETER = "age"
-private val ADD_INFORMATION_PARAMETER = "addInformation"
 private val PHONE_PARAMETER = "phone"
 private val EMAIL_PARAMETER = "email"
 private val LAST_NAME_PARAMETER = "lastName"
@@ -83,14 +82,8 @@ class DisplayUsersViewModelTest {
 
     @Test
     fun testFilterUsersByStringInRandomVariable() {
-        var queryStringFiltration = "info"
-        var variableName = ADD_INFORMATION_PARAMETER
-        Assert.assertEquals(displayUsersViewModel.filterUsersByString(
-                queryStringFiltration, generateUsersForFiltration(countAllUsers, countSimilarUsers, variableName, queryStringFiltration)
-        ).size, countSimilarUsers)
-
-        variableName = NAME_PARAMETER
-        queryStringFiltration = "ExampleName"
+        var queryStringFiltration = "ExampleName"
+        var variableName = NAME_PARAMETER
         Assert.assertEquals(displayUsersViewModel.filterUsersByString(
                 queryStringFiltration, generateUsersForFiltration(countAllUsers, countSimilarUsers, variableName, queryStringFiltration)
         ).size, countSimilarUsers)
@@ -138,7 +131,6 @@ class DisplayUsersViewModelTest {
             val currentUser = User()
             when (currentFiltrationVariable) {
                 AGE_PARAMETER -> currentUser.age = valueFiltrationVariable.toInt()
-                ADD_INFORMATION_PARAMETER -> currentUser.addInformation = valueFiltrationVariable
                 PHONE_PARAMETER -> currentUser.phone = valueFiltrationVariable
                 EMAIL_PARAMETER -> currentUser.email = valueFiltrationVariable
                 LAST_NAME_PARAMETER -> currentUser.lastName = valueFiltrationVariable

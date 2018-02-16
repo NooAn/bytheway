@@ -21,7 +21,7 @@ import javax.inject.Inject
  * Created by andrey.gusenkov on 25/09/2017.
  */
 
-class DisplayUsersViewModel @Inject constructor(var userRepository: UserRepository?) : BaseViewModel(), FilterAndInstallListener {
+class DisplayUsersViewModel @Inject constructor(private var userRepository: UserRepository?) : BaseViewModel(), FilterAndInstallListener {
     var response: MutableLiveData<Response<List<User>>> = MutableLiveData()
     var yearsOldUsers = (0..MAX_AGE).mapTo(ArrayList()) { it.toString() }
     override var filter = Filter()
@@ -78,7 +78,7 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
 
     fun sendUserData(map: HashMap<String, Any>, id: String) {
         userRepository?.let {
-            loadingStatus.setValue(true)
+            loadingStatus.value = true
             disposables.add(it.changeUserProfile(map, id)
                     .timeout(TIMEOUT_SECONDS, timeoutUnit)
                     .retry(2)
@@ -86,7 +86,7 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
                     .subscribe(
                             { Log.e("LOG", "complete") },
                             { t ->
-                                response.setValue(Response.error(t))
+                                response.value = Response.error(t)
                                 Log.e("LOG view model", "send User Data", t)
                             }
                     ))
@@ -95,7 +95,7 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
 
     fun getUsersWithSimilarTravel(paramSearch: Filter) {
         userRepository?.let {
-            loadingStatus.setValue(true)
+            loadingStatus.value = true
             disposables.add(it.getReallUsers(paramSearch)
                     .timeout(TIMEOUT_SECONDS, timeoutUnit)
                     .retry(2)
@@ -145,8 +145,8 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
                     it.name.contains(primaryQuery, true) || it.email.contains(primaryQuery, true) ||
                     it.age.toString().contains(primaryQuery) || it.budget.toString().contains(primaryQuery) ||
                     it.lastName.contains(primaryQuery, true) || it.phone.contains(primaryQuery) ||
-                    it.route.contains(primaryQuery, true) || it.addInformation.contains(primaryQuery, true)
-        } //.stream().sorted({userOne, UserTwo -> userOne.dates[START_DATE] - UserTwo.dates[START_DATE]}).
+                    it.route.contains(primaryQuery, true) // || it.addInformation.contains(primaryQuery, true)
+        }
     }
 
     private fun getTextDate(calendarStartDate: Calendar, yearStart: String, months: Array<String>): String {
