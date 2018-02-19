@@ -9,14 +9,13 @@ import android.support.v4.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
-import android.app.ActivityManager
 import android.graphics.BitmapFactory
 import android.support.v4.content.LocalBroadcastManager
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.util.Constants.NOTIFICATION_CMD
-import ru.a1024bits.bytheway.util.Constants.NOTIFICATION_RUN
+import ru.a1024bits.bytheway.util.Constants.NOTIFICATION_TITLE
 import ru.a1024bits.bytheway.util.Constants.NOTIFICATION_VALUE
 
 class FCMService : FirebaseMessagingService() {
@@ -27,18 +26,14 @@ class FCMService : FirebaseMessagingService() {
         var notificationBody: String? = null
         var dataValue: String? = null
         var dataCmd: String? = null
-        var notify: String? = null
 
         val notificationEnabled = true //todo
-        val inAppNotificationEnabled = true //todo
         val data = remoteMessage?.getData()
-
 
         if (data != null) {
             dataCmd = data[NOTIFICATION_CMD]
             dataValue = data[NOTIFICATION_VALUE]
-            notify = data[NOTIFICATION_RUN]
-            notificationTitle = data["title"]
+            if (data.containsKey(NOTIFICATION_TITLE)) notificationTitle = data[NOTIFICATION_TITLE]
         }
 
         if (remoteMessage?.notification != null) {
@@ -47,17 +42,11 @@ class FCMService : FirebaseMessagingService() {
         }
 
         if (notificationEnabled) {
-            var foregroundMessage = applicationInForeground() && notify.isNullOrEmpty()
             if (dataCmd?.startsWith("fcm_") == true) {
-                foregroundMessage = true
-            }
-            if (foregroundMessage) {
-                if (inAppNotificationEnabled) {
-                    val intent = Intent(Constants.FCM_SRV)
-                    intent.putExtra(NOTIFICATION_CMD, dataCmd)
-                    intent.putExtra(NOTIFICATION_VALUE, dataValue)
-                    LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
-                }
+                val intent = Intent(Constants.FCM_SRV)
+                intent.putExtra(NOTIFICATION_CMD, dataCmd)
+                intent.putExtra(NOTIFICATION_VALUE, dataValue)
+                LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
             } else {
                 val intent = Intent(this, MenuActivity::class.java)
                 intent.putExtra(NOTIFICATION_CMD, dataCmd)
@@ -76,7 +65,8 @@ class FCMService : FirebaseMessagingService() {
         val channelId = getString(R.string.app_name)
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.icon_logo))
+                .setLargeIcon(BitmapFactory.decodeResource(resources, R.drawable.icon_logo))
+                .setSmallIcon(R.drawable.icon_logo)
                 .setContentTitle(notificationTitle)
                 .setContentText(notificationBody)
                 .setAutoCancel(true)
@@ -86,17 +76,5 @@ class FCMService : FirebaseMessagingService() {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         notificationManager.notify(0 /* ID of notification */, notificationBuilder.build())
-    }
-
-    private fun applicationInForeground(): Boolean {
-        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        val services = activityManager.runningAppProcesses
-        var isActivityFound = false
-
-        if (services[0].processName.equals(packageName, ignoreCase = true)) {
-            isActivityFound = true
-        }
-
-        return isActivityFound
     }
 }

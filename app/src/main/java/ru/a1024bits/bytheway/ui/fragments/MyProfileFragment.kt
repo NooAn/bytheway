@@ -173,6 +173,20 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         }
     }
 
+    private val tokenObserver: Observer<ResponseBtw<Boolean>> = Observer {
+        when (it?.status) {
+            Status.SUCCESS -> {
+                if (!activity.isDestroyed) {
+                    (activity as MenuActivity).tokenUpdated()
+                    mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_token_updated", null)
+                }
+            }
+            Status.ERROR -> {
+                mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_error_token_upd", null)
+            }
+        }
+    }
+
     private fun showErrorUploadImage() {
         Toast.makeText(activity, R.string.error_upload_image, Toast.LENGTH_SHORT).show()
     }
@@ -261,6 +275,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         viewModel?.loadingStatus?.observe(this, (activity as MenuActivity).progressBarLoad)
 
         viewModel?.photoUrl?.observe(this, photoUrlObserver)
+        viewModel?.token?.observe(this, tokenObserver)
 
         if (viewModel?.saveSocial?.hasObservers() == false) {
             viewModel?.saveSocial?.observe(this, observerSaveSocial)
