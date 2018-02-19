@@ -26,7 +26,7 @@ object Constants {
     const val FCM_CMD_UPDATE = "fcm_token_update"
     const val FCM_CMD_SHOW_USER = "show_user"
 
+    val NOTIFICATION_TITLE = "title"
     val NOTIFICATION_VALUE = "value"
     val NOTIFICATION_CMD = "cmd"
-    val NOTIFICATION_RUN = "notify"
 }
