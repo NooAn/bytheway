@@ -705,7 +705,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         addInfoUser.afterTextChanged({
             profileStateHashMap[ADD_INFO] = it
             profileChanged(null, false)
-            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_add_info", null)
             Log.d("LOG User", "after text change")
         })
         textCityFrom.setOnClickListener {
@@ -1389,6 +1388,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     fun getHashMapUser(): HashMap<String, Any> {
         if (budget > 0)
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_budget_more_0", null)
+        if (addInfoUser.text.toString().isNotBlank())
+            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_add_info", null)
 
         val hashMap = HashMap<String, Any>()
 
