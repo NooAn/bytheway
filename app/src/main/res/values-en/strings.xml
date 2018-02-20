@@ -255,5 +255,6 @@
     <string name="last_see">Was online .. </string>
     <string name="add_city">+ Add city</string>
     <string name="remove_city">Remove city</string>
+    <string name="notification_user_searching">This user  was searching for you</string>
 
 </resources>

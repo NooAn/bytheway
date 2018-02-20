@@ -5,6 +5,7 @@ import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.QuerySnapshot
 import io.reactivex.Single
+import ru.a1024bits.bytheway.model.FireBaseNotification
 import ru.a1024bits.bytheway.model.Response
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
@@ -185,6 +186,24 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
             }
             found
         }
+    }
+
+    fun sendNotifications(ids: String, notification: FireBaseNotification) {
+        userRepository?.let {
+            disposables.add(it.sendNotifications(ids, notification)
+                    .timeout(TIMEOUT_SECONDS, timeoutUnit)
+                    .retry(2)
+                    .subscribeOn(getBackgroundScheduler())
+                    .observeOn(getMainThreadScheduler())
+                    .subscribe(
+                            { Log.e("LOG", "notify complete") },
+                            { t ->
+                                Log.e("LOG view model", "notify", t)
+                            }
+                    )
+            )
+        }
+
     }
 }
 

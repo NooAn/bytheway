@@ -31,8 +31,10 @@ import retrofit2.Response
 import ru.a1024bits.aviaanimation.ui.util.LatLngInterpolator
 import ru.a1024bits.aviaanimation.ui.util.MarkerAnimation
 import ru.a1024bits.bytheway.App
+import ru.a1024bits.bytheway.BuildConfig
 import ru.a1024bits.bytheway.MapWebService
 import ru.a1024bits.bytheway.R
+import ru.a1024bits.bytheway.model.FireBaseNotification
 import ru.a1024bits.bytheway.model.Status
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.model.map_directions.RoutesList
@@ -42,6 +44,7 @@ import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.a1024bits.bytheway.ui.dialogs.TravelSearchSaveDialog
 import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.util.Constants.END_DATE
+import ru.a1024bits.bytheway.util.Constants.FCM_CMD_SHOW_USER
 import ru.a1024bits.bytheway.util.Constants.FIRST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.START_DATE
@@ -177,7 +180,35 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
     private val listUsers: android.arch.lifecycle.Observer<ru.a1024bits.bytheway.model.Response<List<User>>> = android.arch.lifecycle.Observer { response ->
 
         when (response?.status) {
-            Status.SUCCESS -> if (response.data == null && activity != null) showErrorLoading() else (activity as MenuActivity).navigator.applyCommand(Forward(Screens.SIMILAR_TRAVELS_SCREEN, response.data))
+            Status.SUCCESS -> {
+                if (response.data == null && activity != null) {
+                    showErrorLoading()
+                } else {
+
+                    //debug feature
+                    if (BuildConfig.DEBUG) {
+                        val notifyIds = arrayListOf<String>()
+                        val notifiedIds = (activity as MenuActivity).getNotified()
+                        response.data?.map {
+                            if (it.percentsSimilarTravel >= Constants.FCM_MATCH_PERCENT && !notifiedIds.contains(it.id)) {
+                                notifyIds.add(it.id)
+                                notifiedIds.add(it.id)
+                            }
+                        }
+                        if (notifyIds.size > 0) {
+                            viewModel?.sendNotifications(notifyIds.joinToString(","), FireBaseNotification(
+                                    getString(R.string.app_name),
+                                    getString(R.string.notification_user_searching),
+                                    FCM_CMD_SHOW_USER,
+                                    FirebaseAuth.getInstance().currentUser?.uid
+                            ))
+                            (activity as MenuActivity).updateNotified(notifiedIds)
+                        }
+                    }
+
+                    (activity as MenuActivity).navigator.applyCommand(Forward(Screens.SIMILAR_TRAVELS_SCREEN, response.data))
+                }
+            }
 
             Status.ERROR -> {
                 Log.e("LOG", "log e:" + response.error)

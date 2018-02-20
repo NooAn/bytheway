@@ -201,6 +201,11 @@ class MenuActivity : AppCompatActivity(),
     fun tokenUpdated() = preferences.edit()
             .putBoolean(Constants.FCM_TOKEN, false).apply()
 
+    fun updateNotified(set: Set<String>) = preferences.edit()
+            .putStringSet(Constants.FCM_SET, set).apply()
+
+    fun getNotified() = preferences.getStringSet(Constants.FCM_SET, HashSet<String>())
+
     fun showUserSimpleProfile(displayingUser: User) {
         navigator.applyCommand(Forward(Screens.USER_PROFILE_SCREEN, displayingUser))
     }

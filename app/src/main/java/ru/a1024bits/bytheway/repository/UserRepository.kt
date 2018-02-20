@@ -17,14 +17,12 @@ import ru.a1024bits.bytheway.algorithm.SearchTravelers
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.util.toJsonString
 import ru.a1024bits.bytheway.viewmodel.FilterAndInstallListener
-import java.util.*
 import javax.inject.Inject
 import kotlin.collections.HashMap
 import com.google.firebase.firestore.FirebaseFirestoreException
-import com.google.firebase.iid.FirebaseInstanceId
+import ru.a1024bits.bytheway.model.FireBaseNotification
 import ru.a1024bits.bytheway.model.map_directions.RoutesList
 import ru.a1024bits.bytheway.util.Constants
-
 
 const val COLLECTION_USERS = "users"
 
@@ -242,5 +240,15 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
         } catch (e: Exception) {
             stream.onError(e)
         }
+    }
+
+    fun sendNotifications(ids: String, notification: FireBaseNotification): Completable {
+        return mapService.sendNotifications(hashMapOf(
+                "ids" to ids,
+                "title" to notification.title,
+                "body" to notification.body,
+                "cmd" to notification.cmd,
+                "value" to notification.value.toString()
+        ))
     }
 }

@@ -22,6 +22,11 @@ enum class SocialNetwork(var link: String) {
 }
 
 class SocialResponse(var link: String = "", var value: String = "")
+
+class FireBaseNotification(var title: String = "",
+                           var body: String = "",
+                           var cmd: String = "",
+                           var value: String? = "")
 /**
  *
  */

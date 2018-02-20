@@ -137,4 +137,5 @@
     <string name="attention">Внимание</string>
     <string name="add_city">+ Добавить город</string>
     <string name="remove_city">Удалить город</string>
+    <string name="notification_user_searching">Этот пользователь искал вас</string>
 </resources>
