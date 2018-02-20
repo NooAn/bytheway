@@ -14,7 +14,6 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-
         android:theme="@style/AppTheme.NoActionBar">
         <activity
             android:name=".ui.activity.MenuActivity"
@@ -28,10 +27,6 @@
                     android:host="www.appintheair.mobi"
                     android:scheme="https" />
             </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
         </activity>
         <activity
             android:name=".ui.activity.RegistrationActivity"
@@ -39,8 +34,7 @@
 
         <activity
             android:name=".ui.activity.SplashActivity"
-            android:configChanges="orientation|keyboardHidden"
-            android:label="@string/title_activity_menu">
+            android:configChanges="orientation|keyboardHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

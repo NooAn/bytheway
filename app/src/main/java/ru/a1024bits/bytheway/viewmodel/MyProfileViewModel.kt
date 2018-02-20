@@ -4,6 +4,7 @@ import android.arch.lifecycle.MutableLiveData
 import android.net.Uri
 import android.util.Log
 import com.google.firebase.firestore.GeoPoint
+import com.google.firebase.iid.FirebaseInstanceId
 import io.reactivex.Single
 import ru.a1024bits.bytheway.model.AirUser
 import ru.a1024bits.bytheway.model.Response
@@ -46,6 +47,7 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
     val saveSocial = MutableLiveData<SocialResponse>()
     val saveProfile = MutableLiveData<Response<Boolean>>()
     val photoUrl = MutableLiveData<Response<String>>()
+    val token = MutableLiveData<Response<Boolean>>()
     fun loadImage(pathFile: Uri, userId: String, oldUser: User?) {
         disposables.add(userRepository.uploadPhotoLink(path = pathFile, id = userId)
                 .subscribeOn(getBackgroundScheduler())
@@ -199,6 +201,14 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
     }
 
     fun updateFcmToken() {
-        userRepository.updateFcmToken()
+        disposables.add(userRepository.updateFcmToken(FirebaseInstanceId.getInstance().token)
+                .subscribeOn(getBackgroundScheduler())
+                .observeOn(getMainThreadScheduler())
+                .subscribe({
+                    Log.e("LOG S :", Thread.currentThread().name)
+                    token.setValue(Response.success(true))
+                }, { throwable ->
+                    token.setValue(Response.error(throwable))
+                }))
     }
 }

@@ -173,6 +173,20 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         }
     }
 
+    private val tokenObserver: Observer<ResponseBtw<Boolean>> = Observer {
+        when (it?.status) {
+            Status.SUCCESS -> {
+                if (!activity.isDestroyed) {
+                    (activity as MenuActivity).tokenUpdated()
+                    mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_token_updated", null)
+                }
+            }
+            Status.ERROR -> {
+                mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_error_token_upd", null)
+            }
+        }
+    }
+
     private fun showErrorUploadImage() {
         Toast.makeText(activity, R.string.error_upload_image, Toast.LENGTH_SHORT).show()
     }
@@ -261,6 +275,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         viewModel?.loadingStatus?.observe(this, (activity as MenuActivity).progressBarLoad)
 
         viewModel?.photoUrl?.observe(this, photoUrlObserver)
+        viewModel?.token?.observe(this, tokenObserver)
 
         if (viewModel?.saveSocial?.hasObservers() == false) {
             viewModel?.saveSocial?.observe(this, observerSaveSocial)
@@ -705,7 +720,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         addInfoUser.afterTextChanged({
             profileStateHashMap[ADD_INFO] = it
             profileChanged(null, false)
-            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_add_info", null)
             Log.d("LOG User", "after text change")
         })
         textCityFrom.setOnClickListener {
@@ -1389,6 +1403,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     fun getHashMapUser(): HashMap<String, Any> {
         if (budget > 0)
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_budget_more_0", null)
+        if (addInfoUser.text.toString().isNotBlank())
+            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_add_info", null)
 
         val hashMap = HashMap<String, Any>()
 

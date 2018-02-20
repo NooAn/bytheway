@@ -226,15 +226,21 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
         }
     }
 
-    fun updateFcmToken() {
-        val token = FirebaseInstanceId.getInstance().token
-        if (token != null && token.isNotEmpty()) {
-            val currentUid = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
-            if (currentUid.isNotEmpty()) {
-                val docRef = FirebaseFirestore.getInstance().collection(COLLECTION_USERS)
-                        .document(currentUid)
-                docRef.update(Constants.FCM_TOKEN, token)
-            }
+    fun updateFcmToken(token: String?): Completable = Completable.create { stream ->
+        try {
+            store.runTransaction({
+                val currentUid = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
+                if (currentUid.isNotEmpty() && token != null && token.isNotEmpty()) {
+
+                    val docRef = FirebaseFirestore.getInstance().collection(COLLECTION_USERS)
+                            .document(currentUid)
+                    docRef.update(Constants.FCM_TOKEN, token)
+                }
+            }).addOnFailureListener {
+                stream.onError(it)
+            }.addOnSuccessListener { stream.onComplete() }
+        } catch (e: Exception) {
+            stream.onError(e)
         }
     }
 }

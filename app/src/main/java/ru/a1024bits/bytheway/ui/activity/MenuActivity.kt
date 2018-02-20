@@ -116,7 +116,7 @@ class MenuActivity : AppCompatActivity(),
     private fun isNetworkAvailable(): Boolean {
         val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetworkInfo = connectivityManager.getActiveNetworkInfo()
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected()
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -142,8 +142,6 @@ class MenuActivity : AppCompatActivity(),
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
 
-        notificationWork(intent)
-
         if (savedInstanceState == null) {
             if (preferences.getBoolean(Constants.FIRST_ENTER, true)) {
                 navigator.applyCommand(Replace(Screens.USER_SINHRONIZED_SCREEN, 1))
@@ -152,7 +150,11 @@ class MenuActivity : AppCompatActivity(),
                 if (intent.data != null && intent.data.host.contains("appintheair", true)) {
 
                 } else {
-                    navigator.applyCommand(Replace(Screens.MY_PROFILE_SCREEN, 1))
+                    if (intent.extras != null) {
+                        notificationWork(intent)
+                    } else {
+                        navigator.applyCommand(Replace(Screens.MY_PROFILE_SCREEN, 1))
+                    }
                 }
             }
         } else {
@@ -195,6 +197,9 @@ class MenuActivity : AppCompatActivity(),
 
     private fun markFirstEnter() = preferences.edit()
             .putBoolean(Constants.FIRST_ENTER, false).apply()
+
+    fun tokenUpdated() = preferences.edit()
+            .putBoolean(Constants.FCM_TOKEN, false).apply()
 
     fun showUserSimpleProfile(displayingUser: User) {
         navigator.applyCommand(Forward(Screens.USER_PROFILE_SCREEN, displayingUser))
@@ -425,7 +430,7 @@ class MenuActivity : AppCompatActivity(),
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
-        if (isNetworkAvailable() == false) showSnack(getString(R.string.no_internet))
+        if (!isNetworkAvailable()) showSnack(getString(R.string.no_internet))
         if (this.profileChanged == true) {
             openAwayFromProfileDialog({
                 this.profileChanged = false
