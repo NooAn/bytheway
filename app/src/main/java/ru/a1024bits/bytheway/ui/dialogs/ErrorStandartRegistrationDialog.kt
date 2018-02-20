@@ -24,7 +24,7 @@ class ErrorStandartRegistrationDialog : DialogFragment() {
         view?.sendButtonCode?.setOnClickListener({
             activity.mVerificationId?.let {
                 PhoneAuthProvider.getCredential(it, verificationsData.text.toString())?.let { credentialIt ->
-                    activity.signInGoogle(credentialIt)
+                    activity.signInGoogle(credentialIt, this@ErrorStandartRegistrationDialog)
                 }
             }
         })

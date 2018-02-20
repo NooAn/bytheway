@@ -148,12 +148,13 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
         signInGoogle(credential)
     }
 
-    fun signInGoogle(credential: AuthCredential) {
+    fun signInGoogle(credential: AuthCredential, errorDialog: ErrorStandartRegistrationDialog? = null) {
         try {
             mAuth?.signInWithCredential(credential)
                     ?.addOnCompleteListener(this) { task ->
                         if (task.isSuccessful) {
                             // Sign in success, update UI with the signed-in user's information
+                            errorDialog?.dismissAllowingStateLoss()
                             Log.d("LOG", "signInWithCredential:success")
                             updateUI(true)
                         } else {
