@@ -29,7 +29,7 @@
 
     <string name="city_end">Destination</string>
 
-    <string name="name_button_search">Trouver d'autres voyageurs</string>
+    <string name="name_button_search">Trouver d\'autres voyageurs</string>
 
     <string name="city_start">Point de depart</string>
 
@@ -89,9 +89,9 @@
 
     <string name="fill_all_location">Aucun point choisi</string>
 
-    <string name="fill_from_location">Depart n'est pas selectionne</string>
+    <string name="fill_from_location">Depart n\'est pas selectionne</string>
 
-    <string name="fill_to_location">L'arriver n'est pas selectionne</string>
+    <string name="fill_to_location">L\'arriver n\'est pas selectionne</string>
 
     <string name="social_links">Liens resequx sociaux</string>
 
@@ -114,12 +114,12 @@
     <string name="app_sinchronized">Sync. App in the Air</string>
 
     <string name="text_sinch_app_air">We can add your flights from App in the Air to create an automatic trip and  search of fellow travellers.
-Nous pouvons ajouter vos vols de App in the Air pour creer un voyage automatique et chercher d'autres voyageurs </string>
+Nous pouvons ajouter vos vols de App in the Air pour creer un voyage automatique et chercher d\'autres voyageurs </string>
 
     <string name="sinch_button">synchroniser</string>
 
     <string name="miss">Non merci</string>
-    <string name="hint_all_travelers_description">Si vous voulez vous connecter a d'autres voyages, vous pouvez utiliser cet ecran, nos filtre vont vous aider</string>
+    <string name="hint_all_travelers_description">Si vous voulez vous connecter a d\'autres voyages, vous pouvez utiliser cet ecran, nos filtre vont vous aider</string>
     <string name="close_hint">NEXT</string>
     <string-array name="months_array">
         <item>Jan</item>
@@ -147,7 +147,7 @@ Nous pouvons ajouter vos vols de App in the Air pour creer un voyage automatique
     <string name="feedback_writte">Ecrivez un commentaire ou nue suggestion</string>
     <string name="add_new_trip_from_app_in_the_air">+ Ajouter un voyage App in the Air</string>
     <string name="feedback">Commentaire</string>
-    <string name="textBodyDisaster">Nous sommes dans l'impossibilite de trouver vos voyqges.</string>
+    <string name="textBodyDisaster">Nous sommes dans l\'impossibilite de trouver vos voyqges.</string>
     <string name="textHeadAirDisaster">Votre compte a ete synchronize!</string>
     <string name="item_all_users_empty_date"> </string>
     <string name="filters_all_users_empty_date">____</string>
@@ -155,7 +155,7 @@ Nous pouvons ajouter vos vols de App in the Air pour creer un voyage automatique
     <string name="optionSearch">+ options de Recherche </string>
     <string name="to">vers</string>
     <string name="from">depuis</string>
-    <string name="social_text">Ajouter des informations a votre contact pour que d'autres voyageurs vous trouve</string>
+    <string name="social_text">Ajouter des informations a votre contact pour que d\'autres voyageurs vous trouve</string>
     <string name="save_succesfull">votre profil a etait change avec succes </string>
     <string name="cancel">Annuler</string>
     <string name="any"> - </string>
@@ -171,26 +171,27 @@ Nous pouvons ajouter vos vols de App in the Air pour creer un voyage automatique
     <string name="email">E-mail</string>
     <string name="hint_all_travelers">Tous les voyageurs</string>
     <string name="hint_create_travel">Creer un nouveau voyage!</string>
-    <string name="hint_create_travel_description">Ajouter des informations a votre contact pour que d'autres voyageurs vous trouve :)</string>
+    <string name="hint_create_travel_description">Ajouter des informations a votre contact pour que d\'autres voyageurs vous trouve :)</string>
     <string name="hint_save_and_search">Sauvegarder et trouver</string>
     <string name="hint_save_and_search_description">Cliquer "SAUVEGARDER", tous les changements vont etre sauvegarder sur votre profil. Vous pouvez continuer votre recherche.</string>
-    <string name="no_internet">Vous n'avez pas de connection Internet </string>
-    <string name="date_empty">* utilisateur n'a pas entrer de dates</string>
-    <string name="error_sinchronized">Nous sommes desole.... La synchronisation avec App in this Airn'a pas fonctionne.</string>
-    <string name="this_date_is_not_set">Vous n'avez pas encore choisit de date.</string>
+    <string name="no_internet">Vous n\'avez pas de connection Internet </string>
+    <string name="date_empty">* utilisateur n\'a pas entrer de dates</string>
+    <string name="error_sinchronized">Nous sommes desole.... La synchronisation avec App in this Airn\'a pas fonctionne.</string>
     <string name="copy_done">Copie</string>
     <string name="search_change">Votre voyage va etre changer.</string>
-    <string name="search_change_text1">Etes vous sure de vouloir sauvegarder ces informations?</string>
-    <string name="registration_error">App fonctionne uniquement avec Google Accounts. Oups quelques chose n'a pas marche. Verifie votre connections internet et relancer l'App</string>
-    <string name="tips_for_blank_social">Salut, nous avons decouvert que vous creer un voyage et aue vous rechercher un autre voyageur, mais vous n'avez pas entrer de contacte, ajouter votre lien FB.</string>
+    <string name="registration_error">App fonctionne uniquement avec Google Accounts. Oups quelques chose n\'a pas marche. Verifie votre connections internet et relancer l\'App</string>
+    <string name="tips_for_blank_social">Salut, nous avons decouvert que vous creer un voyage et aue vous rechercher un autre voyageur, mais vous n\'avez pas entrer de contacte, ajouter votre lien FB.</string>
     <string name="ok_I_understand">compris.</string>
     <string name="start">Commencer</string>
+    <string name="search_change_text1">Etes vous sure de vouloir sauvegarder ces informations?</string>
+    <string name="this_date_is_not_set">Vous n\'avez pas encore choisit de date.</string>
+
     <string name="finish">terminer</string>
     <string name="to_date">по</string>
     <string name="from_in">c</string>
     <string name="city_in_the_world">Citoyen du monde</string>
     <string name="error_upload_image">Erreur de chargement</string>
-    <string name="error_link_open">Nous sommes incapable d'ouvrir le lien. Il y a peut etre quelques de faux.</string>
+    <string name="error_link_open">Nous sommes incapable d\'ouvrir le lien. Il y a peut etre quelques de faux.</string>
     <string name="last_see">etait en ligne :</string>
     <string name="notification_user_searching">Cet utilisateur cherchait pour vous</string>
 </resources>
