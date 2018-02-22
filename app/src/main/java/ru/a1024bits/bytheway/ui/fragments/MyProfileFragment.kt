@@ -492,7 +492,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         val midPointLat = (coordFrom.latitude + coordTo.latitude) / 2
         val midPointLong = (coordFrom.longitude + coordTo.longitude) / 2
         val blueMarker = BitmapDescriptorFactory.fromResource(R.drawable.pin_blue)
-
         if (cityTwoLatLng.latitude != 0.0 && cityTwoLatLng.longitude != 0.0) {
             googleMap?.addMarker(MarkerOptions()
                     .icon(blueMarker)
@@ -528,7 +527,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                     .flat(true))
 
             if (markerPositionStart != LatLng(0.0, 0.0)) {
-                var perfectZoom = 190 / coordFrom.getBearing(coordTo)
+                var perfectZoom = (190 / coordFrom.getBearing(coordTo)) + 1
                 googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(midPointLat, midPointLong), perfectZoom))
             } else
                 googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(markerPositionFinal, 2.0f))
@@ -735,6 +734,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         new_cities_block.visibility = View.GONE
         textCityTo.visibility = View.VISIBLE
         textDateFrom.visibility = View.VISIBLE
+        line2.visibility = View.INVISIBLE
+        line3.visibility = View.INVISIBLE
         textNewCity.setText("")
         dateFinish.setText("")
 
@@ -763,6 +764,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         textDateFrom.visibility = View.GONE
         textCityTo.visibility = View.GONE
         dateStartTwo.visibility = View.VISIBLE
+        line2.visibility = View.VISIBLE
+        line3.visibility = View.VISIBLE
         textCityMiddleTwo.visibility = View.VISIBLE
         textCityMiddleTwo.text = textCityTo.text
         dateStartTwo.text = textDateFrom.text

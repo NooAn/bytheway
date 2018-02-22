@@ -78,11 +78,10 @@ class DisplayAllUsersAdapter(val context: Context, val viewModel: DisplayUsersVi
      * @param query строка для поиска
      */
     // todo add https://habrahabr.ru/post/265455/
-    fun filterData(query: String) {
-        var query = query
-        query = query.toLowerCase()
+    fun filterData(stringSearch: String) {
+        val query = stringSearch.toLowerCase()
         users.clear()
-        if (query.isEmpty()) {
+        if (query.isBlank()) {
             users.addAll(originalUser)
         } else {
             originalUser
