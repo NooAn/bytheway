@@ -143,6 +143,10 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         when (response?.status) {
             Status.SUCCESS -> {
                 if (response.data != null && activity != null) {
+                    if (response.data.routes?.size == 0) {
+                        this@MyProfileFragment.routeString = ""
+                        drawPolyline()
+                    }
                     response.data.routes?.map {
                         it.overviewPolyline?.encodedData?.let { routeString ->
                             this@MyProfileFragment.routeString = routeString
@@ -534,7 +538,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     fun drawPolyline() {
 
         val blueColor = activity.resources.getColor(R.color.blueRouteLine)
-
         val options = PolylineOptions()
         options.color(blueColor)
 
@@ -544,8 +547,11 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             options.addAll(PolyUtil.decode(routeString))
         } else {
             // fix me рисуем прямую линию ( как будто на самолете летим)
+            options.add(cityFromLatLng.toLatLng())
+            if (!MODE_TWO_CITY) options.add(cityTwoLatLng.toLatLng())
+            options.add(cityToLatLng.toLatLng())
         }
-
+        options.geodesic(true)
         googleMap?.addPolyline(options)
     }
 
@@ -1454,6 +1460,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         viewModel?.getRoute(cityFromLatLng = cityFromLatLng, cityToLatLng = cityToLatLng, waypoint = cityTwoLatLng)
     }
 }
+
+private fun GeoPoint.toLatLng(): LatLng? = LatLng(this.latitude, this.longitude)
 
 private fun Int.toStringOrBlank(): String = if (this == 0) "" else this.toString()
 

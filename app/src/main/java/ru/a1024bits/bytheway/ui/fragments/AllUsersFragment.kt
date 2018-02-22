@@ -1,14 +1,21 @@
 package ru.a1024bits.bytheway.ui.fragments
 
 import android.animation.LayoutTransition
+import android.app.Activity
+import android.app.SearchManager
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
+import android.content.Context
 import android.os.Bundle
+import android.support.v7.widget.SearchView
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.Menu
+import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.EditText
@@ -123,34 +130,51 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
 
     override fun onResume() {
         super.onResume()
-        try {
-            (activity as MenuActivity).toolbar.findViewById<EditText>(R.id.searchUsers).visibility = View.VISIBLE
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+
     }
 
     override fun onPause() {
         super.onPause()
-        try {
-            (activity as MenuActivity).toolbar.findViewById<EditText>(R.id.searchUsers).visibility = View.GONE
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+
     }
 
-    private fun installLogicToUI() {
-        if (activity != null) {
-            (activity as MenuActivity).toolbar.findViewById<EditText>(R.id.searchUsers).setOnEditorActionListener { textView, _, _ ->
-                sortString = textView.text.toString()
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.all_users_menu, menu)
+
+        val searchView = menu.findItem(R.id.search_all_users_item).actionView as SearchView
+        searchView.setSearchableInfo(
+                (context.getSystemService(Context.SEARCH_SERVICE) as SearchManager).getSearchableInfo(activity.componentName))
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                displayUsersAdapter.filterData(query)
                 analytics.logEvent(TAG_ANALYTICS + "SEARCH_QUERY", null)
-                updateViewsBeforeSearch()
-                viewModel?.getAllUsers(filter, sortString)
-                true
+                closeKeyboard()
+                return true
             }
-            (activity as MenuActivity).toolbar.findViewById<EditText>(R.id.searchUsers)
-                    .afterTextChanged { displayUsersAdapter.filterData(it) }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                displayUsersAdapter.filterData(newText)
+                return false
+            }
+        })
+    }
+
+    private fun closeKeyboard() {
+        val imm = activity?.getSystemService(Activity.INPUT_METHOD_SERVICE) as (InputMethodManager?)
+        //Find the currently focused view, so we can grab the correct window token from it.
+        var view: View? = activity?.getCurrentFocus()
+        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (view == null && activity != null) {
+            view = View(activity)
         }
+        imm?.hideSoftInputFromWindow(view?.getWindowToken(), 0);
+    }
+
+
+    private fun installLogicToUI() {
+
         startBudget.filters = arrayOf(DecimalInputFilter())
         endBudget.filters = arrayOf(DecimalInputFilter())
 

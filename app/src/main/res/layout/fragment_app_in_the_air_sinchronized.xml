@@ -82,17 +82,21 @@
             <Button
                 android:id="@+id/button_sinch"
                 android:layout_width="wrap_content"
+                android:layout_marginStart="16dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
+                android:layout_gravity="bottom|end"
                 android:text="@string/sinch_button"
+                android:textAlignment="textEnd"
                 android:theme="@style/WhiteButton" />
 
             <Button
                 android:id="@+id/button_miss"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
+                android:layout_gravity="bottom|end"
+                android:layout_marginEnd="24dp"
                 android:text="@string/miss"
+                android:textAlignment="textEnd"
                 android:theme="@style/WhiteButton" />
         </LinearLayout>
     </LinearLayout>

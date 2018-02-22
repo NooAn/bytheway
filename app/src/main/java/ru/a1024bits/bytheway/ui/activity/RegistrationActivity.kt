@@ -226,15 +226,19 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
                     override fun onVerificationFailed(e: FirebaseException?) {
                         // This callback is invoked in an invalid request for verification is made,
                         // for instance if the the phone number format is not valid.
-                        Log.w("LOG", "onVerificationFailed", e);
-
                         if (e is FirebaseAuthInvalidCredentialsException) {
                             // Invalid request
                             Log.w("LOG", "Invalid Credintial");
+                            mFirebaseAnalytics.logEvent("RegistrationScreen_invalid_sms", null)
+
                         } else if (e is FirebaseTooManyRequestsException) {
                             // The SMS quota for the project has been exceeded
                             Log.w("LOG", "many request", e);
+                            mFirebaseAnalytics.logEvent("RegistrationScreen_error_lot_req", null)
+
                         }
+                        Toast.makeText(this@RegistrationActivity, R.string.just_error, Toast.LENGTH_SHORT).show()
+
                     }
 
                     override fun onCodeSent(verificationId: String?, token: PhoneAuthProvider.ForceResendingToken?) {

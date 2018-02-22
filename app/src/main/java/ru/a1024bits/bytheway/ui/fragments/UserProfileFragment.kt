@@ -352,8 +352,10 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
 
     override fun onResume() {
         super.onResume()
-        if (mMapView != null) {
+        try {
             mMapView?.onResume()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
