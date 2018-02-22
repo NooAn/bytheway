@@ -150,7 +150,7 @@ class MenuActivity : AppCompatActivity(),
                 if (intent.data != null && intent.data.host.contains("appintheair", true)) {
 
                 } else {
-                    if (intent.extras != null) {
+                    if (intent.extras != null && !intent.getStringExtra(NOTIFICATION_CMD).isNullOrEmpty()) {
                         notificationWork(intent)
                     } else {
                         navigator.applyCommand(Replace(Screens.MY_PROFILE_SCREEN, 1))
