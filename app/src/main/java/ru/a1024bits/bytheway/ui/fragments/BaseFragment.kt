@@ -9,14 +9,18 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crash.FirebaseCrash
-import kotlinx.android.synthetic.main.fragment_display_all_users.*
+import kotlinx.android.synthetic.main.app_bar_main.*
+import ru.a1024bits.bytheway.R
+import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.a1024bits.bytheway.viewmodel.BaseViewModel
 import uk.co.deanwild.materialshowcaseview.IShowcaseListener
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView
+
 
 /**
  * Created by Andrei_Gusenkov on 12/18/2017.
@@ -35,10 +39,8 @@ abstract class BaseFragment<T : BaseViewModel> : Fragment() {
         viewModel?.addObserver(lifecycle)
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater?.inflate(getLayoutRes(), container, false)
-        return view
-    }
+    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?) =
+            inflater?.inflate(getLayoutRes(), container, false)
 
     fun showPrompt(nameScreenPrompt: String, dismissText: String?, titleText: String?, contentText: String?, button: View) {
         try {

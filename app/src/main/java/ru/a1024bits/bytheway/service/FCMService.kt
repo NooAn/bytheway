@@ -58,15 +58,14 @@ class FCMService : FirebaseMessagingService() {
 
     private fun createNotification(notificationTitle: String?, notificationBody: String?, intent: Intent) {
 
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+       // intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         val pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT)
-
         val channelId = getString(R.string.app_name)
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
                 .setLargeIcon(BitmapFactory.decodeResource(resources, R.drawable.icon_logo))
-                .setSmallIcon(R.drawable.icon_logo)
+                .setSmallIcon(R.drawable.leak_canary_icon)
                 .setContentTitle(notificationTitle)
                 .setContentText(notificationBody)
                 .setAutoCancel(true)

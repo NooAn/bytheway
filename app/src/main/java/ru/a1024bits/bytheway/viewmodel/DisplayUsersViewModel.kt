@@ -22,7 +22,7 @@ import javax.inject.Inject
  * Created by andrey.gusenkov on 25/09/2017.
  */
 
-class DisplayUsersViewModel @Inject constructor(var userRepository: UserRepository?) : BaseViewModel(), FilterAndInstallListener {
+class DisplayUsersViewModel @Inject constructor(private var userRepository: UserRepository?) : BaseViewModel(), FilterAndInstallListener {
     var response: MutableLiveData<Response<List<User>>> = MutableLiveData()
     var yearsOldUsers = (0..MAX_AGE).mapTo(ArrayList()) { it.toString() }
     override var filter = Filter()
@@ -31,18 +31,17 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
         const val TAG = "showUserViewModel"
     }
 
-    fun getAllUsers(f: Filter) {
+    fun getAllUsers(f: Filter, sortString: String) {
         this.filter = f
-        userRepository?.installAllUsers(this)
+        userRepository?.installAllUsers(this, sortString)
     }
 
-    override fun filterAndInstallUsers(vararg snapshots: QuerySnapshot) {
+    override fun filterAndInstallUsers(sortString: String, vararg snapshots: QuerySnapshot) {
         Single.create<MutableList<User>> { stream ->
             try {
                 Log.e("LOG get filter users", Thread.currentThread().name)
-                val result: MutableList<User> = ArrayList()
+                var result: MutableList<User> = ArrayList()
                 snapshots.map {
-                    result.sortBy { it.dates[START_DATE] }
                     for (document in it) {
                         try {
                             val user = document.toObject(User::class.java)
@@ -54,7 +53,9 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
                         }
                     }
                 }
-                filterUsersByFilter(result, filter)
+                if (sortString.isNotEmpty()) result = filterUsersByString(sortString, result)
+                /*todo if filter by string XOR filter? then add: else*/filterUsersByFilter(result, filter)
+                result.sortBy { it.dates[START_DATE] }
                 stream.onSuccess(result)
             } catch (exp: Exception) {
                 stream.onError(exp) // for fix bugs FirebaseFirestoreException: DEADLINE_EXCEEDED
@@ -78,7 +79,7 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
 
     fun sendUserData(map: HashMap<String, Any>, id: String) {
         userRepository?.let {
-            loadingStatus.setValue(true)
+            loadingStatus.value = true
             disposables.add(it.changeUserProfile(map, id)
                     .timeout(TIMEOUT_SECONDS, timeoutUnit)
                     .retry(2)
@@ -86,7 +87,7 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
                     .subscribe(
                             { Log.e("LOG", "complete") },
                             { t ->
-                                response.setValue(Response.error(t))
+                                response.value = Response.error(t)
                                 Log.e("LOG view model", "send User Data", t)
                             }
                     ))
@@ -95,7 +96,7 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
 
     fun getUsersWithSimilarTravel(paramSearch: Filter) {
         userRepository?.let {
-            loadingStatus.setValue(true)
+            loadingStatus.value = true
             disposables.add(it.getReallUsers(paramSearch)
                     .timeout(TIMEOUT_SECONDS, timeoutUnit)
                     .retry(2)
@@ -140,13 +141,12 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
     }
 
     fun filterUsersByString(primaryQuery: String = "", primaryList: MutableList<User>): MutableList<User> {
-        val queryLowerCase: String = primaryQuery.toLowerCase()
         return primaryList.filterTo(ArrayList()) {
-            it.cities.filterValues { it1 -> it1.toLowerCase().contains(queryLowerCase) }.isNotEmpty() ||
-                    it.name.toLowerCase().contains(queryLowerCase) || it.email.toLowerCase().contains(queryLowerCase) ||
-                    it.age.toString().contains(queryLowerCase) || it.budget.toString().contains(queryLowerCase) ||
-                    it.lastName.toLowerCase().contains(queryLowerCase) || it.phone.contains(primaryQuery) ||
-                    it.route.contains(queryLowerCase) || it.addInformation.toLowerCase().contains(primaryQuery)
+            it.cities.filterValues { it1 -> it1.contains(primaryQuery, true) }.isNotEmpty() ||
+                    it.name.contains(primaryQuery, true) || it.email.contains(primaryQuery, true) ||
+                    it.age.toString().contains(primaryQuery) || it.budget.toString().contains(primaryQuery) ||
+                    it.lastName.contains(primaryQuery, true) || it.phone.contains(primaryQuery) ||
+                    it.route.contains(primaryQuery, true) // || it.addInformation.contains(primaryQuery, true)
         }
     }
 
@@ -209,6 +209,6 @@ class DisplayUsersViewModel @Inject constructor(var userRepository: UserReposito
 
 interface FilterAndInstallListener {
     var filter: Filter
-    fun filterAndInstallUsers(vararg snapshots: QuerySnapshot)
+    fun filterAndInstallUsers(sortString: String, vararg snapshots: QuerySnapshot)
     fun onFailure(e: Throwable)
 }

@@ -204,7 +204,7 @@
 
     <string name="feedback_text1">We would appreciate if you leave a comment.</string>
 
-    <string name="feedback_text2">We'll make our app better together! :)</string>
+    <string name="feedback_text2">We\'ll make our app better together! :)</string>
 
     <string name="email">Email</string>
 
@@ -220,9 +220,9 @@
 
     <string name="no_internet">You have no Internet connection</string>
 
-    <string name="date_empty">* user didn't enter trip dates</string>
+    <string name="date_empty">* user didn\'t enter trip dates</string>
 
-    <string name="error_sinchronized">We are very sorry.... Didn't sync up with app in the air.</string>
+    <string name="error_sinchronized">We are very sorry.... Didn\'t sync up with app in the air.</string>
 
     <string name="this_date_is_not_set">Date is not set yet.</string>
 
@@ -232,9 +232,9 @@
 
     <string name="search_change_text1">Are you sure to save current info?</string>
 
-    <string name="registration_error">The app supports only Google Accounts. Oops something didn't work out. Please check your Internet connections and relaunch the app</string>
+    <string name="registration_error">The app supports only Google Accounts. Oops something didn\'t work out. Please check your Internet connections and relaunch the app</string>
 
-    <string name="tips_for_blank_social">Hi! We found that you've created a trip and are going to search a fellow traveller, but you haven't entered your contact details, add links on FB, WhatsApp phone number or Telegram nickname.</string>
+    <string name="tips_for_blank_social">Hi! We found that you\'ve created a trip and are going to search a fellow traveller, but you haven\'t entered your contact details, add links on FB, WhatsApp phone number or Telegram nickname.</string>
 
     <string name="ok_I_understand">got it.</string>
 

@@ -18,7 +18,7 @@ class MyFirebaseInstanceIDService : FirebaseInstanceIdService() {
      * is initially generated so this is where you would retrieve the token.
      */
     override fun onTokenRefresh() {
-        Log.d("log", "Refreshed token: " + FirebaseInstanceId.getInstance().token!!)
+       // Log.d("log", "Refreshed token: " + FirebaseInstanceId.getInstance().token!!)
         preferences.edit().putBoolean(Constants.FCM_TOKEN, true).apply()
     }
 }
