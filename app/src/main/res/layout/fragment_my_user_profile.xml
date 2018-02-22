@@ -176,7 +176,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/travelledCountries"
                     android:layout_centerHorizontal="true"
-                    android:text="стран" />
+                    android:text="@string/countries" />
             </RelativeLayout>
 
             <!-- FliflightHoursours -->
@@ -201,7 +201,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/flightHours"
                     android:layout_centerHorizontal="true"
-                    android:text="в полете" />
+                    android:text="@string/plainhours" />
             </RelativeLayout>
 
             <!-- FliflightHoursours -->
@@ -226,7 +226,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/flightDistance"
                     android:layout_centerHorizontal="true"
-                    android:text="км"
+                    android:text="@string/km"
                     android:textAlignment="center" />
 
             </RelativeLayout>

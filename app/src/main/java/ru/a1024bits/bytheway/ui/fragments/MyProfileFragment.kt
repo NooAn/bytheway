@@ -429,11 +429,12 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
      *
      */
     private fun getRoutes() {
-        if ((cityToLatLng.longitude != (0.0) && cityFromLatLng.longitude != 0.0
-                        && cityToLatLng.latitude != (0.0) && cityFromLatLng.latitude != 0.0 && MODE_TWO_CITY == true)
-                || (cityToLatLng.longitude != (0.0) && cityFromLatLng.longitude != 0.0
-                        && cityToLatLng.latitude != (0.0) && cityFromLatLng.latitude != 0.0 && MODE_TWO_CITY == false
-                        && cityTwoLatLng.latitude != 0.0 && cityTwoLatLng.longitude != 0.0))
+        if ((cityToLatLng.longitude != 0.0 && cityFromLatLng.longitude != 0.0
+                        && cityToLatLng.latitude != 0.0 && cityFromLatLng.latitude != 0.0 && MODE_TWO_CITY)
+                ||
+                (cityToLatLng.longitude != 0.0 && cityFromLatLng.longitude != 0.0
+                        && cityToLatLng.latitude != 0.0 && cityFromLatLng.latitude != 0.0
+                        && !MODE_TWO_CITY && cityTwoLatLng.latitude != 0.0 && cityTwoLatLng.longitude != 0.0))
             obtainDirection()
     }
 
@@ -597,51 +598,19 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             openInformationEditDialog()
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_header_click", null)
         }
+
         add_city.setOnClickListener {
             MODE_TWO_CITY = !MODE_TWO_CITY
             Log.e("LOG", "mode:" + MODE_TWO_CITY)
             if (MODE_TWO_CITY == true) {
                 // DELETE CITY
-                mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_remove_new_city", null)
-
-                add_city.text = getString(R.string.add_city)
-                new_cities_block.visibility = View.GONE
-                textCityTo.visibility = View.VISIBLE
-                textDateFrom.visibility = View.VISIBLE
-                textNewCity.setText("")
-                dateFinish.setText("")
-
-                textCityTo.text = textCityMiddleTwo.text
-                textDateFrom.text = dateStartTwo.text
-
-                textCityMiddleTwo.visibility = View.GONE
-                dateStartTwo.visibility = View.GONE
-
-                cities[TWO_INDEX_CITY]?.let {
-                    cities[LAST_INDEX_CITY] = it
-                }
-                cities.remove(TWO_INDEX_CITY)
-                dates[END_DATE] = dates[TWO_DATE] ?: 0
-                dates.remove(TWO_DATE)
-                cityToLatLng = cityTwoLatLng
-                cityTwoLatLng = GeoPoint(0.0, 0.0)
-                setMarkers(LAST_CITY_POINT)
-                getRoutes()
+                clearLastCity()
             } else {
                 // ADD NEW CITY
-                mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_add_new_city", null)
-                show3CitiesBlock()
-                //clear old data for new field
-                cityTwoLatLng = cityToLatLng
-                cityToLatLng = GeoPoint(0.0, 0.0)
-                cities[LAST_INDEX_CITY]?.let {
-                    cities[TWO_INDEX_CITY] = it
-                }
-                dates[TWO_DATE] = dates[END_DATE] ?: 0
-
+                addNewCity()
             }
-
         }
+
         choosePriceTravel.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, number: Int, p2: Boolean) {
                 budget = (START_BUDGET * number).toLong()
@@ -741,6 +710,47 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         }
     }
 
+    private fun addNewCity() {
+        mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_add_new_city", null)
+        show3CitiesBlock()
+        //clear old data for new field
+        cityTwoLatLng = cityToLatLng
+        cityToLatLng = GeoPoint(0.0, 0.0)
+        cities[LAST_INDEX_CITY]?.let {
+            cities[TWO_INDEX_CITY] = it
+        }
+        dates[TWO_DATE] = dates[END_DATE] ?: 0
+    }
+
+    private fun clearLastCity() {
+        mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_remove_new_city", null)
+
+        add_city.text = getString(R.string.add_city)
+        new_cities_block.visibility = View.GONE
+        textCityTo.visibility = View.VISIBLE
+        textDateFrom.visibility = View.VISIBLE
+        textNewCity.setText("")
+        dateFinish.setText("")
+
+        textCityTo.text = textCityMiddleTwo.text
+        textDateFrom.text = dateStartTwo.text
+        textDateFrom.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector, 0)
+
+        textCityMiddleTwo.visibility = View.GONE
+        dateStartTwo.visibility = View.GONE
+
+        cities[TWO_INDEX_CITY]?.let {
+            cities[LAST_INDEX_CITY] = it
+        }
+        cities.remove(TWO_INDEX_CITY)
+        dates[END_DATE] = dates[TWO_DATE] ?: 0
+        dates.remove(TWO_DATE)
+        cityToLatLng = cityTwoLatLng
+        cityTwoLatLng = GeoPoint(0.0, 0.0)
+        setMarkers(LAST_CITY_POINT)
+        getRoutes()
+    }
+
     private fun show3CitiesBlock() {
         add_city.text = getString(R.string.remove_city)
         new_cities_block.visibility = View.VISIBLE
@@ -754,7 +764,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         dateFinish.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector, 0)
 
         dateStartTwo.setOnClickListener {
-            openDateDialog(START_DATE, textDateFrom)
+            openDateDialog(START_DATE, dateStartTwo)
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_date_from_click", null)
         }
         dateStartTwo.setOnTouchListener(DateUtils.onDateTouch)
@@ -853,16 +863,17 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             return
         }
         val date = Calendar.getInstance() //current time by default
-        if (dates[key] ?: 0L > 0L) date.timeInMillis = dates[key] ?: date.timeInMillis
+        if (dates[key] ?: 0L > 0L)
+            date.timeInMillis = dates[key] ?: date.timeInMillis
 
         dateDialog = CalendarDatePickerDialogFragment()
                 .setFirstDayOfWeek(Calendar.MONDAY)
                 .setThemeCustom(R.style.BythewayDatePickerDialogTheme)
                 .setPreselectedDate(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH))
         var currentDate = System.currentTimeMillis()
-        if (key.contentEquals(START_DATE)) {
-            if (dates[key] ?: 0L > 0L) currentDate = dates[key] ?: currentDate
-        }
+//        if (key.contentEquals(START_DATE)) {
+//            if (dates[key] ?: 0L > 0L) currentDate = dates[key] ?: currentDate
+//        }
         dateDialog.setDateRange(MonthAdapter.CalendarDay(currentDate), null)
         dateDialog.setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
             view.setText(StringBuilder(" ")
@@ -971,7 +982,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         }
 
         val yearsView = dialogView.findViewById<EditText>(R.id.yearsView)
-        yearsView.setText(age.toString())
+        yearsView.setText(age.toStringOrBlank())
         yearsView.filters = arrayOf(DecimalInputFilter())
 
         simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.save), { _, _ ->
@@ -979,7 +990,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             name = (nameChoose.text.toString()).capitalize()
             lastName = (lastNameChoose.text.toString()).capitalize()
             city = (cityChoose.text.toString()).capitalize()
-            age = (yearsView.text.toStringOrNill()).toInt()
+            age = (yearsView.text.toStringOrZero()).toInt()
 
             username.text = StringBuilder(name).append(" ").append(lastName)
             cityview.text = if (city.isNotEmpty()) city else getString(R.string.native_city)
@@ -1444,4 +1455,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     }
 }
 
-private fun Editable.toStringOrNill(): String = if (this.toString().isBlank()) "0" else this.toString()
+private fun Int.toStringOrBlank(): String = if (this == 0) "" else this.toString()
+
+
+private fun Editable.toStringOrZero(): String = if (this.toString().isBlank()) "0" else this.toString()

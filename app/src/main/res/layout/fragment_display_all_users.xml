@@ -10,23 +10,24 @@
     android:theme="@style/AppTheme.NoActionBar">
 
     <LinearLayout
-        android:background="@color/colorFiltersBackground"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-    <TextView
-        android:id="@+id/searchParametersText"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@color/colorFiltersBackground"
-        android:gravity="center_vertical|start"
-        android:paddingBottom="@dimen/all_users_searchParametersText_vertical_margin"
-        android:paddingStart="@dimen/standard_margin"
-        android:paddingTop="@dimen/all_users_searchParametersText_vertical_margin"
-        android:text="@string/optionSearch"
-        android:textAllCaps="true"
-        android:textColor="@color/colorPrimaryTeams"
-        android:textSize="@dimen/all_users_searchParametersText_text_size" />
+>
+
+        <TextView
+            android:id="@+id/searchParametersText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/colorFiltersBackground"
+            android:gravity="center_vertical|start"
+            android:paddingBottom="@dimen/all_users_searchParametersText_vertical_margin"
+            android:paddingStart="@dimen/standard_margin"
+            android:paddingTop="@dimen/all_users_searchParametersText_vertical_margin"
+            android:text="@string/optionSearch"
+            android:textAllCaps="true"
+            android:textColor="@color/colorPrimaryTeams"
+            android:textSize="@dimen/all_users_searchParametersText_text_size" />
     </LinearLayout>
 
 

@@ -36,22 +36,27 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="32dp"
         android:text="@string/sex"
         android:textSize="@dimen/standard_text_size"
-        app:layout_constraintBottom_toBottomOf="@+id/sex" />
+        app:layout_constraintBottom_toBottomOf="@+id/sex"
+        app:layout_constraintEnd_toEndOf="@+id/dialog_year"
+        app:layout_constraintStart_toStartOf="@+id/dialog_year"
+        app:layout_constraintTop_toBottomOf="@+id/dialog_year" />
 
     <RadioGroup
         android:id="@+id/sex"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="20dp"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.9"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toEndOf="@+id/textView4"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/yearsView"
         tools:ignore="MissingConstraints">
 
@@ -61,7 +66,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:layout_marginStart="16dp"
-            android:text="М" />
+            android:text="@string/gender_male" />
 
         <RadioButton
             android:id="@+id/woman"
@@ -69,7 +74,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:layout_marginStart="16dp"
-            android:text="Ж" />
+            android:text="@string/gender_female" />
 
     </RadioGroup>
 
@@ -78,10 +83,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:text="@string/year_born"
         android:textSize="16sp"
-        app:layout_constraintBottom_toTopOf="@+id/sex" />
+        app:layout_constraintBottom_toTopOf="@+id/sex"
+        app:layout_constraintStart_toStartOf="@+id/dialog_city"
+        app:layout_constraintTop_toBottomOf="@+id/dialog_city" />
 
 
     <EditText
@@ -91,6 +99,7 @@
         android:layout_marginBottom="16dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
+        android:hint="0"
         android:maxLength="3"
         app:layout_constraintBottom_toBottomOf="@+id/dialog_year"
         app:layout_constraintEnd_toEndOf="parent"

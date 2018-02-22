@@ -194,4 +194,7 @@ Nous pouvons ajouter vos vols de App in the Air pour creer un voyage automatique
     <string name="error_link_open">Nous sommes incapable d\'ouvrir le lien. Il y a peut etre quelques de faux.</string>
     <string name="last_see">etait en ligne :</string>
     <string name="notification_user_searching">Cet utilisateur cherchait pour vous</string>
+    <string name="countries">des pays</string>
+    <string name="plainhours">en vol</string>
+    <string name="km">km</string>
 </resources>

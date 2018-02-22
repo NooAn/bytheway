@@ -4,6 +4,8 @@ import android.animation.LayoutTransition
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -121,23 +123,34 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
 
     override fun onResume() {
         super.onResume()
-        (activity as MenuActivity).toolbar.findViewById<EditText>(R.id.searchUsers).visibility = View.VISIBLE
+        try {
+            (activity as MenuActivity).toolbar.findViewById<EditText>(R.id.searchUsers).visibility = View.VISIBLE
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     override fun onPause() {
         super.onPause()
-        (activity as MenuActivity).toolbar.findViewById<EditText>(R.id.searchUsers).visibility = View.GONE
+        try {
+            (activity as MenuActivity).toolbar.findViewById<EditText>(R.id.searchUsers).visibility = View.GONE
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun installLogicToUI() {
-        (activity as MenuActivity).toolbar.findViewById<EditText>(R.id.searchUsers).setOnEditorActionListener { textView, _, _ ->
-            sortString = textView.text.toString()
-            analytics.logEvent(TAG_ANALYTICS + "SEARCH_QUERY", null)
-            updateViewsBeforeSearch()
-            viewModel?.getAllUsers(filter, sortString)
-            true
+        if (activity != null) {
+            (activity as MenuActivity).toolbar.findViewById<EditText>(R.id.searchUsers).setOnEditorActionListener { textView, _, _ ->
+                sortString = textView.text.toString()
+                analytics.logEvent(TAG_ANALYTICS + "SEARCH_QUERY", null)
+                updateViewsBeforeSearch()
+                viewModel?.getAllUsers(filter, sortString)
+                true
+            }
+            (activity as MenuActivity).toolbar.findViewById<EditText>(R.id.searchUsers)
+                    .afterTextChanged { displayUsersAdapter.filterData(it) }
         }
-
         startBudget.filters = arrayOf(DecimalInputFilter())
         endBudget.filters = arrayOf(DecimalInputFilter())
 
@@ -353,5 +366,19 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
     }
 
     private fun showErrorLoading() {
+    }
+
+    fun EditText.afterTextChanged(afterTextChanged: (String) -> Unit) {
+        this.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            }
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            }
+
+            override fun afterTextChanged(editable: Editable?) {
+                afterTextChanged.invoke(editable.toString())
+            }
+        })
     }
 }

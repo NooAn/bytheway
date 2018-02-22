@@ -27,6 +27,7 @@ class FireBaseNotification(var title: String = "",
                            var body: String = "",
                            var cmd: String = "",
                            var value: String? = "")
+
 /**
  *
  */
@@ -62,3 +63,14 @@ data class User(var name: String = "",
                 var token: String = "",
                 var urlPhoto: String = "https://www.ischool.berkeley.edu/sites/default/files/default_images/avatar.jpeg",
                 @ServerTimestamp var timestamp: Date? = Date())
+
+fun User.contains(query: String): Boolean =
+        this.cities.filterValues { city -> city.contains(query, true) }.isNotEmpty() ||
+                this.name.contains(query, true) ||
+                this.lastName.contains(query, true) ||
+                this.city.contains(query, true) ||
+                this.age.toString().contains(query) ||
+                this.budget.toString().contains(query) ||
+                this.lastName.contains(query, true) ||
+                this.phone.contains(query) ||
+                this.addInformation.contains(query, true)

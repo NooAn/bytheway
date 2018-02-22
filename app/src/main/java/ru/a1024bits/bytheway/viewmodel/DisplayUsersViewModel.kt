@@ -8,6 +8,7 @@ import io.reactivex.Single
 import ru.a1024bits.bytheway.model.FireBaseNotification
 import ru.a1024bits.bytheway.model.Response
 import ru.a1024bits.bytheway.model.User
+import ru.a1024bits.bytheway.model.contains
 import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.repository.MAX_AGE
 import ru.a1024bits.bytheway.repository.UserRepository
@@ -142,11 +143,7 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
 
     fun filterUsersByString(primaryQuery: String = "", primaryList: MutableList<User>): MutableList<User> {
         return primaryList.filterTo(ArrayList()) {
-            it.cities.filterValues { it1 -> it1.contains(primaryQuery, true) }.isNotEmpty() ||
-                    it.name.contains(primaryQuery, true) || it.email.contains(primaryQuery, true) ||
-                    it.age.toString().contains(primaryQuery) || it.budget.toString().contains(primaryQuery) ||
-                    it.lastName.contains(primaryQuery, true) || it.phone.contains(primaryQuery) ||
-                    it.route.contains(primaryQuery, true) // || it.addInformation.contains(primaryQuery, true)
+            it.contains(primaryQuery)
         }
     }
 
@@ -160,7 +157,6 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
     private fun getTextDateDayAndMonth(calendarStartDate: Calendar, months: Array<String>): String {
         return StringBuilder("").append(calendarStartDate.get(Calendar.DAY_OF_MONTH))
                 .append(" ")
-//                .append(context.resources.getStringArray(R.array.months_array)[calendarStartDate.get(Calendar.MONTH)])
                 .append(months[calendarStartDate.get(Calendar.MONTH)])
                 .toString()
     }

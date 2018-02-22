@@ -25,11 +25,10 @@
     <string name="title_activity_menu"><font size="20">bytheway</font>
     </string>
     <string name="city_end">Destination</string>
-    <string name="name_button_search">Find fellow travellers</string>
+    <string name="name_button_search">Find travellers</string>
     <string name="city_start">Point of departure</string>
     <string name="city_fromSmall"><font size="13">From</font> </string>
     <string name="city_toSmall">
-
 <font size="13">To</font>
 
 </string>
@@ -256,5 +255,8 @@
     <string name="add_city">+ Add city</string>
     <string name="remove_city">Remove city</string>
     <string name="notification_user_searching">This user  was searching for you</string>
+    <string name="countries">countries</string>
+    <string name="plainhours">in flight</string>
+    <string name="km">km</string>
 
 </resources>
