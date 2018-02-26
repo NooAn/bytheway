@@ -17,6 +17,9 @@ import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.util.Constants.NOTIFICATION_CMD
 import ru.a1024bits.bytheway.util.Constants.NOTIFICATION_TITLE
 import ru.a1024bits.bytheway.util.Constants.NOTIFICATION_VALUE
+import android.app.NotificationChannel
+import android.os.Build
+
 
 class FCMService : FirebaseMessagingService() {
 
@@ -27,7 +30,6 @@ class FCMService : FirebaseMessagingService() {
         var dataValue: String? = null
         var dataCmd: String? = null
 
-        val notificationEnabled = true //todo
         val data = remoteMessage?.getData()
 
         if (data != null) {
@@ -41,39 +43,45 @@ class FCMService : FirebaseMessagingService() {
             notificationBody = remoteMessage.notification?.body
         }
 
-        if (notificationEnabled) {
-            if (dataCmd?.startsWith("fcm_") == true) {
-                val intent = Intent(Constants.FCM_SRV)
-                intent.putExtra(NOTIFICATION_CMD, dataCmd)
-                intent.putExtra(NOTIFICATION_VALUE, dataValue)
-                LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
-            } else {
-                val intent = Intent(this, MenuActivity::class.java)
-                intent.putExtra(NOTIFICATION_CMD, dataCmd)
-                intent.putExtra(NOTIFICATION_VALUE, dataValue)
-                createNotification(notificationTitle, notificationBody, intent)
-            }
+        if (dataCmd?.startsWith("fcm_") == true) {
+            val intent = Intent(Constants.FCM_SRV)
+            intent.putExtra(NOTIFICATION_CMD, dataCmd)
+            intent.putExtra(NOTIFICATION_VALUE, dataValue)
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+        } else {
+            val intent = Intent(this, MenuActivity::class.java)
+            intent.putExtra(NOTIFICATION_CMD, dataCmd)
+            intent.putExtra(NOTIFICATION_VALUE, dataValue)
+            createNotification(notificationTitle, notificationBody, intent)
         }
     }
 
     private fun createNotification(notificationTitle: String?, notificationBody: String?, intent: Intent) {
 
-       // intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        // intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
         val pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT)
         val channelId = getString(R.string.app_name)
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
                 .setLargeIcon(BitmapFactory.decodeResource(resources, R.drawable.icon_logo))
-                .setSmallIcon(R.drawable.leak_canary_icon)
+                .setSmallIcon(R.drawable.icon_logo)
                 .setContentTitle(notificationTitle)
                 .setContentText(notificationBody)
+                .setColor(resources.getColor(R.color.colorAccent))
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
                 .setContentIntent(pendingIntent)
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        // Since android Oreo notification channel is needed.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(channelId,
+                    "bytheway",
+                    NotificationManager.IMPORTANCE_DEFAULT)
 
+            notificationManager.createNotificationChannel(channel)
+        }
         notificationManager.notify(0 /* ID of notification */, notificationBuilder.build())
     }
 }
