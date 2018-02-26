@@ -24,6 +24,7 @@ object Constants {
     const val FCM_SRV = "notify_service"
     const val FCM_TOKEN = "token"
     const val FCM_CMD_UPDATE = "fcm_token_update"
+    const val FCM_UPDATE = "fcm_update"
     const val FCM_CMD_SHOW_USER = "show_user"
     const val FCM_MATCH_PERCENT = 90
     const val FCM_SET = "notify_set"

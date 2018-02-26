@@ -58,7 +58,6 @@ class FCMService : FirebaseMessagingService() {
 
     private fun createNotification(notificationTitle: String?, notificationBody: String?, intent: Intent) {
 
-        // intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
         val pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT)
         val channelId = getString(R.string.app_name)

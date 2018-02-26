@@ -83,7 +83,6 @@ class MenuActivity : AppCompatActivity(),
     }
     private val mMessageReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            //todo
             notificationWork(intent)
         }
     }
@@ -125,7 +124,6 @@ class MenuActivity : AppCompatActivity(),
         glide = Glide.with(this)
         FirebaseCrash.setCrashCollectionEnabled(false)
         FirebaseFirestore.setLoggingEnabled(false)
-
         if (FirebaseAuth.getInstance().currentUser == null) {
             startActivity(Intent(this, RegistrationActivity::class.java))
         }
@@ -152,6 +150,7 @@ class MenuActivity : AppCompatActivity(),
 
                 } else {
                     if (intent.extras != null && !intent.getStringExtra(NOTIFICATION_CMD).isNullOrEmpty()) {
+                        navigator.applyCommand(Replace(Screens.MY_PROFILE_SCREEN, 1))
                         notificationWork(intent)
                     } else {
                         navigator.applyCommand(Replace(Screens.MY_PROFILE_SCREEN, 1))
