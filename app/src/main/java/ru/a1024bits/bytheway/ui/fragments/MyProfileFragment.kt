@@ -527,7 +527,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                     .flat(true))
 
             if (markerPositionStart != LatLng(0.0, 0.0)) {
-                var perfectZoom = (190 / coordFrom.getBearing(coordTo)) + 1
+                val perfectZoom = (190 / coordFrom.getBearing(coordTo)) - 1
                 googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(midPointLat, midPointLong), perfectZoom))
             } else
                 googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(markerPositionFinal, 2.0f))

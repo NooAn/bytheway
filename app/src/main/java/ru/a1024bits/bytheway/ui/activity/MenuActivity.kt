@@ -139,6 +139,7 @@ class MenuActivity : AppCompatActivity(),
         drawer.addDrawerListener(toggle)
         toggle.syncState()
 
+        updateUsersInfo(FirebaseAuth.getInstance().currentUser?.photoUrl.toString())
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
 
@@ -291,10 +292,10 @@ class MenuActivity : AppCompatActivity(),
 
     override fun onFragmentInteraction(user: User?) {
         mainUser = user
-        updateUsersInfo(user?.urlPhoto ?: return)
+        updateUsersInfo(user?.urlPhoto)
     }
 
-    private fun updateUsersInfo(url: String) {
+    private fun updateUsersInfo(url: String?) {
 
         val navigationView = findViewById<NavigationView>(R.id.nav_view)
         navigationView.setNavigationItemSelectedListener(this)
@@ -302,7 +303,7 @@ class MenuActivity : AppCompatActivity(),
         hView.setOnClickListener {
             openProfile()
         }
-        if (url.isNotBlank()) {
+        if (!url.isNullOrBlank()) {
             val image = hView.findViewById<ImageView>(R.id.menu_image_avatar)
             glide?.load(url)
                     ?.apply(RequestOptions.circleCropTransform())
