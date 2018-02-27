@@ -35,10 +35,20 @@
             android:textSize="16sp" />
 
         <ImageView
+            android:id="@+id/line1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="34dp"
             android:src="@drawable/ic_circles_dot"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/line1_one"
+            android:layout_marginTop="34dp"
+            android:src="@drawable/ic_circles_dot_one"
+            android:visibility="gone"
             app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
@@ -134,7 +144,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="34dp"
-            android:src="@drawable/ic_circles_dot"
+            android:src="@drawable/ic_circles_dot_one"
             android:visibility="invisible"
             app:layout_constraintTop_toTopOf="parent"
             tools:visibility="visible" />
@@ -193,7 +203,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="34dp"
-            android:src="@drawable/ic_circles_dot"
+            android:src="@drawable/ic_circles_dot_one"
             android:visibility="invisible"
             app:layout_constraintTop_toTopOf="parent"
             tools:visibility="visible" />
@@ -222,7 +232,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/new_cities_block"
-        android:paddingBottom="10dp">
+        android:padding="10dp">
 
         <TextView
             android:id="@+id/add_city"

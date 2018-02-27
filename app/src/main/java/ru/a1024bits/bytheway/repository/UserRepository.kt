@@ -123,7 +123,6 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
 
                             val result: MutableList<User> = ArrayList()
                             for (document in task.result) {
-                                Log.d(TAG, document.id + " => " + document.data)
 
                                 var user = User()
 
@@ -145,9 +144,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                                                 user.id != FirebaseAuth.getInstance().currentUser?.uid) {
                                             result.add(user)
                                         }
-                                        Log.e("LOG user", user.toString())
-                                    } else {
-                                        Log.e("LOG !user", user.toString())
+
                                     }
                                 } catch (ex: Exception) {
                                     stream.onError(ex)
@@ -156,7 +153,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                             }
                             result.sortByDescending { it.percentsSimilarTravel } // перед отправкой сортируем по степени похожести маршрута.
                             stream.onSuccess(result)
-                            Log.e("LOG", "result $result")
+
                         } else {
                             stream.onError(Exception("Not Successful load users"))
                         }
@@ -179,7 +176,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
     override fun changeUserProfile(map: HashMap<String, Any>, id: String): Completable =
             Completable.create { stream ->
                 try {
-                    Log.e("LOG change Profile R :", Thread.currentThread().name)
+
                     val documentRef = store.collection(COLLECTION_USERS).document(id)
                     store.runTransaction(object : Transaction.Function<Void> {
                         override fun apply(transaction: Transaction): Void? {
@@ -208,7 +205,6 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
 
     fun sendTime(id: String): Completable = Completable.create { stream ->
         try {
-            Log.e("LOG send time R :", Thread.currentThread().name)
 
             val documentRef = store.collection(COLLECTION_USERS).document(id)
             store.runTransaction {

@@ -1,13 +1,16 @@
 package ru.a1024bits.bytheway.ui.activity
 
+import android.app.Dialog
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.net.ConnectivityManager
 import android.os.Bundle
 import android.support.design.widget.Snackbar
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.EditText
@@ -81,15 +84,29 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
                 }
             }
         })
+        if (!isNetworkAvailable()) {
+            showDialogInternet()
+            return
+        }
         signIn()
-        if (isNetworkAvailable() == false) showSnack()
     }
 
     var snackbar: Snackbar? = null
 
-    private fun showSnack() {
-        snackbar = Snackbar.make(this.findViewById(android.R.id.content), R.string.no_internet, Snackbar.LENGTH_LONG)
-        snackbar?.show()
+    private fun showDialogInternet() {
+//        snackbar = Snackbar.make(this.findViewById(android.R.id.content), R.string.no_internet, Snackbar.LENGTH_LONG)
+//        snackbar?.show()
+        val alertDialog = AlertDialog.Builder(this).create();
+        alertDialog.setTitle("Info");
+        alertDialog.setMessage(resources.getString(R.string.no_internet));
+        alertDialog.setButton(Dialog.BUTTON_POSITIVE, "OK", object : DialogInterface.OnClickListener {
+            override fun onClick(dialog: DialogInterface?, which: Int) {
+                signIn()
+                alertDialog.dismiss()
+            }
+
+        })
+        alertDialog.show();
     }
 
     private fun isNetworkAvailable(): Boolean {
@@ -190,7 +207,8 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
     }
 
     private fun showErrorText() {
-        ErrorStandartRegistrationDialog.newInstance(this).show(supportFragmentManager, "dialogRegistrationOnNumber")
+        if (!isNetworkAvailable()) showDialogInternet() else
+            ErrorStandartRegistrationDialog.newInstance(this).show(supportFragmentManager, "dialogRegistrationOnNumber")
     }
 
     fun validatePhoneNumber(phone: EditText): Boolean {

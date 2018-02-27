@@ -64,7 +64,7 @@ class FCMService : FirebaseMessagingService() {
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
                 .setLargeIcon(BitmapFactory.decodeResource(resources, R.drawable.icon_logo))
-                .setSmallIcon(R.drawable.icon_logo)
+                .setSmallIcon(R.drawable.icon_logo_small)
                 .setContentTitle(notificationTitle)
                 .setContentText(notificationBody)
                 .setColor(resources.getColor(R.color.colorAccent))

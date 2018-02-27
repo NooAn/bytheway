@@ -138,7 +138,8 @@
     <string name="attention">Внимание</string>
     <string name="add_city">+ Добавить город</string>
     <string name="remove_city">Удалить город</string>
-    <string name="notification_user_searching">Этот пользователь искал вас</string>
+    <string name="traveller">Путешественник, </string>
+    <string name="notification_user_searching">, искал маршрут схожий с вашим на 90%!</string>
     <string name="countries">стран</string>
     <string name="plainhours">в полете</string>
     <string name="km">км</string>

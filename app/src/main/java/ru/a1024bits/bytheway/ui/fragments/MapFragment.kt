@@ -42,6 +42,7 @@ import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.a1024bits.bytheway.ui.dialogs.TravelSearchSaveDialog
+import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment.Companion.BUDGET
 import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.util.Constants.END_DATE
 import ru.a1024bits.bytheway.util.Constants.FCM_CMD_SHOW_USER
@@ -185,30 +186,28 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
                     showErrorLoading()
                 } else {
 
-                    //debug feature
-                    if (BuildConfig.DEBUG) {
-                        val notifyIds = arrayListOf<String>()
-                        val notifiedIds = (activity as MenuActivity).getNotified()
-                        response.data?.map {
-                            if (it.percentsSimilarTravel >= Constants.FCM_MATCH_PERCENT && !notifiedIds.contains(it.id)) {
-                                notifyIds.add(it.id)
-                                notifiedIds.add(it.id)
-                            }
-                        }
-                        if (notifyIds.size > 0) {
-                            viewModel?.sendNotifications(notifyIds.joinToString(","), FireBaseNotification(
-                                    getString(R.string.app_name),
-                                    getString(R.string.notification_user_searching),
-                                    FCM_CMD_SHOW_USER,
-                                    FirebaseAuth.getInstance().currentUser?.uid
-                            ))
-                            (activity as MenuActivity).updateNotified(notifiedIds)
+                    val notifyIds = arrayListOf<String>()
+                    val notifiedIds = (activity as MenuActivity).getNotified()
+                    response.data?.map {
+                        if (it.percentsSimilarTravel >= Constants.FCM_MATCH_PERCENT && !notifiedIds.contains(it.id)) {
+                            notifyIds.add(it.id)
+                            notifiedIds.add(it.id)
                         }
                     }
-
-                    (activity as MenuActivity).navigator.applyCommand(Forward(Screens.SIMILAR_TRAVELS_SCREEN, response.data))
+                    if (notifyIds.size > 0) {
+                        viewModel?.sendNotifications(notifyIds.joinToString(","), FireBaseNotification(
+                                getString(R.string.app_name),
+                                getString(R.string.traveller) + user.name + getString(R.string.notification_user_searching),
+                                FCM_CMD_SHOW_USER,
+                                FirebaseAuth.getInstance().currentUser?.uid
+                        ))
+                        //(activity as MenuActivity).updateNotified(notifiedIds)
+                    }
                 }
+
+                (activity as MenuActivity).navigator.applyCommand(Forward(Screens.SIMILAR_TRAVELS_SCREEN, response.data))
             }
+
 
             Status.ERROR -> {
                 Log.e("LOG", "log e:" + response.error)
@@ -308,6 +307,7 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
 
         hashMap[ROUTE] = routeString ?: ""
         hashMap[COUNT_TRIP] = 1
+        hashMap[BUDGET] = searchFragment?.filter?.endBudget?.toLong()?: user.budget
         val dates: HashMap<String, Long> = hashMapOf()
         dates[START_DATE] = searchFragment?.filter?.startDate ?: 0
         dates[END_DATE] = searchFragment?.filter?.endDate ?: 0

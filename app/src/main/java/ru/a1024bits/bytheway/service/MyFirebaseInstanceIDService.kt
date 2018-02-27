@@ -29,7 +29,6 @@ class MyFirebaseInstanceIDService : FirebaseInstanceIdService() {
     override fun onTokenRefresh() {
         // Log.d("log", "Refreshed token: " + FirebaseInstanceId.getInstance().token!!)
         val token = FirebaseInstanceId.getInstance().token
-        preferences.edit().putBoolean(Constants.FCM_TOKEN, true).apply()
         preferences.edit().putString(Constants.FCM_CMD_UPDATE, token).apply() // for save на всякий случай! Если что у нас уже есть токены и мы можем их достать.
         try {
             FirebaseFirestore.getInstance().runTransaction({
@@ -40,7 +39,9 @@ class MyFirebaseInstanceIDService : FirebaseInstanceIdService() {
                             .document(currentUid)
                     docRef.update(Constants.FCM_TOKEN, token)
                 }
-            })
+            }).addOnSuccessListener {
+                preferences.edit().putBoolean(Constants.FCM_TOKEN, true).apply()
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             FirebaseCrash.report(e)

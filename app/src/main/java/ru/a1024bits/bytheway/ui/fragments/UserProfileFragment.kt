@@ -105,6 +105,10 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
             textCityTo.text = user.cities[LAST_INDEX_CITY]
         } else if (user.cities.size == 3) {
             direction2.visibility = View.VISIBLE
+            three_dots2.visibility = View.GONE
+            three_dots1.visibility = View.GONE
+            three_dots2_one.visibility = View.VISIBLE
+            three_dots1_one.visibility = View.VISIBLE
             textCityFrom.text = user.cities[FIRST_INDEX_CITY]
             textCityTo.text = user.cities[TWO_INDEX_CITY]
             textCityFrom2.text = user.cities[TWO_INDEX_CITY]
@@ -488,11 +492,15 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
 
     override fun onDestroyView() {
         super.onDestroyView()
-        mapView?.onDestroy()
-        //Clean up resources from google map to prevent memory leaks.
-        //Stop tracking current location
-        if (googleMap != null) {
-            googleMap?.clear()
+        try {
+            mapView?.onDestroy()
+            //Clean up resources from google map to prevent memory leaks.
+            //Stop tracking current location
+            if (googleMap != null) {
+                googleMap?.clear()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 

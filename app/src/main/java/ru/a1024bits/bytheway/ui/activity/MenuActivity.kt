@@ -336,7 +336,6 @@ class MenuActivity : AppCompatActivity(),
 
                     override fun onResponse(call: Call<AccessToken?>?, response: Response<AccessToken?>?) {
                         val accessToken = response?.body()
-                        saveToken(accessToken)
                         val loginService = generator.createService(AirWebService::class.java, accessToken?.getTokenType() + " " + accessToken?.accessToken)
                         loginService.getUserProfile().enqueue(object : Callback<AirUser?> {
                             override fun onFailure(call: Call<AirUser?>?, t: Throwable?) {
@@ -401,11 +400,6 @@ class MenuActivity : AppCompatActivity(),
         return preferences.getBoolean(Constants.FCM_TOKEN, false)
     }
 
-    private fun saveToken(accessToken: AccessToken?) {
-        preferences.edit().putString(Constants.REFRESH_TOKEN, accessToken?.refresToken).apply()
-        preferences.edit().putString(Constants.ACCESS_TOKEN, accessToken?.accessToken).apply()
-        preferences.edit().putString(Constants.TYPE_TOKEN, accessToken?.getTokenType()).apply()
-    }
 
     override fun onBackPressed() {
         navigator.applyCommand(Back())

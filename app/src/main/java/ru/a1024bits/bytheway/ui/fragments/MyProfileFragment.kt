@@ -736,6 +736,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         textDateFrom.visibility = View.VISIBLE
         line2.visibility = View.INVISIBLE
         line3.visibility = View.INVISIBLE
+        line1.visibility = View.VISIBLE
+        line1_one.visibility = View.GONE
         textNewCity.setText("")
         dateFinish.setText("")
 
@@ -766,6 +768,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         dateStartTwo.visibility = View.VISIBLE
         line2.visibility = View.VISIBLE
         line3.visibility = View.VISIBLE
+        line1.visibility = View.GONE
+        line1_one.visibility = View.VISIBLE
         textCityMiddleTwo.visibility = View.VISIBLE
         textCityMiddleTwo.text = textCityTo.text
         dateStartTwo.text = textDateFrom.text
