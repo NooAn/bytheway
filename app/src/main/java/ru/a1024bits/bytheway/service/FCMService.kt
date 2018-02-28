@@ -67,7 +67,6 @@ class FCMService : FirebaseMessagingService() {
                 .setSmallIcon(R.drawable.icon_logo_small)
                 .setContentTitle(notificationTitle)
                 .setContentText(notificationBody)
-                .setColor(resources.getColor(R.color.colorAccent))
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
                 .setContentIntent(pendingIntent)
@@ -80,6 +79,7 @@ class FCMService : FirebaseMessagingService() {
                     NotificationManager.IMPORTANCE_DEFAULT)
 
             notificationManager.createNotificationChannel(channel)
+
         }
         notificationManager.notify(0 /* ID of notification */, notificationBuilder.build())
     }
