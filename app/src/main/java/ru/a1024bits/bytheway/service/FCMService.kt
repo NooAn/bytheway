@@ -19,6 +19,7 @@ import ru.a1024bits.bytheway.util.Constants.NOTIFICATION_TITLE
 import ru.a1024bits.bytheway.util.Constants.NOTIFICATION_VALUE
 import android.app.NotificationChannel
 import android.os.Build
+import android.support.v4.app.NotificationManagerCompat
 
 
 class FCMService : FirebaseMessagingService() {
@@ -58,17 +59,19 @@ class FCMService : FirebaseMessagingService() {
 
     private fun createNotification(notificationTitle: String?, notificationBody: String?, intent: Intent) {
 
-        val pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+        val pendingIntent = PendingIntent.getActivity(this, 109/* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT)
         val channelId = getString(R.string.app_name)
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
-                .setLargeIcon(BitmapFactory.decodeResource(resources, R.drawable.icon_logo))
                 .setSmallIcon(R.drawable.icon_logo_small)
+                .setBadgeIconType(R.drawable.icon_logo_small)
                 .setContentTitle(notificationTitle)
                 .setContentText(notificationBody)
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
+                .setLargeIcon(BitmapFactory.decodeResource(resources, R.drawable.icon_logo))
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(pendingIntent)
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -81,6 +84,6 @@ class FCMService : FirebaseMessagingService() {
             notificationManager.createNotificationChannel(channel)
 
         }
-        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build())
+        notificationManager.notify(1 /* ID of notification */, notificationBuilder.build())
     }
 }

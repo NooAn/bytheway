@@ -190,7 +190,6 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
                     .timeout(TIMEOUT_SECONDS, timeoutUnit)
                     .retry(2)
                     .subscribeOn(getBackgroundScheduler())
-                    .observeOn(getMainThreadScheduler())
                     .subscribe(
                             { Log.e("LOG", "notify complete") },
                             { t ->

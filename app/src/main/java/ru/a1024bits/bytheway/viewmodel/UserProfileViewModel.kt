@@ -18,8 +18,8 @@ class UserProfileViewModel @Inject constructor(var userRepository: UserRepositor
                 .timeout(TIMEOUT_SECONDS, timeoutUnit)
                 .retry(2)
                 .subscribeOn(getBackgroundScheduler())
-                .doOnSubscribe({ _ -> loadingStatus.setValue(true) })
-                .doAfterTerminate({ loadingStatus.setValue(false) })
+                .doOnSubscribe({ _ -> loadingStatus.postValue(true) })
+                .doAfterTerminate({ loadingStatus.postValue(false) })
                 .observeOn(getMainThreadScheduler())
                 .subscribe(
                         { newUser -> response.setValue(Response.success(newUser)) },

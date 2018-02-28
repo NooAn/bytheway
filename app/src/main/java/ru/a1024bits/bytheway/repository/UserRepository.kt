@@ -134,7 +134,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                                     FirebaseCrash.report(ex2)
                                 }
 
-                                try {
+                                try { // is not correct. Потому что логика должна быть в другом слое. Здесь только получение данных. fixme
                                     if (user.cities.size > 0) {
                                         // run search algorithm
                                         val search = SearchTravelers(filter = paramSearch, user = user)

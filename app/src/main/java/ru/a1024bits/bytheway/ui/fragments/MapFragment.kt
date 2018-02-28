@@ -35,6 +35,7 @@ import ru.a1024bits.bytheway.BuildConfig
 import ru.a1024bits.bytheway.MapWebService
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.FireBaseNotification
+import ru.a1024bits.bytheway.model.Method
 import ru.a1024bits.bytheway.model.Status
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.model.map_directions.RoutesList
@@ -186,18 +187,19 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
                     showErrorLoading()
                 } else {
 
-                    val notifyIds = arrayListOf<String>()
-                    val notifiedIds = (activity as MenuActivity).getNotified()
+                    val notifyIdsForUsers = arrayListOf<String>()
+                    val saveNotifiedIds = (activity as MenuActivity).getNotified()
                     response.data?.map {
-                        if (it.percentsSimilarTravel >= Constants.FCM_MATCH_PERCENT && !notifiedIds.contains(it.id)) {
-                            notifyIds.add(it.id)
-                            notifiedIds.add(it.id)
+                        if (it.percentsSimilarTravel >= Constants.FCM_MATCH_PERCENT && !saveNotifiedIds.contains(it.id)) {
+                            notifyIdsForUsers.add(it.id)
+                            saveNotifiedIds.add(it.id)
                         }
                     }
-                    if (notifyIds.size > 0) {
-                        viewModel?.sendNotifications(notifyIds.joinToString(","), FireBaseNotification(
+                    if (notifyIdsForUsers.size > 0) {
+                        if (BuildConfig.DEBUG) notifyIdsForUsers.add(FirebaseAuth.getInstance().currentUser?.uid!!)
+                        viewModel?.sendNotifications(notifyIdsForUsers.joinToString(","), FireBaseNotification(
                                 getString(R.string.app_name),
-                                getString(R.string.traveller) + user.name + getString(R.string.notification_user_searching),
+                                getString(R.string.traveller) + "  ${user.name}" + getString(R.string.notification_user_searching),
                                 FCM_CMD_SHOW_USER,
                                 FirebaseAuth.getInstance().currentUser?.uid
                         ))
@@ -288,37 +290,50 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
         //send data to Firebase
         try {
             viewModel?.sendUserData(getHashMapUser(), uid)
+            changeUserData()
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
+    private fun changeUserData() {
+        user.cities = getCitiesMap()
+        user.dates = getDatesMap()
+        user.budget = getCurrentBudget()
+    }
+
     private fun getHashMapUser(): HashMap<String, Any> {
         val hashMap = HashMap<String, Any>()
-        val cities: HashMap<String, String> = hashMapOf()
-        cities.put(Constants.FIRST_INDEX_CITY, searchFragment?.filter?.startCity.toString())
-        cities.put(Constants.LAST_INDEX_CITY, searchFragment?.filter?.endCity.toString())
 
-        hashMap[CITIES] = cities
-        val method = searchFragment?.filter?.method
-        if (method != null) {
-            hashMap[METHOD] = method
+        hashMap[CITIES] = getCitiesMap()
+
+        searchFragment?.filter?.method?.let {
+            hashMap[METHOD] = it
         }
 
         hashMap[ROUTE] = routeString ?: ""
         hashMap[COUNT_TRIP] = 1
-        hashMap[BUDGET] = searchFragment?.filter?.endBudget?.toLong()?: user.budget
-        val dates: HashMap<String, Long> = hashMapOf()
-        dates[START_DATE] = searchFragment?.filter?.startDate ?: 0
-        dates[END_DATE] = searchFragment?.filter?.endDate ?: 0
+        hashMap[BUDGET] = getCurrentBudget()
+
         hashMap[MyProfileFragment.CITY_FROM] = GeoPoint(searchFragment?.filter?.locationStartCity?.latitude
                 ?: 0.0, searchFragment?.filter?.locationStartCity?.longitude ?: 0.0)
 
         hashMap[MyProfileFragment.CITY_TO] = GeoPoint(searchFragment?.filter?.locationEndCity?.latitude
                 ?: 0.0, searchFragment?.filter?.locationEndCity?.longitude ?: 0.0)
-        hashMap[DATES] = dates
+
+        hashMap[DATES] = getDatesMap()
         return hashMap
     }
+
+    private fun getCurrentBudget() = searchFragment?.filter?.endBudget?.toLong() ?: user.budget
+
+    private fun getDatesMap(): HashMap<String, Long> = hashMapOf(
+            START_DATE to (searchFragment?.filter?.startDate ?: 0L),
+            END_DATE to (searchFragment?.filter?.endDate ?: 0L))
+
+    private fun getCitiesMap(): HashMap<String, String> = hashMapOf(
+            FIRST_INDEX_CITY to searchFragment?.filter?.startCity.toString(),
+            LAST_INDEX_CITY to searchFragment?.filter?.endCity.toString())
 
     private var marker: Marker? = null
 
@@ -370,9 +385,12 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
 
     //lat = y
     //lon = x
-    private var searchFragment: SearchFragment? = null
-    private val markerAnimation = MarkerAnimation()
-    private var listPointPath: ArrayList<LatLng> = ArrayList()
+    private
+    var searchFragment: SearchFragment? = null
+    private
+    val markerAnimation = MarkerAnimation()
+    private
+    var listPointPath: ArrayList<LatLng> = ArrayList()
 
     //Method for finding bearing between two points
     private fun getBearing(begin: LatLng, end: LatLng): Float {
@@ -424,7 +442,8 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
                     LatLngInterpolator.CurveBezie(),
                     onAnimationEnd = {
                         viewModel?.response?.observe(this@MapFragment, listUsers)
-                        viewModel?.getUsersWithSimilarTravel(searchFragment?.filter ?: Filter())
+                        viewModel?.getUsersWithSimilarTravel(searchFragment?.filter
+                                ?: Filter())
                         //  mMap?.clear()
                         listPointPath.clear()
                         markerAnimation.flag = false
@@ -441,12 +460,17 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
                     .commitAllowingStateLoss()
     }
 
-    private val PATTERN_GAP_LENGTH_PX = 20F
-    private val DOT = Dot()
-    private val GAP = Gap(PATTERN_GAP_LENGTH_PX)
+    private
+    val PATTERN_GAP_LENGTH_PX = 20F
+    private
+    val DOT = Dot()
+    private
+    val GAP = Gap(PATTERN_GAP_LENGTH_PX)
 
-    private val PATTERN_POLYGON_ALPHA = Arrays.asList(GAP, DOT)
-    private val COLOR_BLUE_ARGB = -0x657db
+    private
+    val PATTERN_POLYGON_ALPHA = Arrays.asList(GAP, DOT)
+    private
+    val COLOR_BLUE_ARGB = -0x657db
 
     // Draw polyline on map
     private fun drawPolyLineOnMap(list: List<LatLng>) {

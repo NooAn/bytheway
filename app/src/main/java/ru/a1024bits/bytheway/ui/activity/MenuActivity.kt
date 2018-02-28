@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProviders
 import android.arch.lifecycle.Observer
 import android.content.*
 import android.net.ConnectivityManager
+import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.design.widget.Snackbar
@@ -27,6 +28,7 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.places.Places
 import com.google.android.gms.maps.model.LatLng
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.FirebaseFirestore
@@ -39,6 +41,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import ru.a1024bits.bytheway.AirWebService
 import ru.a1024bits.bytheway.App
+import ru.a1024bits.bytheway.BuildConfig
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.*
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
@@ -122,8 +125,10 @@ class MenuActivity : AppCompatActivity(),
         super.onCreate(savedInstanceState)
         App.component.inject(this)
         glide = Glide.with(this)
-        FirebaseCrash.setCrashCollectionEnabled(false)
-        FirebaseFirestore.setLoggingEnabled(false)
+        FirebaseCrash.setCrashCollectionEnabled(BuildConfig.DEBUG)
+        FirebaseFirestore.setLoggingEnabled(BuildConfig.DEBUG)
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
         if (FirebaseAuth.getInstance().currentUser == null) {
             startActivity(Intent(this, RegistrationActivity::class.java))
         }
@@ -499,6 +504,8 @@ class MenuActivity : AppCompatActivity(),
         dialog.show()
     }
 
+    protected lateinit var mFirebaseAnalytics: FirebaseAnalytics
+
     private fun notificationWork(intent: Intent) {
         if (intent.extras != null) {
             val userId: String? = intent.getStringExtra(NOTIFICATION_VALUE)
@@ -508,12 +515,14 @@ class MenuActivity : AppCompatActivity(),
             when (cmd) {
                 Constants.FCM_CMD_SHOW_USER -> {
                     userId?.let {
-
                         showUserSimpleProfile(User(id = userId))
+                        mFirebaseAnalytics.logEvent("Menu_open_profile_from_push", null)
                     }
                 }
                 Constants.FCM_CMD_UPDATE -> {
                     viewModel?.updateFcmToken()
+                    mFirebaseAnalytics.logEvent("Menu_update_fcm", null)
+
                 }
                 else -> {
                     Log.e("LOG", "error open notification")
