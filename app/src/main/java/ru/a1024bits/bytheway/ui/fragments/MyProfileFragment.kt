@@ -35,6 +35,7 @@ import kotlinx.android.synthetic.main.fragment_my_user_profile.*
 import kotlinx.android.synthetic.main.profile_add_trip.*
 import kotlinx.android.synthetic.main.profile_direction.*
 import kotlinx.android.synthetic.main.profile_main_image.*
+import kotlinx.android.synthetic.main.profile_user_many_direction.*
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.*
@@ -908,8 +909,9 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
         var errorString = ""
 
-        if (textCityFrom.text.isEmpty() || textCityTo.text.isEmpty()) {
-            errorString = getString(R.string.fill_required_fields)
+        if (((textCityFrom.text.isEmpty() || textCityTo.text.isEmpty()) && MODE_TWO_CITY)
+                || (!MODE_TWO_CITY) && (textCityFrom.text.isEmpty() || textCityMiddleTwo.text.isNotBlank() || textCityTo2.text.isNotBlank())) {
+            errorString = getString(R.string.fill_required_fields) //fixme not middle city in this error!
             if (textCityFrom.text.isEmpty()) {
                 textCityFrom.error = getString(R.string.name)
                 errorString += " " + getString(R.string.city_from)
