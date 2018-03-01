@@ -35,7 +35,6 @@
     <string name="save">Сохранить</string>
     <string name="exit">Выйти</string>
     <string name="search_users_text">Поиск</string>
-    <string name="search_similar_text">Поиск...</string>
     <string name="text_away_from_profile">Сохранить измененные данные?</string>
     <string name="fill_required_fields">Пожалуйста заполните обязательные поля:</string>
     <string name="fill_phone_invalid">Неверный формат телефона</string>

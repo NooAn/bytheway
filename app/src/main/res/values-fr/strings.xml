@@ -184,8 +184,13 @@
     <string name="start">Commencer</string>
     <string name="search_change_text1">Etes vous sure de vouloir sauvegarder ces informations?</string>
     <string name="this_date_is_not_set">Vous n\'avez pas encore choisit de date.</string>
-
+    <string name="attention">Attention</string>
+    <string name="alternate_entry">Check internet, please. You can try to enter with sms</string>
     <string name="finish">terminer</string>
+    <string name="phone">Phone</string>
+    <string name="connect">Connect</string>
+    <string name="sms_code">Code from sms</string>
+
     <string name="to_date">по</string>
     <string name="from_in">c</string>
     <string name="city_in_the_world">Citoyen du monde</string>

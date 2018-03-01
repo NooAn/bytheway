@@ -14,6 +14,7 @@ import android.support.v4.util.ArrayMap
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import ru.a1024bits.bytheway.util.toJsonString
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.Toast
@@ -35,6 +36,7 @@ import ru.a1024bits.bytheway.BuildConfig
 import ru.a1024bits.bytheway.MapWebService
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.FireBaseNotification
+import ru.a1024bits.bytheway.model.Method
 import ru.a1024bits.bytheway.model.Status
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.model.map_directions.RoutesList
@@ -50,7 +52,6 @@ import ru.a1024bits.bytheway.util.Constants.FIRST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.START_DATE
 import ru.a1024bits.bytheway.util.createMarker
-import ru.a1024bits.bytheway.util.toJsonString
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
 import ru.terrakok.cicerone.commands.Forward
 import java.util.*
@@ -434,7 +435,12 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
             drawPolyLineOnMap(listPointPath)
 
             // Changing marker icon
-            markerOptions.icon(bitmapDescriptorFromVector(activity, R.drawable.plane)).rotation(getBearing(listPointPath.first(), listPointPath[1]))
+            val icon = if (isCar()) {
+                markerOptions.anchor(0.0F, 1.0F)
+                bitmapDescriptorFromVector(activity, R.drawable.ic_car_moving)
+            } else bitmapDescriptorFromVector(activity, R.drawable.plane)
+
+            markerOptions.icon(icon).rotation(getBearing(listPointPath.first(), listPointPath[1]))
 
             marker = mMap?.addMarker(markerOptions)
 
@@ -449,6 +455,12 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
                     })
         }
     }
+
+    private fun isCar(): Boolean =
+            (user.method[Method.CAR.link] == true
+                    || user.method[Method.BUS.link] == true
+                    || user.method[Method.HITCHHIKING.link] == true)
+
 
     private fun initBoxInputFragment() {
         searchFragment = SearchFragment.newInstance(user)

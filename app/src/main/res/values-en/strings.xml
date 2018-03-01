@@ -244,12 +244,16 @@
     <string name="to_date">по</string>
 
     <string name="from_in">c</string>
-
+    <string name="attention">Attention</string>
     <string name="city_in_the_world">World citizen. </string>
+    <string name="alternate_entry">Check internet, please. You can try to enter with sms</string>
+    <string name="connect">Connect</string>
 
     <string name="error_upload_image">Error upload</string>
+    <string name="phone">Phone</string>
 
     <string name="error_link_open">We were unable to open the link. It may be incorrect.</string>
+    <string name="sms_code">Code from sms</string>
 
     <string name="last_see">Was online .. </string>
     <string name="add_city">+ Add city</string>
