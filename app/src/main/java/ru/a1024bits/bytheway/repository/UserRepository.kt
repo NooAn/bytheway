@@ -117,7 +117,8 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
     override fun getReallUsers(paramSearch: Filter): Single<List<User>> =
             Single.create<List<User>> { stream ->
                 try {
-                    store.collection(COLLECTION_USERS).get().addOnCompleteListener({ task ->
+                    store.collection(COLLECTION_USERS).whereGreaterThanOrEqualTo("dates.start_date", System.currentTimeMillis())
+                            .get().addOnCompleteListener({ task ->
                         if (task.isSuccessful) {
                             Log.e("LOG get real users R", Thread.currentThread().name)
 
@@ -134,9 +135,9 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                                     FirebaseCrash.report(ex2)
                                 }
 
-                                try { // is not correct. Потому что логика должна быть в другом слое. Здесь только получение данных. fixme
+                                try {
                                     if (user.cities.size > 0) {
-                                        // run search algorithm
+                                        // run search algorithm. Для оптимизации запускаем сразу.
                                         val search = SearchTravelers(filter = paramSearch, user = user)
 
                                         user.percentsSimilarTravel = search.getEstimation()
@@ -144,7 +145,6 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                                                 user.id != FirebaseAuth.getInstance().currentUser?.uid) {
                                             result.add(user)
                                         }
-
                                     }
                                 } catch (ex: Exception) {
                                     stream.onError(ex)
@@ -161,7 +161,6 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                 } catch (exp: Exception) {
                     stream.onError(exp) // for fix bugs FirebaseFirestoreException: DEADLINE_EXCEEDED
                 }
-
             }
 
     override fun getUserById(userID: String): Task<DocumentSnapshot> {

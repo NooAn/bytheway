@@ -35,7 +35,6 @@ import ru.a1024bits.bytheway.BuildConfig
 import ru.a1024bits.bytheway.MapWebService
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.FireBaseNotification
-import ru.a1024bits.bytheway.model.Method
 import ru.a1024bits.bytheway.model.Status
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.model.map_directions.RoutesList
@@ -433,6 +432,7 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
                 t += 0.01F
             }
             drawPolyLineOnMap(listPointPath)
+
             // Changing marker icon
             markerOptions.icon(bitmapDescriptorFromVector(activity, R.drawable.plane)).rotation(getBearing(listPointPath.first(), listPointPath[1]))
 
@@ -444,13 +444,11 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
                         viewModel?.response?.observe(this@MapFragment, listUsers)
                         viewModel?.getUsersWithSimilarTravel(searchFragment?.filter
                                 ?: Filter())
-                        //  mMap?.clear()
                         listPointPath.clear()
                         markerAnimation.flag = false
                     })
         }
     }
-
 
     private fun initBoxInputFragment() {
         searchFragment = SearchFragment.newInstance(user)

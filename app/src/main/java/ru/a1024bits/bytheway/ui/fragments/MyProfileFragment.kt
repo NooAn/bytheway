@@ -35,7 +35,6 @@ import kotlinx.android.synthetic.main.fragment_my_user_profile.*
 import kotlinx.android.synthetic.main.profile_add_trip.*
 import kotlinx.android.synthetic.main.profile_direction.*
 import kotlinx.android.synthetic.main.profile_main_image.*
-import kotlinx.android.synthetic.main.profile_user_many_direction.*
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.*
@@ -676,8 +675,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_tg_click", null)
         }
         buttonSaveTravelInfo.setOnClickListener {
-            Log.e("LOG", "save travel")
-            sendUserInfoToServer()
+            if (checkingCityText())
+                sendUserInfoToServer()
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_save", null)
         }
         textDateArrived.setOnClickListener {
@@ -695,7 +694,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         addInfoUser.afterTextChanged({
             profileStateHashMap[ADD_INFO] = it
             profileChanged(null, false)
-            Log.d("LOG User", "after text change")
         })
         textCityFrom.setOnClickListener {
             sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM)
@@ -907,41 +905,61 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     private fun sendUserInfoToServer() {
 
+
+        if (socNet.size == 0)
+            showTipsForEmptySocialLink()
+
+        countTrip = 1
+
+        viewModel?.sendUserData(getHashMapUser(), uid, mainUser)
+    }
+
+    private fun checkingCityText(): Boolean {
         var errorString = ""
 
-        if (((textCityFrom.text.isEmpty() || textCityTo.text.isEmpty()) && MODE_TWO_CITY)
-                || (!MODE_TWO_CITY) && (textCityFrom.text.isEmpty() || textCityMiddleTwo.text.isNotBlank() || textCityTo2.text.isNotBlank())) {
-            errorString = getString(R.string.fill_required_fields) //fixme not middle city in this error!
-            if (textCityFrom.text.isEmpty()) {
-                textCityFrom.error = getString(R.string.name)
-                errorString += " " + getString(R.string.city_from)
-            } else {
-                textCityFrom.error = null
-            }
-            if (textCityTo.text.isEmpty()) {
-                textCityTo.error = getString(R.string.yes)
-                errorString += " " + getString(R.string.city_to)
-            } else {
-                textCityTo.error = null
-            }
-            textCityFrom.parent.requestChildFocus(textCityFrom, textCityFrom)
-        }
 
-        if (cityToLatLng.hashCode() == cityFromLatLng.hashCode()) {
+        if (textCityFrom.text.isEmpty()) {
+            textCityFrom.error = getString(R.string.name)
+            errorString = getString(R.string.fill_required_fields) + " " + getString(R.string.city_from)
+        } else
+            textCityFrom.error = null
+
+        if (textCityTo.text.isEmpty() && MODE_TWO_CITY) {
+            textCityTo.error = getString(R.string.yes)
+            errorString += getString(R.string.fill_required_fields) + " " + getString(R.string.city_to)
+        } else
+            textCityTo.error = null
+
+        if (textNewCity.text.isEmpty() && !MODE_TWO_CITY) {
+            textNewCity.error = getString(R.string.yes)
+            errorString += getString(R.string.fill_required_fields) + " " + getString(R.string.city_to)
+        } else
+            textNewCity.error = null
+
+        if (textCityMiddleTwo.text.isEmpty() && !MODE_TWO_CITY) {
+            textCityMiddleTwo.error = getString(R.string.yes)
+            errorString += getString(R.string.fill_required_fields) + " " + getString(R.string.city_to)
+        } else
+            textCityMiddleTwo.error = null
+
+        textCityFrom.parent.requestChildFocus(textCityFrom, textCityFrom)
+
+        if (isDifferentLocationCity()) {
             errorString += " " + getString(R.string.fill_diff_cities)
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_city_equals_err", null)
         }
 
-        if (errorString.isNotEmpty()) {
+        if (errorString.isNotBlank()) {
             Toast.makeText(this@MyProfileFragment.context, errorString, Toast.LENGTH_LONG).show()
-            return
+            return false
         }
-        if (socNet.size == 0) {
-            showTipsForEmptySocialLink()
-        }
-        countTrip = 1
+        return true
+    }
 
-        viewModel?.sendUserData(getHashMapUser(), uid, mainUser)
+    private fun isDifferentLocationCity(): Boolean {
+        return ((cityToLatLng.hashCode() == cityFromLatLng.hashCode())
+                || (cityToLatLng.hashCode() == cityTwoLatLng.hashCode())
+                || (cityTwoLatLng.hashCode() == cityFromLatLng.hashCode()))
     }
 
     private fun showErrorResponse() {

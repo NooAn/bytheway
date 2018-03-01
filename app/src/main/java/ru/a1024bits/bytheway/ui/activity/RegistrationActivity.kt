@@ -151,6 +151,7 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
             // Signed out, show unauthenticated UI.
             if (result.status.statusCode != 200) {
                 mFirebaseAnalytics.logEvent("RegistrationScreen_Error_Not200", null)
+                mFirebaseAnalytics.logEvent("RegistrationScreen_status_${result.status.statusCode}", null)
                 Log.d("LOG", "Problems with enternet ${result.status.statusCode} and ${result.status.toString()}")
             } else {
                 mFirebaseAnalytics.logEvent("RegistrationScreen_Error_NotKnow", null)

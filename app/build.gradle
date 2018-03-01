@@ -18,7 +18,6 @@ android {
         minSdkVersion 21
         targetSdkVersion 27
         versionCode 1
-
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
@@ -36,7 +35,7 @@ android {
 
         bytheway {
             versionCode 19
-            versionName "1.3.0"
+            versionName "2.0.0"
             dimension "default"
         }
     }
