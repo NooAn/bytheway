@@ -203,7 +203,7 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
                                 FCM_CMD_SHOW_USER,
                                 FirebaseAuth.getInstance().currentUser?.uid
                         ))
-                        //(activity as MenuActivity).updateNotified(notifiedIds)
+                        (activity as MenuActivity).updateNotified(saveNotifiedIds)
                     }
                 }
 
