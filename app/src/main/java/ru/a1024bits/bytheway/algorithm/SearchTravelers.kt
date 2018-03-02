@@ -10,9 +10,10 @@ import ru.a1024bits.bytheway.util.Constants.START_DATE
 import java.lang.Math.max
 import kotlin.math.min
 import kotlin.math.roundToLong
-
+    
 /**
  * Created by Bit on 12/16/2017.
+ * Filter is our User data, but user it's all travelers
  */
 class SearchTravelers(val filter: Filter = Filter(), val user: User) {
     val WeightRoute: Int = 72

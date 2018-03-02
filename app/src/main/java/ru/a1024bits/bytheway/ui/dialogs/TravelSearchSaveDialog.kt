@@ -26,7 +26,6 @@ class TravelSearchSaveDialog(mapFragment: MapFragment) : Dialog(mapFragment.acti
         view.findViewById<Button>(R.id.saveButton).setOnClickListener({ v ->
             fragment.saveData()
             mFirebaseAnalytics.logEvent("Search_screen_save", null)
-
             this.dismiss()
             this.cancel()
         })

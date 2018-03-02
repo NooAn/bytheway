@@ -14,6 +14,7 @@ import android.support.v4.util.ArrayMap
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import ru.a1024bits.bytheway.util.toJsonString
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.Toast
@@ -31,8 +32,11 @@ import retrofit2.Response
 import ru.a1024bits.aviaanimation.ui.util.LatLngInterpolator
 import ru.a1024bits.aviaanimation.ui.util.MarkerAnimation
 import ru.a1024bits.bytheway.App
+import ru.a1024bits.bytheway.BuildConfig
 import ru.a1024bits.bytheway.MapWebService
 import ru.a1024bits.bytheway.R
+import ru.a1024bits.bytheway.model.FireBaseNotification
+import ru.a1024bits.bytheway.model.Method
 import ru.a1024bits.bytheway.model.Status
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.model.map_directions.RoutesList
@@ -40,13 +44,17 @@ import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.a1024bits.bytheway.ui.dialogs.TravelSearchSaveDialog
+import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment.Companion.BUDGET
+import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment.Companion.CITY_FROM
+import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment.Companion.CITY_TO
 import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.util.Constants.END_DATE
+import ru.a1024bits.bytheway.util.Constants.FCM_CMD_SHOW_USER
 import ru.a1024bits.bytheway.util.Constants.FIRST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.START_DATE
 import ru.a1024bits.bytheway.util.createMarker
-import ru.a1024bits.bytheway.util.toJsonString
+import ru.a1024bits.bytheway.util.toGeoPoint
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
 import ru.terrakok.cicerone.commands.Forward
 import java.util.*
@@ -177,7 +185,35 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
     private val listUsers: android.arch.lifecycle.Observer<ru.a1024bits.bytheway.model.Response<List<User>>> = android.arch.lifecycle.Observer { response ->
 
         when (response?.status) {
-            Status.SUCCESS -> if (response.data == null && activity != null) showErrorLoading() else (activity as MenuActivity).navigator.applyCommand(Forward(Screens.SIMILAR_TRAVELS_SCREEN, response.data))
+            Status.SUCCESS -> {
+                if (response.data == null && activity != null) {
+                    showErrorLoading()
+                } else {
+
+                    val notifyIdsForUsers = arrayListOf<String>()
+                    val saveNotifiedIds = (activity as MenuActivity).getNotified()
+                    response.data?.map {
+                        if (it.percentsSimilarTravel >= Constants.FCM_MATCH_PERCENT && !saveNotifiedIds.contains(it.id)) {
+                            notifyIdsForUsers.add(it.id)
+                            saveNotifiedIds.add(it.id)
+                        }
+                    }
+                    if (notifyIdsForUsers.size > 0) {
+                        if (BuildConfig.DEBUG)
+                            notifyIdsForUsers.add(FirebaseAuth.getInstance().currentUser?.uid!!)
+                        viewModel?.sendNotifications(notifyIdsForUsers.joinToString(","), FireBaseNotification(
+                                getString(R.string.app_name),
+                                getString(R.string.traveller) + "  ${user.name} " + getString(R.string.notification_user_searching),
+                                FCM_CMD_SHOW_USER,
+                                FirebaseAuth.getInstance().currentUser?.uid
+                        ))
+                        (activity as MenuActivity).updateNotified(saveNotifiedIds)
+                    }
+                }
+
+                (activity as MenuActivity).navigator.applyCommand(Forward(Screens.SIMILAR_TRAVELS_SCREEN, response.data))
+            }
+
 
             Status.ERROR -> {
                 Log.e("LOG", "log e:" + response.error)
@@ -258,42 +294,52 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
         //send data to Firebase
         try {
             viewModel?.sendUserData(getHashMapUser(), uid)
+            changeUserData()
+
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
+    private fun changeUserData() {
+        user.cities = getCitiesMap()
+        user.dates = getDatesMap()
+        user.budget = getCurrentBudget()
+        user.cityFromLatLng = searchFragment?.filter?.locationStartCity.toGeoPoint()
+        user.cityToLatLng = searchFragment?.filter?.locationEndCity.toGeoPoint()
+    }
+
     private fun getHashMapUser(): HashMap<String, Any> {
         val hashMap = HashMap<String, Any>()
-        val cities: HashMap<String, String> = hashMapOf()
-        cities.put(Constants.FIRST_INDEX_CITY, searchFragment?.filter?.startCity.toString())
-        cities.put(Constants.LAST_INDEX_CITY, searchFragment?.filter?.endCity.toString())
 
-        hashMap[CITIES] = cities
-        val method = searchFragment?.filter?.method
-        if (method != null) {
-            hashMap[METHOD] = method
+        hashMap[CITIES] = getCitiesMap()
+        searchFragment?.filter?.method?.let {
+            hashMap[METHOD] = it
         }
-
         hashMap[ROUTE] = routeString ?: ""
         hashMap[COUNT_TRIP] = 1
-        val dates: HashMap<String, Long> = hashMapOf()
-        dates[START_DATE] = searchFragment?.filter?.startDate ?: 0
-        dates[END_DATE] = searchFragment?.filter?.endDate ?: 0
-        hashMap[MyProfileFragment.CITY_FROM] = GeoPoint(searchFragment?.filter?.locationStartCity?.latitude
-                ?: 0.0, searchFragment?.filter?.locationStartCity?.longitude ?: 0.0)
-
-        hashMap[MyProfileFragment.CITY_TO] = GeoPoint(searchFragment?.filter?.locationEndCity?.latitude
-                ?: 0.0, searchFragment?.filter?.locationEndCity?.longitude ?: 0.0)
-        hashMap[DATES] = dates
+        hashMap[BUDGET] = getCurrentBudget()
+        hashMap[CITY_FROM] = searchFragment?.filter?.locationStartCity.toGeoPoint()
+        hashMap[CITY_TO] = searchFragment?.filter?.locationEndCity.toGeoPoint()
+        hashMap[DATES] = getDatesMap()
         return hashMap
     }
+
+    private fun getCurrentBudget() = searchFragment?.filter?.endBudget?.toLong() ?: user.budget
+
+    private fun getDatesMap(): HashMap<String, Long> = hashMapOf(
+            START_DATE to (searchFragment?.filter?.startDate ?: 0L),
+            END_DATE to (searchFragment?.filter?.endDate ?: 0L))
+
+    private fun getCitiesMap(): HashMap<String, String> = hashMapOf(
+            FIRST_INDEX_CITY to searchFragment?.filter?.startCity.toString(),
+            LAST_INDEX_CITY to searchFragment?.filter?.endCity.toString())
 
     private var marker: Marker? = null
 
     override fun onMapReady(googleMap: GoogleMap) {
         this.mMap = googleMap
-        var constLocation = LatLng(50.0, 50.0)
+        val constLocation = LatLng(50.0, 50.0)
         try {
             if (points.size > 0) {
                 setMarker(points.valueAt(0).position, 1)
@@ -339,9 +385,12 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
 
     //lat = y
     //lon = x
-    private var searchFragment: SearchFragment? = null
-    private val markerAnimation = MarkerAnimation()
-    private var listPointPath: ArrayList<LatLng> = ArrayList()
+    private
+    var searchFragment: SearchFragment? = null
+    private
+    val markerAnimation = MarkerAnimation()
+    private
+    var listPointPath: ArrayList<LatLng> = ArrayList()
 
     //Method for finding bearing between two points
     private fun getBearing(begin: LatLng, end: LatLng): Float {
@@ -384,8 +433,14 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
                 t += 0.01F
             }
             drawPolyLineOnMap(listPointPath)
+
             // Changing marker icon
-            markerOptions.icon(bitmapDescriptorFromVector(activity, R.drawable.plane)).rotation(getBearing(listPointPath.first(), listPointPath[1]))
+            val icon = if (isCar()) {
+                markerOptions.anchor(0.0F, 1.0F)
+                bitmapDescriptorFromVector(activity, R.drawable.ic_car_moving)
+            } else bitmapDescriptorFromVector(activity, R.drawable.plane)
+
+            markerOptions.icon(icon).rotation(getBearing(listPointPath.first(), listPointPath[1]))
 
             marker = mMap?.addMarker(markerOptions)
 
@@ -393,13 +448,18 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
                     LatLngInterpolator.CurveBezie(),
                     onAnimationEnd = {
                         viewModel?.response?.observe(this@MapFragment, listUsers)
-                        viewModel?.getUsersWithSimilarTravel(searchFragment?.filter ?: Filter())
-                        //  mMap?.clear()
+                        viewModel?.getUsersWithSimilarTravel(searchFragment?.filter
+                                ?: Filter())
                         listPointPath.clear()
                         markerAnimation.flag = false
                     })
         }
     }
+
+    private fun isCar(): Boolean =
+            (user.method[Method.CAR.link] == true
+                    || user.method[Method.BUS.link] == true
+                    || user.method[Method.HITCHHIKING.link] == true)
 
 
     private fun initBoxInputFragment() {
@@ -410,12 +470,17 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
                     .commitAllowingStateLoss()
     }
 
-    private val PATTERN_GAP_LENGTH_PX = 20F
-    private val DOT = Dot()
-    private val GAP = Gap(PATTERN_GAP_LENGTH_PX)
+    private
+    val PATTERN_GAP_LENGTH_PX = 20F
+    private
+    val DOT = Dot()
+    private
+    val GAP = Gap(PATTERN_GAP_LENGTH_PX)
 
-    private val PATTERN_POLYGON_ALPHA = Arrays.asList(GAP, DOT)
-    private val COLOR_BLUE_ARGB = -0x657db
+    private
+    val PATTERN_POLYGON_ALPHA = Arrays.asList(GAP, DOT)
+    private
+    val COLOR_BLUE_ARGB = -0x657db
 
     // Draw polyline on map
     private fun drawPolyLineOnMap(list: List<LatLng>) {

@@ -8,6 +8,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.*
 import com.google.firebase.firestore.EventListener
+import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageException
 import io.reactivex.Completable
@@ -17,11 +18,13 @@ import ru.a1024bits.bytheway.algorithm.SearchTravelers
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.util.toJsonString
 import ru.a1024bits.bytheway.viewmodel.FilterAndInstallListener
-import java.util.*
 import javax.inject.Inject
 import kotlin.collections.HashMap
-import com.google.firebase.firestore.FirebaseFirestoreException
 
+import com.google.firebase.iid.FirebaseInstanceId
+import ru.a1024bits.bytheway.model.FireBaseNotification
+import ru.a1024bits.bytheway.model.map_directions.RoutesList
+import ru.a1024bits.bytheway.util.Constants
 
 const val COLLECTION_USERS = "users"
 
@@ -78,7 +81,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
         }
     }
 
-    override fun installAllUsers(listener: FilterAndInstallListener) {
+    override fun installAllUsers(listener: FilterAndInstallListener, sortString: String) {
         try {
             var lastTime = listener.filter.endDate
             if (listener.filter.endDate == 0L) {
@@ -86,7 +89,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
             }
             var query = store.collection(COLLECTION_USERS).orderBy("dates.end_date")
             if (listener.filter.endDate == 0L) {
-                query = query.whereGreaterThanOrEqualTo("dates.end_date", lastTime).orderBy("dates.start_date")
+                query = query.whereGreaterThanOrEqualTo("dates.end_date", lastTime)
             } else {
                 query = query.whereLessThanOrEqualTo("dates.end_date", lastTime)
             }
@@ -96,12 +99,13 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                     return@EventListener
                 }
                 if (listener.filter.endDate != 0L) {
-                    listener.filterAndInstallUsers(snapshot)
+                    listener.filterAndInstallUsers(sortString, snapshot)
                     return@EventListener
                 }
                 store.collection(COLLECTION_USERS)
-                        .whereEqualTo("dates.end_date", 0).whereGreaterThan("cities.first_city", "").get().addOnCompleteListener({ task ->
-                    listener.filterAndInstallUsers(snapshot, task.result)
+                        .whereEqualTo("dates.end_date", 0).whereGreaterThan("cities.first_city", "")
+                        .get().addOnCompleteListener({ task ->
+                    listener.filterAndInstallUsers(sortString, snapshot, task.result)
                 }).addOnFailureListener({ e -> listener.onFailure(e) })
             })
         } catch (e: Exception) {
@@ -113,24 +117,27 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
     override fun getReallUsers(paramSearch: Filter): Single<List<User>> =
             Single.create<List<User>> { stream ->
                 try {
-                    store.collection(COLLECTION_USERS).get().addOnCompleteListener({ task ->
+                    store.collection(COLLECTION_USERS).whereGreaterThanOrEqualTo("dates.start_date", System.currentTimeMillis())
+                            .get().addOnCompleteListener({ task ->
                         if (task.isSuccessful) {
                             Log.e("LOG get real users R", Thread.currentThread().name)
 
                             val result: MutableList<User> = ArrayList()
                             for (document in task.result) {
-                                Log.d(TAG, document.id + " => " + document.data)
 
                                 var user = User()
+
                                 try {
                                     user = document.toObject(User::class.java)
+
                                 } catch (ex2: Exception) {
                                     ex2.printStackTrace()
                                     FirebaseCrash.report(ex2)
                                 }
+
                                 try {
                                     if (user.cities.size > 0) {
-                                        // run search algorithm
+                                        // run search algorithm. Для оптимизации запускаем сразу.
                                         val search = SearchTravelers(filter = paramSearch, user = user)
 
                                         user.percentsSimilarTravel = search.getEstimation()
@@ -146,6 +153,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                             }
                             result.sortByDescending { it.percentsSimilarTravel } // перед отправкой сортируем по степени похожести маршрута.
                             stream.onSuccess(result)
+
                         } else {
                             stream.onError(Exception("Not Successful load users"))
                         }
@@ -153,7 +161,6 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                 } catch (exp: Exception) {
                     stream.onError(exp) // for fix bugs FirebaseFirestoreException: DEADLINE_EXCEEDED
                 }
-
             }
 
     override fun getUserById(userID: String): Task<DocumentSnapshot> {
@@ -168,7 +175,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
     override fun changeUserProfile(map: HashMap<String, Any>, id: String): Completable =
             Completable.create { stream ->
                 try {
-                    Log.e("LOG change Profile R :", Thread.currentThread().name)
+
                     val documentRef = store.collection(COLLECTION_USERS).document(id)
                     store.runTransaction(object : Transaction.Function<Void> {
                         override fun apply(transaction: Transaction): Void? {
@@ -186,15 +193,17 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                 }
             }
 
-    override fun getRoute(cityFromLatLng: GeoPoint, cityToLatLng: GeoPoint) =
-            mapService.getDirection(hashMapOf(
-                    "origin" to LatLng(cityFromLatLng.latitude, cityFromLatLng.longitude).toJsonString(),
-                    "destination" to LatLng(cityToLatLng.latitude, cityToLatLng.longitude).toJsonString(),
-                    "sensor" to "false"))
+    override fun getRoute(cityFromLatLng: GeoPoint, cityToLatLng: GeoPoint, waypoints: GeoPoint?): Single<RoutesList> {
+        val latLngPoint = if (waypoints?.latitude == 0.0 || waypoints?.longitude == 0.0 || waypoints == null) "" else LatLng(waypoints.latitude, waypoints.longitude).toJsonString()
+        return mapService.getDirection(hashMapOf(
+                "origin" to LatLng(cityFromLatLng.latitude, cityFromLatLng.longitude).toJsonString(),
+                "destination" to LatLng(cityToLatLng.latitude, cityToLatLng.longitude).toJsonString(),
+                "waypoints" to latLngPoint,
+                "sensor" to "false"))
+    }
 
     fun sendTime(id: String): Completable = Completable.create { stream ->
         try {
-            Log.e("LOG send time R :", Thread.currentThread().name)
 
             val documentRef = store.collection(COLLECTION_USERS).document(id)
             store.runTransaction {
@@ -210,5 +219,33 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
         } catch (e: Exception) {
             stream.onError(e)
         }
+    }
+
+    fun updateFcmToken(token: String?): Completable = Completable.create { stream ->
+        try {
+            store.runTransaction({
+                val currentUid = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
+                if (currentUid.isNotEmpty() && token != null && token.isNotEmpty()) {
+
+                    val docRef = FirebaseFirestore.getInstance().collection(COLLECTION_USERS)
+                            .document(currentUid)
+                    docRef.update(Constants.FCM_TOKEN, token)
+                }
+            }).addOnFailureListener {
+                stream.onError(it)
+            }.addOnSuccessListener { stream.onComplete() }
+        } catch (e: Exception) {
+            stream.onError(e)
+        }
+    }
+
+    fun sendNotifications(ids: String, notification: FireBaseNotification): Completable {
+        return mapService.sendNotifications(hashMapOf(
+                "ids" to ids,
+                "title" to notification.title,
+                "body" to notification.body,
+                "cmd" to notification.cmd,
+                "value" to notification.value.toString()
+        ))
     }
 }

@@ -45,8 +45,14 @@ class SplashActivity : AppCompatActivity() {
         if (preferences.getBoolean(Constants.FIRST_ENTER, true)) {
             startActivity(Intent(this, RegistrationActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
         } else {
+            val menuActivityIntent = Intent(this, MenuActivity::class.java)
+            if (intent.extras != null) {
+                menuActivityIntent.putExtras(intent.extras)
+            }
+            menuActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
             //if it isn't first start
-            startActivity(Intent(this, MenuActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
+            startActivity(menuActivityIntent)
         }
     }
 }

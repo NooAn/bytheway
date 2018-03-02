@@ -3,6 +3,7 @@ package ru.a1024bits.bytheway.util
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.firebase.firestore.GeoPoint
 import ru.a1024bits.bytheway.R
 
 /**
@@ -16,6 +17,8 @@ fun LatLng.createMarker(title: String): MarkerOptions =
                 .title(title)
 
 fun LatLng.toJsonString(): String = "${this.latitude},${this.longitude}"
+
+fun LatLng?.toGeoPoint(): GeoPoint = GeoPoint(this?.latitude ?: 0.0, this?.longitude ?: 0.0)
 
 fun LatLng.getBearing(end: LatLng): Float {
     val lat = Math.abs(this.latitude - end.latitude)

@@ -305,7 +305,9 @@ class SearchFragment : Fragment() {
                     filter.endCity = place.name.toString()
                     text_to_city?.error = null
                     manageErrorCityEquals(firstPoint)
-                    secondPoint?.let { latLng -> (activity as OnFragmentInteractionListener).onSetPoint(latLng, SECOND_MARKER_POSITION) }
+                    secondPoint?.let { latLng ->
+                        (activity as OnFragmentInteractionListener).onSetPoint(latLng, SECOND_MARKER_POSITION)
+                    }
                 }
                 else -> {
                     val status = PlaceAutocomplete.getStatus(activity, data)

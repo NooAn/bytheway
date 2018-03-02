@@ -11,19 +11,22 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.analytics.FirebaseAnalytics
-import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.User
+import ru.a1024bits.bytheway.model.contains
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
+
 
 class DisplayAllUsersAdapter(val context: Context, val viewModel: DisplayUsersViewModel) : RecyclerView.Adapter<DisplayAllUsersAdapter.UserViewHolder>() {
     private var glide: RequestManager = Glide.with(this.context)
     var users: MutableList<User> = ArrayList()
+    val originalUser: ArrayList<User> = ArrayList()
 
 
     fun setItems(users: List<User>?) {
         this.users = users as MutableList<User>
+        originalUser.addAll(users)
         notifyDataSetChanged()
     }
 
@@ -66,4 +69,29 @@ class DisplayAllUsersAdapter(val context: Context, val viewModel: DisplayUsersVi
         var age = view.findViewById<TextView>(R.id.ageContentUser)
         var cities = view.findViewById<TextView>(R.id.usersCities)
     }
+
+    /**
+     *  Поиск.
+     *  Ищем вхождения query в каждом элементе из списка, если такое есть,
+     *  значит добавляем для нового отображения.
+     *  Так формируем новый список для вывода.
+     * @param query строка для поиска
+     */
+    // todo add https://habrahabr.ru/post/265455/
+    fun filterData(stringSearch: String) {
+        val query = stringSearch.toLowerCase()
+        users.clear()
+        if (query.isBlank()) {
+            users.addAll(originalUser)
+        } else {
+            originalUser
+                    .filter { it.contains(query) }
+                    .forEach { users.add(it) }
+        }
+        notifyDataSetChanged()
+    }
 }
+
+
+
+

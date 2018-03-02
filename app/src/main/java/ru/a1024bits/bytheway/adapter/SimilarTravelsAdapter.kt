@@ -31,10 +31,9 @@ class SimilarTravelsAdapter(val context: Context, val users: List<User>) : Recyc
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
         val currentUser = users[position]
         holder.cities.text = if (currentUser.cities["first_city"] != null && currentUser.cities["last_city"] != null)
-            StringBuilder(getShortCity(currentUser.cities.get(FIRST_INDEX_CITY)
-                    ?: ""))
+            StringBuilder(getShortCity(currentUser.cities[FIRST_INDEX_CITY]?.trim() ?: ""))
                     .append(" - ")
-                    .append(getShortCity(currentUser.cities.get(LAST_INDEX_CITY) ?: ""))
+                    .append(getShortCity(currentUser.cities[LAST_INDEX_CITY]?.trim() ?: ""))
         else
             context.getString(R.string.not_cities)
 
@@ -79,12 +78,12 @@ class SimilarTravelsAdapter(val context: Context, val users: List<User>) : Recyc
         var percentSimilarTravel = view.findViewById<TextView>(R.id.percent_similar_travel)
 
         init {
-            view.setOnClickListener({ _ ->
+            view.setOnClickListener {
                 if (adapterPosition != RecyclerView.NO_POSITION && context is MenuActivity) {
                     FirebaseAnalytics.getInstance(context.applicationContext).logEvent("SimilarTravelsFragment_SELECT_USER_" + adapterPosition, null)
                     context.showUserSimpleProfile(users[adapterPosition])
                 }
-            })
+            }
         }
     }
 }

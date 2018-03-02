@@ -1,13 +1,16 @@
 package ru.a1024bits.bytheway.ui.activity
 
+import android.app.Dialog
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.net.ConnectivityManager
 import android.os.Bundle
 import android.support.design.widget.Snackbar
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.EditText
@@ -81,15 +84,29 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
                 }
             }
         })
+        if (!isNetworkAvailable()) {
+            showDialogInternet()
+            return
+        }
         signIn()
-        if (isNetworkAvailable() == false) showSnack()
     }
 
     var snackbar: Snackbar? = null
 
-    private fun showSnack() {
-        snackbar = Snackbar.make(this.findViewById(android.R.id.content), R.string.no_internet, Snackbar.LENGTH_LONG)
-        snackbar?.show()
+    private fun showDialogInternet() {
+//        snackbar = Snackbar.make(this.findViewById(android.R.id.content), R.string.no_internet, Snackbar.LENGTH_LONG)
+//        snackbar?.show()
+        val alertDialog = AlertDialog.Builder(this).create();
+        alertDialog.setTitle("Info");
+        alertDialog.setMessage(resources.getString(R.string.no_internet));
+        alertDialog.setButton(Dialog.BUTTON_POSITIVE, "OK", object : DialogInterface.OnClickListener {
+            override fun onClick(dialog: DialogInterface?, which: Int) {
+                signIn()
+                alertDialog.dismiss()
+            }
+
+        })
+        alertDialog.show();
     }
 
     private fun isNetworkAvailable(): Boolean {
@@ -134,6 +151,7 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
             // Signed out, show unauthenticated UI.
             if (result.status.statusCode != 200) {
                 mFirebaseAnalytics.logEvent("RegistrationScreen_Error_Not200", null)
+                mFirebaseAnalytics.logEvent("RegistrationScreen_status_${result.status.statusCode}", null)
                 Log.d("LOG", "Problems with enternet ${result.status.statusCode} and ${result.status.toString()}")
             } else {
                 mFirebaseAnalytics.logEvent("RegistrationScreen_Error_NotKnow", null)
@@ -148,12 +166,13 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
         signInGoogle(credential)
     }
 
-    fun signInGoogle(credential: AuthCredential) {
+    fun signInGoogle(credential: AuthCredential, errorDialog: ErrorStandartRegistrationDialog? = null) {
         try {
             mAuth?.signInWithCredential(credential)
                     ?.addOnCompleteListener(this) { task ->
                         if (task.isSuccessful) {
                             // Sign in success, update UI with the signed-in user's information
+                            errorDialog?.dismissAllowingStateLoss()
                             Log.d("LOG", "signInWithCredential:success")
                             updateUI(true)
                         } else {
@@ -189,7 +208,8 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
     }
 
     private fun showErrorText() {
-        ErrorStandartRegistrationDialog.newInstance(this).show(supportFragmentManager, "dialogRegistrationOnNumber")
+        if (!isNetworkAvailable()) showDialogInternet() else
+            ErrorStandartRegistrationDialog.newInstance(this).show(supportFragmentManager, "dialogRegistrationOnNumber")
     }
 
     fun validatePhoneNumber(phone: EditText): Boolean {
@@ -225,15 +245,19 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
                     override fun onVerificationFailed(e: FirebaseException?) {
                         // This callback is invoked in an invalid request for verification is made,
                         // for instance if the the phone number format is not valid.
-                        Log.w("LOG", "onVerificationFailed", e);
-
                         if (e is FirebaseAuthInvalidCredentialsException) {
                             // Invalid request
                             Log.w("LOG", "Invalid Credintial");
+                            mFirebaseAnalytics.logEvent("RegistrationScreen_invalid_sms", null)
+
                         } else if (e is FirebaseTooManyRequestsException) {
                             // The SMS quota for the project has been exceeded
                             Log.w("LOG", "many request", e);
+                            mFirebaseAnalytics.logEvent("RegistrationScreen_error_lot_req", null)
+
                         }
+                        Toast.makeText(this@RegistrationActivity, R.string.just_error, Toast.LENGTH_SHORT).show()
+
                     }
 
                     override fun onCodeSent(verificationId: String?, token: PhoneAuthProvider.ForceResendingToken?) {

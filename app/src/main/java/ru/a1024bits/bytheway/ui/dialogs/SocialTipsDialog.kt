@@ -1,5 +1,6 @@
 package ru.a1024bits.bytheway.ui.dialogs
 
+import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
 import android.view.ViewGroup
@@ -16,7 +17,9 @@ class SocialTipsDialog : DialogFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val rootView = inflater.inflate(R.layout.fragment_social_tips_dialog, container, false)
-        getDialog().setTitle(getString(R.string.attention))
+
+        dialog.setTitle(getString(R.string.attention))
+
         rootView.findViewById<Button>(R.id.dismiss).setOnClickListener{
             dismiss()
         }

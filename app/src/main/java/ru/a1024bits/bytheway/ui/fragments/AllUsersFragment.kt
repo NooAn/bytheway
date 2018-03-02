@@ -1,22 +1,30 @@
 package ru.a1024bits.bytheway.ui.fragments
 
 import android.animation.LayoutTransition
+import android.app.Activity
 import android.app.SearchManager
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
 import android.content.Context
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.v7.widget.SearchView
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
-import android.view.*
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.EditText
 import android.widget.TextView
 import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment
 import com.codetroopers.betterpickers.calendardatepicker.MonthAdapter
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crash.FirebaseCrash
+import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.fragment_display_all_users.*
 import kotlinx.android.synthetic.main.searching_parameters_block.*
 import ru.a1024bits.bytheway.App
@@ -47,8 +55,10 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
     private lateinit var displayUsersAdapter: DisplayAllUsersAdapter
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
+    private var sortString: String = ""
     private var countInitialElements = 0
     private lateinit var analytics: FirebaseAnalytics
+    private lateinit var dateDialog: CalendarDatePickerDialogFragment
 
     private val usersObservers: Observer<Response<List<User>>> = Observer { response ->
         when (response?.status) {
@@ -70,16 +80,12 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
         analytics = FirebaseAnalytics.getInstance(this.context)
     }
 
-    private fun showErrorLoading() {
-    }
-
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         App.component.inject(this)
         super.onActivityCreated(savedInstanceState)
         analytics.setCurrentScreen(this.activity, "AllUsersFragment", this.javaClass.simpleName)
 
         try {
-
             viewModel?.let {
                 filter = it.filter
             }
@@ -89,9 +95,13 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             displayAllUsers.adapter = displayUsersAdapter
 
             viewModel?.response?.observe(this, usersObservers)
-            viewModel?.loadingStatus?.observe(this, (activity?.let { it as MenuActivity })?.progressBarLoad
-                    ?: return)
-            viewModel?.getAllUsers(filter)
+            viewModel?.loadingStatus?.observe(this, Observer<Boolean?> { t ->
+                if (t == true)
+                    loadingWhereLoadUsers.visibility = View.VISIBLE
+                else
+                    loadingWhereLoadUsers.visibility = View.GONE
+            })
+            viewModel?.getAllUsers(filter, sortString)
 
             showPrompt("isFirstEnterAllUsersFragment", context.resources.getString(R.string.close_hint),
                     context.resources.getString(R.string.hint_all_travelers), context.resources.getString(R.string.hint_all_travelers_description), searchParametersText)
@@ -99,34 +109,6 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             Log.e("LOG_AUF", e.toString())
             FirebaseCrash.report(e)
         }
-    }
-
-    private lateinit var dateDialog: CalendarDatePickerDialogFragment
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.all_users_menu, menu)
-
-        val searchView = menu.findItem(R.id.search_all_users_item).actionView as SearchView
-        searchView.setSearchableInfo(
-                (context.getSystemService(Context.SEARCH_SERVICE) as SearchManager).getSearchableInfo(activity.componentName))
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            var isNotStartSearch = false
-            override fun onQueryTextSubmit(query: String): Boolean {
-                displayUsersAdapter.setItems(viewModel?.filterUsersByString(query, displayUsersAdapter.users))
-                analytics.logEvent(TAG_ANALYTICS + "SEARCH_QUERY", null)
-                return true
-            }
-
-            override fun onQueryTextChange(newText: String): Boolean {
-                if (newText.isEmpty() && isNotStartSearch && this@AllUsersFragment.view != null) {
-                    updateViewsBeforeSearch()
-                    viewModel?.getAllUsers(filter)
-                }
-                isNotStartSearch = true
-                return false
-            }
-        })
     }
 
     override fun onStart() {
@@ -140,80 +122,59 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
                 .setPreselectedDate(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH))
     }
 
-    private fun openDateArrivedDialog(view: TextView) {
-        if (view.text.contains("  ")) {
-            view.text = getString(R.string.filters_all_users_empty_date)
-            filter.endDate = 0L
-            view.setCompoundDrawables(null, null, null, null)
-            return
-        }
-        val dateTo = Calendar.getInstance() //current time by default
-        if (filter.endDate > 0L) dateTo.timeInMillis = filter.endDate
-        dateDialog = CalendarDatePickerDialogFragment()
-                .setFirstDayOfWeek(Calendar.MONDAY)
-                .setThemeCustom(R.style.BythewayDatePickerDialogTheme)
-                .setPreselectedDate(dateTo.get(Calendar.YEAR), dateTo.get(Calendar.MONTH), dateTo.get(Calendar.DAY_OF_MONTH))
-
-        dateDialog.setDateRange(MonthAdapter.CalendarDay(if (filter.startDate == 0L) System.currentTimeMillis() else filter.startDate), null)
-        dateDialog.setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
-            view.text = StringBuilder(" ")
-                    .append(dayOfMonth)
-                    .append(" ")
-                    .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
-                    .toString()
-            filter.endDate = DateUtils.getLongFromDate(year = year, month = monthOfYear, day = dayOfMonth)
-            view.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector_black, 0)
-        }
-        dateDialog.show(activity.supportFragmentManager, "")
-    }
-
-    private fun openDateFromDialog(view: TextView) {
-        if (view.text.contains("  ")) {
-            view.text = getString(R.string.filters_all_users_empty_date)
-            filter.startDate = 0L
-            view.setCompoundDrawables(null, null, null, null)
-            return
-        }
-        val dateFrom = Calendar.getInstance() //current time by default
-        if (filter.startDate > 0L) dateFrom.timeInMillis = filter.startDate
-
-        dateDialog = CalendarDatePickerDialogFragment()
-                .setFirstDayOfWeek(Calendar.MONDAY)
-                .setThemeCustom(R.style.BythewayDatePickerDialogTheme)
-                .setPreselectedDate(dateFrom.get(Calendar.YEAR), dateFrom.get(Calendar.MONTH), dateFrom.get(Calendar.DAY_OF_MONTH))
-
-        dateDialog.setDateRange(MonthAdapter.CalendarDay(System.currentTimeMillis()), null)
-        dateDialog.setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
-            view.text = StringBuilder(" ")
-                    .append(dayOfMonth)
-                    .append(" ")
-                    .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
-                    .toString()
-            filter.startDate = DateUtils.getLongFromDate(year = year, month = monthOfYear, day = dayOfMonth)
-            view.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector_black, 0)
-        }
-        dateDialog.show(activity.supportFragmentManager, "")
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.search_all_users_item -> {
-            true
-        }
-        else -> super.onOptionsItemSelected(item)
-    }
-
     override fun getViewFactoryClass() = viewModelFactory
 
     override fun getLayoutRes() = R.layout.fragment_display_all_users
 
     override fun getViewModelClass(): Class<DisplayUsersViewModel> = DisplayUsersViewModel::class.java
 
-    fun nonSuchSetDate() {
-        Snackbar.make(activity.findViewById(android.R.id.content), context.getString(R.string.dates_has_been_incorrect), Snackbar.LENGTH_LONG).show()
+    override fun onResume() {
+        super.onResume()
+
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.all_users_menu, menu)
+
+        val searchView = menu.findItem(R.id.search_all_users_item).actionView as SearchView
+        searchView.setSearchableInfo(
+                (context.getSystemService(Context.SEARCH_SERVICE) as SearchManager).getSearchableInfo(activity.componentName))
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                displayUsersAdapter.filterData(query)
+                analytics.logEvent(TAG_ANALYTICS + "SEARCH_QUERY", null)
+                closeKeyboard()
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                displayUsersAdapter.filterData(newText)
+                return false
+            }
+        })
+    }
+
+    private fun closeKeyboard() {
+        val imm = activity?.getSystemService(Activity.INPUT_METHOD_SERVICE) as (InputMethodManager?)
+        //Find the currently focused view, so we can grab the correct window token from it.
+        var view: View? = activity?.getCurrentFocus()
+        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (view == null && activity != null) {
+            view = View(activity)
+        }
+        imm?.hideSoftInputFromWindow(view?.getWindowToken(), 0);
     }
 
 
     private fun installLogicToUI() {
+
         startBudget.filters = arrayOf(DecimalInputFilter())
         endBudget.filters = arrayOf(DecimalInputFilter())
 
@@ -310,7 +271,6 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             sexButtons.check(sexAny.id)
         }
 
-        view_contain_block_parameters.layoutTransition.setDuration(700L)
         searchParametersText.setOnClickListener {
             if (block_search_parameters.visibility == View.GONE) {
                 block_search_parameters.visibility = View.VISIBLE
@@ -319,6 +279,62 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             }
         }
     }
+
+    private fun openDateArrivedDialog(view: TextView) {
+        if (view.text.contains("  ")) {
+            view.text = getString(R.string.filters_all_users_empty_date)
+            filter.endDate = 0L
+            view.setCompoundDrawables(null, null, null, null)
+            return
+        }
+        val dateTo = Calendar.getInstance() //current time by default
+        if (filter.endDate > 0L) dateTo.timeInMillis = filter.endDate
+        dateDialog = CalendarDatePickerDialogFragment()
+                .setFirstDayOfWeek(Calendar.MONDAY)
+                .setThemeCustom(R.style.BythewayDatePickerDialogTheme)
+                .setPreselectedDate(dateTo.get(Calendar.YEAR), dateTo.get(Calendar.MONTH), dateTo.get(Calendar.DAY_OF_MONTH))
+
+        dateDialog.setDateRange(MonthAdapter.CalendarDay(if (filter.startDate == 0L) System.currentTimeMillis() else filter.startDate), null)
+        dateDialog.setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
+            view.text = StringBuilder(" ")
+                    .append(dayOfMonth)
+                    .append(" ")
+                    .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
+                    .toString()
+            filter.endDate = DateUtils.getLongFromDate(year = year, month = monthOfYear, day = dayOfMonth)
+            view.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector_black, 0)
+        }
+        dateDialog.show(activity.supportFragmentManager, "")
+    }
+
+    private fun openDateFromDialog(view: TextView) {
+        if (view.text.contains("  ")) {
+            view.text = getString(R.string.filters_all_users_empty_date)
+            filter.startDate = 0L
+            view.setCompoundDrawables(null, null, null, null)
+            return
+        }
+        val dateFrom = Calendar.getInstance() //current time by default
+        if (filter.startDate > 0L) dateFrom.timeInMillis = filter.startDate
+
+        dateDialog = CalendarDatePickerDialogFragment()
+                .setFirstDayOfWeek(Calendar.MONDAY)
+                .setThemeCustom(R.style.BythewayDatePickerDialogTheme)
+                .setPreselectedDate(dateFrom.get(Calendar.YEAR), dateFrom.get(Calendar.MONTH), dateFrom.get(Calendar.DAY_OF_MONTH))
+
+        dateDialog.setDateRange(MonthAdapter.CalendarDay(System.currentTimeMillis()), null)
+        dateDialog.setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
+            view.text = StringBuilder(" ")
+                    .append(dayOfMonth)
+                    .append(" ")
+                    .append(context.resources.getStringArray(R.array.months_array)[monthOfYear])
+                    .toString()
+            filter.startDate = DateUtils.getLongFromDate(year = year, month = monthOfYear, day = dayOfMonth)
+            view.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector_black, 0)
+        }
+        dateDialog.show(activity.supportFragmentManager, "")
+    }
+
 
     private fun setLogEventForSearch() {
         if (filter.endDate != 0L) analytics.logEvent(TAG_ANALYTICS + "END_DATE", null)
@@ -340,7 +356,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             override fun endTransition(p0: LayoutTransition?, p1: ViewGroup?, view: View, p3: Int) {
                 if ((view.id == block_search_parameters.id) && (block_search_parameters.visibility == View.GONE)) {
                     updateViewsBeforeSearch()
-                    viewModel?.getAllUsers(filter)
+                    viewModel?.getAllUsers(filter, sortString)
                     view_contain_block_parameters.layoutTransition.removeTransitionListener(this)
                 }
             }
@@ -350,11 +366,9 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
     private fun updateViewsBeforeSearch() {
         displayAllUsers.visibility = View.GONE
         block_empty_users.visibility = View.GONE
-        loadingWhereLoadUsers.visibility = View.VISIBLE
     }
 
     private fun updateViewsAfterSearch(isNotEmptyListUsers: Boolean) {
-        loadingWhereLoadUsers.visibility = View.GONE
         if (isNotEmptyListUsers)
             displayAllUsers.visibility = View.VISIBLE
         else
@@ -373,5 +387,23 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             viewModel?.getTextFromDates(filter.endDate, context.resources.getStringArray(R.array.months_array)) else getString(R.string.filters_all_users_empty_date)
         if (filter.endDate > 0L)
             choseDateEnd.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector_black, 0)
+    }
+
+    private fun showErrorLoading() {
+        loadingWhereLoadUsers
+    }
+
+    fun EditText.afterTextChanged(afterTextChanged: (String) -> Unit) {
+        this.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            }
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            }
+
+            override fun afterTextChanged(editable: Editable?) {
+                afterTextChanged.invoke(editable.toString())
+            }
+        })
     }
 }

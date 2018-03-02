@@ -22,6 +22,12 @@ enum class SocialNetwork(var link: String) {
 }
 
 class SocialResponse(var link: String = "", var value: String = "")
+
+class FireBaseNotification(var title: String = "",
+                           var body: String = "",
+                           var cmd: String = "",
+                           var value: String? = "")
+
 /**
  *
  */
@@ -35,6 +41,7 @@ data class User(var name: String = "",
                 var flightHours: Long = 0,
                 var cityFromLatLng: GeoPoint = GeoPoint(0.0, 0.0),
                 var cityToLatLng: GeoPoint = GeoPoint(0.0, 0.0),
+                var cityTwoLatLng: GeoPoint = GeoPoint(0.0, 0.0),
                 var countries: Long = 0,
                 var kilometers: Long = 0,
                 var route: String = "",
@@ -53,5 +60,17 @@ data class User(var name: String = "",
                 var sex: Int = 0,
                 var socialNetwork: HashMap<String, String> = hashMapOf<String, String>(),
                 var data: Long = 0,
+                var token: String = "",
                 var urlPhoto: String = "https://www.ischool.berkeley.edu/sites/default/files/default_images/avatar.jpeg",
                 @ServerTimestamp var timestamp: Date? = Date())
+
+fun User.contains(query: String): Boolean =
+        this.cities.filterValues { city -> city.contains(query, true) }.isNotEmpty() ||
+                this.name.contains(query, true) ||
+                this.lastName.contains(query, true) ||
+                this.city.contains(query, true) ||
+                this.age.toString().contains(query) ||
+                this.budget.toString().contains(query) ||
+                this.lastName.contains(query, true) ||
+                this.phone.contains(query) ||
+                this.addInformation.contains(query, true)

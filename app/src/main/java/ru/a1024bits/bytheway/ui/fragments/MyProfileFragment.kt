@@ -25,10 +25,7 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException
 import com.google.android.gms.location.places.AutocompleteFilter
 import com.google.android.gms.location.places.ui.PlaceAutocomplete
 import com.google.android.gms.maps.*
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.PolylineOptions
+import com.google.android.gms.maps.model.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.GeoPoint
@@ -46,15 +43,17 @@ import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.a1024bits.bytheway.ui.dialogs.SocialTipsDialog
+import ru.a1024bits.bytheway.util.*
 import ru.a1024bits.bytheway.util.Constants.END_DATE
 import ru.a1024bits.bytheway.util.Constants.FIRST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM
+import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM_MIDDLE_CITY
 import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO
+import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO_NEW_CITY
 import ru.a1024bits.bytheway.util.Constants.START_DATE
-import ru.a1024bits.bytheway.util.DateUtils
-import ru.a1024bits.bytheway.util.DecimalInputFilter
-import ru.a1024bits.bytheway.util.getBearing
+import ru.a1024bits.bytheway.util.Constants.TWO_DATE
+import ru.a1024bits.bytheway.util.Constants.TWO_INDEX_CITY
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import ru.terrakok.cicerone.commands.Replace
 import java.text.SimpleDateFormat
@@ -75,6 +74,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         const val DATES = "dates"
         const val CITY_FROM = "cityFromLatLng"
         const val CITY_TO = "cityToLatLng"
+        const val CITY_TWO = "cityTwoLatLng"
         const val ADD_INFO = "addInformation"
         const val COUNT_TRIP = "countTrip"
         const val SEX = "sex"
@@ -96,6 +96,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     private var name = ""
     private var cityFromLatLng = GeoPoint(0.0, 0.0)
     private var cityToLatLng = GeoPoint(0.0, 0.0)
+    private var cityTwoLatLng = GeoPoint(0.0, 0.0)
     private var lastName = ""
     private var city = ""
     private lateinit var dateDialog: CalendarDatePickerDialogFragment
@@ -142,6 +143,10 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         when (response?.status) {
             Status.SUCCESS -> {
                 if (response.data != null && activity != null) {
+                    if (response.data.routes?.size == 0) {
+                        this@MyProfileFragment.routeString = ""
+                        drawPolyline()
+                    }
                     response.data.routes?.map {
                         it.overviewPolyline?.encodedData?.let { routeString ->
                             this@MyProfileFragment.routeString = routeString
@@ -168,6 +173,20 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             Status.ERROR -> {
                 mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_error_upload", null)
                 showErrorUploadImage()
+            }
+        }
+    }
+
+    private val tokenObserver: Observer<ResponseBtw<Boolean>> = Observer {
+        when (it?.status) {
+            Status.SUCCESS -> {
+                if (!activity.isDestroyed) {
+                    (activity as MenuActivity).tokenUpdated()
+                    mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_token_updated", null)
+                }
+            }
+            Status.ERROR -> {
+                mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_error_token_upd", null)
             }
         }
     }
@@ -260,6 +279,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         viewModel?.loadingStatus?.observe(this, (activity as MenuActivity).progressBarLoad)
 
         viewModel?.photoUrl?.observe(this, photoUrlObserver)
+        viewModel?.token?.observe(this, tokenObserver)
 
         if (viewModel?.saveSocial?.hasObservers() == false) {
             viewModel?.saveSocial?.observe(this, observerSaveSocial)
@@ -301,10 +321,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                     } else {
                         cities[FIRST_INDEX_CITY] = place.name.toString()
                         profileStateHashMap[CITY_FROM] = cityFromLatLng.hashCode().toString()
-
-                        if (cityToLatLng.latitude != 0.0 && cityToLatLng.longitude != 0.0)
-                            obtainDirection()
-                        setMarkers(1)
+                        getRoutes()
+                        setMarkers(FIRST_CITY_POINT)
                         profileChanged()
                     }
                 }
@@ -319,8 +337,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO -> when (resultCode) {
                 AppCompatActivity.RESULT_OK -> {
                     val place = PlaceAutocomplete.getPlace(activity, data)
-                    textCityTo.setText(place.name)
-                    textCityTo.error = null
+                    textCityTo?.setText(place.name)
+                    textCityTo?.error = null
                     cityToLatLng = GeoPoint(place.latLng.latitude, place.latLng.longitude)
                     if (cityToLatLng.hashCode() == cityFromLatLng.hashCode()) {
                         textCityTo.error = "true"
@@ -329,9 +347,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                     } else {
                         cities[LAST_INDEX_CITY] = place.name.toString()
                         profileStateHashMap[CITY_TO] = cityToLatLng.hashCode().toString()
-                        if (cityFromLatLng.latitude != 0.0 && cityFromLatLng.longitude != 0.0)
-                            obtainDirection()
-                        setMarkers(2)
+                        getRoutes()
+                        setMarkers(LAST_CITY_POINT)
                         profileChanged()
                     }
                 }
@@ -340,6 +357,56 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                     Log.i("LOG", status.statusMessage + " ")
                     if (textCityTo.text.isEmpty())
                         textCityTo.setText("")
+                }
+            }
+            PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM_MIDDLE_CITY -> when (resultCode) {
+                AppCompatActivity.RESULT_OK -> {
+                    val place = PlaceAutocomplete.getPlace(activity, data)
+                    textCityMiddleTwo.setText(place.name)
+                    textCityMiddleTwo.error = null
+                    cityTwoLatLng = GeoPoint(place.latLng.latitude, place.latLng.longitude)
+                    if (cityTwoLatLng.hashCode() == cityFromLatLng.hashCode() || cityTwoLatLng == cityToLatLng) {
+                        textCityTo.error = "true"
+                        Toast.makeText(this@MyProfileFragment.context,
+                                getString(R.string.fill_diff_cities), Toast.LENGTH_LONG).show()
+                    } else {
+                        cities[TWO_INDEX_CITY] = place.name.toString()
+                        profileStateHashMap[CITY_TWO] = cityTwoLatLng.hashCode().toString()
+                        getRoutes()
+                        setMarkers(TWO_CITY_POINT)
+                        profileChanged()
+                    }
+                }
+                else -> {
+                    val status = PlaceAutocomplete.getStatus(activity, data)
+                    Log.i("LOG", status.statusMessage + " ")
+                    if (textCityMiddleTwo.text.isEmpty())
+                        textCityMiddleTwo.setText("")
+                }
+            }
+            PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO_NEW_CITY -> when (resultCode) {
+                AppCompatActivity.RESULT_OK -> {
+                    val place = PlaceAutocomplete.getPlace(activity, data)
+                    textNewCity?.setText(place.name)
+                    textNewCity?.error = null
+                    cityToLatLng = GeoPoint(place.latLng.latitude, place.latLng.longitude)
+                    if (cityToLatLng.hashCode() == cityFromLatLng.hashCode() || cityToLatLng.hashCode() == cityTwoLatLng.hashCode()) {
+                        textCityTo.error = "true"
+                        Toast.makeText(this@MyProfileFragment.context,
+                                getString(R.string.fill_diff_cities), Toast.LENGTH_LONG).show()
+                    } else {
+                        cities[LAST_INDEX_CITY] = place.name.toString()
+                        profileStateHashMap[CITY_TO] = cityToLatLng.hashCode().toString()
+                        getRoutes()
+                        setMarkers(LAST_CITY_POINT)
+                        profileChanged()
+                    }
+                }
+                else -> {
+                    val status = PlaceAutocomplete.getStatus(activity, data)
+                    Log.i("LOG", status.statusMessage + " ")
+                    if (textNewCity.text.isEmpty())
+                        textNewCity.setText("")
                 }
             }
             READ_REQUEST_CODE -> when (resultCode) {
@@ -359,6 +426,22 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         }
     }
 
+    /**
+     *
+     * Если у нас сейчас заполнение только двух городов то надо сделать вызов после заполнения двух городов.
+     * Если у нас сейчас заполнение (@MODE_TWO_CITY == false) трех городов то надо также проверить на заполняемость всех трех городов
+     *
+     */
+    private fun getRoutes() {
+        if ((cityToLatLng.longitude != 0.0 && cityFromLatLng.longitude != 0.0
+                        && cityToLatLng.latitude != 0.0 && cityFromLatLng.latitude != 0.0 && MODE_TWO_CITY)
+                ||
+                (cityToLatLng.longitude != 0.0 && cityFromLatLng.longitude != 0.0
+                        && cityToLatLng.latitude != 0.0 && cityFromLatLng.latitude != 0.0
+                        && !MODE_TWO_CITY && cityTwoLatLng.latitude != 0.0 && cityTwoLatLng.longitude != 0.0))
+            obtainDirection()
+    }
+
     override fun onResume() {
         super.onResume()
         try {
@@ -373,33 +456,50 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         viewModel?.load(uid)
     }
 
+    val TWO_CITY_POINT = 3
+    val FIRST_CITY_POINT = 1
+    val LAST_CITY_POINT = 2
+
     private fun setMarkers(position: Int) {
         googleMap?.clear()
         val coordFrom = LatLng(cityFromLatLng.latitude, cityFromLatLng.longitude)
+        val coordMiddle = LatLng(cityTwoLatLng.latitude, cityTwoLatLng.longitude)
         val coordTo = LatLng(cityToLatLng.latitude, cityToLatLng.longitude)
         var markerTitleStart: String? = ""
         var markerTitleFinal: String? = ""
+        var markerTwoTitle: String? = ""
         var markerPositionStart = LatLng(0.0, 0.0)
+        var markerPositionTwo = LatLng(0.0, 0.0)
         var markerPositionFinal = LatLng(0.0, 0.0)
-        val cityFrom = cities[FIRST_INDEX_CITY]
-        val cityTo = cities[LAST_INDEX_CITY]
-        if (position == 1) {
-            markerTitleStart = cityTo
-            markerTitleFinal = cityFrom
+        val nameCityFrom = cities[FIRST_INDEX_CITY]
+        val nameCityTo = cities[LAST_INDEX_CITY]
+        if (position == FIRST_CITY_POINT) {
+            markerTitleStart = nameCityTo
+            markerTitleFinal = nameCityFrom
             markerPositionStart = coordTo
             markerPositionFinal = coordFrom
 
-        } else if (position == 2) {
-            markerTitleFinal = cityTo
-            markerTitleStart = cityFrom
+        } else if (position == LAST_CITY_POINT) {
+            markerTitleFinal = nameCityTo
+            markerTitleStart = nameCityFrom
             markerPositionFinal = coordTo
             markerPositionStart = coordFrom
+        } else if (position == TWO_CITY_POINT) {
+            markerPositionTwo = coordMiddle
+            markerTwoTitle = cities[TWO_INDEX_CITY]
         }
 
         val midPointLat = (coordFrom.latitude + coordTo.latitude) / 2
         val midPointLong = (coordFrom.longitude + coordTo.longitude) / 2
         val blueMarker = BitmapDescriptorFactory.fromResource(R.drawable.pin_blue)
-
+        if (cityTwoLatLng.latitude != 0.0 && cityTwoLatLng.longitude != 0.0) {
+            googleMap?.addMarker(MarkerOptions()
+                    .icon(blueMarker)
+                    .position(LatLng(cityTwoLatLng.latitude, cityTwoLatLng.longitude))
+                    .title(cities[Constants.TWO_INDEX_CITY])
+                    .anchor(0.5F, 1.0F)
+                    .flat(true))
+        }
         if (markerPositionStart != LatLng(0.0, 0.0)) {
             googleMap?.addMarker(MarkerOptions()
                     .icon(blueMarker)
@@ -408,7 +508,14 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                     .anchor(0.5F, 1.0F)
                     .flat(true))
         }
-
+        if (markerPositionTwo != LatLng(0.0, 0.0)) {
+            googleMap?.addMarker(MarkerOptions()
+                    .icon(blueMarker)
+                    .position(markerPositionTwo)
+                    .title(markerTwoTitle)
+                    .anchor(0.5F, 1.0F)
+                    .flat(true))
+        }
 
         if (markerPositionFinal != LatLng(0.0, 0.0)) {
             googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(markerPositionFinal, 4.0f))
@@ -420,7 +527,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                     .flat(true))
 
             if (markerPositionStart != LatLng(0.0, 0.0)) {
-                var perfectZoom = 190 / coordFrom.getBearing(coordTo)
+                val perfectZoom = (190 / coordFrom.getBearing(coordTo)) - 1
                 googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(midPointLat, midPointLong), perfectZoom))
             } else
                 googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(markerPositionFinal, 2.0f))
@@ -430,7 +537,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     fun drawPolyline() {
 
         val blueColor = activity.resources.getColor(R.color.blueRouteLine)
-
         val options = PolylineOptions()
         options.color(blueColor)
 
@@ -440,15 +546,17 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             options.addAll(PolyUtil.decode(routeString))
         } else {
             // fix me рисуем прямую линию ( как будто на самолете летим)
+            options.add(cityFromLatLng.toLatLng())
+            if (!MODE_TWO_CITY) options.add(cityTwoLatLng.toLatLng())
+            options.add(cityToLatLng.toLatLng())
         }
-
+        options.geodesic(true)
         googleMap?.addPolyline(options)
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = super.onCreateView(inflater, container, savedInstanceState)
         mapView = view?.findViewById(R.id.mapView)
-
         try {
             mapView?.onCreate(null)
             MapsInitializer.initialize(context)
@@ -477,6 +585,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         mListener = null
     }
 
+    private var MODE_TWO_CITY: Boolean = true
+
     override fun onStart() {
         super.onStart()
 
@@ -492,6 +602,18 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         headerprofile.setOnClickListener {
             openInformationEditDialog()
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_header_click", null)
+        }
+
+        add_city.setOnClickListener {
+            MODE_TWO_CITY = !MODE_TWO_CITY
+            Log.e("LOG", "mode:" + MODE_TWO_CITY)
+            if (MODE_TWO_CITY == true) {
+                // DELETE CITY
+                clearLastCity()
+            } else {
+                // ADD NEW CITY
+                addNewCity()
+            }
         }
 
         choosePriceTravel.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -553,15 +675,15 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_tg_click", null)
         }
         buttonSaveTravelInfo.setOnClickListener {
-            Log.e("LOG", "save travel")
-            sendUserInfoToServer()
+            if (checkingCityText())
+                sendUserInfoToServer()
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_save", null)
         }
-        dateArrived.setOnClickListener {
-            openDateDialog(END_DATE, dateArrived)
+        textDateArrived.setOnClickListener {
+            openDateDialog(END_DATE, textDateArrived)
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_date_to_click", null)
         }
-        dateArrived.setOnTouchListener(DateUtils.onDateTouch)
+        textDateArrived.setOnTouchListener(DateUtils.onDateTouch)
 
         textDateFrom.setOnClickListener {
             openDateDialog(START_DATE, textDateFrom)
@@ -572,8 +694,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         addInfoUser.afterTextChanged({
             profileStateHashMap[ADD_INFO] = it
             profileChanged(null, false)
-            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_add_info", null)
-            Log.d("LOG User", "after text change")
         })
         textCityFrom.setOnClickListener {
             sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM)
@@ -591,6 +711,101 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         buttonRemoveTravelInfo.setOnClickListener {
             openAlertDialog(this::removeTrip)
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_remove_trip", null)
+        }
+    }
+
+    private fun addNewCity() {
+        mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_add_new_city", null)
+        show3CitiesBlock()
+        //clear old data for new field
+        cityTwoLatLng = cityToLatLng
+        cityToLatLng = GeoPoint(0.0, 0.0)
+        cities[LAST_INDEX_CITY]?.let {
+            cities[TWO_INDEX_CITY] = it
+        }
+        dates[TWO_DATE] = dates[END_DATE] ?: 0
+    }
+
+    private fun clearLastCity() {
+        mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_remove_new_city", null)
+
+        add_city.text = getString(R.string.add_city)
+        new_cities_block.visibility = View.GONE
+        textCityTo.visibility = View.VISIBLE
+        textDateFrom.visibility = View.VISIBLE
+        line2.visibility = View.INVISIBLE
+        line3.visibility = View.INVISIBLE
+        line1.visibility = View.VISIBLE
+        line1_one.visibility = View.GONE
+        textNewCity.setText("")
+        dateFinish.setText("")
+
+        textCityTo.text = textCityMiddleTwo.text
+        textDateFrom.text = dateStartTwo.text
+        textDateFrom.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector, 0)
+
+        textCityMiddleTwo.visibility = View.GONE
+        dateStartTwo.visibility = View.GONE
+
+        cities[TWO_INDEX_CITY]?.let {
+            cities[LAST_INDEX_CITY] = it
+        }
+        cities.remove(TWO_INDEX_CITY)
+        dates[END_DATE] = dates[TWO_DATE] ?: 0
+        dates.remove(TWO_DATE)
+        cityToLatLng = cityTwoLatLng
+        cityTwoLatLng = GeoPoint(0.0, 0.0)
+        setMarkers(LAST_CITY_POINT)
+        getRoutes()
+    }
+
+    private fun show3CitiesBlock() {
+        add_city.text = getString(R.string.remove_city)
+        new_cities_block.visibility = View.VISIBLE
+        textDateFrom.visibility = View.GONE
+        textCityTo.visibility = View.GONE
+        dateStartTwo.visibility = View.VISIBLE
+        line2.visibility = View.VISIBLE
+        line3.visibility = View.VISIBLE
+        line1.visibility = View.GONE
+        line1_one.visibility = View.VISIBLE
+        textCityMiddleTwo.visibility = View.VISIBLE
+        textCityMiddleTwo.text = textCityTo.text
+        dateStartTwo.text = textDateFrom.text
+        dateStartTwo.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector, 0)
+        dateFinish.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector, 0)
+
+        dateStartTwo.setOnClickListener {
+            openDateDialog(START_DATE, dateStartTwo)
+            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_date_from_click", null)
+        }
+        dateStartTwo.setOnTouchListener(DateUtils.onDateTouch)
+
+        dateFinish.setOnClickListener {
+            openDateDialog(END_DATE, dateFinish)
+            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_date_to_click", null)
+        }
+        dateFinish.setOnTouchListener(DateUtils.onDateTouch)
+
+        textDateArrived.setOnClickListener {
+            openDateDialog(TWO_DATE, textDateArrived)
+            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_date_midle_click", null)
+        }
+        textDateArrived.setOnTouchListener(DateUtils.onDateTouch)
+
+        textCityFrom.setOnClickListener {
+            sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM)
+            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_city_from_change", null)
+        }
+
+        textNewCity.setOnClickListener {
+            sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO_NEW_CITY)
+            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_city_to_change", null)
+        }
+
+        textCityMiddleTwo.setOnClickListener {
+            sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM_MIDDLE_CITY)
+            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_city_ml_change", null)
         }
     }
 
@@ -660,16 +875,17 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             return
         }
         val date = Calendar.getInstance() //current time by default
-        if (dates[key] ?: 0L > 0L) date.timeInMillis = dates[key] ?: date.timeInMillis
+        if (dates[key] ?: 0L > 0L)
+            date.timeInMillis = dates[key] ?: date.timeInMillis
 
         dateDialog = CalendarDatePickerDialogFragment()
                 .setFirstDayOfWeek(Calendar.MONDAY)
                 .setThemeCustom(R.style.BythewayDatePickerDialogTheme)
                 .setPreselectedDate(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH))
         var currentDate = System.currentTimeMillis()
-        if (key.contentEquals(START_DATE)) {
-            if (dates[key] ?: 0L > 0L) currentDate = dates[key] ?: currentDate
-        }
+//        if (key.contentEquals(START_DATE)) {
+//            if (dates[key] ?: 0L > 0L) currentDate = dates[key] ?: currentDate
+//        }
         dateDialog.setDateRange(MonthAdapter.CalendarDay(currentDate), null)
         dateDialog.setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
             view.setText(StringBuilder(" ")
@@ -689,40 +905,61 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     private fun sendUserInfoToServer() {
 
+
+        if (socNet.size == 0)
+            showTipsForEmptySocialLink()
+
+        countTrip = 1
+
+        viewModel?.sendUserData(getHashMapUser(), uid, mainUser)
+    }
+
+    private fun checkingCityText(): Boolean {
         var errorString = ""
 
-        if (textCityFrom.text.isEmpty() || textCityTo.text.isEmpty()) {
-            errorString = getString(R.string.fill_required_fields)
-            if (textCityFrom.text.isEmpty()) {
-                textCityFrom.error = getString(R.string.name)
-                errorString += " " + getString(R.string.city_from)
-            } else {
-                textCityFrom.error = null
-            }
-            if (textCityTo.text.isEmpty()) {
-                textCityTo.error = getString(R.string.yes)
-                errorString += " " + getString(R.string.city_to)
-            } else {
-                textCityTo.error = null
-            }
-            textCityFrom.parent.requestChildFocus(textCityFrom, textCityFrom)
-        }
 
-        if (cityToLatLng.hashCode() == cityFromLatLng.hashCode()) {
+        if (textCityFrom.text.isEmpty()) {
+            textCityFrom.error = getString(R.string.name)
+            errorString = getString(R.string.fill_required_fields) + " " + getString(R.string.city_from)
+        } else
+            textCityFrom.error = null
+
+        if (textCityTo.text.isEmpty() && MODE_TWO_CITY) {
+            textCityTo.error = getString(R.string.yes)
+            errorString += getString(R.string.fill_required_fields) + " " + getString(R.string.city_to)
+        } else
+            textCityTo.error = null
+
+        if (textNewCity.text.isEmpty() && !MODE_TWO_CITY) {
+            textNewCity.error = getString(R.string.yes)
+            errorString += getString(R.string.fill_required_fields) + " " + getString(R.string.city_to)
+        } else
+            textNewCity.error = null
+
+        if (textCityMiddleTwo.text.isEmpty() && !MODE_TWO_CITY) {
+            textCityMiddleTwo.error = getString(R.string.yes)
+            errorString += getString(R.string.fill_required_fields) + " " + getString(R.string.city_to)
+        } else
+            textCityMiddleTwo.error = null
+
+        textCityFrom.parent.requestChildFocus(textCityFrom, textCityFrom)
+
+        if (isDifferentLocationCity()) {
             errorString += " " + getString(R.string.fill_diff_cities)
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_city_equals_err", null)
         }
 
-        if (errorString.isNotEmpty()) {
+        if (errorString.isNotBlank()) {
             Toast.makeText(this@MyProfileFragment.context, errorString, Toast.LENGTH_LONG).show()
-            return
+            return false
         }
-        if (socNet.size == 0) {
-            showTipsForEmptySocialLink()
-        }
-        countTrip = 1
+        return true
+    }
 
-        viewModel?.sendUserData(getHashMapUser(), uid, mainUser)
+    private fun isDifferentLocationCity(): Boolean {
+        return ((cityToLatLng.hashCode() == cityFromLatLng.hashCode())
+                || (cityToLatLng.hashCode() == cityTwoLatLng.hashCode())
+                || (cityTwoLatLng.hashCode() == cityFromLatLng.hashCode()))
     }
 
     private fun showErrorResponse() {
@@ -778,7 +1015,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         }
 
         val yearsView = dialogView.findViewById<EditText>(R.id.yearsView)
-        yearsView.setText(age.toString())
+        yearsView.setText(age.toStringOrBlank())
         yearsView.filters = arrayOf(DecimalInputFilter())
 
         simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.save), { _, _ ->
@@ -786,7 +1023,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             name = (nameChoose.text.toString()).capitalize()
             lastName = (lastNameChoose.text.toString()).capitalize()
             city = (cityChoose.text.toString()).capitalize()
-            age = (yearsView.text.toStringOrNill()).toInt()
+            age = (yearsView.text.toStringOrZero()).toInt()
 
             username.text = StringBuilder(name).append(" ").append(lastName)
             cityview.text = if (city.isNotEmpty()) city else getString(R.string.native_city)
@@ -948,7 +1185,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         direction.visibility = View.GONE
         textCityFrom.setText("")
         textCityTo.setText("")
-        dateArrived.setText("")
+        textDateArrived.setText("")
         textDateFrom.setText("")
         addInfoUser.setText("")
         maplayout.visibility = View.GONE
@@ -1043,6 +1280,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
         cityFromLatLng = user.cityFromLatLng
         cityToLatLng = user.cityToLatLng
+        cityTwoLatLng = user.cityTwoLatLng
 
         profileStateHashMap.clear()
         lastName = user.lastName
@@ -1070,34 +1308,58 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             showBlockTravelInformation()
         }
 
-        if (user.cities.size > 0) {
+        if (user.cities.size == 1 || user.cities.size == 2) {
             textCityFrom.setText(user.cities[FIRST_INDEX_CITY])
             textCityTo.setText(user.cities[LAST_INDEX_CITY])
             cities = user.cities
+        } else if (user.cities.size == 3) {
+            MODE_TWO_CITY = false // Включаем режим трех городов.
+            show3CitiesBlock()
+            textCityFrom.setText(user.cities[FIRST_INDEX_CITY])
+            textCityMiddleTwo.setText(user.cities[TWO_INDEX_CITY])
+            textNewCity.setText(user.cities[LAST_INDEX_CITY])
+            cities = user.cities
+
         }
 
         val formatDate = SimpleDateFormat("dd.MM.yyyy", Locale.US)
 
         if (user.dates.size > 0) {
-            if (user.dates[START_DATE] != null && user.dates[START_DATE] != 0L) {
-                textDateFrom.setText(formatDate.format(Date(user.dates[START_DATE] ?: 0)))
-                textDateFrom.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector, 0)
-            }
-            if (user.dates[END_DATE] != null && user.dates[END_DATE] != 0L) {
-                dateArrived.setText(formatDate.format(Date(user.dates[END_DATE] ?: 0)))
-                dateArrived.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector, 0)
+            if (user.cities.size == 2) {
+                if (user.dates[START_DATE] != null && user.dates[START_DATE] != 0L) {
+                    textDateFrom.setText(formatDate.format(Date(user.dates[START_DATE] ?: 0)))
+                    textDateFrom.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector, 0)
+                }
+                if (user.dates[END_DATE] != null && user.dates[END_DATE] != 0L) {
+                    textDateArrived.setText(formatDate.format(Date(user.dates[END_DATE] ?: 0)))
+                    textDateArrived.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector, 0)
+                }
+            } else {
+                // Для случая когда у нас три города
+                if (user.dates[START_DATE] != null && user.dates[START_DATE] != 0L) {
+                    dateStartTwo.setText(formatDate.format(Date(user.dates[START_DATE] ?: 0)))
+                    dateStartTwo.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector, 0)
+                }
+                if (user.dates[END_DATE] != null && user.dates[END_DATE] != 0L) {
+                    dateFinish.setText(formatDate.format(Date(user.dates[END_DATE] ?: 0)))
+                    dateFinish.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector, 0)
+                }
+                if (user.dates[TWO_DATE] != null && user.dates[TWO_DATE] != 0L) {
+                    textDateArrived.setText(formatDate.format(Date(user.dates[TWO_DATE] ?: 0)))
+                    textDateArrived.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector, 0)
+                }
             }
             dates = user.dates
         }
 
         fillAgeSex(user.age, user.sex)
-        setMarkers(2)
+        setMarkers(LAST_CITY_POINT)
 
         if (user.route.isNotBlank()) {
             routeString = user.route
             drawPolyline()
         } else
-            obtainDirection()
+            obtainDirection() // для стразовки. Если машрута нет, то пытаемя получить его.
 
         age = user.age
 
@@ -1116,7 +1378,9 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                 socialValues[name.key] = name.value
             }
         }
-
+        if (user.token.isEmpty() || (activity as MenuActivity).needUpdateToken()) {
+            viewModel?.updateFcmToken()
+        }
         if (user.socialNetwork.size == 0 && user.countTrip > 0) {
             showTipsForEmptySocialLink()
         }
@@ -1151,23 +1415,25 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     private fun showTipsForEmptySocialLink() {
         val tips = SocialTipsDialog()
         tips.show(fragmentManager, "Tips")
+        scrollProfile?.fullScroll(ScrollView.FOCUS_UP)
     }
+
 
     private fun removeTrip() {
         countTrip = 0
         budget = 0
         methods.clear()
         cities.clear()
-        //addInfoUser.setText("")
         cityFromLatLng = GeoPoint(0.0, 0.0)
         cityToLatLng = GeoPoint(0.0, 0.0)
+        cityTwoLatLng = GeoPoint(0.0, 0.0)
         dates.clear()
         googleMap?.clear()
         routeString = ""
         viewModel?.sendUserData(getHashMapUser(), uid, mainUser)
         hideBlockTravelInforamtion()
         showBlockAddTrip()
-        dateArrived.setCompoundDrawables(null, null, null, null)
+        textDateArrived.setCompoundDrawables(null, null, null, null)
         textDateFrom.setCompoundDrawables(null, null, null, null)
     }
 
@@ -1183,6 +1449,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     fun getHashMapUser(): HashMap<String, Any> {
         if (budget > 0)
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_budget_more_0", null)
+        if (addInfoUser.text.toString().isNotBlank())
+            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_add_info", null)
 
         val hashMap = HashMap<String, Any>()
 
@@ -1193,6 +1461,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         hashMap[BUDGET] = budget
         hashMap[BUDGET_POSITION] = budgetPosition
         hashMap[CITY_FROM] = cityFromLatLng
+        hashMap[CITY_TWO] = cityTwoLatLng
         hashMap[CITY_TO] = cityToLatLng
         hashMap[ADD_INFO] = addInfoUser.text.toString()
         hashMap[COUNT_TRIP] = countTrip
@@ -1217,8 +1486,13 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     }
 
     private fun obtainDirection() {
-        viewModel?.getRoute(cityFromLatLng = cityFromLatLng, cityToLatLng = cityToLatLng)
+        viewModel?.getRoute(cityFromLatLng = cityFromLatLng, cityToLatLng = cityToLatLng, waypoint = cityTwoLatLng)
     }
 }
 
-private fun Editable.toStringOrNill(): String = if (this.toString().isBlank()) "0" else this.toString()
+private fun GeoPoint.toLatLng(): LatLng? = LatLng(this.latitude, this.longitude)
+
+private fun Int.toStringOrBlank(): String = if (this == 0) "" else this.toString()
+
+
+private fun Editable.toStringOrZero(): String = if (this.toString().isBlank()) "0" else this.toString()

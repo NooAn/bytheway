@@ -3,14 +3,14 @@ package ru.a1024bits.bytheway.ui.activity
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.arch.lifecycle.Observer
-import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
+import android.content.*
 import android.net.ConnectivityManager
+import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
+import android.support.v4.content.LocalBroadcastManager
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
@@ -28,6 +28,7 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.places.Places
 import com.google.android.gms.maps.model.LatLng
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.FirebaseFirestore
@@ -40,6 +41,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import ru.a1024bits.bytheway.AirWebService
 import ru.a1024bits.bytheway.App
+import ru.a1024bits.bytheway.BuildConfig
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.*
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
@@ -53,6 +55,8 @@ import ru.a1024bits.bytheway.router.Screens.Companion.USER_SINHRONIZED_SCREEN
 import ru.a1024bits.bytheway.ui.dialogs.FeedbackDialog
 import ru.a1024bits.bytheway.ui.fragments.*
 import ru.a1024bits.bytheway.util.Constants
+import ru.a1024bits.bytheway.util.Constants.NOTIFICATION_CMD
+import ru.a1024bits.bytheway.util.Constants.NOTIFICATION_VALUE
 import ru.a1024bits.bytheway.util.ProgressCustom
 import ru.a1024bits.bytheway.util.ServiceGenerator
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
@@ -78,6 +82,11 @@ class MenuActivity : AppCompatActivity(),
             pLoader?.show()
         } else {
             pLoader?.hide()
+        }
+    }
+    private val mMessageReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            notificationWork(intent)
         }
     }
 
@@ -109,16 +118,17 @@ class MenuActivity : AppCompatActivity(),
     private fun isNetworkAvailable(): Boolean {
         val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetworkInfo = connectivityManager.getActiveNetworkInfo()
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected()
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         App.component.inject(this)
         glide = Glide.with(this)
-        FirebaseCrash.setCrashCollectionEnabled(false)
-        FirebaseFirestore.setLoggingEnabled(false)
+        FirebaseCrash.setCrashCollectionEnabled(BuildConfig.DEBUG)
+        FirebaseFirestore.setLoggingEnabled(BuildConfig.DEBUG)
 
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
         if (FirebaseAuth.getInstance().currentUser == null) {
             startActivity(Intent(this, RegistrationActivity::class.java))
         }
@@ -132,6 +142,7 @@ class MenuActivity : AppCompatActivity(),
         drawer.addDrawerListener(toggle)
         toggle.syncState()
 
+        updateUsersInfo(FirebaseAuth.getInstance().currentUser?.photoUrl.toString())
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
 
@@ -143,7 +154,12 @@ class MenuActivity : AppCompatActivity(),
                 if (intent.data != null && intent.data.host.contains("appintheair", true)) {
 
                 } else {
-                    navigator.applyCommand(Replace(Screens.MY_PROFILE_SCREEN, 1))
+                    if (intent.extras != null && !intent.getStringExtra(NOTIFICATION_CMD).isNullOrEmpty()) {
+                        navigator.applyCommand(Replace(Screens.MY_PROFILE_SCREEN, 1))
+                        notificationWork(intent)
+                    } else {
+                        navigator.applyCommand(Replace(Screens.MY_PROFILE_SCREEN, 1))
+                    }
                 }
             }
         } else {
@@ -172,6 +188,7 @@ class MenuActivity : AppCompatActivity(),
 
     var snackbar: Snackbar? = null
 
+
     private fun showSnack(string: String) {
         snackbar = Snackbar.make(this.findViewById(android.R.id.content), string, Snackbar.LENGTH_LONG)
         snackbar?.show()
@@ -186,6 +203,14 @@ class MenuActivity : AppCompatActivity(),
     private fun markFirstEnter() = preferences.edit()
             .putBoolean(Constants.FIRST_ENTER, false).apply()
 
+    fun tokenUpdated() = preferences.edit()
+            .putBoolean(Constants.FCM_TOKEN, false).apply()
+
+    fun updateNotified(set: Set<String>) = preferences.edit()
+            .putStringSet(Constants.FCM_SET, set).apply()
+
+    fun getNotified() = preferences.getStringSet(Constants.FCM_SET, HashSet<String>())
+
     fun showUserSimpleProfile(displayingUser: User) {
         navigator.applyCommand(Forward(Screens.USER_PROFILE_SCREEN, displayingUser))
     }
@@ -195,7 +220,7 @@ class MenuActivity : AppCompatActivity(),
 
     val navigator = object : SupportFragmentNavigator(supportFragmentManager, R.id.fragment_container) {
         override fun createFragment(screenKey: String?, data: Any?): Fragment {
-            return if (data is User) {
+            return if (data is User && screenKey.equals(Screens.USER_PROFILE_SCREEN)) {
                 return UserProfileFragment.newInstance(data.id)
             } else
                 when (screenKey) {
@@ -271,10 +296,10 @@ class MenuActivity : AppCompatActivity(),
 
     override fun onFragmentInteraction(user: User?) {
         mainUser = user
-        updateUsersInfo(user?.urlPhoto ?: return)
+        updateUsersInfo(user?.urlPhoto)
     }
 
-    private fun updateUsersInfo(url: String) {
+    private fun updateUsersInfo(url: String?) {
 
         val navigationView = findViewById<NavigationView>(R.id.nav_view)
         navigationView.setNavigationItemSelectedListener(this)
@@ -282,7 +307,7 @@ class MenuActivity : AppCompatActivity(),
         hView.setOnClickListener {
             openProfile()
         }
-        if (url.isNotBlank()) {
+        if (!url.isNullOrBlank()) {
             val image = hView.findViewById<ImageView>(R.id.menu_image_avatar)
             glide?.load(url)
                     ?.apply(RequestOptions.circleCropTransform())
@@ -316,7 +341,6 @@ class MenuActivity : AppCompatActivity(),
 
                     override fun onResponse(call: Call<AccessToken?>?, response: Response<AccessToken?>?) {
                         val accessToken = response?.body()
-                        saveToken(accessToken)
                         val loginService = generator.createService(AirWebService::class.java, accessToken?.getTokenType() + " " + accessToken?.accessToken)
                         loginService.getUserProfile().enqueue(object : Callback<AirUser?> {
                             override fun onFailure(call: Call<AirUser?>?, t: Throwable?) {
@@ -353,6 +377,8 @@ class MenuActivity : AppCompatActivity(),
             }
         }
         navigatorHolder.setNavigator(navigator)
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
+                IntentFilter(Constants.FCM_SRV))
     }
 
     private fun getLatLngForAirports(code: String?) {
@@ -375,11 +401,10 @@ class MenuActivity : AppCompatActivity(),
         }
     }
 
-    private fun saveToken(accessToken: AccessToken?) {
-        preferences.edit().putString(Constants.REFRESH_TOKEN, accessToken?.refresToken).apply()
-        preferences.edit().putString(Constants.ACCESS_TOKEN, accessToken?.accessToken).apply()
-        preferences.edit().putString(Constants.TYPE_TOKEN, accessToken?.getTokenType()).apply()
+    fun needUpdateToken(): Boolean {
+        return preferences.getBoolean(Constants.FCM_TOKEN, false)
     }
+
 
     override fun onBackPressed() {
         navigator.applyCommand(Back())
@@ -389,8 +414,8 @@ class MenuActivity : AppCompatActivity(),
     override fun onPause() {
         super.onPause()
         navigatorHolder.removeNavigator()
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver)
         Log.e("LOG", "onPause")
-
     }
 
     override fun onStop() {
@@ -409,7 +434,7 @@ class MenuActivity : AppCompatActivity(),
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
-        if (isNetworkAvailable() == false) showSnack(getString(R.string.no_internet))
+        if (!isNetworkAvailable()) showSnack(getString(R.string.no_internet))
         if (this.profileChanged == true) {
             openAwayFromProfileDialog({
                 this.profileChanged = false
@@ -477,5 +502,32 @@ class MenuActivity : AppCompatActivity(),
     private fun openDialogFeedback() {
         val dialog = FeedbackDialog(this)
         dialog.show()
+    }
+
+    protected lateinit var mFirebaseAnalytics: FirebaseAnalytics
+
+    private fun notificationWork(intent: Intent) {
+        if (intent.extras != null) {
+            val userId: String? = intent.getStringExtra(NOTIFICATION_VALUE)
+            val cmd: String? = intent.getStringExtra(NOTIFICATION_CMD)
+
+            Log.e("notificationWork", "Command: $cmd Value: $userId")
+            when (cmd) {
+                Constants.FCM_CMD_SHOW_USER -> {
+                    userId?.let {
+                        showUserSimpleProfile(User(id = userId))
+                        mFirebaseAnalytics.logEvent("Menu_open_profile_from_push", null)
+                    }
+                }
+                Constants.FCM_CMD_UPDATE -> {
+                    viewModel?.updateFcmToken()
+                    mFirebaseAnalytics.logEvent("Menu_update_fcm", null)
+
+                }
+                else -> {
+                    Log.e("LOG", "error open notification")
+                }
+            }
+        }
     }
 }

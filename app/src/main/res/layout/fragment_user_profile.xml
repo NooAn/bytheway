@@ -256,11 +256,20 @@
             android:visibility="visible"
             tools:visibility="visible" />
 
+        <include
+            android:id="@+id/direction2"
+            layout="@layout/profile_user_many_direction"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/direction"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
         <LinearLayout
             android:id="@+id/maplayout"
             android:layout_width="match_parent"
             android:layout_height="150dp"
-            android:layout_below="@+id/direction"
+            android:layout_below="@+id/direction2"
             android:orientation="vertical"
             android:visibility="visible"
             tools:visibility="visible">

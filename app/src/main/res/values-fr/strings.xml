@@ -1,0 +1,205 @@
+<?xml version="1.0"?>
+<resources>
+
+    <string name="app_name">bytheway</string>
+
+    <string name="button_send">Envoyer</string>
+
+    <string name="fullname">Andrey Petrov</string>
+
+    <string name="type_money"> </string>
+
+    <string name="money">budget</string>
+
+    <string name="description">description du voyage</string>
+
+    <string name="city">Ville de residence</string>
+
+    <string name="drawer_item_map_search">Rechercher des voyageurs</string>
+
+    <string name="drawer_item_profile">Profile</string>
+
+    <string name="drawer_item_allusers">Tous les voyageurs</string>
+
+    <string name="title_activity_menu">
+
+<font size="20">bytheway</font>
+
+</string>
+
+    <string name="city_end">Destination</string>
+
+    <string name="name_button_search">Trouver d\'autres voyageurs</string>
+
+    <string name="city_start">Point de depart</string>
+
+
+    <string name="city_fromSmall">
+<font size="13">Depuis</font>
+</string>
+    <string name="add_city">+ Ajouter une ville</string>
+    <string name="remove_city">Supprimer la ville</string>
+    <string name="city_toSmall">
+
+<font size="13">Vers</font>
+
+</string>
+
+    <string name="city_from">Depuis</string>
+
+    <string name="city_to">Vers</string>
+
+    <string name="date_from">Date</string>
+
+    <string name="date_to">Date</string>
+
+    <string name="method_move">Moyen de transport</string>
+
+    <string name="budget">1000 </string>
+
+    <string name="budgetName">Budget</string>
+
+    <string name="add_info_profile">informations Additionennelle </string>
+
+    <string name="date">Date</string>
+
+    <string name="sex">Sexe</string>
+
+    <string name="name">nom</string>
+
+    <string name="default_phone_code">+7</string>
+
+    <string name="gender_male">H</string>
+
+    <string name="gender_female">F</string>
+
+    <string name="save">Sauvegarder</string>
+
+    <string name="exit">Quitter</string>
+
+    <string name="search_users_text">Rechercher</string>
+
+    <string name="text_away_from_profile">Sauvegarder les nouvelles informations?</string>
+
+    <string name="fill_required_fields">Remplir les champs obligatoires SVP:</string>
+
+    <string name="fill_phone_invalid">telephone incorrecte</string>
+
+    <string name="fill_diff_cities">Choisissez une autre ville SVP</string>
+
+    <string name="fill_all_location">Aucun point choisi</string>
+
+    <string name="fill_from_location">Depart n\'est pas selectionne</string>
+
+    <string name="fill_to_location">L\'arriver n\'est pas selectionne</string>
+
+    <string name="social_links">Liens resequx sociaux</string>
+
+    <string name="error_update">Erreur de la mise a jour</string>
+
+    <string name="just_error">Erreur du serveur, veuillez plus tard</string>
+
+    <string name="text_confirm_remove_trip">Tous les changements seront perdus, etes vous sure de vouloir quitter?</string>
+
+    <string name="sex_and_age">Sexe, age</string>
+
+    <string name="age">Age</string>
+
+    <string name="add_new_trip">+ Creer un nouvequ voyage</string>
+
+    <string name="app_in_the_air">App in the Air</string>
+
+    <string name="personal_flight_assistant">Vol assistance</string>
+
+    <string name="app_sinchronized">Sync. App in the Air</string>
+
+    <string name="text_sinch_app_air">Nous pouvons ajouter vos vols de App in the Air pour creer un voyage automatique et chercher d\'autres voyageurs </string>
+
+    <string name="sinch_button">synchroniser</string>
+
+    <string name="miss">Non merci</string>
+    <string name="hint_all_travelers_description">Si vous voulez vous connecter a d\'autres voyages, vous pouvez utiliser cet ecran, nos filtre vont vous aider</string>
+    <string name="close_hint">NEXT</string>
+    <string-array name="months_array">
+        <item>Jan</item>
+        <item>Fev</item>
+        <item>Mar</item>
+        <item>Avr</item>
+        <item>Mai</item>
+        <item>Juin</item>
+        <item>Juil</item>
+        <item>Aout</item>
+        <item>Sep</item>
+        <item>Oct</item>
+        <item>Nov</item>
+        <item>Dec</item>
+    </string-array>
+    <string name="air_next_profile"> Profile </string>
+    <string name="text_air_succesful_add">Votre voayge a etait ajoute avec succes!</string>
+    <string name="exampleCity">Berlin - Moscou</string>
+    <string name="travelCar">Voiture</string>
+    <string name="travelTrain">Train</string>
+    <string name="travelBus">Bus</string>
+    <string name="travelPlane">Plane</string>
+
+    <string name="travelHitchHicking">Auto-stop</string>
+    <string name="feedback_writte">Ecrivez un commentaire ou nue suggestion</string>
+    <string name="add_new_trip_from_app_in_the_air">+ Ajouter un voyage App in the Air</string>
+    <string name="feedback">Commentaire</string>
+    <string name="textBodyDisaster">Nous sommes dans l\'impossibilite de trouver vos voyqges.</string>
+    <string name="textHeadAirDisaster">Votre compte a ete synchronize!</string>
+    <string name="item_all_users_empty_date"> </string>
+    <string name="filters_all_users_empty_date">____</string>
+    <string name="not_cities">No match to your search. Aucun resultat a votre recherche</string>
+    <string name="optionSearch">+ options de Recherche </string>
+    <string name="to">vers</string>
+    <string name="from">depuis</string>
+    <string name="social_text">Ajouter des informations a votre contact pour que d\'autres voyageurs vous trouve</string>
+    <string name="save_succesfull">votre profil a etait change avec succes </string>
+    <string name="cancel">Annuler</string>
+    <string name="any"> - </string>
+    <string name="native_city">Ville</string>
+    <string name="remove">Supprimer</string>
+    <string name="yes">oui</string>
+    <string name="no">Non</string>
+    <string name="year_born">Age</string>
+    <string name="dates_has_been_incorrect">les dates sont incorrectes, veuillez les resaisir SVP </string>
+    <string name="lastname">Nom</string>
+    <string name="feedback_text1">Nous serions content que vous lqissiez un commentaire.</string>
+    <string name="feedback_text2">Nous allons ameliorer notre App ensemble! :)</string>
+    <string name="email">E-mail</string>
+    <string name="hint_all_travelers">Tous les voyageurs</string>
+    <string name="hint_create_travel">Creer un nouveau voyage!</string>
+    <string name="hint_create_travel_description">Ajouter des informations a votre contact pour que d\'autres voyageurs vous trouve :)</string>
+    <string name="hint_save_and_search">Sauvegarder et trouver</string>
+    <string name="hint_save_and_search_description">Cliquer "SAUVEGARDER", tous les changements vont etre sauvegarder sur votre profil. Vous pouvez continuer votre recherche.</string>
+    <string name="no_internet">Vous n\'avez pas de connection Internet </string>
+    <string name="date_empty">* utilisateur n\'a pas entrer de dates</string>
+    <string name="error_sinchronized">Nous sommes desole.... La synchronisation avec App in this Airn\'a pas fonctionne.</string>
+    <string name="copy_done">Copie</string>
+    <string name="search_change">Votre voyage va etre changer.</string>
+    <string name="registration_error">App fonctionne uniquement avec Google Accounts. Oups quelques chose n\'a pas marche. Verifie votre connections internet et relancer l\'App</string>
+    <string name="tips_for_blank_social">Salut, nous avons decouvert que vous creer un voyage et aue vous rechercher un autre voyageur, mais vous n\'avez pas entrer de contacte, ajouter votre lien FB.</string>
+    <string name="ok_I_understand">compris.</string>
+    <string name="start">Commencer</string>
+    <string name="search_change_text1">Etes vous sure de vouloir sauvegarder ces informations?</string>
+    <string name="this_date_is_not_set">Vous n\'avez pas encore choisit de date.</string>
+    <string name="attention">Attention</string>
+    <string name="alternate_entry">Check internet, please. You can try to enter with sms</string>
+    <string name="finish">terminer</string>
+    <string name="phone">Phone</string>
+    <string name="connect">Connect</string>
+    <string name="sms_code">Code from sms</string>
+
+    <string name="to_date">по</string>
+    <string name="from_in">c</string>
+    <string name="city_in_the_world">Citoyen du monde</string>
+    <string name="error_upload_image">Erreur de chargement</string>
+    <string name="traveller">Voyageur</string>
+    <string name="error_link_open">Nous sommes incapable d\'ouvrir le lien. Il y a peut etre quelques de faux.</string>
+    <string name="last_see">etait en ligne :</string>
+    <string name="notification_user_searching"> cherchait pour vous</string>
+    <string name="countries">des pays</string>
+    <string name="plainhours">en vol</string>
+    <string name="km">km</string>
+</resources>

@@ -19,13 +19,10 @@
             android:name=".ui.activity.MenuActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:hardwareAccelerated="true">
-
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
                 <data
                     android:host="www.appintheair.mobi"
                     android:scheme="https" />
@@ -33,25 +30,40 @@
         </activity>
         <activity
             android:name=".ui.activity.RegistrationActivity"
-            android:configChanges="orientation|keyboardHidden" />
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize" />
 
         <activity
             android:name=".ui.activity.SplashActivity"
-            android:configChanges="orientation|keyboardHidden"
-            android:label="@string/title_activity_menu">
+            android:configChanges="orientation|keyboardHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <service android:name=".service.FCMService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        <!-- [START firebase_iid_service] -->
+        <service
+            android:name=".service.MyFirebaseInstanceIDService" android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
+        <!-- [END firebase_iid_service] -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDBqb2pdkfSx1ii31xwPsFf635j-cQB1tU" />
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="ffb4d33983aaa714c5d96ca2dc7836360d357ee7" />
+        <meta-data android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/colorAccent" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/icon_logo_small" />
     </application>
 
 </manifest>

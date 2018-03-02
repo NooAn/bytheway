@@ -4,13 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_below="@+id/travelledStatistics"
     android:background="@color/colorPrimary"
-    android:paddingBottom="24dp"
-    android:paddingTop="24dp">
+    android:paddingBottom="24dp">
 
     <TextView
-        android:id="@+id/textCityFrom"
+        android:id="@+id/textCityFrom2"
         android:layout_width="120dp"
         android:layout_height="wrap_content"
         android:layout_margin="12dp"
@@ -26,7 +24,7 @@
         tools:ignore="MissingConstraints" />
 
     <TextView
-        android:id="@+id/textDateFrom"
+        android:id="@+id/textDateFrom2"
         android:layout_width="120dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/marginTopDate"
@@ -34,16 +32,15 @@
         android:focusableInTouchMode="false"
         android:textColor="@color/colorTextGrey"
         android:textSize="13sp"
-        app:layout_constraintEnd_toEndOf="@+id/textCityFrom"
+        app:layout_constraintEnd_toEndOf="@+id/textCityFrom2"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/textCityFrom"
-        app:layout_constraintTop_toBottomOf="@+id/textCityFrom"
+        app:layout_constraintStart_toStartOf="@+id/textCityFrom2"
+        app:layout_constraintTop_toBottomOf="@+id/textCityFrom2"
         tools:text="@string/date_from" />
 
     <ImageView
-        android:id="@+id/iconDateFromEmpty"
+        android:id="@+id/iconDateFromEmpty2"
         android:layout_width="100dp"
-        android:visibility="gone"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:clickable="false"
@@ -51,52 +48,54 @@
         android:scaleType="fitStart"
         android:src="@drawable/ic_help_white_24px"
         android:textColor="@color/colorTextGrey"
-        app:layout_constraintEnd_toEndOf="@+id/textCityFrom"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@+id/textCityFrom2"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/textCityFrom"
-        app:layout_constraintTop_toBottomOf="@+id/textCityFrom" />
+        app:layout_constraintStart_toStartOf="@+id/textCityFrom2"
+        app:layout_constraintTop_toBottomOf="@+id/textCityFrom2" />
 
     <TextView
-        android:id="@+id/textDateEmpty"
+        android:id="@+id/textDateEmpty2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/marginTopDate"
         android:clickable="false"
         android:focusableInTouchMode="false"
+        android:text="@string/date_empty"
         android:textColor="@color/colorTextGrey"
         android:textSize="13sp"
         android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="@+id/textCityTo"
+        app:layout_constraintEnd_toEndOf="@+id/textCityTo2"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/textCityFrom"
-        app:layout_constraintTop_toBottomOf="@+id/textCityFrom"
-        android:text="@string/date_empty"
+        app:layout_constraintStart_toStartOf="@+id/textCityFrom2"
+        app:layout_constraintTop_toBottomOf="@+id/textCityFrom2"
         tools:visibility="visible" />
 
     <ImageView
+        android:id="@+id/three_dots2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:id="@+id/three_dots1"
         android:src="@drawable/ic_circles_dot"
-        app:layout_constraintEnd_toStartOf="@+id/textCityTo"
+        app:layout_constraintEnd_toStartOf="@+id/textCityTo2"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/textCityFrom"
+        app:layout_constraintStart_toEndOf="@+id/textCityFrom2"
         app:layout_constraintTop_toTopOf="parent" />
+
     <ImageView
+        android:id="@+id/three_dots2_one"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:id="@+id/three_dots1_one"
-        android:src="@drawable/ic_circles_dot"
+        android:src="@drawable/ic_circles_dot_one"
         android:visibility="gone"
-        app:layout_constraintEnd_toStartOf="@+id/textCityTo"
+        app:layout_constraintEnd_toStartOf="@+id/textCityTo2"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/textCityFrom"
+        app:layout_constraintStart_toEndOf="@+id/textCityFrom2"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textCityTo"
+        android:id="@+id/textCityTo2"
         android:layout_width="120dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="12dp"
@@ -111,7 +110,7 @@
 
 
     <ImageView
-        android:id="@+id/iconDateArrivedEmpty"
+        android:id="@+id/iconDateArrivedEmpty2"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
@@ -121,16 +120,16 @@
         android:src="@drawable/ic_help_white_24px"
         android:textAlignment="textEnd"
         android:textColor="@color/colorTextGrey"
-        android:visibility="gone"
         android:textSize="13sp"
-        app:layout_constraintEnd_toEndOf="@+id/textCityTo"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@+id/textCityTo2"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/textCityTo"
-        app:layout_constraintTop_toBottomOf="@+id/textCityTo"
+        app:layout_constraintStart_toStartOf="@+id/textCityTo2"
+        app:layout_constraintTop_toBottomOf="@+id/textCityTo2"
         tools:text="@string/date_from" />
 
     <TextView
-        android:id="@+id/textDateArrived"
+        android:id="@+id/textDateArrived2"
         android:layout_width="120dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
@@ -140,9 +139,9 @@
         android:textAlignment="textEnd"
         android:textColor="@color/colorTextGrey"
         android:textSize="13sp"
-        app:layout_constraintEnd_toEndOf="@+id/textCityTo"
+        app:layout_constraintEnd_toEndOf="@+id/textCityTo2"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/textCityTo"
-        app:layout_constraintTop_toBottomOf="@+id/textCityTo"
+        app:layout_constraintStart_toStartOf="@+id/textCityTo2"
+        app:layout_constraintTop_toBottomOf="@+id/textCityTo2"
         tools:text="@string/date_from" />
 </android.support.constraint.ConstraintLayout>
