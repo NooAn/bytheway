@@ -14,6 +14,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:layout_alignParentStart="true"
             android:layout_below="@+id/profile_image"
             android:layout_marginTop="18dp"
@@ -69,6 +70,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:layout_weight="1.0"
                 android:scaleType="center"
                 android:src="@drawable/ic_vk_gray"
@@ -86,6 +88,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:layout_weight="1.0"
                 android:scaleType="center"
                 android:src="@drawable/ic_whats_icon_grey"
@@ -104,6 +107,7 @@
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:scaleType="center"
                 android:src="@drawable/tg_grey"
                 android:visibility="visible"
@@ -122,6 +126,7 @@
                 android:layout_marginEnd="6dp"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:scaleType="center"
                 android:src="@drawable/ic_fb_grey"
                 tools:ignore="ContentDescription"
@@ -140,6 +145,7 @@
                 android:layout_marginStart="6dp"
                 android:layout_weight="1.0"
                 android:scaleType="center"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_cs_grey"
                 tools:ignore="ContentDescription"
                 tools:src="@drawable/ic_cs_color" />
@@ -295,6 +301,7 @@
             <RelativeLayout
                 android:id="@+id/iconCar"
                 android:layout_width="0dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:layout_height="wrap_content"
                 android:layout_weight="1">
 
@@ -347,6 +354,7 @@
             <RelativeLayout
                 android:id="@+id/iconBus"
                 android:layout_width="0dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:layout_height="wrap_content"
                 android:layout_weight="1">
 
@@ -373,6 +381,7 @@
             <RelativeLayout
                 android:id="@+id/iconPlane"
                 android:layout_width="0dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:layout_height="wrap_content"
                 android:layout_weight="1">
 
@@ -399,6 +408,7 @@
             <RelativeLayout
                 android:id="@+id/iconHitchHicking"
                 android:layout_width="0dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:layout_height="wrap_content"
                 android:layout_weight="1">
 

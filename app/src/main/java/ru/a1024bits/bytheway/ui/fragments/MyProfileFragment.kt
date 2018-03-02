@@ -1415,7 +1415,9 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     private fun showTipsForEmptySocialLink() {
         val tips = SocialTipsDialog()
         tips.show(fragmentManager, "Tips")
+        scrollProfile?.fullScroll(ScrollView.FOCUS_UP)
     }
+
 
     private fun removeTrip() {
         countTrip = 0
