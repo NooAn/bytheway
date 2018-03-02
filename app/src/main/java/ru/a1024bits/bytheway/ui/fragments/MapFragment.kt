@@ -199,8 +199,8 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
                         }
                     }
                     if (notifyIdsForUsers.size > 0) {
-                        //if (BuildConfig.DEBUG)
-                        notifyIdsForUsers.add(FirebaseAuth.getInstance().currentUser?.uid!!)
+                        if (BuildConfig.DEBUG)
+                            notifyIdsForUsers.add(FirebaseAuth.getInstance().currentUser?.uid!!)
                         viewModel?.sendNotifications(notifyIdsForUsers.joinToString(","), FireBaseNotification(
                                 getString(R.string.app_name),
                                 getString(R.string.traveller) + "  ${user.name} " + getString(R.string.notification_user_searching),
@@ -341,7 +341,7 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
         this.mMap = googleMap
         val constLocation = LatLng(50.0, 50.0)
         try {
-            if (points.size > 0)  {
+            if (points.size > 0) {
                 setMarker(points.valueAt(0).position, 1)
                 setMarker(points.valueAt(1).position, 2)
             } else {

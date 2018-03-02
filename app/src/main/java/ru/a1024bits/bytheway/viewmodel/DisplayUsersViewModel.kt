@@ -46,7 +46,6 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
                     for (document in it) {
                         try {
                             val user = document.toObject(User::class.java)
-                            Log.e("LOG get filter users", "${user.dates}")
                             if (user.cities.size > 0 && user.id != FirebaseAuth.getInstance().currentUser?.uid) {
                                 result.add(user)
                             }
@@ -54,9 +53,10 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
                         }
                     }
                 }
-                if (sortString.isNotEmpty()) result = filterUsersByString(sortString, result)
-                /*todo if filter by string XOR filter? then add: else*/filterUsersByFilter(result, filter)
-                result.sortBy { it.dates[START_DATE] }
+               // if (sortString.isNotEmpty()) result = filterUsersByString(sortString, result)
+                /*todo if filter by string XOR filter? then add: else*/
+                filterUsersByFilter(result, filter)
+              //  result.sortBy { it.dates[START_DATE] }
                 stream.onSuccess(result)
             } catch (exp: Exception) {
                 stream.onError(exp) // for fix bugs FirebaseFirestoreException: DEADLINE_EXCEEDED
