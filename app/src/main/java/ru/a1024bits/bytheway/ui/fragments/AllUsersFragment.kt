@@ -390,6 +390,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
     }
 
     private fun showErrorLoading() {
+        loadingWhereLoadUsers
     }
 
     fun EditText.afterTextChanged(afterTextChanged: (String) -> Unit) {

@@ -45,6 +45,8 @@ import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.a1024bits.bytheway.ui.dialogs.TravelSearchSaveDialog
 import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment.Companion.BUDGET
+import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment.Companion.CITY_FROM
+import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment.Companion.CITY_TO
 import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.util.Constants.END_DATE
 import ru.a1024bits.bytheway.util.Constants.FCM_CMD_SHOW_USER
@@ -52,6 +54,7 @@ import ru.a1024bits.bytheway.util.Constants.FIRST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.START_DATE
 import ru.a1024bits.bytheway.util.createMarker
+import ru.a1024bits.bytheway.util.toGeoPoint
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
 import ru.terrakok.cicerone.commands.Forward
 import java.util.*
@@ -196,10 +199,11 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
                         }
                     }
                     if (notifyIdsForUsers.size > 0) {
-                        if (BuildConfig.DEBUG) notifyIdsForUsers.add(FirebaseAuth.getInstance().currentUser?.uid!!)
+                        //if (BuildConfig.DEBUG)
+                        notifyIdsForUsers.add(FirebaseAuth.getInstance().currentUser?.uid!!)
                         viewModel?.sendNotifications(notifyIdsForUsers.joinToString(","), FireBaseNotification(
                                 getString(R.string.app_name),
-                                getString(R.string.traveller) + "  ${user.name}" + getString(R.string.notification_user_searching),
+                                getString(R.string.traveller) + "  ${user.name} " + getString(R.string.notification_user_searching),
                                 FCM_CMD_SHOW_USER,
                                 FirebaseAuth.getInstance().currentUser?.uid
                         ))
@@ -291,6 +295,7 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
         try {
             viewModel?.sendUserData(getHashMapUser(), uid)
             changeUserData()
+
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -300,27 +305,22 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
         user.cities = getCitiesMap()
         user.dates = getDatesMap()
         user.budget = getCurrentBudget()
+        user.cityFromLatLng = searchFragment?.filter?.locationStartCity.toGeoPoint()
+        user.cityToLatLng = searchFragment?.filter?.locationEndCity.toGeoPoint()
     }
 
     private fun getHashMapUser(): HashMap<String, Any> {
         val hashMap = HashMap<String, Any>()
 
         hashMap[CITIES] = getCitiesMap()
-
         searchFragment?.filter?.method?.let {
             hashMap[METHOD] = it
         }
-
         hashMap[ROUTE] = routeString ?: ""
         hashMap[COUNT_TRIP] = 1
         hashMap[BUDGET] = getCurrentBudget()
-
-        hashMap[MyProfileFragment.CITY_FROM] = GeoPoint(searchFragment?.filter?.locationStartCity?.latitude
-                ?: 0.0, searchFragment?.filter?.locationStartCity?.longitude ?: 0.0)
-
-        hashMap[MyProfileFragment.CITY_TO] = GeoPoint(searchFragment?.filter?.locationEndCity?.latitude
-                ?: 0.0, searchFragment?.filter?.locationEndCity?.longitude ?: 0.0)
-
+        hashMap[CITY_FROM] = searchFragment?.filter?.locationStartCity.toGeoPoint()
+        hashMap[CITY_TO] = searchFragment?.filter?.locationEndCity.toGeoPoint()
         hashMap[DATES] = getDatesMap()
         return hashMap
     }
@@ -339,9 +339,9 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         this.mMap = googleMap
-        var constLocation = LatLng(50.0, 50.0)
+        val constLocation = LatLng(50.0, 50.0)
         try {
-            if (points.size > 0) {
+            if (points.size > 0)  {
                 setMarker(points.valueAt(0).position, 1)
                 setMarker(points.valueAt(1).position, 2)
             } else {
