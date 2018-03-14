@@ -204,4 +204,5 @@
     <string name="km">km</string>
     <string name="immortal">Immortel</string>
     <string name="very_long">Really long time ago</string>
+    <string name="email_send">Sending letter. Select email client</string>
 </resources>

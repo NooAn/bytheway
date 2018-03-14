@@ -273,7 +273,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
     private fun openEmail(email: String) {
         val emailIntent = Intent(Intent.ACTION_SEND)
         emailIntent.setType("message/rfc822")
-        emailIntent.setData(Uri.parse("mailto:default@recipient.com"));
+        emailIntent.setData(Uri.parse("mailto:"));
         emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, arrayOf(email))
         emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, getString(R.string.app_name))
         emailIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -282,7 +282,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
             dialog.show()
         } else
             try {
-                context.startActivity(Intent.createChooser(emailIntent, "Отправка письма. Выберите почтовый клиент"))
+                context.startActivity(Intent.createChooser(emailIntent, getString(R.string.email_send)))
             } catch (e: Exception) {
                 Toast.makeText(activity, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
             }
@@ -364,7 +364,6 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
             val userId: String = arguments.getString(UID_KEY, "")
             viewModel?.load(userId)
         } else {
-            // fix me error when don't load user
             showErrorLoading()
         }
     }

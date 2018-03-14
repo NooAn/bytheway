@@ -33,12 +33,12 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
         const val TAG = "showUserViewModel"
     }
 
-    fun getAllUsers(f: Filter, sortString: String) {
+    fun getAllUsers(f: Filter) {
         this.filter = f
-        userRepository?.installAllUsers(this, sortString)
+        userRepository?.installAllUsers(this)
     }
 
-    override fun filterAndInstallUsers(sortString: String, vararg snapshots: QuerySnapshot) {
+    override fun filterAndInstallUsers(vararg snapshots: QuerySnapshot) {
         Single.create<MutableList<User>> { stream ->
             try {
                 Log.e("LOG get filter users", Thread.currentThread().name)
@@ -58,11 +58,10 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
                 }
                 // if (sortString.isNotEmpty()) result = filterUsersByString(sortString, result)
                 /*todo if filter by string XOR filter? then add: else*/
-                filterUsersByFilter(result, filter)
-                //  result.sortBy { it.dates[START_DATE] }
+                filterUsersByOptions(result, filter)
                 stream.onSuccess(result)
             } catch (exp: Exception) {
-                stream.onError(exp) // for fix bugs FirebaseFirestoreException: DEADLINE_EXCEEDED
+                stream.onError(exp)
             }
         }
                 .subscribeOn(getBackgroundScheduler())
@@ -98,13 +97,13 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
         }
     }
 
-    fun getUsersWithSimilarTravel(paramSearch: Filter) {
+    fun getUsersForFilter(paramSearch: Filter) {
         userRepository?.let {
             loadingStatus.value = true
             disposables.add(it.getReallUsers(paramSearch)
+                    .subscribeOn(getBackgroundScheduler())
                     .timeout(TIMEOUT_SECONDS, timeoutUnit)
                     .retry(2)
-                    .subscribeOn(getBackgroundScheduler())
                     .observeOn(getMainThreadScheduler())
                     .doAfterTerminate({ loadingStatus.setValue(false) })
                     .subscribe(
@@ -164,8 +163,7 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
                 .toString()
     }
 
-    fun filterUsersByFilter(resultUsers: MutableList<User>, filter: Filter) {
-        Log.e("LOG filter", Thread.currentThread().name)
+    fun filterUsersByOptions(resultUsers: MutableList<User>, filter: Filter) {
         resultUsers.retainAll {
             var found = (!((filter.startBudget >= 0) && (filter.endBudget > 0)) ||
                     (it.budget >= filter.startBudget && it.budget <= filter.endBudget)) &&
@@ -207,6 +205,6 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
 
 interface FilterAndInstallListener {
     var filter: Filter
-    fun filterAndInstallUsers(sortString: String, vararg snapshots: QuerySnapshot)
+    fun filterAndInstallUsers(vararg snapshots: QuerySnapshot)
     fun onFailure(e: Throwable)
 }

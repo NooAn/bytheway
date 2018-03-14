@@ -12,7 +12,7 @@ import ru.a1024bits.bytheway.viewmodel.FilterAndInstallListener
 
 interface IUsersRepository {
     fun getReallUsers(paramSearch: Filter): Single<List<User>>
-    fun installAllUsers(listener: FilterAndInstallListener, sortString: String)
+    fun installAllUsers(listener: FilterAndInstallListener)
     fun getUserById(userID: String): Task<DocumentSnapshot>
     fun addUser(user: User): Task<Void>
     fun uploadPhotoLink(path: Uri, id: String): Single<String>

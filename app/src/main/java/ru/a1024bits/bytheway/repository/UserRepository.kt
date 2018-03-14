@@ -55,7 +55,6 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
 
     override fun uploadPhotoLink(path: Uri, id: String): Single<String> = Single.create { stream ->
         try {
-            Log.e("LOG uploadPhotoLink R", Thread.currentThread().name)
             // Create a storage reference from our app
             val storageRef = FirebaseStorage.getInstance().reference
             val riversRef = storageRef.child("images/" + id)
@@ -81,7 +80,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
         }
     }
 
-    override fun installAllUsers(listener: FilterAndInstallListener, sortString: String) {
+    override fun installAllUsers(listener: FilterAndInstallListener) {
         try {
             var lastTime = listener.filter.endDate
             if (listener.filter.endDate == 0L) {
@@ -99,14 +98,16 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                     return@EventListener
                 }
                 if (listener.filter.endDate != 0L) {
-                    listener.filterAndInstallUsers(sortString, snapshot)
+                    listener.filterAndInstallUsers(snapshot)
                     return@EventListener
                 }
                 store.collection(COLLECTION_USERS)
                         .whereEqualTo("dates.end_date", 0).whereGreaterThan("cities.first_city", "")
-                        .get().addOnCompleteListener({ task ->
-                    listener.filterAndInstallUsers(sortString, snapshot, task.result)
-                }).addOnFailureListener({ e -> listener.onFailure(e) })
+                        .get()
+                        .addOnCompleteListener({ task ->
+                            listener.filterAndInstallUsers(snapshot, task.result)
+                        })
+                        .addOnFailureListener({ e -> listener.onFailure(e) })
             })
         } catch (e: Exception) {
             e.printStackTrace()
@@ -183,11 +184,8 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                             documentRef.update(map)
                             return null
                         }
-                    }).addOnFailureListener {
-                        stream.onError(it)
-                    }.addOnSuccessListener { _ ->
-                                stream.onComplete()
-                            }
+                    }).addOnFailureListener { stream.onError(it) }
+                            .addOnSuccessListener { _ -> stream.onComplete() }
                 } catch (e: Exception) {
                     stream.onError(e)
                 }

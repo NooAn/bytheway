@@ -144,4 +144,5 @@
     <string name="km">км</string>
     <string name="immortal">Бессмертный</string>
     <string name="very_long">Очень давно</string>
+    <string name="email_send">Отправка письма. Выберите почтовый клиент</string>
 </resources>

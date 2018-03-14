@@ -23,7 +23,6 @@ import com.google.android.gms.maps.model.*
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.crash.FirebaseCrash
-import com.google.firebase.firestore.GeoPoint
 import kotlinx.android.synthetic.main.fragment_maps.*
 import kotlinx.android.synthetic.main.fragment_search_block.*
 import retrofit2.Call
@@ -450,8 +449,7 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
                     LatLngInterpolator.CurveBezie(),
                     onAnimationEnd = {
                         viewModel?.response?.observe(this@MapFragment, listUsers)
-                        viewModel?.getUsersWithSimilarTravel(searchFragment?.filter
-                                ?: Filter())
+                        viewModel?.getUsersForFilter(searchFragment?.filter ?: Filter())
                         listPointPath.clear()
                         markerAnimation.flag = false
                     })
@@ -472,17 +470,12 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
                     .commitAllowingStateLoss()
     }
 
-    private
-    val PATTERN_GAP_LENGTH_PX = 20F
-    private
-    val DOT = Dot()
-    private
-    val GAP = Gap(PATTERN_GAP_LENGTH_PX)
+    private val PATTERN_GAP_LENGTH_PX = 20F
+    private val DOT = Dot()
+    private val GAP = Gap(PATTERN_GAP_LENGTH_PX)
 
-    private
-    val PATTERN_POLYGON_ALPHA = Arrays.asList(GAP, DOT)
-    private
-    val COLOR_BLUE_ARGB = -0x657db
+    private val PATTERN_POLYGON_ALPHA = Arrays.asList(GAP, DOT)
+    private val COLOR_BLUE_ARGB = -0x657db
 
     // Draw polyline on map
     private fun drawPolyLineOnMap(list: List<LatLng>) {

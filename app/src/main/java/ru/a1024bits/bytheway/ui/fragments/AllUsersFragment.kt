@@ -55,7 +55,6 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
     private lateinit var displayUsersAdapter: DisplayAllUsersAdapter
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
-    private var sortString: String = ""
     private var countInitialElements = 0
     private lateinit var analytics: FirebaseAnalytics
     private lateinit var dateDialog: CalendarDatePickerDialogFragment
@@ -101,7 +100,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
                 else
                     loadingWhereLoadUsers.visibility = View.GONE
             })
-            viewModel?.getAllUsers(filter, sortString)
+            viewModel?.getAllUsers(filter)
 
             showPrompt("isFirstEnterAllUsersFragment", context.resources.getString(R.string.close_hint),
                     context.resources.getString(R.string.hint_all_travelers), context.resources.getString(R.string.hint_all_travelers_description), searchParametersText)
@@ -356,7 +355,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             override fun endTransition(p0: LayoutTransition?, p1: ViewGroup?, view: View, p3: Int) {
                 if ((view.id == block_search_parameters.id) && (block_search_parameters.visibility == View.GONE)) {
                     updateViewsBeforeSearch()
-                    viewModel?.getAllUsers(filter, sortString)
+                    viewModel?.getAllUsers(filter)
                     view_contain_block_parameters.layoutTransition.removeTransitionListener(this)
                 }
             }
