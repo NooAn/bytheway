@@ -17,9 +17,11 @@ open class BaseViewModel : ViewModel(), LifecycleObserver {
     val disposables = CompositeDisposable()
     val loadingStatus = MutableLiveData<Boolean>()
     val timeoutUnit = TimeUnit.SECONDS
+
     companion object {
-        const val TIMEOUT_SECONDS = 30L
+        const val TIMEOUT_SECONDS = 20L
     }
+
     fun addObserver(lifecycle: Lifecycle) {
         lifecycle.addObserver(this)
     }
@@ -37,8 +39,7 @@ open class BaseViewModel : ViewModel(), LifecycleObserver {
     }
 
     fun markPromptIsShowing(nameScreenPrompt: String) {
-        App.INSTANCE.getSharedPreferences(Constants.APP_PREFERENCES, Context.MODE_PRIVATE).
-                edit().putBoolean(nameScreenPrompt, false).apply()
+        App.INSTANCE.getSharedPreferences(Constants.APP_PREFERENCES, Context.MODE_PRIVATE).edit().putBoolean(nameScreenPrompt, false).apply()
     }
 
     fun promptNotShowing(nameScreenPrompt: String): Boolean =

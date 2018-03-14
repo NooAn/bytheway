@@ -3,6 +3,7 @@ package ru.a1024bits.bytheway.viewmodel
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.QuerySnapshot
 import io.reactivex.Single
 import ru.a1024bits.bytheway.model.FireBaseNotification
@@ -50,13 +51,15 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
                                 result.add(user)
                             }
                         } catch (e: Exception) {
+                            e.printStackTrace()
+                            FirebaseCrash.report(e)
                         }
                     }
                 }
-               // if (sortString.isNotEmpty()) result = filterUsersByString(sortString, result)
+                // if (sortString.isNotEmpty()) result = filterUsersByString(sortString, result)
                 /*todo if filter by string XOR filter? then add: else*/
                 filterUsersByFilter(result, filter)
-              //  result.sortBy { it.dates[START_DATE] }
+                //  result.sortBy { it.dates[START_DATE] }
                 stream.onSuccess(result)
             } catch (exp: Exception) {
                 stream.onError(exp) // for fix bugs FirebaseFirestoreException: DEADLINE_EXCEEDED

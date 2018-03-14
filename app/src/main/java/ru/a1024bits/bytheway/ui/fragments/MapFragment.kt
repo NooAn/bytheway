@@ -298,6 +298,8 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
 
         } catch (e: Exception) {
             e.printStackTrace()
+            FirebaseCrash.log("save data user's")
+            FirebaseCrash.report(e)
         }
     }
 

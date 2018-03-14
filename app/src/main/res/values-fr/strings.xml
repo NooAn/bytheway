@@ -194,7 +194,7 @@
     <string name="to_date">по</string>
     <string name="from_in">c</string>
     <string name="city_in_the_world">Citoyen du monde</string>
-    <string name="error_upload_image">Erreur de chargement</string>
+    <string name="error_upload">Erreur de chargement</string>
     <string name="traveller">Voyageur</string>
     <string name="error_link_open">Nous sommes incapable d\'ouvrir le lien. Il y a peut etre quelques de faux.</string>
     <string name="last_see">etait en ligne :</string>
@@ -202,4 +202,6 @@
     <string name="countries">des pays</string>
     <string name="plainhours">en vol</string>
     <string name="km">km</string>
+    <string name="immortal">Immortel</string>
+    <string name="very_long">Really long time ago</string>
 </resources>

@@ -69,7 +69,7 @@
 
     <string name="text_away_from_profile">Save changed data?</string>
 
-    <string name="fill_required_fields">Fill mandatory fields please:</string>
+    <string name="fill_required_fields">Fill mandatory fields please: </string>
 
     <string name="fill_phone_invalid">Incorrect phone format</string>
 
@@ -249,7 +249,7 @@
     <string name="alternate_entry">Check internet, please. You can try to enter with sms</string>
     <string name="connect">Connect</string>
 
-    <string name="error_upload_image">Error upload</string>
+    <string name="error_upload">Error upload</string>
     <string name="phone">Phone</string>
 
     <string name="error_link_open">We were unable to open the link. It may be incorrect.</string>
@@ -263,5 +263,7 @@
     <string name="countries">countries</string>
     <string name="plainhours">in flight</string>
     <string name="km">km</string>
+    <string name="immortal">Immortal</string>
+    <string name="very_long">Really long time ago</string>
 
 </resources>

@@ -192,7 +192,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     }
 
     private fun showErrorUploadImage() {
-        Toast.makeText(activity, R.string.error_upload_image, Toast.LENGTH_SHORT).show()
+        Toast.makeText(activity, R.string.error_upload, Toast.LENGTH_SHORT).show()
     }
 
     private val usersObservers: Observer<User> = Observer { user ->
@@ -882,10 +882,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                 .setFirstDayOfWeek(Calendar.MONDAY)
                 .setThemeCustom(R.style.BythewayDatePickerDialogTheme)
                 .setPreselectedDate(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH))
-        var currentDate = System.currentTimeMillis()
-//        if (key.contentEquals(START_DATE)) {
-//            if (dates[key] ?: 0L > 0L) currentDate = dates[key] ?: currentDate
-//        }
+        val currentDate = System.currentTimeMillis()
+
         dateDialog.setDateRange(MonthAdapter.CalendarDay(currentDate), null)
         dateDialog.setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
             view.setText(StringBuilder(" ")
@@ -904,14 +902,13 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     }
 
     private fun sendUserInfoToServer() {
+        countTrip = 1
 
+        viewModel?.sendUserData(getHashMapUser(), uid, mainUser)
 
         if (socNet.size == 0)
             showTipsForEmptySocialLink()
 
-        countTrip = 1
-
-        viewModel?.sendUserData(getHashMapUser(), uid, mainUser)
     }
 
     private fun checkingCityText(): Boolean {

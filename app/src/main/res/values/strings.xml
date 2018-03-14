@@ -127,7 +127,7 @@
     <string name="to_date">по</string>
     <string name="from_in">c</string>
     <string name="city_in_the_world">Человек мира</string>
-    <string name="error_upload_image">Ошибка загрузки</string>
+    <string name="error_upload">Ошибка загрузки</string>
     <string name="error_link_open">Мы не смогли открыть ссылку. Возможно она некорректная.</string>
     <string name="last_see">Последний раз был</string>
     <string name="sms_code">Код из sms</string>
@@ -142,4 +142,6 @@
     <string name="countries">стран</string>
     <string name="plainhours">в полете</string>
     <string name="km">км</string>
+    <string name="immortal">Бессмертный</string>
+    <string name="very_long">Очень давно</string>
 </resources>
