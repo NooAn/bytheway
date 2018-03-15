@@ -11,7 +11,7 @@ enum class Status {
     ERROR
 }
 
-class Response<T> private constructor(val status: Status, val data: T?, val error: Throwable?) {
+class Response<out T> private constructor(val status: Status, val data: T?, val error: Throwable?) {
     companion object {
 
         fun <T> success(data: T): Response<T> {

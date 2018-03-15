@@ -6,6 +6,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.QuerySnapshot
 import io.reactivex.Single
+import io.reactivex.functions.Function
+import io.reactivex.functions.Predicate
+import ru.a1024bits.bytheway.algorithm.SearchTravelers
 import ru.a1024bits.bytheway.model.FireBaseNotification
 import ru.a1024bits.bytheway.model.Response
 import ru.a1024bits.bytheway.model.User
@@ -31,7 +34,8 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
     override var filter = Filter()
 
     companion object {
-        const val TAG = "showUserViewModel"
+        const val TAG = "LOG UserRepository"
+        const val MIN_LIMIT = 1
     }
 
     fun getAllUsers(f: Filter?) {
@@ -101,17 +105,36 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
         }
     }
 
-    fun getUsersForFilter(paramSearch: Filter) {
+
+    fun getSearchUsers(paramSearch: Filter) {
         userRepository?.let {
             loadingStatus.value = true
-            disposables.add(it.getReallUsers(paramSearch)
+            disposables.add(it.getRealUsers()
                     .subscribeOn(getBackgroundScheduler())
                     .timeout(TIMEOUT_SECONDS, timeoutUnit)
                     .retry(2)
+                    .doOnNext { Log.e("LOG 1", Thread.currentThread().name) }
+                    .cache()
+                    .filter { user -> user.cities.size > 0 }
+                    .map { user ->
+                        // run search algorithm.
+                        Log.e("LOG", "users")
+                        val search = SearchTravelers(filter = paramSearch, user = user)
+                        user.percentsSimilarTravel = search.getEstimation()
+                        user
+                    }
+                    .filter { user ->
+                        user.percentsSimilarTravel > MIN_LIMIT && user.id != FirebaseAuth.getInstance().currentUser?.uid
+                    }
+                    .toSortedList(compareByDescending { l -> l.percentsSimilarTravel }) // перед отправкой сортируем по степени похожести маршрута.
                     .observeOn(getMainThreadScheduler())
+                    .doOnSuccess { Log.e("LOG 2", Thread.currentThread().name) }
                     .doAfterTerminate({ loadingStatus.setValue(false) })
                     .subscribe(
-                            { list -> response.setValue(Response.success(list)) },
+                            { list ->
+                                Log.e("LOG", "users2")
+                                response.setValue(Response.success(list))
+                            },
                             { throwable -> response.setValue(Response.error(throwable)) }
                     )
             )
@@ -210,7 +233,6 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
 }
 
 private fun Filter.isNotDefault(): Boolean = (this == Filter())
-
 
 interface FilterAndInstallListener {
     var filter: Filter

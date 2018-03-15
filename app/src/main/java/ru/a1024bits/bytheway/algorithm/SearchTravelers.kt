@@ -10,7 +10,7 @@ import ru.a1024bits.bytheway.util.Constants.START_DATE
 import java.lang.Math.max
 import kotlin.math.min
 import kotlin.math.roundToLong
-    
+
 /**
  * Created by Bit on 12/16/2017.
  * Filter is our User data, but user it's all travelers
@@ -76,16 +76,15 @@ class SearchTravelers(val filter: Filter = Filter(), val user: User) {
     где x и y - координаты вашей точки,
     x0 и y0 - координаты центра окружности, R - радиус окружности, ^2 - возведение в квадрат.
     Если условие выполняется, то точка находится внутри (или на окружности,
-    в случае равенства левой и правой частей). Если не выполняется,то пользователь вне окружности и значит расширяем радиус по фибоначчи
+    в случае равенства левой и правой частей). Если не выполняется,то пользователь вне окружности и значит расширяем радиус
     */
     fun calculateRoute(): Double {
 
 //        val startPoint = (user.cityFromLatLng.latitude - filter.locationStartCity.latitude) * (user.cityFromLatLng.latitude - filter.locationStartCity.latitude)
 //        +((user.cityFromLatLng.longitude - filter.locationStartCity.longitude) * (user.cityFromLatLng.longitude - filter.locationStartCity.longitude))
-
+        val correctionFactor = correctForTheSecondCity()
         val distanceEndPoints = (user.cityToLatLng.latitude - filter.locationEndCity.latitude) * (user.cityToLatLng.latitude - filter.locationEndCity.latitude)
         +((user.cityToLatLng.longitude - filter.locationEndCity.longitude) * (user.cityToLatLng.longitude - filter.locationEndCity.longitude))
-
 
         val userAngel = valuationAngel(user.cityFromLatLng.latitude, user.cityFromLatLng.longitude, user.cityToLatLng.latitude, user.cityToLatLng.longitude).roundToLong()
         val filterAngel = valuationAngel(filter.locationStartCity.latitude, filter.locationStartCity.longitude, filter.locationEndCity.latitude, filter.locationEndCity.longitude).roundToLong()
@@ -97,19 +96,28 @@ class SearchTravelers(val filter: Filter = Filter(), val user: User) {
         val distanceFilter = distance(filter.locationStartCity.latitude, filter.locationEndCity.latitude, filter.locationStartCity.longitude, filter.locationEndCity.longitude).roundToLong()
 
         if (distanceUser == distanceFilter) {
-            return computePercentBeetwenTwoLocation(K, distanceEndPoints, user.cityFromLatLng.latitude, filter.locationStartCity.latitude, user.cityFromLatLng.longitude, filter.locationStartCity.longitude)
+            return computePercentBeetwenTwoLocation(K, distanceEndPoints, user.cityFromLatLng.latitude,
+                    filter.locationStartCity.latitude, user.cityFromLatLng.longitude, filter.locationStartCity.longitude) - correctionFactor
         } else {
-            var distanceFromStartToAnotherStart = distance(user.cityFromLatLng.latitude, filter.locationStartCity.latitude, user.cityFromLatLng.longitude, filter.locationStartCity.longitude)
-            var distanceFromEndUserToEndFilter = distance(user.cityToLatLng.latitude, filter.locationEndCity.latitude, user.cityToLatLng.longitude, filter.locationEndCity.longitude)
+            val distanceFromStartToAnotherStart = distance(user.cityFromLatLng.latitude, filter.locationStartCity.latitude, user.cityFromLatLng.longitude, filter.locationStartCity.longitude)
+            val distanceFromEndUserToEndFilter = distance(user.cityToLatLng.latitude, filter.locationEndCity.latitude, user.cityToLatLng.longitude, filter.locationEndCity.longitude)
             // 10 it's sqrt radius
             if (distanceFromStartToAnotherStart < 10 || distanceFromEndUserToEndFilter < 10) {
 
                 //  Log.e("LOG", "${user.name} " + ((min(distanceUser, distanceFilter).toDouble() / max(distanceUser, distanceFilter)) * K).toString() + " " + (Math.abs(distanceUser - distanceFilter).toDouble() / max(distanceUser, distanceFilter)) * K)
-                return (min(distanceUser, distanceFilter).toDouble() / max(distanceUser, distanceFilter)) * K
+                return ((min(distanceUser, distanceFilter).toDouble() / max(distanceUser, distanceFilter)) * K) - correctionFactor
             }
 
-            return classificationRouteDistance(K, distanceEndPoints, distanceUser, distanceFilter)
+            return classificationRouteDistance(K, distanceEndPoints, distanceUser, distanceFilter) - correctionFactor
         }
+    }
+
+    private val factorForSecondCity = 3
+
+    private fun correctForTheSecondCity(): Int {
+        if (filter.locationMiddleCity.longitude == user.cityTwoLatLng.longitude
+                && filter.locationMiddleCity.latitude == user.cityTwoLatLng.latitude)
+            return 0 else return factorForSecondCity
     }
 
     private fun classificationRouteDistance(K: Double, distanceEndPoints: Double, distanceUser: Long, distanceFilter: Long): Double {
@@ -125,16 +133,16 @@ class SearchTravelers(val filter: Filter = Filter(), val user: User) {
     private fun getFactor(distance: Long) =
             if (distance > 1 && distance < 350) 1 else
                 if (distance > 350 && distance < 800) 2 else
-                    if (distance > 800 && distance < 1600) 3 else
+                    if (distance > 800 && distance < 1600) factorForSecondCity else
                         if (distance > 1600 && distance < 3000) 4 else
                             if (distance > 3000 && distance < 6000) 5 else 6
 }
 
 fun valuationAngel(latitudeStart: Double, longitudeStart: Double, latitudeEnd: Double, longitudeEnd: Double): Double {
-    var locationUser = Location("Start")
+    val locationUser = Location("Start")
     locationUser.longitude = longitudeStart
     locationUser.latitude = latitudeStart
-    var locationFilter = Location("End")
+    val locationFilter = Location("End")
     locationFilter.latitude = latitudeEnd
     locationFilter.longitude = longitudeEnd
     return locationUser.bearingTo(locationFilter).toDouble()

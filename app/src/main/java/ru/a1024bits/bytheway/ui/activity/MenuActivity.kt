@@ -69,8 +69,7 @@ import javax.inject.Inject
 
 class MenuActivity : AppCompatActivity(),
         NavigationView.OnNavigationItemSelectedListener,
-        OnFragmentInteractionListener,
-        GoogleApiClient.OnConnectionFailedListener {
+        OnFragmentInteractionListener, GoogleApiClient.OnConnectionFailedListener {
 
     val preferences: SharedPreferences by lazy { getSharedPreferences(Constants.APP_PREFERENCES, Context.MODE_PRIVATE) }
 

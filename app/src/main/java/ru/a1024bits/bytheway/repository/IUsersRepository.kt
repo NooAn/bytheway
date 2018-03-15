@@ -5,13 +5,14 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.GeoPoint
 import io.reactivex.Completable
+import io.reactivex.Observable
 import io.reactivex.Single
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.model.map_directions.RoutesList
 import ru.a1024bits.bytheway.viewmodel.FilterAndInstallListener
 
 interface IUsersRepository {
-    fun getReallUsers(paramSearch: Filter): Single<List<User>>
+    fun getRealUsers(): Observable<User>
     fun installAllUsers(listener: FilterAndInstallListener)
     fun getUserById(userID: String): Task<DocumentSnapshot>
     fun addUser(user: User): Task<Void>

@@ -54,8 +54,6 @@ import ru.a1024bits.bytheway.util.Constants.FCM_CMD_SHOW_USER
 import ru.a1024bits.bytheway.util.Constants.FIRST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.START_DATE
-import ru.a1024bits.bytheway.util.Constants.TWO_DATE
-import ru.a1024bits.bytheway.util.Constants.TWO_INDEX_CITY
 import ru.a1024bits.bytheway.util.createMarker
 import ru.a1024bits.bytheway.util.toGeoPoint
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
@@ -189,34 +187,28 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
 
         when (response?.status) {
             Status.SUCCESS -> {
-                if (response.data == null && activity != null) {
-                    showErrorLoading()
-                } else {
-
-                    val notifyIdsForUsers = arrayListOf<String>()
-                    val saveNotifiedIds = (activity as MenuActivity).getNotified()
-                    response.data?.map {
-                        if (it.percentsSimilarTravel >= Constants.FCM_MATCH_PERCENT && !saveNotifiedIds.contains(it.id)) {
-                            notifyIdsForUsers.add(it.id)
-                            saveNotifiedIds.add(it.id)
-                        }
+                val notifyIdsForUsers = arrayListOf<String>()
+                val saveNotifiedIds = (activity as MenuActivity).getNotified()
+                response.data?.map {
+                    if (it.percentsSimilarTravel >= Constants.FCM_MATCH_PERCENT && !saveNotifiedIds.contains(it.id)) {
+                        notifyIdsForUsers.add(it.id)
+                        saveNotifiedIds.add(it.id)
                     }
-                    if (notifyIdsForUsers.size > 0) {
-                        if (BuildConfig.DEBUG)
-                            notifyIdsForUsers.add(FirebaseAuth.getInstance().currentUser?.uid!!)
-                        viewModel?.sendNotifications(notifyIdsForUsers.joinToString(","), FireBaseNotification(
-                                getString(R.string.app_name),
-                                getString(R.string.traveller) + "  ${user.name} " + getString(R.string.notification_user_searching),
-                                FCM_CMD_SHOW_USER,
-                                FirebaseAuth.getInstance().currentUser?.uid
-                        ))
-                        (activity as MenuActivity).updateNotified(saveNotifiedIds)
-                    }
+                }
+                if (notifyIdsForUsers.size > 0) {
+                    if (BuildConfig.DEBUG)
+                        notifyIdsForUsers.add(FirebaseAuth.getInstance().currentUser?.uid!!)
+                    viewModel?.sendNotifications(notifyIdsForUsers.joinToString(","), FireBaseNotification(
+                            getString(R.string.app_name),
+                            getString(R.string.traveller) + "  ${user.name} " + getString(R.string.notification_user_searching),
+                            FCM_CMD_SHOW_USER,
+                            FirebaseAuth.getInstance().currentUser?.uid
+                    ))
+                    (activity as MenuActivity).updateNotified(saveNotifiedIds)
                 }
 
                 (activity as MenuActivity).navigator.applyCommand(Forward(Screens.SIMILAR_TRAVELS_SCREEN, response.data))
             }
-
 
             Status.ERROR -> {
                 Log.e("LOG", "log e:" + response.error)
@@ -226,7 +218,7 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
     }
 
     private fun showErrorLoading() {
-        Toast.makeText(activity, R.string.just_error, Toast.LENGTH_SHORT).show()
+        Toast.makeText(activity ?: return, R.string.just_error, Toast.LENGTH_SHORT).show()
     }
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
@@ -454,7 +446,7 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
                     LatLngInterpolator.CurveBezie(),
                     onAnimationEnd = {
                         viewModel?.response?.observe(this@MapFragment, listUsers)
-                        viewModel?.getUsersForFilter(searchFragment?.filter ?: Filter())
+                        viewModel?.getSearchUsers(searchFragment?.filter ?: Filter())
                         listPointPath.clear()
                         markerAnimation.flag = false
                     })

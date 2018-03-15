@@ -22,6 +22,7 @@ import javax.inject.Inject
 import kotlin.collections.HashMap
 
 import com.google.firebase.iid.FirebaseInstanceId
+import io.reactivex.Observable
 import ru.a1024bits.bytheway.model.FireBaseNotification
 import ru.a1024bits.bytheway.model.map_directions.RoutesList
 import ru.a1024bits.bytheway.util.Constants
@@ -33,15 +34,9 @@ const val COLLECTION_USERS = "users"
  */
 class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapService: MapWebService) : IUsersRepository {
 
-    companion object {
-        const val TAG = "LOG UserRepository"
-        const val MIN_LIMIT = 1
-    }
-
     override fun getUser(id: String): Single<User> =
             Single.create<User> { stream ->
                 try {
-                    Log.e("LOG get user R", Thread.currentThread().name)
                     store.collection(COLLECTION_USERS).document(id).get().addOnSuccessListener({ document ->
                         val user = document.toObject(User::class.java)
                         stream.onSuccess(user)
@@ -115,54 +110,32 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
         }
     }
 
-    override fun getReallUsers(paramSearch: Filter): Single<List<User>> =
-            Single.create<List<User>> { stream ->
-                try {
-                    store.collection(COLLECTION_USERS).whereGreaterThanOrEqualTo("dates.start_date", System.currentTimeMillis())
-                            .get().addOnCompleteListener({ task ->
-                        if (task.isSuccessful) {
-                            Log.e("LOG get real users R", Thread.currentThread().name)
-
-                            val result: MutableList<User> = ArrayList()
-                            for (document in task.result) {
-
-                                var user = User()
-
-                                try {
-                                    user = document.toObject(User::class.java)
-
-                                } catch (ex2: Exception) {
-                                    ex2.printStackTrace()
-                                    FirebaseCrash.report(ex2)
-                                }
-
-                                try {
-                                    if (user.cities.size > 0) {
-                                        // run search algorithm. Для оптимизации запускаем сразу.
-                                        val search = SearchTravelers(filter = paramSearch, user = user)
-
-                                        user.percentsSimilarTravel = search.getEstimation()
-                                        if (user.percentsSimilarTravel > MIN_LIMIT &&
-                                                user.id != FirebaseAuth.getInstance().currentUser?.uid) {
-                                            result.add(user)
-                                        }
-                                    }
-                                } catch (ex: Exception) {
-                                    stream.onError(ex)
-                                    FirebaseCrash.report(ex)
-                                }
-                            }
-                            result.sortByDescending { it.percentsSimilarTravel } // перед отправкой сортируем по степени похожести маршрута.
-                            stream.onSuccess(result)
-
-                        } else {
-                            stream.onError(Exception("Not Successful load users"))
+    override fun getRealUsers(): Observable<User> = Observable.create<User> { stream ->
+        try {
+            store.collection(COLLECTION_USERS).whereGreaterThanOrEqualTo("dates.start_date", System.currentTimeMillis())
+                    .get().addOnCompleteListener({ task ->
+                if (task.isSuccessful) {
+                    for (document in task.result) {
+                        var user: User
+                        try {
+                            user = document.toObject(User::class.java)
+                            stream.onNext(user)
+                        } catch (ex2: Exception) {
+                            ex2.printStackTrace()
+                            FirebaseCrash.report(ex2)
                         }
-                    })
-                } catch (exp: Exception) {
-                    stream.onError(exp) // for fix bugs FirebaseFirestoreException: DEADLINE_EXCEEDED
+                    }
+                } else {
+                    stream.onError(Exception("Not Successful load users"))
                 }
-            }
+                stream.onComplete()
+            })
+        } catch (exp: Exception) {
+            stream.onError(exp) // for fix bugs FirebaseFirestoreException: DEADLINE_EXCEEDED
+            stream.onComplete()
+        }
+    }
+
 
     override fun getUserById(userID: String): Task<DocumentSnapshot> {
         return store.collection(COLLECTION_USERS).document(userID).get()
