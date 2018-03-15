@@ -48,7 +48,10 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
     companion object {
         const val SIZE_INITIAL_ELEMENTS = 2
         const val TAG_ANALYTICS = "AllUsersFragment_"
-        fun newInstance(): AllUsersFragment = AllUsersFragment()
+        fun newInstance(): AllUsersFragment {
+            Log.e("LOG", "AllUsersFragment install")
+            return AllUsersFragment()
+        }
     }
 
     private lateinit var filter: Filter
@@ -73,34 +76,38 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
         }
     }
 
+    private fun loadingObserver(): Observer<Boolean?> = Observer { loading ->
+        loadingWhereLoadUsers.visibility = if (loading == true) View.VISIBLE else View.GONE
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
         analytics = FirebaseAnalytics.getInstance(this.context)
+        Log.e("LOG", "AllUsersFragment onCreate")
+
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         App.component.inject(this)
         super.onActivityCreated(savedInstanceState)
         analytics.setCurrentScreen(this.activity, "AllUsersFragment", this.javaClass.simpleName)
-
         try {
             viewModel?.let {
                 filter = it.filter
             }
-
+            Log.e("LOG", "AllUsersFragment")
             displayUsersAdapter = DisplayAllUsersAdapter(this.context, viewModel ?: return)
             installLogicToUI()
             displayAllUsers.adapter = displayUsersAdapter
 
-            viewModel?.response?.observe(this, usersObservers)
-            viewModel?.loadingStatus?.observe(this, Observer<Boolean?> { t ->
-                if (t == true)
-                    loadingWhereLoadUsers.visibility = View.VISIBLE
-                else
-                    loadingWhereLoadUsers.visibility = View.GONE
-            })
-            viewModel?.getAllUsers(filter)
+            if (viewModel?.response?.hasObservers() == false)
+                viewModel?.response?.observe(this, usersObservers)
+
+            if (viewModel?.loadingStatus?.hasObservers() == false)
+                viewModel?.loadingStatus?.observe(this, loadingObserver())
+
+            viewModel?.getAllUsers(null)
 
             showPrompt("isFirstEnterAllUsersFragment", context.resources.getString(R.string.close_hint),
                     context.resources.getString(R.string.hint_all_travelers), context.resources.getString(R.string.hint_all_travelers_description), searchParametersText)
@@ -109,6 +116,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             FirebaseCrash.report(e)
         }
     }
+
 
     override fun onStart() {
         super.onStart()
@@ -129,12 +137,10 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
 
     override fun onResume() {
         super.onResume()
-
     }
 
     override fun onPause() {
         super.onPause()
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

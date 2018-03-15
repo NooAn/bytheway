@@ -243,6 +243,7 @@ class MenuActivity : AppCompatActivity(),
                     ALL_USERS_SCREEN -> return allUsersFragment
 
                     SIMILAR_TRAVELS_SCREEN -> {
+
                         SimilarTravelsFragment.newInstance(data as List<User>)
                     }
                     else -> return MapFragment()

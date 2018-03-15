@@ -19,6 +19,7 @@ import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.START_DATE
 import java.util.*
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 /**
  * Created by andrey.gusenkov on 25/09/2017.
@@ -33,16 +34,19 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
         const val TAG = "showUserViewModel"
     }
 
-    fun getAllUsers(f: Filter) {
-        this.filter = f
-        userRepository?.installAllUsers(this)
+    fun getAllUsers(f: Filter?) {
+        this.filter = f ?: filter
+        if (users.size != 0 && filter.isNotDefault()) {
+            response.value = Response.success(users)
+        } else
+            userRepository?.installAllUsers(this)
     }
 
     override fun filterAndInstallUsers(vararg snapshots: QuerySnapshot) {
         Single.create<MutableList<User>> { stream ->
             try {
                 Log.e("LOG get filter users", Thread.currentThread().name)
-                var result: MutableList<User> = ArrayList()
+                val result: MutableList<User> = ArrayList()
                 snapshots.map {
                     for (document in it) {
                         try {
@@ -56,8 +60,6 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
                         }
                     }
                 }
-                // if (sortString.isNotEmpty()) result = filterUsersByString(sortString, result)
-                /*todo if filter by string XOR filter? then add: else*/
                 filterUsersByOptions(result, filter)
                 stream.onSuccess(result)
             } catch (exp: Exception) {
@@ -71,10 +73,14 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
                 .doAfterTerminate({ loadingStatus.postValue(false) })
                 .subscribe({ resultUsers ->
                     Log.e("LOG subscribe", Thread.currentThread().name)
+                    if (users.size == 0)
+                        users.addAll(resultUsers)
                     response.postValue(Response.success(resultUsers))
                 },
                         { throwable -> response.postValue(Response.error(throwable)) })
     }
+
+    var users: ArrayList<User> = ArrayList<User>()
 
     override fun onFailure(e: Throwable) {
         response.postValue(Response.error(e))
@@ -202,6 +208,9 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
 
     }
 }
+
+private fun Filter.isNotDefault(): Boolean = (this == Filter())
+
 
 interface FilterAndInstallListener {
     var filter: Filter
