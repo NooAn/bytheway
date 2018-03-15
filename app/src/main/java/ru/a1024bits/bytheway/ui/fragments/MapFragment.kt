@@ -23,6 +23,7 @@ import com.google.android.gms.maps.model.*
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.crash.FirebaseCrash
+import com.google.firebase.firestore.GeoPoint
 import kotlinx.android.synthetic.main.fragment_maps.*
 import kotlinx.android.synthetic.main.fragment_search_block.*
 import retrofit2.Call
@@ -46,12 +47,15 @@ import ru.a1024bits.bytheway.ui.dialogs.TravelSearchSaveDialog
 import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment.Companion.BUDGET
 import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment.Companion.CITY_FROM
 import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment.Companion.CITY_TO
+import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment.Companion.CITY_TWO
 import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.util.Constants.END_DATE
 import ru.a1024bits.bytheway.util.Constants.FCM_CMD_SHOW_USER
 import ru.a1024bits.bytheway.util.Constants.FIRST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.START_DATE
+import ru.a1024bits.bytheway.util.Constants.TWO_DATE
+import ru.a1024bits.bytheway.util.Constants.TWO_INDEX_CITY
 import ru.a1024bits.bytheway.util.createMarker
 import ru.a1024bits.bytheway.util.toGeoPoint
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
@@ -321,6 +325,7 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
         hashMap[COUNT_TRIP] = 1
         hashMap[BUDGET] = getCurrentBudget()
         hashMap[CITY_FROM] = searchFragment?.filter?.locationStartCity.toGeoPoint()
+        hashMap[CITY_TWO] = GeoPoint(0.0, 0.0)
         hashMap[CITY_TO] = searchFragment?.filter?.locationEndCity.toGeoPoint()
         hashMap[DATES] = getDatesMap()
         return hashMap
@@ -538,6 +543,9 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
                 "destination" to points.valueAt(1).position.toJsonString(),
                 "sensor" to "false")).enqueue(object : Callback<RoutesList?> {
             override fun onResponse(call: Call<RoutesList?>?, response: Response<RoutesList?>?) {
+                if (response?.body()?.routes?.size == 0)
+                    this@MapFragment.routeString = ""
+
                 response?.body()?.routes?.map {
                     it.overviewPolyline?.encodedData?.let { routeString ->
                         this@MapFragment.routeString = routeString

@@ -45,7 +45,6 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
     override fun filterAndInstallUsers(vararg snapshots: QuerySnapshot) {
         Single.create<MutableList<User>> { stream ->
             try {
-                Log.e("LOG get filter users", Thread.currentThread().name)
                 val result: MutableList<User> = ArrayList()
                 snapshots.map {
                     for (document in it) {
@@ -72,7 +71,6 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
                 .doOnSubscribe({ loadingStatus.postValue(true) })
                 .doAfterTerminate({ loadingStatus.postValue(false) })
                 .subscribe({ resultUsers ->
-                    Log.e("LOG subscribe", Thread.currentThread().name)
                     if (users.size == 0)
                         users.addAll(resultUsers)
                     response.postValue(Response.success(resultUsers))
@@ -192,6 +190,7 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
     }
 
     fun sendNotifications(ids: String, notification: FireBaseNotification) {
+        FirebaseCrash.log("send Notification")
         userRepository?.let {
             disposables.add(it.sendNotifications(ids, notification)
                     .timeout(TIMEOUT_SECONDS, timeoutUnit)
@@ -200,6 +199,7 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
                     .subscribe(
                             { Log.e("LOG", "notify complete") },
                             { t ->
+                                FirebaseCrash.report(t)
                                 Log.e("LOG view model", "notify", t)
                             }
                     )
