@@ -39,12 +39,20 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
     }
 
     fun getAllUsers(f: Filter?) {
-        this.filter = f ?: filter
-        if (users.size != 0 && filter.isNotDefault()) {
-            response.value = Response.success(users)
-        } else
-            userRepository?.installAllUsers(this)
+        try {
+            this.filter = f ?: filter
+            if (users.size != 0 && filter.isNotDefault()) {
+                response.value = Response.success(users)
+            } else
+                userRepository?.installAllUsers(this)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            FirebaseCrash.report(e)
+            loadingStatus.postValue(false)
+        }
     }
+
+    val TWO_MONTHS_IN_MLSECONDS: Long = 5270400000
 
     override fun filterAndInstallUsers(vararg snapshots: QuerySnapshot) {
         Single.create<MutableList<User>> { stream ->
@@ -53,9 +61,12 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
                 snapshots.map {
                     for (document in it) {
                         try {
+                            //FIXME надо попытаться вынести это в условие запроса для сервера.
                             val user = document.toObject(User::class.java)
-                            if (user.cities.size > 0 && user.id != FirebaseAuth.getInstance().currentUser?.uid) {
-                                result.add(user)
+                            if (user.cities.size > 0
+                                    && user.id != FirebaseAuth.getInstance().currentUser?.uid) {
+                                if (!(user.dates[START_DATE] ?: 0L <= System.currentTimeMillis() - TWO_MONTHS_IN_MLSECONDS && (user.dates[END_DATE] == null || user.dates[END_DATE] ?: 0 != 0L)))
+                                    result.add(user)
                             }
                         } catch (e: Exception) {
                             e.printStackTrace()

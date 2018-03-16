@@ -112,7 +112,6 @@
     <string name="close_hint">NEXT</string>
 
 
-
     <string-array name="months_array">
 
         <item>Jan</item>
@@ -241,9 +240,9 @@
 
     <string name="finish">Finish</string>
 
-    <string name="to_date">по</string>
+    <string name="to_date">to</string>
 
-    <string name="from_in">c</string>
+    <string name="from_in">from</string>
     <string name="attention">Attention</string>
     <string name="city_in_the_world">World citizen. </string>
     <string name="alternate_entry">Check internet, please. You can try to enter with sms</string>
@@ -266,5 +265,6 @@
     <string name="immortal">Immortal</string>
     <string name="very_long">Really long time ago</string>
     <string name="email_send">Sending letter. Select email client</string>
+    <string name="without_name">Traveler</string>
 
 </resources>

@@ -152,6 +152,8 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
             glide?.load(user.urlPhoto)
                     ?.apply(RequestOptions.circleCropTransform())
                     ?.into(image_avatar)
+        else
+            image_avatar.setImageResource(R.drawable.default_avatar)
 
         for (name in user.socialNetwork) {
             when (name.key) {

@@ -12,10 +12,12 @@ import com.bumptech.glide.RequestManager
 import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.analytics.FirebaseAnalytics
 import ru.a1024bits.bytheway.R
+import ru.a1024bits.bytheway.model.URL_PHOTO
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.model.contains
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
+import java.util.concurrent.atomic.AtomicInteger
 
 
 class DisplayAllUsersAdapter(val context: Context, val viewModel: DisplayUsersViewModel) : RecyclerView.Adapter<DisplayAllUsersAdapter.UserViewHolder>() {
@@ -35,7 +37,7 @@ class DisplayAllUsersAdapter(val context: Context, val viewModel: DisplayUsersVi
 
     override fun onBindViewHolder(holder: UserViewHolder?, position: Int) {
         val currentUser = users[position]
-        holder?.name?.text = currentUser.name
+        holder?.name?.text = if (currentUser.name.isBlank()) context.getString(R.string.without_name) else currentUser.name
         holder?.dates?.text = if (currentUser.dates["start_date"] != null && currentUser.dates["end_date"] != null)
             viewModel.getTextFromDates(currentUser.dates["start_date"], currentUser.dates["end_date"], context.resources.getStringArray(R.array.months_array))
         else ""
@@ -46,7 +48,7 @@ class DisplayAllUsersAdapter(val context: Context, val viewModel: DisplayUsersVi
             StringBuilder(currentUser.cities["first_city"]).append(" - ").append(currentUser.cities["last_city"])
         else
             context.getString(R.string.not_cities)
-        glide.load(currentUser.urlPhoto)
+        glide.load(if (currentUser.urlPhoto.isBlank()) URL_PHOTO else currentUser.urlPhoto)
                 ?.apply(RequestOptions.circleCropTransform())
                 ?.into(holder?.avatar)
     }
@@ -57,7 +59,7 @@ class DisplayAllUsersAdapter(val context: Context, val viewModel: DisplayUsersVi
         init {
             view.setOnClickListener({ _ ->
                 if (adapterPosition != RecyclerView.NO_POSITION && context is MenuActivity) {
-                    FirebaseAnalytics.getInstance(context.applicationContext).logEvent("AllUsersFragment_SELECT_USER_" + adapterPosition, null)
+                    if (adapterPosition <= 10) FirebaseAnalytics.getInstance(context.applicationContext).logEvent("AllUsersFragment_SELECT_USER_" + adapterPosition, null)
                     context.showUserSimpleProfile(users[adapterPosition])
                 }
             })

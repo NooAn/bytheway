@@ -145,4 +145,5 @@
     <string name="immortal">Бессмертный</string>
     <string name="very_long">Очень давно</string>
     <string name="email_send">Отправка письма. Выберите почтовый клиент</string>
+    <string name="without_name">Путешественник</string>
 </resources>

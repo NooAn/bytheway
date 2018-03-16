@@ -24,7 +24,6 @@ import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialo
 import com.codetroopers.betterpickers.calendardatepicker.MonthAdapter
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crash.FirebaseCrash
-import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.fragment_display_all_users.*
 import kotlinx.android.synthetic.main.searching_parameters_block.*
 import ru.a1024bits.bytheway.App
@@ -36,7 +35,6 @@ import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.repository.M_SEX
 import ru.a1024bits.bytheway.repository.W_SEX
-import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.a1024bits.bytheway.util.DateUtils
 import ru.a1024bits.bytheway.util.DecimalInputFilter
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
@@ -107,13 +105,15 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             if (viewModel?.loadingStatus?.hasObservers() == false)
                 viewModel?.loadingStatus?.observe(this, loadingObserver())
 
-            viewModel?.getAllUsers(null)
+            viewModel?.getAllUsers(filter)
 
             showPrompt("isFirstEnterAllUsersFragment", context.resources.getString(R.string.close_hint),
                     context.resources.getString(R.string.hint_all_travelers), context.resources.getString(R.string.hint_all_travelers_description), searchParametersText)
         } catch (e: Throwable) {
             Log.e("LOG_AUF", e.toString())
             FirebaseCrash.report(e)
+            loadingWhereLoadUsers.visibility = View.GONE
+           // showErrorLoading()
         }
     }
 
@@ -230,7 +230,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
         }
         choseDateEnd.setOnTouchListener(DateUtils.onDateTouch)
         view_contain_block_parameters.layoutTransition.setDuration(700L)
-        saveParameters.setOnClickListener {
+        searchButtonParameters.setOnClickListener {
             analytics.logEvent(TAG_ANALYTICS + "CLICK_ON_SEARCH", null)
 
             try {
@@ -240,7 +240,6 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
                 e.printStackTrace()
                 filter.endBudget = -1
                 filter.startBudget = 0
-
             }
 
             filter.startCity = startCity.text.toString()
@@ -252,17 +251,13 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
         }
 
         cancelParameters.setOnClickListener {
+            if (filter == Filter()) {
+                block_search_parameters.visibility = View.GONE
+                return@setOnClickListener
+            }
             analytics.logEvent(TAG_ANALYTICS + "CLICK_ON_CANCEL", null)
 
-            filter.sex = 0
-            filter.startAge = -1
-            filter.endAge = viewModel?.yearsOldUsers?.size?.minus(1) ?: -1
-            filter.startCity = ""
-            filter.endCity = ""
-            filter.startBudget = -1
-            filter.endBudget = -1
-            filter.startDate = 0L
-            filter.endDate = 0L
+            filter = Filter()
 
             startAge.setSelection(filter.startAge)
             endAge.setSelection(filter.endAge)

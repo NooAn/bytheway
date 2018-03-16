@@ -19,6 +19,7 @@ import com.google.android.gms.location.places.AutocompleteFilter
 import com.google.android.gms.location.places.ui.PlaceAutocomplete
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.crash.FirebaseCrash
 import kotlinx.android.synthetic.main.fragment_search_block.*
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.Method
@@ -298,15 +299,20 @@ class SearchFragment : Fragment() {
 
             PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO -> when (resultCode) {
                 AppCompatActivity.RESULT_OK -> {
-                    val place = PlaceAutocomplete.getPlace(activity, data);
-                    text_to_city?.text = place.name
-                    secondPoint = place.latLng
-                    filter.locationEndCity = place.latLng
-                    filter.endCity = place.name.toString()
-                    text_to_city?.error = null
-                    manageErrorCityEquals(firstPoint)
-                    secondPoint?.let { latLng ->
-                        (activity as OnFragmentInteractionListener).onSetPoint(latLng, SECOND_MARKER_POSITION)
+                    try {
+                        val place = PlaceAutocomplete.getPlace(activity, data);
+                        text_to_city?.text = place.name
+                        secondPoint = place.latLng
+                        filter.locationEndCity = place.latLng
+                        filter.endCity = place.name.toString()
+                        text_to_city?.error = null
+                        manageErrorCityEquals(firstPoint)
+                        secondPoint?.let { latLng ->
+                            (activity as OnFragmentInteractionListener).onSetPoint(latLng, SECOND_MARKER_POSITION)
+                        }
+                    }catch (e: Exception) {
+                        e.printStackTrace()
+                        FirebaseCrash.report(e)
                     }
                 }
                 else -> {

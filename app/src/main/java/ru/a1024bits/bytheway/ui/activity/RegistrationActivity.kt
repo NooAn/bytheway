@@ -72,16 +72,14 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
         mFirebaseAnalytics.setCurrentScreen(this, "Registration", this.javaClass.getSimpleName())
         mFirebaseAnalytics.logEvent("RegistrationScreen_Enter", null)
 
-        viewModel?.load?.observe(this, object : Observer<Boolean> {
-            override fun onChanged(upload: Boolean?) {
-                if (upload == true) {
-                    mFirebaseAnalytics.logEvent("RegistrationScreen_Success", null)
-                    startActivity(Intent(this@RegistrationActivity, MenuActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
-                } else {
-                    mFirebaseAnalytics.logEvent("RegistrationScreen_Error_Checkin", null)
-                    updateUI(false)
-                    Toast.makeText(this@RegistrationActivity, "Error for registration", Toast.LENGTH_SHORT).show()
-                }
+        viewModel?.load?.observe(this, Observer<Boolean> { upload ->
+            if (upload == true) {
+                mFirebaseAnalytics.logEvent("RegistrationScreen_Success", null)
+                startActivity(Intent(this@RegistrationActivity, MenuActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
+            } else {
+                mFirebaseAnalytics.logEvent("RegistrationScreen_Error_Checkin", null)
+                updateUI(false)
+                Toast.makeText(this@RegistrationActivity, "Error for registration", Toast.LENGTH_SHORT).show()
             }
         })
         if (!isNetworkAvailable()) {
@@ -99,13 +97,10 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
         val alertDialog = AlertDialog.Builder(this).create();
         alertDialog.setTitle("Info");
         alertDialog.setMessage(resources.getString(R.string.no_internet));
-        alertDialog.setButton(Dialog.BUTTON_POSITIVE, "OK", object : DialogInterface.OnClickListener {
-            override fun onClick(dialog: DialogInterface?, which: Int) {
-                signIn()
-                alertDialog.dismiss()
-            }
-
-        })
+        alertDialog.setButton(Dialog.BUTTON_POSITIVE, "OK") { _, _ ->
+            signIn()
+            alertDialog.dismiss()
+        }
         alertDialog.show();
     }
 

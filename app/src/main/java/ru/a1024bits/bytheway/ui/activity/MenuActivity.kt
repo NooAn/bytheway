@@ -89,8 +89,13 @@ class MenuActivity : AppCompatActivity(),
     }
 
     override fun onSetPoint(l: LatLng, pos: Int, swap: Boolean) {
-        val mapFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as MapFragment
-        mapFragment.setMarker(l, pos, swap)
+        try {
+            val mapFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as MapFragment
+            mapFragment.setMarker(l, pos, swap)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            onBackPressed()
+        }
     }
 
     override fun onConnectionFailed(p0: ConnectionResult) {
