@@ -16,6 +16,7 @@ import ru.a1024bits.bytheway.model.URL_PHOTO
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.model.contains
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
+import ru.a1024bits.bytheway.util.Translit
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -87,11 +88,13 @@ class DisplayAllUsersAdapter(val context: Context, val viewModel: DisplayUsersVi
             users.addAll(originalUser)
         } else {
             originalUser
-                    .filter { it.contains(query) }
+                    .filter { it.contains(query) || it.contains(translation.cyr2lat(query)) }
                     .forEach { users.add(it) }
         }
         notifyDataSetChanged()
     }
+
+    val translation = Translit()
 }
 
 

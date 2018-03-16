@@ -94,6 +94,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignStart="@+id/budgetFromLayout"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:layout_marginTop="40dp"
                 android:gravity="center_vertical"
                 android:text="с   ___________" />
@@ -102,6 +103,7 @@
                 android:id="@+id/dateToValue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:layout_alignStart="@+id/budgetToLayout"
                 android:layout_marginEnd="5dp"
                 android:layout_marginStart="5dp"
@@ -176,6 +178,7 @@
             <!-- Car -->
             <RelativeLayout
                 android:id="@+id/iconCar"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1">
@@ -203,6 +206,8 @@
             <RelativeLayout
                 android:id="@+id/iconTrain"
                 android:layout_width="0dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+
                 android:layout_height="wrap_content"
                 android:layout_weight="1">
 
@@ -229,6 +234,7 @@
             <RelativeLayout
                 android:id="@+id/iconBus"
                 android:layout_width="0dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:layout_height="wrap_content"
                 android:layout_weight="1">
 
@@ -255,6 +261,7 @@
             <RelativeLayout
                 android:id="@+id/iconPlane"
                 android:layout_width="0dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:layout_height="wrap_content"
                 android:layout_weight="1">
 
@@ -281,6 +288,7 @@
             <RelativeLayout
                 android:id="@+id/iconHitchHicking"
                 android:layout_width="0dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:layout_height="wrap_content"
                 android:layout_weight="1">
 
