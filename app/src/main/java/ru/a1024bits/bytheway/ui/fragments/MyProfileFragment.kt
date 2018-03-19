@@ -30,6 +30,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.GeoPoint
 import com.google.maps.android.PolyUtil
+import com.vk.sdk.VKSdk
 import kotlinx.android.synthetic.main.confirm_dialog.view.*
 import kotlinx.android.synthetic.main.fragment_my_user_profile.*
 import kotlinx.android.synthetic.main.profile_add_trip.*
@@ -125,6 +126,9 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     )
     private var methodIcons: HashMap<String, RelativeLayout> = hashMapOf()
     private var methodTextViews: HashMap<String, TextView?> = hashMapOf()
+    /**
+     *
+     */
     private var socNet: HashMap<String, String> = hashMapOf()
     private var dates: HashMap<String, Long> = hashMapOf()
     private var sex: Int = 0
@@ -655,7 +659,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
              Если были какие-то изменения в линках то сохраняем в бд.
              И меняем цвет иконки соответсвенно значениям.
              */
-            openDialog(SocialNetwork.VK)
+            //openDialog(SocialNetwork.VK)
+            openDialogVK(SocialNetwork.VK.link)
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_vk_click", null)
         }
         csIcon.setOnClickListener {
@@ -663,7 +668,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_cs_click", null)
         }
         whatsAppIcon.setOnClickListener {
-            openDialog(SocialNetwork.WHATSAPP)
+            openDialogWhatsApp(SocialNetwork.WHATSAPP.link)
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_wap_click", null)
         }
         fbcon.setOnClickListener {
@@ -707,6 +712,10 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             (activity as MenuActivity).navigator
                     .applyCommand(Replace(Screens.USER_SINHRONIZED_SCREEN, 1))
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_click_air", null)
+        }
+        vkApp.setOnClickListener {
+            sinchVk()
+            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_click_vk_sinch", null)
         }
         buttonRemoveTravelInfo.setOnClickListener {
             openAlertDialog(this::removeTrip)
@@ -821,7 +830,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     override fun onDestroyView() {
         super.onDestroyView()
         try {
-
             mapView?.onDestroy()
             //Clean up resources from google map to prevent memory leaks.
             //Stop tracking current location
@@ -838,7 +846,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         super.onLowMemory()
         mapView?.onLowMemory()
     }
-
 
     private fun TextView.afterTextChanged(afterTextChanged: (String) -> Unit) {
         this.addTextChangedListener(object : TextWatcher {
@@ -908,7 +915,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
         if (socNet.size == 0)
             showTipsForEmptySocialLink()
-
     }
 
     private fun checkingCityText(): Boolean {
@@ -963,12 +969,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         Toast.makeText(this@MyProfileFragment.context,
                 getString(R.string.error_update), Toast.LENGTH_SHORT).show()
         mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_error_update", null)
-
-    }
-
-    private fun validCellPhone(number: String): Boolean {
-        return number.matches(Regex("^([0-9]|\\+[0-9]){11,13}\$")) &&
-                number != getString(R.string.default_phone_code)
+        mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_error_update", null)
     }
 
     private fun showBlockTravelInformation() {
@@ -978,6 +979,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         layoutTravelMethod.visibility = View.VISIBLE
         moneyfortrip.visibility = View.VISIBLE
         appinTheAirEnter.visibility = View.VISIBLE
+        vkApp.visibility = View.VISIBLE
         descriptionprofile.visibility = View.VISIBLE
         buttonRemoveTravelInfo.visibility = View.VISIBLE
         buttonSaveTravelInfo.visibility = View.VISIBLE
@@ -999,7 +1001,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         lastNameChoose.setText(lastName)
         val cityChoose = dialogView.findViewById<View>(R.id.dialog_city) as EditText
         cityChoose.setText(city)
-
 
         val man = dialogView.findViewById<RadioButton>(R.id.man)
         val woman = dialogView.findViewById<RadioButton>(R.id.woman)
@@ -1068,75 +1069,126 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     private fun savingUserData(name: String, lastName: String, city: String, age: Int, sex: Int) {
 
-        val hashMap = HashMap<String, Any>()
-        hashMap[NAME] = name
-        hashMap[LASTNAME] = lastName
-        hashMap[CITY] = city
-        hashMap[AGE] = age
-        hashMap[SEX] = sex
+        val hashMap = hashMapOf(
+                NAME to name,
+                LASTNAME to lastName,
+                CITY to city,
+                AGE to age,
+                SEX to sex
+        )
 
         viewModel?.sendUserData(hashMap, uid, mainUser)
     }
 
-    private fun openDialog(socialNetwork: SocialNetwork, errorText: String? = null) {
+    private fun openDialogWhatsApp(socialNetworkLink: String) {
+        val dialog = AlertDialog.Builder(activity).create()
+        if (dialog.isShowing) return
+
+        dialog.setTitle(getString(R.string.social_title_wp))
+        dialog.setMessage(getString(R.string.social_text_wp))
+        val dialogView = View.inflate(context, R.layout.custom_dialog_profile_add_wp, null)
+        dialog.setView(dialogView)
+        dialogView.findViewById<EditText>(R.id.socLinkText).setText(mainUser?.phone)
+        socialValues[socialNetworkLink]?.let {
+            dialogView.findViewById<EditText>(R.id.socLinkText).setText(it)
+        }
+        dialog.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.remove), { _, _ ->
+            removeSocNet(socialNetworkLink)
+        })
+
+        dialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.save), { _, _ ->
+            val newLink = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString()
+            newLink.isNumberPhone()
+            if (!newLink.isNumberPhone()) {
+                dialogView.findViewById<EditText>(R.id.socLinkText).error = getString(R.string.fill_phone_invalid)
+            } else {
+                if (newLink in defaultSocialValues.values) return@setButton
+                addNewSocLink(socialNetworkLink, newLink)
+            }
+        })
+
+        dialogView.findViewById<EditText>(R.id.socLinkText).afterTextChanged {
+            val valid = it.isNumberPhone()
+            if (!valid) {
+                dialogView.findViewById<EditText>(R.id.socLinkText).error = getString(R.string.fill_phone_invalid)
+            }
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.isEnabled = valid
+        }
+        dialog.show()
+    }
+
+    private fun openDialogVK(socialNetworkLink: String) {
+        val dialog = AlertDialog.Builder(activity).create()
+        if (dialog.isShowing) return
+        VKSdk.initialize(activity);
+
+        dialog.setTitle(getString(R.string.social_title_vk))
+        dialog.setMessage(getString(R.string.social_text_vk))
+        val dialogView = View.inflate(context, R.layout.custom_dialog_profile_add_vk, null)
+        dialog.setView(dialogView)
+        dialogView.findViewById<Button>(R.id.vkAppSinch).setOnClickListener {
+            sinchVk()
+        }
+
+        socialValues[socialNetworkLink]?.let {
+            dialogView.findViewById<EditText>(R.id.socLinkText).setText(it)
+        }
+
+        dialog.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.remove), { _, _ ->
+            removeSocNet(socialNetworkLink)
+        })
+
+        dialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.save), { _, _ ->
+            val newLink = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString()
+            if (newLink in defaultSocialValues.values) return@setButton
+            addNewSocLink(socialNetworkLink, newLink)
+        })
+        dialog.show()
+    }
+
+    private fun sinchVk() {
+
+    }
+
+    private fun openDialog(socialNetwork: SocialNetwork) {
         val simpleAlert = AlertDialog.Builder(activity).create()
         simpleAlert.setTitle(getString(R.string.social_links))
         simpleAlert.setMessage(getString(R.string.social_text))
         val dialogView = View.inflate(context, R.layout.custom_dialog_profile_soc_network, null)
 
         simpleAlert.setView(dialogView)
-        var socVal = ""
+        var socValueDone = ""
         socialValues[socialNetwork.link]?.let {
-            socVal = it
+            socValueDone = it
         }
-        if (socialNetwork == SocialNetwork.TG && socVal.length <= 1) {
-            socVal = numberPhone
+        if (socialNetwork == SocialNetwork.TG && socValueDone.length <= 1) {
+            socValueDone = numberPhone
         }
-        dialogView.findViewById<EditText>(R.id.socLinkText).setText(socVal)
-
-        if (errorText != null) {
-            dialogView.findViewById<EditText>(R.id.socLinkText).error = errorText
-        }
+        dialogView.findViewById<EditText>(R.id.socLinkText).setText(socValueDone)
 
         simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.remove), { _, _ ->
-            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_remove_links", null)
-            socNet.remove(socialNetwork.link)
-            viewModel?.saveLinks(socNet, uid, SocialResponse(socialNetwork.link))
+            removeSocNet(socialNetwork.link)
         })
 
         simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.save), { _, _ ->
             val newLink = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString()
-
-            var valid = true
-            var errorText = ""
-
-            if (socialNetwork == SocialNetwork.WHATSAPP) {
-                valid = validCellPhone(newLink)
-                if (!valid) errorText = getString(R.string.fill_phone_invalid)
-            }
-
-            if (!valid) {
-                //openDialog(socialNetwork, errorText)
-                dialogView.findViewById<EditText>(R.id.socLinkText).error = errorText
-            } else {
-                if (newLink in defaultSocialValues.values) return@setButton
-                socNet[socialNetwork.link] = newLink
-                viewModel?.saveLinks(socNet, uid, SocialResponse(socialNetwork.link, newLink))
-                mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_save_links", null)
-            }
+            if (newLink in defaultSocialValues.values) return@setButton
+            addNewSocLink(socialNetwork.link, newLink)
         })
 
-        dialogView.findViewById<EditText>(R.id.socLinkText).afterTextChanged {
-            if (socialNetwork == SocialNetwork.WHATSAPP) {
-                val valid = validCellPhone(it)
-                if (!valid) {
-                    dialogView.findViewById<EditText>(R.id.socLinkText).error =
-                            getString(R.string.fill_phone_invalid)
-                }
-                simpleAlert.getButton(AlertDialog.BUTTON_POSITIVE)?.isEnabled = valid
-            }
-        }
         simpleAlert.show()
+    }
+
+    private fun addNewSocLink(socialNetworkLink: String, newLink: String) {
+        socNet[socialNetworkLink] = newLink
+        viewModel?.saveLinks(socNet, uid, SocialResponse(socialNetworkLink, newLink))
+        mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_save_links", null)
+    }
+
+    private fun removeSocNet(socialNetworkLink: String) {
+        mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_remove_links", null)
+        socNet.remove(socialNetworkLink)
+        viewModel?.saveLinks(socNet, uid, SocialResponse(socialNetworkLink))
     }
 
     private fun openAlertDialog(callback: () -> Unit) {
@@ -1148,8 +1200,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.yes), { _, _ ->
             callback()
         })
-        simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.no), { _, _ ->
-        })
+        simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.no), { _, _ -> })
         simpleAlert.show()
     }
 
@@ -1195,6 +1246,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             it?.isActivated = false
         }
         appinTheAirEnter.visibility = View.GONE
+        vkApp.visibility = View.GONE
         layoutTravelMethod.visibility = View.GONE
         moneyfortrip.visibility = View.GONE
         displayPriceTravel.text = ""
@@ -1214,7 +1266,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             2 -> getString(R.string.gender_female)
             else -> {
                 ""
-
             }
         }
 
@@ -1242,7 +1293,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     /**
      * Fires an intent to spin up the "file chooser" UI and select an image.
      */
-    fun performFileSearch() {
+    private fun performFileSearch() {
 
         // ACTION_OPEN_DOCUMENT is the intent to choose a file via the system's file
         // browser.
@@ -1356,7 +1407,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             routeString = user.route
             drawPolyline()
         } else
-            obtainDirection() // для стразовки. Если машрута нет, то пытаемя получить его.
+            obtainDirection() // для страховки. Если машрута нет, то пытаемя получить его.
 
         age = user.age
 
@@ -1371,9 +1422,10 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                 SocialNetwork.WHATSAPP.link -> whatsAppIcon.setImageResource(R.drawable.ic_whats_icon_color)
                 SocialNetwork.TG.link -> tgIcon.setImageResource(R.drawable.ic_tg_color)
             }
-            if (name.key in socialValues) {
+
+            if (name.key in socialValues)
                 socialValues[name.key] = name.value
-            }
+
         }
         if (user.token.isEmpty() || (activity as MenuActivity).needUpdateToken()) {
             viewModel?.updateFcmToken()
@@ -1490,6 +1542,5 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 private fun GeoPoint.toLatLng(): LatLng? = LatLng(this.latitude, this.longitude)
 
 private fun Int.toStringOrBlank(): String = if (this == 0) "" else this.toString()
-
 
 private fun Editable.toStringOrZero(): String = if (this.toString().isBlank()) "0" else this.toString()

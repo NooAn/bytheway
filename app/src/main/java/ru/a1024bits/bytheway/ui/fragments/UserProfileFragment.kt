@@ -495,7 +495,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
     }
 }// Required empty public constructor
 
-private fun String.isNumberPhone(): Boolean {
+fun String.isNumberPhone(): Boolean {
     return this.matches(Regex("^([0-9]|\\+[0-9]){11,13}\$")) ||
             this.startsWith("+7") && !this.startsWith("@")
 }

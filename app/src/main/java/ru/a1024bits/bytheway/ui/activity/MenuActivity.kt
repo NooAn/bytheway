@@ -7,6 +7,7 @@ import android.content.*
 import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.support.design.widget.NavigationView
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
@@ -121,13 +122,32 @@ class MenuActivity : AppCompatActivity(),
         val activeNetworkInfo = connectivityManager.getActiveNetworkInfo()
         return activeNetworkInfo != null && activeNetworkInfo.isConnected
     }
+//
+//    if (!VKSdk.onActivityResult(requestCode, resultCode, data, new VKCallback<VKAccessToken>() {
+//        @Override
+//        public void onResult(VKAccessToken res) {
+//            Log.i("LOG", " Пользователь успешно авторизовался Vk");
+//            Social.getVkPoster().onSuccess(null);
+//        }
+//
+//        @Override
+//        public void onError(VKError error) {
+//            try {
+//                Log.i("LOG", " Произошла ошибка авторизации  vk (например, пользователь запретил авторизацию" + error.errorMessage
+//                        + " reason=" + error.toString());
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }))
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.e("TEST", " onCreate")
         App.component.inject(this)
         glide = Glide.with(this)
-        FirebaseCrash.setCrashCollectionEnabled(BuildConfig.DEBUG)
-        FirebaseFirestore.setLoggingEnabled(BuildConfig.DEBUG)
+        FirebaseCrash.setCrashCollectionEnabled(!BuildConfig.DEBUG)
+        FirebaseFirestore.setLoggingEnabled(!BuildConfig.DEBUG)
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
         if (FirebaseAuth.getInstance().currentUser == null) {
@@ -319,7 +339,7 @@ class MenuActivity : AppCompatActivity(),
 
     override fun onResume() {
         super.onResume()
-        Log.e("LOG", "onResume")
+        Log.e("TEST", "onResume")
         // the intent filter defined in AndroidManifest will handle the return from ACTION_VIEW intent
         val uri = intent.data
         if (uri != null && uri.toString().startsWith(redirectUri)) {
@@ -383,6 +403,39 @@ class MenuActivity : AppCompatActivity(),
                 IntentFilter(Constants.FCM_SRV))
     }
 
+    override fun onStart() {
+        super.onStart()
+        Log.e("TEST", "onStart")
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
+        super.onRestoreInstanceState(savedInstanceState, persistentState)
+        Log.e("TEST", "onRestoreInstanceState")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mGoogleApiClient = null
+        Log.e("TEST", "onDestroy")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        navigatorHolder.removeNavigator()
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver)
+        Log.e("TEST", "onPause")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.e("TEST", "onStop")
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        Log.e("TEST", "onRestart")
+    }
+
     private fun getLatLngForAirports(code: String?) {
         code?.let {
             val generator = ServiceGenerator()
@@ -411,23 +464,6 @@ class MenuActivity : AppCompatActivity(),
     override fun onBackPressed() {
         navigator.applyCommand(Back())
         Log.e("LOG", "on back tap")
-    }
-
-    override fun onPause() {
-        super.onPause()
-        navigatorHolder.removeNavigator()
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver)
-        Log.e("LOG", "onPause")
-    }
-
-    override fun onStop() {
-        super.onStop()
-        Log.e("LOG", "onStop")
-    }
-
-    override fun onRestart() {
-        super.onRestart()
-        Log.e("LOG", "onRestart")
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

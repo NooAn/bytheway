@@ -266,5 +266,10 @@
     <string name="very_long">Really long time ago</string>
     <string name="email_send">Sending letter. Select email client</string>
     <string name="without_name">Traveler</string>
+    <string name="social_text_vk">Добавьте свой аккаунт VK, чтобы с Вами смогли связаться другие путешественники</string>
+    <string name="social_title_vk">Vkontakte</string>
+    <string name="social_title_wp">WhatsApp</string>
+    <string name="social_text_wp">Добавьте свой номер телефона, чтобы с Вами смогли связаться другие путешественники</string>
+    <string name="sinch_vk">Синхронизация с помощью приложение</string>
 
 </resources>
