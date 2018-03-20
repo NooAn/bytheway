@@ -271,5 +271,6 @@
     <string name="social_title_wp">WhatsApp</string>
     <string name="social_text_wp">Добавьте свой номер телефона, чтобы с Вами смогли связаться другие путешественники</string>
     <string name="sinch_vk">Синхронизация с помощью приложение</string>
+    <string name="share_friends">Рассказать друзьям</string>
 
 </resources>

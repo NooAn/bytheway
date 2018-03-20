@@ -33,6 +33,10 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.FirebaseFirestore
+import com.vk.sdk.VKAccessToken
+import com.vk.sdk.VKCallback
+import com.vk.sdk.VKSdk
+import com.vk.sdk.api.VKError
 import io.reactivex.SingleObserver
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_menu.*
@@ -67,6 +71,7 @@ import ru.terrakok.cicerone.commands.*
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
+import kotlin.math.log
 
 class MenuActivity : AppCompatActivity(),
         NavigationView.OnNavigationItemSelectedListener,
@@ -117,29 +122,18 @@ class MenuActivity : AppCompatActivity(),
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
+
     private fun isNetworkAvailable(): Boolean {
         val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetworkInfo = connectivityManager.getActiveNetworkInfo()
         return activeNetworkInfo != null && activeNetworkInfo.isConnected
     }
-//
-//    if (!VKSdk.onActivityResult(requestCode, resultCode, data, new VKCallback<VKAccessToken>() {
-//        @Override
-//        public void onResult(VKAccessToken res) {
-//            Log.i("LOG", " Пользователь успешно авторизовался Vk");
-//            Social.getVkPoster().onSuccess(null);
-//        }
-//
-//        @Override
-//        public void onError(VKError error) {
-//            try {
-//                Log.i("LOG", " Произошла ошибка авторизации  vk (например, пользователь запретил авторизацию" + error.errorMessage
-//                        + " reason=" + error.toString());
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }))
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        Log.e("LOG", "onActiviyt")
+        super.onActivityResult(requestCode, resultCode, data)
+        fragmentProfile.onActivityResult(requestCode, resultCode, data)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

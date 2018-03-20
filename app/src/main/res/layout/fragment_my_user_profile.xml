@@ -530,7 +530,7 @@
             android:drawablePadding="10dp"
             android:drawableStart="@drawable/ic_vk_color"
             android:fontFamily="sans-serif-medium"
-            android:text="@string/sinch_vk"
+            android:text="@string/share_friends"
             android:visibility="gone"
             tools:visibility="visible" />
 
@@ -538,7 +538,7 @@
             android:id="@+id/grayLine"
             android:layout_width="match_parent"
             android:layout_height="2dp"
-            android:layout_below="@id/appinTheAirEnter"
+            android:layout_below="@id/vkApp"
             android:layout_marginEnd="15dp"
             android:layout_marginStart="15dp"
             android:layout_marginTop="25dp"

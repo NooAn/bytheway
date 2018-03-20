@@ -1,5 +1,7 @@
 package ru.a1024bits.bytheway.util
 
+import android.app.Activity
+import android.app.Fragment
 import android.widget.Toast
 import com.vk.sdk.api.VKError
 import com.vk.sdk.api.VKRequest
@@ -29,8 +31,22 @@ interface Callback {
     fun onError(error: String)
 }
 
+class VK {
+    /**
+     * init vk_app and auth user
+     */
+    fun start(activity: Activity): Boolean {
+        if (!VKSdk.isLoggedIn()) {
+            VKSdk.login(activity, VKScope.WALL, VKScope.EMAIL, VKScope.NOHTTPS, VKScope.OFFLINE);
+            return true;
+        }
+        return false;
+    }
+}
+
 enum class Social {
     VK, FB, TW;
+
 
     fun share(activity: FragmentActivity, text: String, link: String, imageLink: String?, nameObj: String, lat: Double, lon: Double) {
         when (this) {
@@ -45,7 +61,7 @@ enum class Social {
                     // AppDialog.createSimple1BtnDialog(activity,fingerprints[0],"","",null).show();
 
                     if (!VKSdk.isLoggedIn()) {
-                        VKSdk.login(activity, *arrayOf(VKScope.WALL, VKScope.NOHTTPS, VKScope.OFFLINE))
+                        VKSdk.login(activity, VKScope.WALL, VKScope.NOHTTPS, VKScope.OFFLINE)
                         vkPoster = object : Callback {
                             override fun onSuccess(obj: Any) {
                                 Log.e("LOG", " onSuccess -> postToWall")
@@ -119,8 +135,5 @@ enum class Social {
         })
     }
 
-    companion object {
-        var vkPoster: Callback? = null
-            private set
-    }
+    var vkPoster: Callback? = null
 }

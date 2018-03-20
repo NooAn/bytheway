@@ -5,6 +5,7 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.support.annotation.LayoutRes
@@ -30,7 +31,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.GeoPoint
 import com.google.maps.android.PolyUtil
+import com.vk.sdk.VKAccessToken
+import com.vk.sdk.VKCallback
 import com.vk.sdk.VKSdk
+import com.vk.sdk.api.VKError
 import kotlinx.android.synthetic.main.confirm_dialog.view.*
 import kotlinx.android.synthetic.main.fragment_my_user_profile.*
 import kotlinx.android.synthetic.main.profile_add_trip.*
@@ -309,121 +313,144 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+        if (!VKSdk.onActivityResult(
+                        requestCode,
+                        resultCode,
+                        data,
+                        object : VKCallback<VKAccessToken> {
+                            // Пользователь успешно авторизовался
+                            override fun onResult(res: VKAccessToken?) {
+                                val vkLink = defaultSocialValues[SocialNetwork.VK.link].plus(res?.userId)
+                                addNewSocLink(SocialNetwork.VK.link, newLink = vkLink)
+                                socialValues[SocialNetwork.VK.link] = vkLink
+                                openDialogVK(SocialNetwork.VK.link)
+                            }
 
-        when (requestCode) {
-            PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM -> when (resultCode) {
-                AppCompatActivity.RESULT_OK -> {
-                    val place = PlaceAutocomplete.getPlace(activity, data)
-                    textCityFrom.setText(place.name)
-                    textCityFrom.error = null
-                    cityFromLatLng = GeoPoint(place.latLng.latitude, place.latLng.longitude)
-                    if (cityFromLatLng.hashCode() == cityToLatLng.hashCode()) {
-                        textCityFrom.error = "true"
-                        Toast.makeText(this@MyProfileFragment.context,
-                                getString(R.string.fill_diff_cities), Toast.LENGTH_LONG).show()
-                    } else {
-                        cities[FIRST_INDEX_CITY] = place.name.toString()
-                        profileStateHashMap[CITY_FROM] = cityFromLatLng.hashCode().toString()
-                        getRoutes()
-                        setMarkers(FIRST_CITY_POINT)
-                        profileChanged()
+                            override fun onError(error: VKError?) {
+                                try {
+                                    Log.i("LOG", " Произошла ошибка авторизации  vk (например, пользователь запретил авторизацию" + error?.errorMessage
+                                            + " reason=" + error.toString())
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                }
+                            }
+                        }
+                )) {
+            super.onActivityResult(requestCode, resultCode, data)
+            when (requestCode) {
+                PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM -> when (resultCode) {
+                    AppCompatActivity.RESULT_OK -> {
+                        val place = PlaceAutocomplete.getPlace(activity, data)
+                        textCityFrom.setText(place.name)
+                        textCityFrom.error = null
+                        cityFromLatLng = GeoPoint(place.latLng.latitude, place.latLng.longitude)
+                        if (cityFromLatLng.hashCode() == cityToLatLng.hashCode()) {
+                            textCityFrom.error = "true"
+                            Toast.makeText(this@MyProfileFragment.context,
+                                    getString(R.string.fill_diff_cities), Toast.LENGTH_LONG).show()
+                        } else {
+                            cities[FIRST_INDEX_CITY] = place.name.toString()
+                            profileStateHashMap[CITY_FROM] = cityFromLatLng.hashCode().toString()
+                            getRoutes()
+                            setMarkers(FIRST_CITY_POINT)
+                            profileChanged()
+                        }
+                    }
+                    else -> {
+                        val status = PlaceAutocomplete.getStatus(activity, data)
+                        Log.i("LOG", status.statusMessage + " ")
+                        if (textCityFrom.text.isEmpty())
+                            textCityFrom.setText("")
                     }
                 }
-                else -> {
-                    val status = PlaceAutocomplete.getStatus(activity, data)
-                    Log.i("LOG", status.statusMessage + " ")
-                    if (textCityFrom.text.isEmpty())
-                        textCityFrom.setText("")
-                }
-            }
 
-            PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO -> when (resultCode) {
-                AppCompatActivity.RESULT_OK -> {
-                    val place = PlaceAutocomplete.getPlace(activity, data)
-                    textCityTo?.setText(place.name)
-                    textCityTo?.error = null
-                    cityToLatLng = GeoPoint(place.latLng.latitude, place.latLng.longitude)
-                    if (cityToLatLng.hashCode() == cityFromLatLng.hashCode()) {
-                        textCityTo.error = "true"
-                        Toast.makeText(this@MyProfileFragment.context,
-                                getString(R.string.fill_diff_cities), Toast.LENGTH_LONG).show()
-                    } else {
-                        cities[LAST_INDEX_CITY] = place.name.toString()
-                        profileStateHashMap[CITY_TO] = cityToLatLng.hashCode().toString()
-                        getRoutes()
-                        setMarkers(LAST_CITY_POINT)
-                        profileChanged()
+                PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO -> when (resultCode) {
+                    AppCompatActivity.RESULT_OK -> {
+                        val place = PlaceAutocomplete.getPlace(activity, data)
+                        textCityTo?.setText(place.name)
+                        textCityTo?.error = null
+                        cityToLatLng = GeoPoint(place.latLng.latitude, place.latLng.longitude)
+                        if (cityToLatLng.hashCode() == cityFromLatLng.hashCode()) {
+                            textCityTo.error = "true"
+                            Toast.makeText(this@MyProfileFragment.context,
+                                    getString(R.string.fill_diff_cities), Toast.LENGTH_LONG).show()
+                        } else {
+                            cities[LAST_INDEX_CITY] = place.name.toString()
+                            profileStateHashMap[CITY_TO] = cityToLatLng.hashCode().toString()
+                            getRoutes()
+                            setMarkers(LAST_CITY_POINT)
+                            profileChanged()
+                        }
+                    }
+                    else -> {
+                        val status = PlaceAutocomplete.getStatus(activity, data)
+                        Log.i("LOG", status.statusMessage + " ")
+                        if (textCityTo.text.isEmpty())
+                            textCityTo.setText("")
                     }
                 }
-                else -> {
-                    val status = PlaceAutocomplete.getStatus(activity, data)
-                    Log.i("LOG", status.statusMessage + " ")
-                    if (textCityTo.text.isEmpty())
-                        textCityTo.setText("")
-                }
-            }
-            PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM_MIDDLE_CITY -> when (resultCode) {
-                AppCompatActivity.RESULT_OK -> {
-                    val place = PlaceAutocomplete.getPlace(activity, data)
-                    textCityMiddleTwo.setText(place.name)
-                    textCityMiddleTwo.error = null
-                    cityTwoLatLng = GeoPoint(place.latLng.latitude, place.latLng.longitude)
-                    if (cityTwoLatLng.hashCode() == cityFromLatLng.hashCode() || cityTwoLatLng == cityToLatLng) {
-                        textCityTo.error = "true"
-                        Toast.makeText(this@MyProfileFragment.context,
-                                getString(R.string.fill_diff_cities), Toast.LENGTH_LONG).show()
-                    } else {
-                        cities[TWO_INDEX_CITY] = place.name.toString()
-                        profileStateHashMap[CITY_TWO] = cityTwoLatLng.hashCode().toString()
-                        getRoutes()
-                        setMarkers(TWO_CITY_POINT)
-                        profileChanged()
+                PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM_MIDDLE_CITY -> when (resultCode) {
+                    AppCompatActivity.RESULT_OK -> {
+                        val place = PlaceAutocomplete.getPlace(activity, data)
+                        textCityMiddleTwo.setText(place.name)
+                        textCityMiddleTwo.error = null
+                        cityTwoLatLng = GeoPoint(place.latLng.latitude, place.latLng.longitude)
+                        if (cityTwoLatLng.hashCode() == cityFromLatLng.hashCode() || cityTwoLatLng == cityToLatLng) {
+                            textCityTo.error = "true"
+                            Toast.makeText(this@MyProfileFragment.context,
+                                    getString(R.string.fill_diff_cities), Toast.LENGTH_LONG).show()
+                        } else {
+                            cities[TWO_INDEX_CITY] = place.name.toString()
+                            profileStateHashMap[CITY_TWO] = cityTwoLatLng.hashCode().toString()
+                            getRoutes()
+                            setMarkers(TWO_CITY_POINT)
+                            profileChanged()
+                        }
+                    }
+                    else -> {
+                        val status = PlaceAutocomplete.getStatus(activity, data)
+                        Log.i("LOG", status.statusMessage + " ")
+                        if (textCityMiddleTwo.text.isEmpty())
+                            textCityMiddleTwo.setText("")
                     }
                 }
-                else -> {
-                    val status = PlaceAutocomplete.getStatus(activity, data)
-                    Log.i("LOG", status.statusMessage + " ")
-                    if (textCityMiddleTwo.text.isEmpty())
-                        textCityMiddleTwo.setText("")
-                }
-            }
-            PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO_NEW_CITY -> when (resultCode) {
-                AppCompatActivity.RESULT_OK -> {
-                    val place = PlaceAutocomplete.getPlace(activity, data)
-                    textNewCity?.setText(place.name)
-                    textNewCity?.error = null
-                    cityToLatLng = GeoPoint(place.latLng.latitude, place.latLng.longitude)
-                    if (cityToLatLng.hashCode() == cityFromLatLng.hashCode() || cityToLatLng.hashCode() == cityTwoLatLng.hashCode()) {
-                        textCityTo.error = "true"
-                        Toast.makeText(this@MyProfileFragment.context,
-                                getString(R.string.fill_diff_cities), Toast.LENGTH_LONG).show()
-                    } else {
-                        cities[LAST_INDEX_CITY] = place.name.toString()
-                        profileStateHashMap[CITY_TO] = cityToLatLng.hashCode().toString()
-                        getRoutes()
-                        setMarkers(LAST_CITY_POINT)
-                        profileChanged()
+                PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO_NEW_CITY -> when (resultCode) {
+                    AppCompatActivity.RESULT_OK -> {
+                        val place = PlaceAutocomplete.getPlace(activity, data)
+                        textNewCity?.setText(place.name)
+                        textNewCity?.error = null
+                        cityToLatLng = GeoPoint(place.latLng.latitude, place.latLng.longitude)
+                        if (cityToLatLng.hashCode() == cityFromLatLng.hashCode() || cityToLatLng.hashCode() == cityTwoLatLng.hashCode()) {
+                            textCityTo.error = "true"
+                            Toast.makeText(this@MyProfileFragment.context,
+                                    getString(R.string.fill_diff_cities), Toast.LENGTH_LONG).show()
+                        } else {
+                            cities[LAST_INDEX_CITY] = place.name.toString()
+                            profileStateHashMap[CITY_TO] = cityToLatLng.hashCode().toString()
+                            getRoutes()
+                            setMarkers(LAST_CITY_POINT)
+                            profileChanged()
+                        }
+                    }
+                    else -> {
+                        val status = PlaceAutocomplete.getStatus(activity, data)
+                        Log.i("LOG", status.statusMessage + " ")
+                        if (textNewCity.text.isEmpty())
+                            textNewCity.setText("")
                     }
                 }
-                else -> {
-                    val status = PlaceAutocomplete.getStatus(activity, data)
-                    Log.i("LOG", status.statusMessage + " ")
-                    if (textNewCity.text.isEmpty())
-                        textNewCity.setText("")
-                }
-            }
-            READ_REQUEST_CODE -> when (resultCode) {
-                Activity.RESULT_OK -> {
-                    // The document selected by the user won't be returned in the intent.
-                    // Instead, a URI to that document will be contained in the return intent
-                    // provided to this method as a parameter.
-                    // Pull that URI using resultData.getData().
-                    var uri: Uri? = null
-                    if (data != null) {
-                        uri = data.getData()
-                        Log.i("LOG", "Uri: ${uri.path} ${uri.encodedPath}" + uri?.toString())
-                        viewModel?.loadImage(uri, FirebaseAuth.getInstance().currentUser?.uid!!, mainUser)
+                READ_REQUEST_CODE -> when (resultCode) {
+                    Activity.RESULT_OK -> {
+                        // The document selected by the user won't be returned in the intent.
+                        // Instead, a URI to that document will be contained in the return intent
+                        // provided to this method as a parameter.
+                        // Pull that URI using resultData.getData().
+                        var uri: Uri? = null
+                        if (data != null) {
+                            uri = data.getData()
+                            Log.i("LOG", "Uri: ${uri.path} ${uri.encodedPath}" + uri?.toString())
+                            viewModel?.loadImage(uri, FirebaseAuth.getInstance().currentUser?.uid!!, mainUser)
+                        }
                     }
                 }
             }
@@ -589,7 +616,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         mListener = null
     }
 
-    private var MODE_TWO_CITY: Boolean = true
+    private
+    var MODE_TWO_CITY: Boolean = true
 
     override fun onStart() {
         super.onStart()
@@ -659,7 +687,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
              Если были какие-то изменения в линках то сохраняем в бд.
              И меняем цвет иконки соответсвенно значениям.
              */
-            //openDialog(SocialNetwork.VK)
             openDialogVK(SocialNetwork.VK.link)
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_vk_click", null)
         }
@@ -715,12 +742,17 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         }
         vkApp.setOnClickListener {
             sinchVk()
+            shareVKPost()
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_click_vk_sinch", null)
         }
         buttonRemoveTravelInfo.setOnClickListener {
             openAlertDialog(this::removeTrip)
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_remove_trip", null)
         }
+    }
+
+    private fun shareVKPost() {
+        
     }
 
     private fun addNewCity() {
@@ -979,7 +1011,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         layoutTravelMethod.visibility = View.VISIBLE
         moneyfortrip.visibility = View.VISIBLE
         appinTheAirEnter.visibility = View.VISIBLE
-        vkApp.visibility = View.VISIBLE
+        vkApp.visibility = if (shouldVkButtonShow(SocialNetwork.VK.link)) View.GONE else View.VISIBLE
         descriptionprofile.visibility = View.VISIBLE
         buttonRemoveTravelInfo.visibility = View.VISIBLE
         buttonSaveTravelInfo.visibility = View.VISIBLE
@@ -1117,37 +1149,64 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         dialog.show()
     }
 
-    private fun openDialogVK(socialNetworkLink: String) {
+    private fun openDialogVK(socialNetworkLinkKey: String) {
         val dialog = AlertDialog.Builder(activity).create()
         if (dialog.isShowing) return
-        VKSdk.initialize(activity);
-
         dialog.setTitle(getString(R.string.social_title_vk))
         dialog.setMessage(getString(R.string.social_text_vk))
         val dialogView = View.inflate(context, R.layout.custom_dialog_profile_add_vk, null)
         dialog.setView(dialogView)
+        Log.e("LOG", isLinkNotDefault(socialNetworkLinkKey).toString())
+        Log.e("LOG", vkAppIsInstalled().toString())
+        Log.e("LOG", VKSdk.isLoggedIn().toString())
+
+        if (shouldVkButtonShow(socialNetworkLinkKey))
+            dialogView.findViewById<Button>(R.id.vkAppSinch).visibility = View.GONE
+
+
         dialogView.findViewById<Button>(R.id.vkAppSinch).setOnClickListener {
             sinchVk()
+            dialog.cancel()
         }
 
-        socialValues[socialNetworkLink]?.let {
+        socialValues[socialNetworkLinkKey]?.let {
             dialogView.findViewById<EditText>(R.id.socLinkText).setText(it)
         }
 
         dialog.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.remove), { _, _ ->
-            removeSocNet(socialNetworkLink)
+            removeSocNet(socialNetworkLinkKey)
         })
 
         dialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.save), { _, _ ->
-            val newLink = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString()
+            val newLink = dialogView.findViewById<EditText>(R.id.socLinkText)?.text.toString()
             if (newLink in defaultSocialValues.values) return@setButton
-            addNewSocLink(socialNetworkLink, newLink)
+            addNewSocLink(socialNetworkLinkKey, newLink)
         })
         dialog.show()
     }
 
-    private fun sinchVk() {
+    private fun shouldVkButtonShow(socialNetworkLinkKey: String) =
+            !vkAppIsInstalled() || VKSdk.isLoggedIn() || isLinkNotDefault(socialNetworkLinkKey)
 
+
+    private fun vkAppIsInstalled(): Boolean {
+        val pm = activity.packageManager
+        try {
+            pm.getPackageInfo("com.vkontakte.android", PackageManager.GET_ACTIVITIES);
+            return true;
+        } catch (e: PackageManager.NameNotFoundException) {
+            e.printStackTrace()
+        }
+        return false;
+    }
+
+    private fun isLinkNotDefault(key: String) = !(socialValues[key] in defaultSocialValues.values)
+
+    private fun sinchVk() {
+        val s = VK()
+        if (!s.start(activity)) {
+            Toast.makeText(activity, "Already", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun openDialog(socialNetwork: SocialNetwork) {
@@ -1289,7 +1348,9 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         }
     }
 
-    private val READ_REQUEST_CODE = 42
+    private
+    val READ_REQUEST_CODE = 42
+
     /**
      * Fires an intent to spin up the "file chooser" UI and select an image.
      */
@@ -1375,25 +1436,30 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         if (user.dates.size > 0) {
             if (user.cities.size == 2) {
                 if (user.dates[START_DATE] != null && user.dates[START_DATE] != 0L) {
-                    textDateFrom.setText(formatDate.format(Date(user.dates[START_DATE] ?: 0)))
+                    textDateFrom.setText(formatDate.format(Date(user.dates[START_DATE]
+                            ?: 0)))
                     textDateFrom.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector, 0)
                 }
                 if (user.dates[END_DATE] != null && user.dates[END_DATE] != 0L) {
-                    textDateArrived.setText(formatDate.format(Date(user.dates[END_DATE] ?: 0)))
+                    textDateArrived.setText(formatDate.format(Date(user.dates[END_DATE]
+                            ?: 0)))
                     textDateArrived.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector, 0)
                 }
             } else {
                 // Для случая когда у нас три города
                 if (user.dates[START_DATE] != null && user.dates[START_DATE] != 0L) {
-                    dateStartTwo.setText(formatDate.format(Date(user.dates[START_DATE] ?: 0)))
+                    dateStartTwo.setText(formatDate.format(Date(user.dates[START_DATE]
+                            ?: 0)))
                     dateStartTwo.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector, 0)
                 }
                 if (user.dates[END_DATE] != null && user.dates[END_DATE] != 0L) {
-                    dateFinish.setText(formatDate.format(Date(user.dates[END_DATE] ?: 0)))
+                    dateFinish.setText(formatDate.format(Date(user.dates[END_DATE]
+                            ?: 0)))
                     dateFinish.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector, 0)
                 }
                 if (user.dates[TWO_DATE] != null && user.dates[TWO_DATE] != 0L) {
-                    textDateArrived.setText(formatDate.format(Date(user.dates[TWO_DATE] ?: 0)))
+                    textDateArrived.setText(formatDate.format(Date(user.dates[TWO_DATE]
+                            ?: 0)))
                     textDateArrived.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector, 0)
                 }
             }

@@ -1,9 +1,8 @@
 <resources>
     <string name="app_name">bytheway</string>
     <string name="button_send">Отправить</string>
-    <integer name="com_vk_sdk_AppId">12</integer>
-
-    <!-- TODO: Remove or change this placeholder text -->
+    <integer name="com_vk_sdk_AppId">6416394</integer>
+    
     <string name="fullname">Andrey Petrov</string>
     <string name="type_money"> </string>
     <string name="money">Бюджет поездки</string>
@@ -152,4 +151,5 @@
     <string name="social_title_wp">WhatsApp</string>
     <string name="social_text_wp">Добавьте свой номер телефона, чтобы с Вами смогли связаться другие путешественники</string>
     <string name="sinch_vk">Синхронизация с помощью приложение</string>
+    <string name="share_friends">Рассказать друзьям</string>
 </resources>
