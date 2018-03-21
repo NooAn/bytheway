@@ -1,7 +1,7 @@
 package ru.a1024bits.bytheway.util
 
 import android.app.Activity
-import android.app.Fragment
+import android.app.PendingIntent.getActivity
 import android.widget.Toast
 import com.vk.sdk.api.VKError
 import com.vk.sdk.api.VKRequest
@@ -14,13 +14,18 @@ import android.support.v4.app.FragmentActivity
 import com.vk.sdk.dialogs.VKShareDialog
 import android.content.Intent
 import android.net.Uri
-import android.support.v4.view.MenuItemCompat.setContentDescription
 import android.util.Log
 import com.vk.sdk.VKScope
 import com.vk.sdk.VKSdk
-
-import com.vk.sdk.*;
+import com.vk.sdk.api.model.VKApiPhoto
+import com.vk.sdk.api.model.VKPhotoArray
+import com.vk.sdk.api.photo.VKUploadImage
 import com.vk.sdk.dialogs.VKShareDialogBuilder
+import com.vk.sdk.api.photo.VKImageParameters
+import android.graphics.BitmapFactory
+import android.graphics.Bitmap
+import java.io.IOException
+
 
 /**
  * Created by Andrei_Gusenkov on 3/19/2018.
@@ -37,16 +42,76 @@ class VK {
      */
     fun start(activity: Activity): Boolean {
         if (!VKSdk.isLoggedIn()) {
-            VKSdk.login(activity, VKScope.WALL, VKScope.EMAIL, VKScope.NOHTTPS, VKScope.OFFLINE);
+            VKSdk.login(activity, VKScope.WALL, VKScope.EMAIL, VKScope.NOHTTPS, VKScope.OFFLINE, VKScope.PHOTOS)
             return true;
         }
         return false;
+    }
+
+    private fun getPhoto(activity: Activity): Bitmap? {
+        try {
+            return BitmapFactory.decodeStream(activity.assets.open("android.jpg"))
+        } catch (e: IOException) {
+            e.printStackTrace()
+            return null
+        }
+
+    }
+
+    fun postToWall(activity: FragmentActivity, text: String, title: String, cityArrived: String, cityTo: String, bitmap: Bitmap) {
+
+        VKShareDialogBuilder()
+                .setText(text)
+                //.setUploadedPhotos(photos)
+                .setAttachmentImages(arrayOf(VKUploadImage(bitmap, VKImageParameters.pngImage())))
+                .setAttachmentLink("More details", "https://play.google.com/store/apps/details?id=ru.a1024bits.bytheway.release&hl=ru") // fixme locale
+                .setAttachmentLink("GoogleMap", "https://www.google.ru/maps/dir/${cityArrived}/${cityTo}")
+                .setShareDialogListener(object : VKShareDialog.VKShareDialogListener {
+                    override fun onVkShareComplete(postId: Int) {
+                        Log.e("LOG", "complete")
+                    }
+
+                    override fun onVkShareCancel() {
+                        Log.e("LOG", "cancel")
+                    }
+
+                    override fun onVkShareError(error: VKError) {
+                        Log.e("LOG", "error ${error.errorReason}", error.httpError)
+                    }
+                })
+                .show(activity.fragmentManager, "VK_SHARE_DIALOG")
+    }
+
+    fun shareVk(text: String, ac: FragmentActivity, latEnd: Double, LonEnd: Double) {
+        val postToId = VKAccessToken.currentToken().userId
+        val request = VKApi.wall().post(VKParameters.from(
+                VKApiConst.OWNER_ID, postToId,
+                VKApiConst.MESSAGE, text,
+                VKApiConst.LAT, latEnd,
+                VKApiConst.LONG, LonEnd))
+        // VKApiConst.ATTACHMENTS, " http://resources.guide.toptriptip.com/14bfa6bb14875e45bba028a21ed38046/clips/21-28-8.jpg"));
+        request.attempts = 5
+        request.executeWithListener(object : VKRequest.VKRequestListener() {
+            override fun onComplete(response: VKResponse?) {
+                Log.w("LOG", "Wall response  " + response!!.responseString)
+                Toast.makeText(ac, "Запись отправлена", Toast.LENGTH_SHORT).show()
+            }
+
+            override fun attemptFailed(request: VKRequest?, attemptNumber: Int, totalAttempts: Int) {
+                Log.d("LOG", "Wall response failed on $attemptNumber")
+            }
+
+            override fun onError(error: VKError?) {
+                Log.e("LOG", "Wall error response  " + error!!.toString())
+                Toast.makeText(ac, "Ошибка", Toast.LENGTH_SHORT).show()
+            }
+
+        })
     }
 }
 
 enum class Social {
     VK, FB, TW;
-
 
     fun share(activity: FragmentActivity, text: String, link: String, imageLink: String?, nameObj: String, lat: Double, lon: Double) {
         when (this) {
@@ -108,32 +173,6 @@ enum class Social {
         dialog.show(activity.supportFragmentManager, "VK_SHARE_DIALOG")
     }
 
-    private fun shareVk(text: String, ac: FragmentActivity, lat: Double, lon: Double) {
-        val postToId = VKAccessToken.currentToken().userId
-        val request = VKApi.wall().post(VKParameters.from(
-                VKApiConst.OWNER_ID, postToId,
-                VKApiConst.MESSAGE, text,
-                VKApiConst.LAT, lat,
-                VKApiConst.LONG, lon))
-        // VKApiConst.ATTACHMENTS, " http://resources.guide.toptriptip.com/14bfa6bb14875e45bba028a21ed38046/clips/21-28-8.jpg"));
-        request.attempts = 5
-        request.executeWithListener(object : VKRequest.VKRequestListener() {
-            override fun onComplete(response: VKResponse?) {
-                Log.w("LOG", "Wall response  " + response!!.responseString)
-                Toast.makeText(ac, "Запись отправлена", Toast.LENGTH_SHORT).show()
-            }
-
-            override fun attemptFailed(request: VKRequest?, attemptNumber: Int, totalAttempts: Int) {
-                Log.d("LOG", "Wall response failed on $attemptNumber")
-            }
-
-            override fun onError(error: VKError?) {
-                Log.e("LOG", "Wall error response  " + error!!.toString())
-                Toast.makeText(ac, "Ошибка", Toast.LENGTH_SHORT).show()
-            }
-
-        })
-    }
 
     var vkPoster: Callback? = null
 }

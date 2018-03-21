@@ -6,6 +6,8 @@ import android.arch.lifecycle.ViewModelProvider
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.net.Uri
 import android.os.Bundle
 import android.support.annotation.LayoutRes
@@ -312,6 +314,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                 getString(R.string.hint_create_travel), getString(R.string.hint_create_travel_description), addNewTrip)
     }
 
+    private var thisActionIsVkShare: Boolean = false
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (!VKSdk.onActivityResult(
                         requestCode,
@@ -323,7 +327,10 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                                 val vkLink = defaultSocialValues[SocialNetwork.VK.link].plus(res?.userId)
                                 addNewSocLink(SocialNetwork.VK.link, newLink = vkLink)
                                 socialValues[SocialNetwork.VK.link] = vkLink
-                                openDialogVK(SocialNetwork.VK.link)
+                                if (thisActionIsVkShare)
+                                    VK().shareVk("test", activity, 12.0, 12.0)
+                                else
+                                    openDialogVK(SocialNetwork.VK.link)
                             }
 
                             override fun onError(error: VKError?) {
@@ -741,7 +748,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_click_air", null)
         }
         vkApp.setOnClickListener {
-            sinchVk()
             shareVKPost()
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_click_vk_sinch", null)
         }
@@ -752,7 +758,33 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     }
 
     private fun shareVKPost() {
+        thisActionIsVkShare = true
+        val s = VK()
+        val test = "Test for application"
+//        scrollProfile.post({
+//            fun run() {
+//                scrollProfile.fullScroll(View.FOCUS_DOWN)
+//            }
+//        });
+        maplayout.requestFocus()
         
+        if (!s.start(activity))
+            s.postToWall(activity, test, "link", "Moscow", "London", screenShot(view ?: return))
+        //s.shareVk("test", activity, 12.0, 12.0)
+    }
+
+    fun screenShot(view: View): Bitmap {
+//        val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888);
+//
+//        val canvas = Canvas(bitmap)
+//
+//        view.draw(canvas)
+//        return bitmap
+        view.setDrawingCacheEnabled(true)
+        view.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_AUTO)
+        val screenshot = Bitmap.createBitmap(view.drawingCache)
+        view.isDrawingCacheEnabled = false;
+        return screenshot;
     }
 
     private fun addNewCity() {
@@ -1011,7 +1043,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         layoutTravelMethod.visibility = View.VISIBLE
         moneyfortrip.visibility = View.VISIBLE
         appinTheAirEnter.visibility = View.VISIBLE
-        vkApp.visibility = if (shouldVkButtonShow(SocialNetwork.VK.link)) View.GONE else View.VISIBLE
+        vkApp.visibility = if (!vkAppIsInstalled()) View.GONE else View.VISIBLE
         descriptionprofile.visibility = View.VISIBLE
         buttonRemoveTravelInfo.visibility = View.VISIBLE
         buttonSaveTravelInfo.visibility = View.VISIBLE
