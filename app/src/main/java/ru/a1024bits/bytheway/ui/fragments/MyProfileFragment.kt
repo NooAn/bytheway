@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.Canvas
 import android.net.Uri
 import android.os.Bundle
 import android.support.annotation.LayoutRes
@@ -760,28 +759,52 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     private fun shareVKPost() {
         thisActionIsVkShare = true
         val s = VK()
-        val test = "Test for application"
-//        scrollProfile.post({
-//            fun run() {
-//                scrollProfile.fullScroll(View.FOCUS_DOWN)
-//            }
-//        });
-        maplayout.requestFocus()
-        
+        val cityArrived = textCityFrom.text.toString()
+        val cityTo = getLastCity()
+        val text = "Ищу попутчика в $cityTo \nhttps://www.google.ru/maps/dir/$cityArrived/$cityTo \n\n\n ${getHashTags(addInfoUser.text.toString())}"
+        scrollProfile.scrollTo(0, appinTheAirEnter.top)
+        val totalHeight = scrollProfile.getChildAt(0).height
+        val pos = totalHeight - appinTheAirEnter.top
+        scrollProfile.scrollBy(0, -pos)
+
         if (!s.start(activity))
-            s.postToWall(activity, test, "link", "Moscow", "London", screenShot(view ?: return))
-        //s.shareVk("test", activity, 12.0, 12.0)
+            s.postToWall(activity, text, screenShot(view ?: return))
     }
 
+    private fun getHashTags(text: String): String {
+        val hashTagText = StringBuilder("#bytheway ")
+        hashTagText.append("#поискпопутчиков ")
+        hashTagText.append("#ищупопутчика")
+        hashTagText.append("#").append(textCityFrom.text.toString()).append(" ")
+        hashTagText.append("#").append(getLastCity()).append("2018 ")
+        if (mainUser?.method!![Method.HITCHHIKING.link] == true) {
+            hashTagText.append("#автостоп ")
+            hashTagText.append("#HITCHHIKING2018 ")
+        }
+        if (mainUser?.method!![Method.TRAIN.link] == true) {
+            hashTagText.append("#напоезде ")
+        }
+        if (mainUser?.method!![Method.PLANE.link] == true) {
+            hashTagText.append("#самолетом ")
+        }
+        //hashTagText.append("#")
+//        text.split(',', ' ', '!', '?', '.', '+').forEachIndexed { index, s ->
+//            if (index < 2) hashTagText.append(s) // первые два слова
+//            if (s.contains("([A-Z]+[a-z][A-Z]*)|([A-Z]*[a-z][A-Z]+)")) hashTagText.append("#").append(s).append("2018")
+//        }
+        return hashTagText.toString()
+    }
+
+    private fun getLastCity(): String =
+            if (MODE_TWO_CITY)
+                textCityTo.text.toString()
+            else
+                textNewCity.text.toString()
+
+
     fun screenShot(view: View): Bitmap {
-//        val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888);
-//
-//        val canvas = Canvas(bitmap)
-//
-//        view.draw(canvas)
-//        return bitmap
-        view.setDrawingCacheEnabled(true)
-        view.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_AUTO)
+        view.isDrawingCacheEnabled = true
+        view.drawingCacheQuality = View.DRAWING_CACHE_QUALITY_AUTO
         val screenshot = Bitmap.createBitmap(view.drawingCache)
         view.isDrawingCacheEnabled = false;
         return screenshot;
