@@ -24,6 +24,7 @@ import com.vk.sdk.dialogs.VKShareDialogBuilder
 import com.vk.sdk.api.photo.VKImageParameters
 import android.graphics.BitmapFactory
 import android.graphics.Bitmap
+import com.google.firebase.crash.FirebaseCrash
 import java.io.IOException
 
 
@@ -63,8 +64,7 @@ class VK {
         VKShareDialogBuilder()
                 .setText(text)
                 .setAttachmentImages(arrayOf(VKUploadImage(bitmap, VKImageParameters.pngImage())))
-                .setAttachmentLink("More details", "https://play.google.com/store/apps/details?id=ru.a1024bits.bytheway.release&hl=ru") // fixme locale
-                // .setAttachmentLink("GoogleMap", "https://www.google.ru/maps/dir/${cityArrived}/${cityTo}")
+                .setAttachmentLink("Опубликованно с помощью ByTheWay", "https://play.google.com/store/apps/details?id=ru.a1024bits.bytheway.release&hl=ru") // fixme locale
                 .setShareDialogListener(object : VKShareDialog.VKShareDialogListener {
                     override fun onVkShareComplete(postId: Int) {
                         Log.e("LOG", "complete")
@@ -75,38 +75,13 @@ class VK {
                     }
 
                     override fun onVkShareError(error: VKError) {
+                        FirebaseCrash.report(error.httpError)
                         Log.e("LOG", "error ${error.errorReason}", error.httpError)
                     }
                 })
                 .show(activity.fragmentManager, "VK_SHARE_DIALOG")
     }
 
-    fun shareVk(text: String, ac: FragmentActivity, latEnd: Double, LonEnd: Double) {
-        val postToId = VKAccessToken.currentToken().userId
-        val request = VKApi.wall().post(VKParameters.from(
-                VKApiConst.OWNER_ID, postToId,
-                VKApiConst.MESSAGE, text,
-                VKApiConst.LAT, latEnd,
-                VKApiConst.LONG, LonEnd))
-        // VKApiConst.ATTACHMENTS, " http://resources.guide.toptriptip.com/14bfa6bb14875e45bba028a21ed38046/clips/21-28-8.jpg"));
-        request.attempts = 5
-        request.executeWithListener(object : VKRequest.VKRequestListener() {
-            override fun onComplete(response: VKResponse?) {
-                Log.w("LOG", "Wall response  " + response!!.responseString)
-                Toast.makeText(ac, "Запись отправлена", Toast.LENGTH_SHORT).show()
-            }
-
-            override fun attemptFailed(request: VKRequest?, attemptNumber: Int, totalAttempts: Int) {
-                Log.d("LOG", "Wall response failed on $attemptNumber")
-            }
-
-            override fun onError(error: VKError?) {
-                Log.e("LOG", "Wall error response  " + error!!.toString())
-                Toast.makeText(ac, "Ошибка", Toast.LENGTH_SHORT).show()
-            }
-
-        })
-    }
 }
 
 enum class Social {

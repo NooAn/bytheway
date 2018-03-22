@@ -327,18 +327,16 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                                 addNewSocLink(SocialNetwork.VK.link, newLink = vkLink)
                                 socialValues[SocialNetwork.VK.link] = vkLink
                                 if (thisActionIsVkShare)
-                                    VK().shareVk("test", activity, 12.0, 12.0)
+                                    shareVKPost()
                                 else
                                     openDialogVK(SocialNetwork.VK.link)
                             }
 
                             override fun onError(error: VKError?) {
-                                try {
-                                    Log.i("LOG", " Произошла ошибка авторизации  vk (например, пользователь запретил авторизацию" + error?.errorMessage
-                                            + " reason=" + error.toString())
-                                } catch (e: Exception) {
-                                    e.printStackTrace()
-                                }
+                                Log.i("LOG", " Произошла ошибка авторизации  vk (например, пользователь запретил авторизацию" + error?.errorMessage
+                                        + " reason=" + error.toString())
+                                FirebaseCrash.report(error?.httpError)
+
                             }
                         }
                 )) {
@@ -709,7 +707,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_fb_click", null)
         }
         tgIcon.setOnClickListener {
-            openDialog(SocialNetwork.TG)
+            openDialogTelegram(SocialNetwork.TG.link)
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_tg_click", null)
         }
         buttonSaveTravelInfo.setOnClickListener {
@@ -748,7 +746,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         }
         vkApp.setOnClickListener {
             shareVKPost()
-            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_click_vk_sinch", null)
+            mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_click_vk_share", null)
         }
         buttonRemoveTravelInfo.setOnClickListener {
             openAlertDialog(this::removeTrip)
@@ -1185,7 +1183,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
         dialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.save), { _, _ ->
             val newLink = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString()
-            newLink.isNumberPhone()
             if (!newLink.isNumberPhone()) {
                 dialogView.findViewById<EditText>(R.id.socLinkText).error = getString(R.string.fill_phone_invalid)
             } else {
@@ -1204,6 +1201,38 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         dialog.show()
     }
 
+    private fun openDialogTelegram(socialNetworkLinkKey: String) {
+        val dialog = AlertDialog.Builder(activity).create()
+        if (dialog.isShowing) return
+        dialog.setTitle(getString(R.string.social_title_tg))
+        dialog.setMessage(getString(R.string.social_text_tg))
+        val dialogView = View.inflate(context, R.layout.custom_dialog_profile_add_tg, null)
+        dialog.setView(dialogView)
+
+        socialValues[socialNetworkLinkKey]?.let {
+            dialogView.findViewById<EditText>(R.id.socLinkText).setText(it)
+        }
+
+        dialog.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.remove), { _, _ ->
+            removeSocNet(socialNetworkLinkKey)
+        })
+
+        dialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.save), { _, _ ->
+            val newLink = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString()
+            if (newLink in defaultSocialValues.values) return@setButton
+            addNewSocLink(socialNetworkLinkKey, newLink)
+
+        })
+
+        dialogView.findViewById<EditText>(R.id.socLinkText).afterTextChanged {
+            val valid = it.isNumberPhone() || it.startsWith("@")
+            if (!valid) {
+                dialogView.findViewById<EditText>(R.id.socLinkText).error = getString(R.string.fill_phone_invalid)
+            }
+        }
+        dialog.show()
+    }
+
     private fun openDialogVK(socialNetworkLinkKey: String) {
         val dialog = AlertDialog.Builder(activity).create()
         if (dialog.isShowing) return
@@ -1211,9 +1240,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         dialog.setMessage(getString(R.string.social_text_vk))
         val dialogView = View.inflate(context, R.layout.custom_dialog_profile_add_vk, null)
         dialog.setView(dialogView)
-        Log.e("LOG", isLinkNotDefault(socialNetworkLinkKey).toString())
-        Log.e("LOG", vkAppIsInstalled().toString())
-        Log.e("LOG", VKSdk.isLoggedIn().toString())
+
 
         if (shouldVkButtonShow(socialNetworkLinkKey))
             dialogView.findViewById<Button>(R.id.vkAppSinch).visibility = View.GONE

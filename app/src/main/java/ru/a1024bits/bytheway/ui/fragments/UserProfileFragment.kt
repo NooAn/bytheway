@@ -457,7 +457,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
 
     private fun intentMessageTelegram(id: String?) {
         try {
-            if (id?.isNumberPhone() == false) {
+            if (id?.isNumberPhone() == false && id?.startsWith("@") == true) {
                 startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/${id.replace("@", "")}")))
                 mFirebaseAnalytics.logEvent(TAG_ANALYTICS + "OPEN_TG", null)
             } else {
@@ -496,8 +496,9 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
 }// Required empty public constructor
 
 fun String.isNumberPhone(): Boolean {
-    return this.matches(Regex("^([0-9]|\\+[0-9]){11,13}\$")) ||
-            this.startsWith("+7") && !this.startsWith("@")
+    return this.matches(Regex("^([0-9]|\\+[0-9]){11,13}\$"))
+    //this.startsWith("+7")
+
 }
 
 

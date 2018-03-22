@@ -212,4 +212,6 @@
     <string name="social_text_wp">Добавьте свой номер телефона, чтобы с Вами смогли связаться другие путешественники</string>
     <string name="sinch_vk">Синхронизация с помощью приложение</string>
     <string name="share_friends">Рассказать друзьям</string>
+    <string name="social_title_tg">Telegram</string>
+    <string name="social_text_tg">Добавьте свой аккаунт Telegram, чтобы с Вами смогли связаться другие путешественники</string>
 </resources>
