@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.support.annotation.LayoutRes
 import android.support.design.widget.NavigationView
@@ -759,17 +760,24 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         val s = VK()
         val cityArrived = textCityFrom.text.toString()
         val cityTo = getLastCity()
-        val text = "Ищу попутчика в $cityTo \nhttps://www.google.ru/maps/dir/$cityArrived/$cityTo \n\n\n ${getHashTags(addInfoUser.text.toString())}"
+        val text = "Ищу попутчика в $cityTo \nhttps://www.google.ru/maps/dir/$cityArrived/$cityTo \n\n\n ${getHashTags()}"
         scrollProfile.scrollTo(0, appinTheAirEnter.top)
         val totalHeight = scrollProfile.getChildAt(0).height
         val pos = totalHeight - appinTheAirEnter.top
         scrollProfile.scrollBy(0, -pos)
+        val linkUri = "https://play.google.com/store/apps/details?id=ru.a1024bits.bytheway.release&hl=${getCurrentLocale(activity)}&referrer=${mainUser?.id}"
 
         if (!s.start(activity))
-            s.postToWall(activity, text, screenShot(view ?: return))
+            s.postToWall(activity, text, screenShot(view ?: return), linkUri)
     }
 
-    private fun getHashTags(text: String): String {
+    fun getCurrentLocale(context: Context): Locale =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                context.resources.configuration.locales[0];
+            else
+                context.resources.configuration.locale;
+
+    private fun getHashTags(): String {
         val hashTagText = StringBuilder("#bytheway ")
         hashTagText.append("#поискпопутчиков ")
         hashTagText.append("#ищупопутчика")
@@ -785,11 +793,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         if (mainUser?.method!![Method.PLANE.link] == true) {
             hashTagText.append("#самолетом ")
         }
-        //hashTagText.append("#")
-//        text.split(',', ' ', '!', '?', '.', '+').forEachIndexed { index, s ->
-//            if (index < 2) hashTagText.append(s) // первые два слова
-//            if (s.contains("([A-Z]+[a-z][A-Z]*)|([A-Z]*[a-z][A-Z]+)")) hashTagText.append("#").append(s).append("2018")
-//        }
         return hashTagText.toString()
     }
 

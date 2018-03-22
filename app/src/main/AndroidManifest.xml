@@ -60,6 +60,13 @@
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
+        <receiver
+            android:name=".service.ReferListener"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.android.vending.INSTALL_REFERRER" />
+            </intent-filter>
+        </receiver>
         <!-- [END firebase_iid_service] -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"

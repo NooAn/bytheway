@@ -542,13 +542,17 @@ class MenuActivity : AppCompatActivity(),
         if (intent.extras != null) {
             val userId: String? = intent.getStringExtra(NOTIFICATION_VALUE)
             val cmd: String? = intent.getStringExtra(NOTIFICATION_CMD)
-
-            Log.e("notificationWork", "Command: $cmd Value: $userId")
             when (cmd) {
                 Constants.FCM_CMD_SHOW_USER -> {
                     userId?.let {
                         showUserSimpleProfile(User(id = userId))
                         mFirebaseAnalytics.logEvent("Menu_open_profile_from_push", null)
+                    }
+                }
+                Constants.GOOGLE_PLAY_CMD_SHOW_USER -> {
+                    userId?.let {
+                        showUserSimpleProfile(User(id = userId))
+                        mFirebaseAnalytics.logEvent("Menu_open_profile_play_link", null)
                     }
                 }
                 Constants.FCM_CMD_UPDATE -> {

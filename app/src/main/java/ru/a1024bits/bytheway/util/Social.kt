@@ -59,12 +59,12 @@ class VK {
 
     }
 
-    fun postToWall(activity: FragmentActivity, text: String, bitmap: Bitmap) {
+    fun postToWall(activity: FragmentActivity, text: String, bitmap: Bitmap, linkUri: String) {
 
         VKShareDialogBuilder()
                 .setText(text)
                 .setAttachmentImages(arrayOf(VKUploadImage(bitmap, VKImageParameters.pngImage())))
-                .setAttachmentLink("Опубликованно с помощью ByTheWay", "https://play.google.com/store/apps/details?id=ru.a1024bits.bytheway.release&hl=ru") // fixme locale
+                .setAttachmentLink("Опубликованно с помощью ByTheWay", linkUri) // fixme locale
                 .setShareDialogListener(object : VKShareDialog.VKShareDialogListener {
                     override fun onVkShareComplete(postId: Int) {
                         Log.e("LOG", "complete")
