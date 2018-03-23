@@ -12,6 +12,7 @@ import android.os.Build
 import android.os.Bundle
 import android.support.annotation.LayoutRes
 import android.support.design.widget.NavigationView
+import android.support.v4.widget.NestedScrollView
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.text.Editable
@@ -600,7 +601,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             e.printStackTrace()
         }
         mapView?.getMapAsync(this@MyProfileFragment)
-        val scroll = view?.findViewById(R.id.scrollProfile) as ScrollView
+        val scroll = view?.findViewById(R.id.scrollProfile) as NestedScrollView
         scroll.descendantFocusability = ViewGroup.FOCUS_BEFORE_DESCENDANTS
         scroll.isFocusable = true
         scroll.isFocusableInTouchMode = true
