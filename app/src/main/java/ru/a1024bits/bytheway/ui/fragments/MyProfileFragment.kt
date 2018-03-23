@@ -525,8 +525,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             markerTwoTitle = cities[TWO_INDEX_CITY]
         }
 
-        val midPointLat = (coordFrom.latitude + coordTo.latitude) / 2
-        val midPointLong = (coordFrom.longitude + coordTo.longitude) / 2
         val blueMarker = BitmapDescriptorFactory.fromResource(R.drawable.pin_blue)
         val builder = LatLngBounds.Builder();
         if (cityTwoLatLng.latitude != 0.0 && cityTwoLatLng.longitude != 0.0) {
@@ -568,7 +566,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                     .flat(true))
 
             val bounds = builder.build();
-            val padding = 50; // offset from edges of the map in pixels
+            val padding = resources.getDimensionPixelSize(R.dimen.latLngBoundsPadding); // offset from edges of the map in pixels
             val cu = CameraUpdateFactory.newLatLngBounds(bounds, padding)
             if (mapView?.viewTreeObserver?.isAlive == true) {
                 mapView?.viewTreeObserver?.addOnGlobalLayoutListener({

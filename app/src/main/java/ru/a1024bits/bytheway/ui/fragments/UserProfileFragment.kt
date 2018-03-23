@@ -412,8 +412,6 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
         val markerTitleStart = user.cities[Constants.LAST_INDEX_CITY]
         val markerTitleFinal = user.cities[Constants.FIRST_INDEX_CITY]
 
-        val midPointLat = (markerPositionFinal.latitude + markerPositionStart.latitude) / 2
-        val midPointLong = (markerPositionFinal.longitude + markerPositionStart.longitude) / 2
         val blueMarker = BitmapDescriptorFactory.fromResource(R.drawable.pin_blue)
         val builder = LatLngBounds.Builder();
         if (user.cityTwoLatLng.latitude != 0.0 && user.cityTwoLatLng.longitude != 0.0) {
@@ -432,7 +430,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
                 .title(markerTitleStart)
                 .anchor(0.5F, 1.0F)
                 .flat(true))
-        builder.include(markerPositionStart);
+        builder.include(markerPositionStart)
 
         googleMap?.addMarker(MarkerOptions()
                 .icon(blueMarker)
@@ -440,9 +438,9 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
                 .title(markerTitleFinal)
                 .anchor(0.5F, 1.0F)
                 .flat(true))
-        builder.include(markerPositionFinal);
+        builder.include(markerPositionFinal)
         val bounds = builder.build();
-        val padding = 50; // offset from edges of the map in pixels
+        val padding = resources.getDimensionPixelSize(R.dimen.latLngBoundsPadding);
         val cu = CameraUpdateFactory.newLatLngBounds(bounds, padding)
         if (mapView?.viewTreeObserver?.isAlive == true) {
             mapView?.viewTreeObserver?.addOnGlobalLayoutListener({
