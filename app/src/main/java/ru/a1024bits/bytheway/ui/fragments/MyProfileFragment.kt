@@ -528,7 +528,9 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         val midPointLat = (coordFrom.latitude + coordTo.latitude) / 2
         val midPointLong = (coordFrom.longitude + coordTo.longitude) / 2
         val blueMarker = BitmapDescriptorFactory.fromResource(R.drawable.pin_blue)
+        val builder = LatLngBounds.Builder();
         if (cityTwoLatLng.latitude != 0.0 && cityTwoLatLng.longitude != 0.0) {
+            builder.include(LatLng(cityTwoLatLng.latitude, cityTwoLatLng.longitude))
             googleMap?.addMarker(MarkerOptions()
                     .icon(blueMarker)
                     .position(LatLng(cityTwoLatLng.latitude, cityTwoLatLng.longitude))
@@ -537,6 +539,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                     .flat(true))
         }
         if (markerPositionStart != LatLng(0.0, 0.0)) {
+            builder.include(markerPositionStart)
             googleMap?.addMarker(MarkerOptions()
                     .icon(blueMarker)
                     .position(markerPositionStart)
@@ -545,6 +548,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                     .flat(true))
         }
         if (markerPositionTwo != LatLng(0.0, 0.0)) {
+            builder.include(markerPositionTwo);
             googleMap?.addMarker(MarkerOptions()
                     .icon(blueMarker)
                     .position(markerPositionTwo)
@@ -554,6 +558,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         }
 
         if (markerPositionFinal != LatLng(0.0, 0.0)) {
+            builder.include(markerPositionFinal);
             googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(markerPositionFinal, 4.0f))
             googleMap?.addMarker(MarkerOptions()
                     .icon(blueMarker)
@@ -562,11 +567,17 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                     .anchor(0.5F, 1.0F)
                     .flat(true))
 
-            if (markerPositionStart != LatLng(0.0, 0.0)) {
-                val perfectZoom = (190 / coordFrom.getBearing(coordTo)) - 1
-                googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(midPointLat, midPointLong), perfectZoom))
-            } else
-                googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(markerPositionFinal, 2.0f))
+            val bounds = builder.build();
+            val padding = 50; // offset from edges of the map in pixels
+            val cu = CameraUpdateFactory.newLatLngBounds(bounds, padding)
+            if (mapView?.viewTreeObserver?.isAlive == true) {
+                mapView?.viewTreeObserver?.addOnGlobalLayoutListener({
+                    if (markerPositionStart != LatLng(0.0, 0.0)) {
+                        googleMap?.animateCamera(cu)
+                    } else
+                        googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(markerPositionFinal, 2.0f))
+                })
+            }
         }
     }
 
@@ -1229,9 +1240,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
         dialogView.findViewById<EditText>(R.id.socLinkText).afterTextChanged {
             val valid = it.isNumberPhone() || it.startsWith("@")
-            if (!valid) {
+            if (!valid)
                 dialogView.findViewById<EditText>(R.id.socLinkText).error = getString(R.string.fill_phone_invalid)
-            }
         }
         dialog.show()
     }
@@ -1243,7 +1253,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         dialog.setMessage(getString(R.string.social_text_vk))
         val dialogView = View.inflate(context, R.layout.custom_dialog_profile_add_vk, null)
         dialog.setView(dialogView)
-
 
         if (shouldVkButtonShow(socialNetworkLinkKey))
             dialogView.findViewById<Button>(R.id.vkAppSinch).visibility = View.GONE
@@ -1289,9 +1298,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     private fun sinchVk() {
         val s = VK()
-        if (!s.start(activity)) {
+        if (!s.start(activity))
             Toast.makeText(activity, "Already", Toast.LENGTH_SHORT).show()
-        }
     }
 
     private fun openDialog(socialNetwork: SocialNetwork) {
@@ -1433,8 +1441,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         }
     }
 
-    private
-    val READ_REQUEST_CODE = 42
+    private val READ_REQUEST_CODE = 42
 
     /**
      * Fires an intent to spin up the "file chooser" UI and select an image.

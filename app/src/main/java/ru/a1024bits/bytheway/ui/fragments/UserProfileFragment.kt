@@ -15,10 +15,7 @@ import android.widget.TextView
 import android.widget.Toast
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.gms.maps.*
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.PolylineOptions
+import com.google.android.gms.maps.model.*
 import com.google.firebase.crash.FirebaseCrash
 import com.google.maps.android.PolyUtil
 import kotlinx.android.synthetic.main.fragment_user_profile.*
@@ -418,7 +415,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
         val midPointLat = (markerPositionFinal.latitude + markerPositionStart.latitude) / 2
         val midPointLong = (markerPositionFinal.longitude + markerPositionStart.longitude) / 2
         val blueMarker = BitmapDescriptorFactory.fromResource(R.drawable.pin_blue)
-
+        val builder = LatLngBounds.Builder();
         if (user.cityTwoLatLng.latitude != 0.0 && user.cityTwoLatLng.longitude != 0.0) {
             googleMap?.addMarker(MarkerOptions()
                     .icon(blueMarker)
@@ -426,6 +423,8 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
                     .title(user.cities[Constants.TWO_INDEX_CITY])
                     .anchor(0.5F, 1.0F)
                     .flat(true))
+            builder.include(LatLng(user.cityTwoLatLng.latitude, user.cityTwoLatLng.longitude));
+
         }
         googleMap?.addMarker(MarkerOptions()
                 .icon(blueMarker)
@@ -433,6 +432,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
                 .title(markerTitleStart)
                 .anchor(0.5F, 1.0F)
                 .flat(true))
+        builder.include(markerPositionStart);
 
         googleMap?.addMarker(MarkerOptions()
                 .icon(blueMarker)
@@ -440,10 +440,18 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
                 .title(markerTitleFinal)
                 .anchor(0.5F, 1.0F)
                 .flat(true))
-
-        val perfectZoom = 190 / markerPositionFinal.getBearing(markerPositionStart) - 1
-
-        googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(midPointLat, midPointLong), perfectZoom))
+        builder.include(markerPositionFinal);
+        val bounds = builder.build();
+        val padding = 50; // offset from edges of the map in pixels
+        val cu = CameraUpdateFactory.newLatLngBounds(bounds, padding)
+        if (mapView?.viewTreeObserver?.isAlive == true) {
+            mapView?.viewTreeObserver?.addOnGlobalLayoutListener({
+                if (markerPositionStart != LatLng(0.0, 0.0)) {
+                    googleMap?.animateCamera(cu)
+                } else
+                    googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(markerPositionFinal, 2.0f))
+            })
+        }
     }
 
     private fun drawPolyline(routeString: String) {
