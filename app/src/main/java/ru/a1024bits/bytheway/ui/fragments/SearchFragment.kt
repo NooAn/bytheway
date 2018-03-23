@@ -45,8 +45,8 @@ class SearchFragment : Fragment() {
 
     private lateinit var mFirebaseAnalytics: FirebaseAnalytics
     private lateinit var dateDialog: CalendarDatePickerDialogFragment
-    var firstPoint: LatLng? = null
-    var secondPoint: LatLng? = null
+    private var firstPoint: LatLng? = null
+    private var secondPoint: LatLng? = null
     var user: User = User()
     var filter: Filter = Filter()
 
@@ -68,12 +68,12 @@ class SearchFragment : Fragment() {
         activity.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(context)
         try {
-            filter.startDate = user.dates.get(START_DATE) ?: 0
-            filter.endDate = user.dates.get(END_DATE) ?: 0
+            filter.startDate = user.dates[START_DATE] ?: 0
+            filter.endDate = user.dates[END_DATE] ?: 0
             filter.endBudget = user.budget.toInt()
             filter.method = user.method
-            filter.endCity = user.cities.get(LAST_INDEX_CITY) ?: ""
-            filter.startCity = user.cities.get(FIRST_INDEX_CITY) ?: ""
+            filter.endCity = user.cities[LAST_INDEX_CITY] ?: ""
+            filter.startCity = user.cities[FIRST_INDEX_CITY] ?: ""
             filter.locationStartCity = LatLng(user.cityFromLatLng.latitude, user.cityFromLatLng.longitude)
             filter.locationEndCity = LatLng(user.cityToLatLng.latitude, user.cityToLatLng.longitude)
         } catch (e: Exception) {
@@ -88,19 +88,19 @@ class SearchFragment : Fragment() {
         for (method in user.method.keys) {
             when (method) {
                 Method.CAR.link -> {
-                    iconCar.isActivated = user.method.get(method) == true
+                    iconCar.isActivated = user.method[method] == true
                 }
                 Method.TRAIN.link -> {
-                    iconTrain.isActivated = user.method.get(method) == true
+                    iconTrain.isActivated = user.method[method] == true
                 }
                 Method.BUS.link -> {
-                    iconBus.isActivated = user.method.get(method) == true
+                    iconBus.isActivated = user.method[method] == true
                 }
                 Method.PLANE.link -> {
-                    iconPlane.isActivated = user.method.get(method) == true
+                    iconPlane.isActivated = user.method[method] == true
                 }
                 Method.HITCHHIKING.link -> {
-                    iconHitchHicking.isActivated = user.method.get(method) == true
+                    iconHitchHicking.isActivated = user.method[method] == true
                 }
             }
         }
@@ -136,21 +136,21 @@ class SearchFragment : Fragment() {
             }
         }
 
-        text_from_city.text = user.cities.get(FIRST_INDEX_CITY)
+        text_from_city.text = user.cities[FIRST_INDEX_CITY]
         text_from_city.setOnClickListener {
             sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM)
         }
 
-        text_to_city.text = user.cities.get(LAST_INDEX_CITY)
+        text_to_city.text = user.cities[LAST_INDEX_CITY]
         text_to_city.setOnClickListener {
             sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO)
         }
 
         if (user.dates.size > 0) {
             if (user.dates[START_DATE] != null && user.dates[START_DATE] != 0L)
-                dateFromValue.text = user.dates.get(START_DATE)?.getNormallDate()
+                dateFromValue.text = user.dates[START_DATE]?.getNormallDate()
             if (user.dates[END_DATE] != null && user.dates[END_DATE] != 0L)
-                dateToValue.text = user.dates.get(END_DATE)?.getNormallDate()
+                dateToValue.text = user.dates[END_DATE]?.getNormallDate()
         }
 
 
@@ -160,8 +160,8 @@ class SearchFragment : Fragment() {
             text_from_city.text = text_to_city.text
             text_to_city.text = tempString
 
-            filter?.endCity = text_to_city.text.toString()
-            filter?.startCity = text_from_city.text.toString()
+            filter.endCity = text_to_city.text.toString()
+            filter.startCity = text_from_city.text.toString()
 
             val tempLng = filter.locationStartCity
             filter.locationStartCity = filter.locationEndCity
@@ -279,7 +279,7 @@ class SearchFragment : Fragment() {
         when (requestCode) {
             PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM -> when (resultCode) {
                 AppCompatActivity.RESULT_OK -> {
-                    val place = PlaceAutocomplete.getPlace(activity, data);
+                    val place = PlaceAutocomplete.getPlace(activity, data)
                     text_from_city?.text = place.name
                     firstPoint = place.latLng
                     filter.startCity = place.name.toString()
@@ -290,7 +290,7 @@ class SearchFragment : Fragment() {
                 }
                 else -> {
                     val status = PlaceAutocomplete.getStatus(activity, data)
-                    Log.i("LOG", status.getStatusMessage() + " ")
+                    Log.i("LOG", status.statusMessage + " ")
                     if (text_from_city != null) {
                         text_from_city.text = filter.startCity
                     }
@@ -300,7 +300,7 @@ class SearchFragment : Fragment() {
             PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO -> when (resultCode) {
                 AppCompatActivity.RESULT_OK -> {
                     try {
-                        val place = PlaceAutocomplete.getPlace(activity, data);
+                        val place = PlaceAutocomplete.getPlace(activity, data)
                         text_to_city?.text = place.name
                         secondPoint = place.latLng
                         filter.locationEndCity = place.latLng
@@ -349,7 +349,7 @@ class SearchFragment : Fragment() {
     }
 }
 
-private fun String.getIntOrNothing(): Int = if (this.toString().isBlank()) 0 else this.toInt()
+private fun String.getIntOrNothing(): Int = if (this.isBlank()) 0 else this.toInt()
 
 
 private val Long.toStringOrEmpty: String

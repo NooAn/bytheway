@@ -712,8 +712,10 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_tg_click", null)
         }
         buttonSaveTravelInfo.setOnClickListener {
-            if (checkingCityText())
+            if (checkingCityText()) {
                 sendUserInfoToServer()
+                scrollProfile.post { scrollProfile.smoothScrollTo(0, 0) }
+            }
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_save", null)
         }
         textDateArrived.setOnClickListener {
