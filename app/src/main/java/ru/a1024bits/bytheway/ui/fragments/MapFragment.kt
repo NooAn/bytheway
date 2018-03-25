@@ -110,10 +110,6 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
         }
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         App.component.inject(this)
@@ -272,6 +268,7 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
             if (error != 0 && points.size < 2) {
                 Toast.makeText(this@MapFragment.context, getString(error), Toast.LENGTH_SHORT).show()
             } else {
+                appBarLayout.setExpanded(true)
                 goFlyPlan()
             }
         }

@@ -93,6 +93,10 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         const val CITY = "city"
         const val TAG_ANALYTICS: String = "MProfile_screen"
         const val START_BUDGET: Int = 50
+
+        const val TWO_CITY_POINT = 3
+        const val FIRST_CITY_POINT = 1
+        const val LAST_CITY_POINT = 2
     }
 
     @Inject
@@ -493,10 +497,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         viewModel?.load(uid)
     }
 
-    val TWO_CITY_POINT = 3
-    val FIRST_CITY_POINT = 1
-    val LAST_CITY_POINT = 2
-
     private fun setMarkers(position: Int) {
         googleMap?.clear()
         val coordFrom = LatLng(cityFromLatLng.latitude, cityFromLatLng.longitude)
@@ -571,16 +571,20 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             val cu = CameraUpdateFactory.newLatLngBounds(bounds, padding)
             if (mapView?.viewTreeObserver?.isAlive == true) {
                 mapView?.viewTreeObserver?.addOnGlobalLayoutListener({
-                    if (markerPositionStart != LatLng(0.0, 0.0)) {
-                        googleMap?.animateCamera(cu)
-                    } else
-                        googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(markerPositionFinal, 2.0f))
+                    try {
+                        if (markerPositionStart != LatLng(0.0, 0.0)) {
+                            googleMap?.animateCamera(cu)
+                        } else
+                            googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(markerPositionFinal, 2.0f))
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                 })
             }
         }
     }
 
-    fun drawPolyline() {
+    private fun drawPolyline() {
 
         val blueColor = activity.resources.getColor(R.color.blueRouteLine)
         val options = PolylineOptions()
@@ -724,7 +728,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         buttonSaveTravelInfo.setOnClickListener {
             if (checkingCityText()) {
                 sendUserInfoToServer()
-                scrollProfile.post { scrollProfile.smoothScrollTo(0, 0) }
             }
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_save", null)
         }
@@ -783,7 +786,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             s.postToWall(activity, text, screenShot(view ?: return), linkUri)
     }
 
-    fun getCurrentLocale(context: Context): Locale =
+    private fun getCurrentLocale(context: Context): Locale =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
                 context.resources.configuration.locales[0];
             else
@@ -815,7 +818,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                 textNewCity.text.toString()
 
 
-    fun screenShot(view: View): Bitmap {
+    private fun screenShot(view: View): Bitmap {
         view.isDrawingCacheEnabled = true
         view.drawingCacheQuality = View.DRAWING_CACHE_QUALITY_AUTO
         val screenshot = Bitmap.createBitmap(view.drawingCache)
@@ -1145,10 +1148,10 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
         lastNameChoose.setOnKeyListener(View.OnKeyListener { _, keyCode, _ ->
             if (keyCode == KeyEvent.KEYCODE_ENTER) {
-                if (enterCounter == 0) {
+                enterCounter = if (enterCounter == 0) {
                     cityChoose.requestFocus()
-                    enterCounter = 1
-                } else enterCounter = 0
+                    1
+                } else 0
                 return@OnKeyListener true
             }
             false

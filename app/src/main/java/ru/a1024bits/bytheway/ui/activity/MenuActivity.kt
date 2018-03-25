@@ -77,7 +77,11 @@ class MenuActivity : AppCompatActivity(),
         NavigationView.OnNavigationItemSelectedListener,
         OnFragmentInteractionListener, GoogleApiClient.OnConnectionFailedListener {
 
-    val preferences: SharedPreferences by lazy { getSharedPreferences(Constants.APP_PREFERENCES, Context.MODE_PRIVATE) }
+    private companion object {
+        private const val STATE_SCREEN_NAMES = "state_screen_names"
+    }
+
+    private val preferences: SharedPreferences by lazy { getSharedPreferences(Constants.APP_PREFERENCES, Context.MODE_PRIVATE) }
 
     private var mGoogleApiClient: GoogleApiClient? = null
     var pLoader: ProgressCustom? = null
@@ -109,7 +113,6 @@ class MenuActivity : AppCompatActivity(),
     }
 
     var screenNames: ArrayList<String> = arrayListOf()
-    private val STATE_SCREEN_NAMES = "state_screen_names"
 
     @Inject
     lateinit var navigatorHolder: NavigatorHolder
@@ -201,7 +204,7 @@ class MenuActivity : AppCompatActivity(),
         if (!isNetworkAvailable()) showSnack(getString(R.string.no_internet))
     }
 
-    var snackbar: Snackbar? = null
+    private var snackbar: Snackbar? = null
 
 
     private fun showSnack(string: String) {
@@ -247,11 +250,11 @@ class MenuActivity : AppCompatActivity(),
                     SEARCH_MAP_SCREEN -> return MapFragment.newInstance(mainUser)
 
                     AIR_SUCCES_SCREEN -> {
-                        var name: String = ""
-                        var date: String = ""
+                        var name = ""
+                        var date = ""
                         if (data is List<*>) {
                             name = getNameFromFligths(data as List<Fligths>)
-                            date = getDateFromFligths(data as List<Fligths>)
+                            date = getDateFromFligths(data)
                         }
                         return AirSuccesfullFragment.newInstance(name, date)
                     }
@@ -467,12 +470,12 @@ class MenuActivity : AppCompatActivity(),
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
         if (!isNetworkAvailable()) showSnack(getString(R.string.no_internet))
-        if (this.profileChanged == true) {
+        return if (this.profileChanged == true) {
             openAwayFromProfileDialog({
                 this.profileChanged = false
                 onNavigationItemSelected(item)
             })
-            return false
+            false
         } else {
             when (item.itemId) {
                 R.id.profile_item -> navigator.applyCommand(Forward(Screens.MY_PROFILE_SCREEN, 1))
@@ -480,7 +483,7 @@ class MenuActivity : AppCompatActivity(),
                 R.id.all_users_item -> navigator.applyCommand(Forward(Screens.ALL_USERS_SCREEN, 1))
             }
             close()
-            return true
+            true
         }
     }
 
@@ -499,7 +502,7 @@ class MenuActivity : AppCompatActivity(),
         val dialogView = inflater.inflate(R.layout.confirm_dialog, null)
         simpleAlert.setView(dialogView)
         dialogView.textMessage.text = getString(R.string.text_away_from_profile)
-        simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.yes), { dialogInterface, i ->
+        simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.yes), { _, _ ->
             val myProfile = supportFragmentManager.findFragmentById(R.id.fragment_container) as MyProfileFragment
 
             viewModel?.saveProfile?.observe(this, android.arch.lifecycle.Observer<ru.a1024bits.bytheway.model.Response<Boolean>> { response ->
@@ -520,7 +523,7 @@ class MenuActivity : AppCompatActivity(),
             })
             viewModel?.sendUserData(myProfile.getHashMapUser(), FirebaseAuth.getInstance().currentUser?.uid.toString(), mainUser)
         })
-        simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.no), { dialogInterface, i ->
+        simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.no), { _, _ ->
             Log.e("LOG", " refused")
             callback()
         })
