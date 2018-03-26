@@ -31,5 +31,5 @@ class UserRepositoryModule {
     fun providesFirestoreSettings(): FirebaseFirestoreSettings = FirebaseFirestoreSettings.Builder()
             .setPersistenceEnabled(true)
             .setSslEnabled(true)
-            .build();
+            .build()
 }

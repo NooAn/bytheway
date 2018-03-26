@@ -151,7 +151,7 @@ fun valuationAngel(latitudeStart: Double, longitudeStart: Double, latitudeEnd: D
 
 private fun computePercentBeetwenTwoLocation(K: Double, endPoint: Double, latitudeUser: Double, latitudeFilter: Double, longitudeUser: Double, longitude1Filter: Double, radiusValue: Int = 1): Double {
     var R = 0
-    var indexFirst = 0.0
+    var indexFirst: Double
     var indexLast = 0.500
     val radiusStart = distance(latitudeUser, latitudeFilter, longitudeUser, longitude1Filter)
     if (radiusStart < 10 * radiusValue) indexFirst = 1.0
@@ -163,7 +163,6 @@ private fun computePercentBeetwenTwoLocation(K: Double, endPoint: Double, latitu
         indexFirst = (5000 - 5 * radiusStart) / 900000
     } else indexFirst = 0.0
 
-    R = 0
     for (i in 1..20) {
         if (endPoint <= R * R) break
         R += i

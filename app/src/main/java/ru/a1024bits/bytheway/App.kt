@@ -6,7 +6,12 @@ import android.util.Log
 import com.google.android.gms.maps.model.LatLng
 import com.squareup.leakcanary.LeakCanary
 import com.vk.sdk.VKSdk
+import org.koin.android.ext.android.get
+import org.koin.android.ext.android.startKoin
+import org.koin.dsl.module.Module
 import ru.a1024bits.bytheway.dagger.*
+import ru.a1024bits.bytheway.koin.mainModule
+import ru.a1024bits.bytheway.koin.remoteDatasourceModule
 import ru.terrakok.cicerone.Cicerone
 import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.Router
@@ -32,6 +37,8 @@ class App : Application() {
                 .navigationModule(NavigationModule())
                 .userRepositoryModule(UserRepositoryModule())
                 .build();
+        startKoin(this, listOf(mainModule, remoteDatasourceModule))
+
         initCicerone()
         if (LeakCanary.isInAnalyzerProcess(this)) {
             // This process is dedicated to LeakCanary for heap analysis.

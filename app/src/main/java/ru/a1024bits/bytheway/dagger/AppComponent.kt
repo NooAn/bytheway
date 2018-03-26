@@ -14,11 +14,7 @@ import javax.inject.Singleton
  */
 
 @Singleton
-@Component(modules = arrayOf(AppModule::class,
-        NetworkModule::class,
-        NavigationModule::class,
-        ViewModelModule::class,
-        UserRepositoryModule::class))
+@Component(modules = [(AppModule::class), (NetworkModule::class), (NavigationModule::class), (ViewModelModule::class), (UserRepositoryModule::class)])
 
 interface AppComponent {
     fun inject(activity: MenuActivity)
@@ -31,5 +27,5 @@ interface AppComponent {
     fun inject(activity: SplashActivity)
     fun inject(registrationActivity: RegistrationActivity)
     fun inject(mapFragment: MapFragment)
-    fun inject(userProfileFragment: UserProfileFragment)
+//    fun inject(userProfileFragment: UserProfileFragment)
 }

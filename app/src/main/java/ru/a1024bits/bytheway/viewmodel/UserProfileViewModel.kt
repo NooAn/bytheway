@@ -5,11 +5,12 @@ import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.UserRepository
 import javax.inject.Inject
 import ru.a1024bits.bytheway.model.Response
+import ru.a1024bits.bytheway.repository.IUsersRepository
 
 /**
  * Created by andrey.gusenkov on 18/09/2017.
  */
-class UserProfileViewModel @Inject constructor(var userRepository: UserRepository) : BaseViewModel() {
+class UserProfileViewModel(var userRepository: IUsersRepository) : BaseViewModel() {
 
     var response: MutableLiveData<Response<User>> = MutableLiveData()
 

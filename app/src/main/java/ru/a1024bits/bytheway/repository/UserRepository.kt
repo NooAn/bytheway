@@ -1,6 +1,7 @@
 package ru.a1024bits.bytheway.repository
 
 import android.net.Uri
+import android.support.annotation.NonNull
 import android.util.Log
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.Task
@@ -32,7 +33,8 @@ const val COLLECTION_USERS = "users"
 /**
  * Created by andrey.gusenkov on 19/09/2017
  */
-class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapService: MapWebService) : IUsersRepository {
+
+class UserRepository @Inject constructor(private val store: FirebaseFirestore, var mapService: MapWebService) : IUsersRepository {
 
     override fun getUser(id: String): Single<User> =
             Single.create<User> { stream ->
@@ -66,9 +68,9 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                 }
                 stream.onError(it)
             }.addOnSuccessListener { taskSnapshot ->
-                        // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-                        stream.onSuccess(taskSnapshot.downloadUrl.toString())
-                    }
+                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+                stream.onSuccess(taskSnapshot.downloadUrl.toString())
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             stream.onError(e)
@@ -116,22 +118,22 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
         try {
             store.collection(COLLECTION_USERS).whereGreaterThanOrEqualTo("dates.start_date", System.currentTimeMillis())
                     .get().addOnCompleteListener({ task ->
-                if (task.isSuccessful) {
-                    for (document in task.result) {
-                        var user: User
-                        try {
-                            user = document.toObject(User::class.java)
-                            stream.onNext(user)
-                        } catch (ex2: Exception) {
-                            ex2.printStackTrace()
-                            FirebaseCrash.report(ex2)
+                        if (task.isSuccessful) {
+                            for (document in task.result) {
+                                var user: User
+                                try {
+                                    user = document.toObject(User::class.java)
+                                    stream.onNext(user)
+                                } catch (ex2: Exception) {
+                                    ex2.printStackTrace()
+                                    FirebaseCrash.report(ex2)
+                                }
+                            }
+                        } else {
+                            stream.onError(Exception("Not Successful load users"))
                         }
-                    }
-                } else {
-                    stream.onError(Exception("Not Successful load users"))
-                }
-                stream.onComplete()
-            })
+                        stream.onComplete()
+                    })
         } catch (exp: Exception) {
             stream.onError(exp) // for fix bugs FirebaseFirestoreException: DEADLINE_EXCEEDED
             stream.onComplete()
@@ -185,10 +187,10 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                 documentRef.update(map)
                 null
             }.addOnFailureListener {
-                        stream.onError(it)
-                    }.addOnSuccessListener { _ ->
-                        stream.onComplete()
-                    }
+                stream.onError(it)
+            }.addOnSuccessListener { _ ->
+                stream.onComplete()
+            }
         } catch (e: Exception) {
             stream.onError(e)
         }

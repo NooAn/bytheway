@@ -133,7 +133,7 @@ class MenuActivity : AppCompatActivity(),
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        Log.e("LOG", "onActiviyt")
+        Log.e("LOG", "onActivity")
         super.onActivityResult(requestCode, resultCode, data)
         fragmentProfile.onActivityResult(requestCode, resultCode, data)
     }
@@ -182,7 +182,6 @@ class MenuActivity : AppCompatActivity(),
             }
         } else {
             screenNames = savedInstanceState.getSerializable(STATE_SCREEN_NAMES) as ArrayList<String>
-            Log.e("LOGGER", "hash code ${viewModel?.hashCode()}")
         }
 
         mGoogleApiClient = GoogleApiClient.Builder(this)

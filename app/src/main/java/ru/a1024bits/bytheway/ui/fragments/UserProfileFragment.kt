@@ -22,7 +22,7 @@ import kotlinx.android.synthetic.main.fragment_user_profile.*
 import kotlinx.android.synthetic.main.profile_main_image.*
 import kotlinx.android.synthetic.main.profile_user_many_direction.*
 import kotlinx.android.synthetic.main.profilte_user_direction.*
-import ru.a1024bits.bytheway.App
+import org.koin.android.architecture.ext.viewModel
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.*
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
@@ -35,14 +35,13 @@ import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.START_DATE
 import ru.a1024bits.bytheway.util.Constants.TWO_DATE
 import ru.a1024bits.bytheway.util.Constants.TWO_INDEX_CITY
-import ru.a1024bits.bytheway.util.getBearing
 import ru.a1024bits.bytheway.viewmodel.UserProfileViewModel
+import ru.a1024bits.bytheway.viewmodel.ViewModelFactory
 import java.text.SimpleDateFormat
 import java.util.*
-import javax.inject.Inject
 
 
-class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCallback {
+class UserProfileFragment : BaseFragment2<UserProfileViewModel>(UserProfileViewModel::class), OnMapReadyCallback {
 
     private var mListener: OnFragmentInteractionListener? = null
     private val userLoad: Observer<Response<User>> = Observer { response ->
@@ -55,8 +54,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
         }
     }
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
+
     private var mMapView: MapView? = null
     private var googleMap: GoogleMap? = null
 
@@ -75,7 +73,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        App.component.inject(this)
+
     }
 
     private fun fillProfile(user: User) {
@@ -337,15 +335,12 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
         Toast.makeText(activity, getString(R.string.error_upload), Toast.LENGTH_SHORT).show()
     }
 
-    override fun getViewFactoryClass(): ViewModelProvider.Factory = viewModelFactory
+    override fun getViewFactoryClass(): ViewModelProvider.Factory = ViewModelFactory(emptyMap())
 
     @LayoutRes
     override fun getLayoutRes(): Int {
         return R.layout.fragment_user_profile
     }
-
-    override fun getViewModelClass(): Class<UserProfileViewModel> = UserProfileViewModel::class.java
-
 
     override fun onResume() {
         super.onResume()
