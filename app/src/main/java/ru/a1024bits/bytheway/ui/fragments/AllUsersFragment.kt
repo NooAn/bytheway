@@ -42,7 +42,7 @@ import java.util.*
 import javax.inject.Inject
 
 
-class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
+class AllUsersFragment : BaseFragment2<DisplayUsersViewModel>(DisplayUsersViewModel::class) {
     companion object {
         const val SIZE_INITIAL_ELEMENTS = 2
         const val TAG_ANALYTICS = "AllUsersFragment_"
@@ -54,8 +54,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
 
     private lateinit var filter: Filter
     private lateinit var displayUsersAdapter: DisplayAllUsersAdapter
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
+
     private var countInitialElements = 0
     private lateinit var analytics: FirebaseAnalytics
     private lateinit var dateDialog: CalendarDatePickerDialogFragment
@@ -87,7 +86,6 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
-        App.component.inject(this)
         super.onActivityCreated(savedInstanceState)
         analytics.setCurrentScreen(this.activity, "AllUsersFragment", this.javaClass.simpleName)
         try {
@@ -113,7 +111,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             Log.e("LOG_AUF", e.toString())
             FirebaseCrash.report(e)
             loadingWhereLoadUsers.visibility = View.GONE
-           // showErrorLoading()
+            // showErrorLoading()
         }
     }
 
@@ -129,11 +127,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
                 .setPreselectedDate(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH))
     }
 
-    override fun getViewFactoryClass() = viewModelFactory
-
     override fun getLayoutRes() = R.layout.fragment_display_all_users
-
-    override fun getViewModelClass(): Class<DisplayUsersViewModel> = DisplayUsersViewModel::class.java
 
     override fun onResume() {
         super.onResume()

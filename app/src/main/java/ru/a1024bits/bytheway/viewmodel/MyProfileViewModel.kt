@@ -11,6 +11,7 @@ import ru.a1024bits.bytheway.model.Response
 import ru.a1024bits.bytheway.model.SocialResponse
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.model.map_directions.RoutesList
+import ru.a1024bits.bytheway.repository.IUsersRepository
 import ru.a1024bits.bytheway.repository.UserRepository
 import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment
 import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment.Companion.ADD_INFO
@@ -40,7 +41,7 @@ import javax.inject.Inject
 /**
  * Created by andrey.gusenkov on 25/09/2017.
  */
-class MyProfileViewModel @Inject constructor(var userRepository: UserRepository) : BaseViewModel() {
+open class MyProfileViewModel(var userRepository: IUsersRepository) : BaseViewModel() {
     val user = MutableLiveData<User>()
     var response = MutableLiveData<Response<User>>()
     var routes = MutableLiveData<Response<RoutesList>>()
@@ -57,7 +58,7 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                 .observeOn(getMainThreadScheduler())
                 .subscribe({
                     Log.e("LOG S :", Thread.currentThread().name)
-                    photoUrl.setValue(Response.success(it))
+                    photoUrl.value = Response.success(it)
                     oldUser?.urlPhoto = it
                     user.value = oldUser
                 }, { throwable ->

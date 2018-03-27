@@ -22,9 +22,8 @@ import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView
 import kotlin.reflect.KClass
 
 abstract class BaseFragment2<out T : BaseViewModel>(viewModelClass: KClass<T>) : Fragment() {
-    protected val viewModel: T by viewModelByClass(false, viewModelClass)
+    protected val viewModel: T by viewModelByClass(true, viewModelClass)
 
-    //    protected var viewModel: T? = null
     protected var glide: RequestManager? = null
     protected lateinit var mFirebaseAnalytics: FirebaseAnalytics
 
@@ -32,6 +31,7 @@ abstract class BaseFragment2<out T : BaseViewModel>(viewModelClass: KClass<T>) :
         super.onActivityCreated(savedInstanceState)
         glide = Glide.with(this)
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(context)
+        viewModel.addObserver(lifecycle)
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?) =
@@ -39,7 +39,7 @@ abstract class BaseFragment2<out T : BaseViewModel>(viewModelClass: KClass<T>) :
 
     fun showPrompt(nameScreenPrompt: String, dismissText: String?, titleText: String?, contentText: String?, button: View) {
         try {
-            if (viewModel?.promptNotShowing(nameScreenPrompt) == true && Build.VERSION.SDK_INT < Build.VERSION_CODES.N && (activity != null) && !activity.isDestroyed)
+            if (viewModel.promptNotShowing(nameScreenPrompt) && Build.VERSION.SDK_INT < Build.VERSION_CODES.N && (activity != null) && !activity.isDestroyed)
                 MaterialShowcaseView.Builder(activity)
                         .setTarget(button)
                         .renderOverNavigationBar()
@@ -52,7 +52,7 @@ abstract class BaseFragment2<out T : BaseViewModel>(viewModelClass: KClass<T>) :
                             }
 
                             override fun onShowcaseDismissed(p0: MaterialShowcaseView?) {
-                                viewModel?.markPromptIsShowing(nameScreenPrompt)
+                                viewModel.markPromptIsShowing(nameScreenPrompt)
                             }
                         })
                         .show()
@@ -62,14 +62,13 @@ abstract class BaseFragment2<out T : BaseViewModel>(viewModelClass: KClass<T>) :
         }
     }
 
-    protected abstract fun getViewFactoryClass(): ViewModelProvider.Factory
 
     override fun onDestroy() {
         super.onDestroy()
     }
 
     override fun onDestroyView() {
-        viewModel?.removeObserver(lifecycle)
+        viewModel.removeObserver(lifecycle)
         super.onDestroyView()
     }
 

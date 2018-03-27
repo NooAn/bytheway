@@ -26,6 +26,7 @@ import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.*
 import com.google.firebase.crash.FirebaseCrash
+import org.koin.android.architecture.ext.getViewModel
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.ui.dialogs.ErrorStandartRegistrationDialog
@@ -41,9 +42,7 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
         FirebaseCrash.report(Exception(p0.errorMessage + " " + p0.errorCode))
     }
 
-    private var viewModel: RegistrationViewModel? = null
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
+    private var viewModel: RegistrationViewModel = getViewModel()
 
     private val RC_SIGN_IN = 9001
     private val mAuth = FirebaseAuth.getInstance()
@@ -53,7 +52,6 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
-        App.component.inject(this)
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
         mAuth.useAppLanguage()
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -67,7 +65,6 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build()
 
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(RegistrationViewModel::class.java)
         mFirebaseAnalytics.setUserId(mAuth?.currentUser.toString())
         mFirebaseAnalytics.setCurrentScreen(this, "Registration", this.javaClass.getSimpleName())
         mFirebaseAnalytics.logEvent("RegistrationScreen_Enter", null)

@@ -36,7 +36,6 @@ import ru.a1024bits.bytheway.util.Constants.START_DATE
 import ru.a1024bits.bytheway.util.Constants.TWO_DATE
 import ru.a1024bits.bytheway.util.Constants.TWO_INDEX_CITY
 import ru.a1024bits.bytheway.viewmodel.UserProfileViewModel
-import ru.a1024bits.bytheway.viewmodel.ViewModelFactory
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -53,7 +52,6 @@ class UserProfileFragment : BaseFragment2<UserProfileViewModel>(UserProfileViewM
             }
         }
     }
-
 
     private var mMapView: MapView? = null
     private var googleMap: GoogleMap? = null
@@ -327,15 +325,14 @@ class UserProfileFragment : BaseFragment2<UserProfileViewModel>(UserProfileViewM
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel?.loadingStatus?.observe(this, (activity as MenuActivity).progressBarLoad)
-        viewModel?.response?.observe(this, userLoad)
+        viewModel.loadingStatus?.observe(this, (activity as MenuActivity).progressBarLoad)
+        viewModel.response?.observe(this, userLoad)
     }
 
     private fun showErrorLoading() {
         Toast.makeText(activity, getString(R.string.error_upload), Toast.LENGTH_SHORT).show()
     }
 
-    override fun getViewFactoryClass(): ViewModelProvider.Factory = ViewModelFactory(emptyMap())
 
     @LayoutRes
     override fun getLayoutRes(): Int {
@@ -356,7 +353,7 @@ class UserProfileFragment : BaseFragment2<UserProfileViewModel>(UserProfileViewM
 
         if (arguments != null) {
             val userId: String = arguments.getString(UID_KEY, "")
-            viewModel?.load(userId)
+            viewModel.load(userId)
         } else {
             showErrorLoading()
         }

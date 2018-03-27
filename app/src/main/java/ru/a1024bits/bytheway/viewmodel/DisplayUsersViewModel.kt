@@ -14,6 +14,7 @@ import ru.a1024bits.bytheway.model.Response
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.model.contains
 import ru.a1024bits.bytheway.repository.Filter
+import ru.a1024bits.bytheway.repository.IUsersRepository
 import ru.a1024bits.bytheway.repository.MAX_AGE
 import ru.a1024bits.bytheway.repository.UserRepository
 import ru.a1024bits.bytheway.util.Constants.END_DATE
@@ -28,7 +29,7 @@ import kotlin.collections.ArrayList
  * Created by andrey.gusenkov on 25/09/2017.
  */
 
-class DisplayUsersViewModel @Inject constructor(private var userRepository: UserRepository?) : BaseViewModel(), FilterAndInstallListener {
+class DisplayUsersViewModel(private var userRepository: IUsersRepository?) : BaseViewModel(), FilterAndInstallListener {
     var response: MutableLiveData<Response<List<User>>> = MutableLiveData()
     var yearsOldUsers = (0..MAX_AGE).mapTo(ArrayList()) { it.toString() }
     override var filter = Filter()

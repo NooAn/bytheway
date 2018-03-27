@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
+import org.koin.android.architecture.ext.getViewModel
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.util.Constants
@@ -22,15 +23,11 @@ class SplashActivity : AppCompatActivity() {
 
     private var viewModel: RegistrationViewModel? = null
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
-        App.component.inject(this)
+        viewModel = getViewModel()
 
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(RegistrationViewModel::class.java)
         viewModel?.setTimestamp(FirebaseAuth.getInstance().currentUser?.uid ?: return)
         Log.e("LOG", "on ")
     }

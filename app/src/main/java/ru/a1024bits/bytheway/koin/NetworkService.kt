@@ -1,9 +1,10 @@
 package ru.a1024bits.bytheway.koin
 
 import android.content.Context
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.gson.GsonBuilder
 import org.koin.dsl.module.applicationContext
-import ru.a1024bits.bytheway.dagger.NetworkModule
 import io.reactivex.schedulers.Schedulers
 import okhttp3.Cache
 import okhttp3.OkHttpClient
@@ -29,10 +30,20 @@ val remoteDatasourceModule = applicationContext {
 const val TIMEOUT = 120L
 const val SERVER_URL = "https://iappintheair.appspot.com"
 
+fun createFirestore(): FirebaseFirestore {
+    val store = FirebaseFirestore.getInstance()
+    store.firestoreSettings = providesFirestoreSettings()
+    return store
+}
+
+fun providesFirestoreSettings(): FirebaseFirestoreSettings = FirebaseFirestoreSettings.Builder()
+        .setPersistenceEnabled(true)
+        .setSslEnabled(true)
+        .build()
 
 fun createOkHttpClient(): OkHttpClient {
     val httpLoggingInterceptor = HttpLoggingInterceptor()
-    httpLoggingInterceptor.level = HttpLoggingInterceptor.Level.BASIC
+    httpLoggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
     val cacheSize = 10 * 1024 * 1024
 //    val cache = Cache(context.cacheDir, cacheSize.toLong())
     return OkHttpClient.Builder()

@@ -17,6 +17,7 @@ import io.reactivex.schedulers.Schedulers
 import ru.a1024bits.bytheway.model.Response
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.COLLECTION_USERS
+import ru.a1024bits.bytheway.repository.IUsersRepository
 import ru.a1024bits.bytheway.repository.UserRepository
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -24,7 +25,7 @@ import javax.inject.Inject
 /**
  * Created by Bit on 1/4/2018.
  */
-class RegistrationViewModel @Inject constructor(var userRepository: UserRepository) : BaseViewModel(), LifecycleObserver {
+class RegistrationViewModel(var userRepository: IUsersRepository) : BaseViewModel(), LifecycleObserver {
     val load: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
     fun setTimestamp(uid: String) {
         disposables.add(userRepository.sendTime(uid)
@@ -60,8 +61,8 @@ class RegistrationViewModel @Inject constructor(var userRepository: UserReposito
                         }).addOnCompleteListener {
                             load.value = true
                         }.addOnFailureListener {
-                                    load.value = false
-                                }
+                            load.value = false
+                        }
                     } else {
                         // Пользователь уже существует и не нужно тогда добавлять его
                         load.value = true

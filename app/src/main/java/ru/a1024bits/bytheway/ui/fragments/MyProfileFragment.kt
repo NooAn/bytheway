@@ -71,7 +71,7 @@ import kotlin.collections.HashMap
 import ru.a1024bits.bytheway.model.Response as ResponseBtw
 
 
-class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback {
+class MyProfileFragment : BaseFragment2<MyProfileViewModel>(MyProfileViewModel::class), OnMapReadyCallback {
 
     companion object {
         const val BUDGET = "budget"
@@ -93,14 +93,11 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         const val CITY = "city"
         const val TAG_ANALYTICS: String = "MProfile_screen"
         const val START_BUDGET: Int = 50
-
         const val TWO_CITY_POINT = 3
         const val FIRST_CITY_POINT = 1
         const val LAST_CITY_POINT = 2
     }
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
 
     private var mListener: OnFragmentInteractionListener? = null
 
@@ -265,7 +262,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        App.component.inject(this)
     }
 
     private fun showErrorRout() {
@@ -303,15 +299,11 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             viewModel?.saveProfile?.observe(this, observerSaveProfile)
         }
     }
-
-    override fun getViewFactoryClass(): ViewModelProvider.Factory = viewModelFactory
-
+    
     @LayoutRes
     override fun getLayoutRes(): Int {
         return R.layout.fragment_my_user_profile
     }
-
-    override fun getViewModelClass(): Class<MyProfileViewModel> = MyProfileViewModel::class.java
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

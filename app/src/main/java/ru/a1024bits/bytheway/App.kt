@@ -9,7 +9,6 @@ import com.vk.sdk.VKSdk
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.startKoin
 import org.koin.dsl.module.Module
-import ru.a1024bits.bytheway.dagger.*
 import ru.a1024bits.bytheway.koin.mainModule
 import ru.a1024bits.bytheway.koin.remoteDatasourceModule
 import ru.terrakok.cicerone.Cicerone
@@ -22,7 +21,7 @@ import ru.terrakok.cicerone.Router
 class App : Application() {
     companion object {
         lateinit var INSTANCE: App
-        lateinit var component: AppComponent
+        //  lateinit var component: AppComponent
     }
 
     private lateinit var cicerone: Cicerone<Router>
@@ -31,12 +30,12 @@ class App : Application() {
         super.onCreate()
         INSTANCE = this
         VKSdk.initialize(this);
-        component = DaggerAppComponent.builder()
-                .appModule(AppModule(this))
-                .networkModule(NetworkModule())
-                .navigationModule(NavigationModule())
-                .userRepositoryModule(UserRepositoryModule())
-                .build();
+//        component = DaggerAppComponent.builder()
+//                .appModule(AppModule(this))
+//                .networkModule(NetworkModule())
+//                .navigationModule(NavigationModule())
+//                .userRepositoryModule(UserRepositoryModule())
+//                .build();
         startKoin(this, listOf(mainModule, remoteDatasourceModule))
 
         initCicerone()
@@ -84,6 +83,5 @@ class App : Application() {
     val router: Router
         get() = cicerone.router
 
-    fun appComponent(): AppComponent = component
 
 }

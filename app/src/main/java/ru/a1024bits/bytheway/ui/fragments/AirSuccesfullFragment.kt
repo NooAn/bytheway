@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import kotlinx.android.synthetic.main.fragment_air_succesfull.*
 
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener

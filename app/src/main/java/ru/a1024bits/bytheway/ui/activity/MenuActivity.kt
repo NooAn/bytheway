@@ -33,19 +33,18 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.FirebaseFirestore
-import com.vk.sdk.VKAccessToken
-import com.vk.sdk.VKCallback
-import com.vk.sdk.VKSdk
-import com.vk.sdk.api.VKError
+
 import io.reactivex.SingleObserver
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_menu.*
 import kotlinx.android.synthetic.main.confirm_dialog.view.*
+import org.koin.android.architecture.ext.getViewModel
+import org.koin.android.architecture.ext.viewModel
+import org.koin.android.ext.android.inject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import ru.a1024bits.bytheway.AirWebService
-import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.BuildConfig
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.*
@@ -71,7 +70,6 @@ import ru.terrakok.cicerone.commands.*
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
-import kotlin.math.log
 
 class MenuActivity : AppCompatActivity(),
         NavigationView.OnNavigationItemSelectedListener,
@@ -114,17 +112,13 @@ class MenuActivity : AppCompatActivity(),
 
     var screenNames: ArrayList<String> = arrayListOf()
 
-    @Inject
-    lateinit var navigatorHolder: NavigatorHolder
+    val navigatorHolder by inject<NavigatorHolder>()
 
     private var glide: RequestManager? = null
     var mainUser: User? = null
     var profileChanged: Boolean? = false
 
-    private var viewModel: MyProfileViewModel? = null
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
-
+    val viewModel: MyProfileViewModel  by viewModel<MyProfileViewModel>()
 
     private fun isNetworkAvailable(): Boolean {
         val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -141,7 +135,6 @@ class MenuActivity : AppCompatActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.e("TEST", " onCreate")
-        App.component.inject(this)
         glide = Glide.with(this)
         FirebaseCrash.setCrashCollectionEnabled(!BuildConfig.DEBUG)
         FirebaseFirestore.setLoggingEnabled(!BuildConfig.DEBUG)
@@ -162,7 +155,7 @@ class MenuActivity : AppCompatActivity(),
 
         updateUsersInfo(FirebaseAuth.getInstance().currentUser?.photoUrl.toString())
 
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
+
 
         if (savedInstanceState == null) {
             if (preferences.getBoolean(Constants.FIRST_ENTER, true)) {
@@ -263,7 +256,6 @@ class MenuActivity : AppCompatActivity(),
                     ALL_USERS_SCREEN -> return allUsersFragment
 
                     SIMILAR_TRAVELS_SCREEN -> {
-
                         SimilarTravelsFragment.newInstance(data as List<User>)
                     }
                     else -> return MapFragment()

@@ -177,7 +177,7 @@ class UserRepository @Inject constructor(private val store: FirebaseFirestore, v
                 "sensor" to "false"))
     }
 
-    fun sendTime(id: String): Completable = Completable.create { stream ->
+    override fun sendTime(id: String): Completable = Completable.create { stream ->
         try {
 
             val documentRef = store.collection(COLLECTION_USERS).document(id)
@@ -196,7 +196,7 @@ class UserRepository @Inject constructor(private val store: FirebaseFirestore, v
         }
     }
 
-    fun updateFcmToken(token: String?): Completable = Completable.create { stream ->
+    override fun updateFcmToken(token: String?): Completable = Completable.create { stream ->
         try {
             store.runTransaction({
                 val currentUid = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
@@ -214,7 +214,7 @@ class UserRepository @Inject constructor(private val store: FirebaseFirestore, v
         }
     }
 
-    fun sendNotifications(ids: String, notification: FireBaseNotification): Completable {
+    override fun sendNotifications(ids: String, notification: FireBaseNotification): Completable {
         return mapService.sendNotifications(hashMapOf(
                 "ids" to ids,
                 "title" to notification.title,

@@ -26,6 +26,8 @@ import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.GeoPoint
 import kotlinx.android.synthetic.main.fragment_maps.*
 import kotlinx.android.synthetic.main.fragment_search_block.*
+import org.koin.android.ext.android.get
+import org.koin.android.ext.android.inject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -67,17 +69,12 @@ import kotlin.collections.HashMap
 /**
  * Created by andrey.gusenkov on 30/09/2017//
  */
-class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
-
-    override fun getViewFactoryClass(): ViewModelProvider.Factory = viewModelFactory
-
+class MapFragment : BaseFragment2<DisplayUsersViewModel>(DisplayUsersViewModel::class), OnMapReadyCallback {
 
     @LayoutRes
     override fun getLayoutRes(): Int {
         return R.layout.fragment_maps
     }
-
-    override fun getViewModelClass(): Class<DisplayUsersViewModel> = DisplayUsersViewModel::class.java
 
 
     private var mMap: GoogleMap? = null
@@ -86,13 +83,9 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
     private val points: ArrayMap<Int, MarkerOptions> by lazy { ArrayMap<Int, MarkerOptions>() }
     private var routeString: String? = null
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
-
     private val uid: String by lazy { FirebaseAuth.getInstance().currentUser?.uid.orEmpty() }
 
-    @Inject
-    lateinit var mapService: MapWebService
+    val mapService by inject<MapWebService>()
 
     var user: User = User()
 
@@ -112,7 +105,6 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        App.component.inject(this)
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
