@@ -1337,7 +1337,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             if (newLink in defaultSocialValues.values) return@setButton
             addNewSocLink(socialNetwork.link, newLink)
         })
-
         simpleAlert.show()
     }
 
