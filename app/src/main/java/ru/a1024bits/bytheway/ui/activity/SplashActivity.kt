@@ -15,7 +15,6 @@ import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.viewmodel.RegistrationViewModel
-import javax.inject.Inject
 
 class SplashActivity : AppCompatActivity() {
 

@@ -12,7 +12,6 @@ import com.google.firebase.iid.FirebaseInstanceIdService
 import ru.a1024bits.bytheway.repository.COLLECTION_USERS
 import ru.a1024bits.bytheway.repository.UserRepository
 import ru.a1024bits.bytheway.util.Constants
-import javax.inject.Inject
 
 class MyFirebaseInstanceIDService : FirebaseInstanceIdService() {
 

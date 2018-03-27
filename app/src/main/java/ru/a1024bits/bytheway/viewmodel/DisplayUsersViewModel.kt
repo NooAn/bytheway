@@ -22,7 +22,6 @@ import ru.a1024bits.bytheway.util.Constants.FIRST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.START_DATE
 import java.util.*
-import javax.inject.Inject
 import kotlin.collections.ArrayList
 
 /**

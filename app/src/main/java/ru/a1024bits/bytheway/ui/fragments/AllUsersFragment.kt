@@ -39,7 +39,6 @@ import ru.a1024bits.bytheway.util.DateUtils
 import ru.a1024bits.bytheway.util.DecimalInputFilter
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
 import java.util.*
-import javax.inject.Inject
 
 
 class AllUsersFragment : BaseFragment2<DisplayUsersViewModel>(DisplayUsersViewModel::class) {
@@ -54,10 +53,10 @@ class AllUsersFragment : BaseFragment2<DisplayUsersViewModel>(DisplayUsersViewMo
 
     private lateinit var filter: Filter
     private lateinit var displayUsersAdapter: DisplayAllUsersAdapter
-
-    private var countInitialElements = 0
     private lateinit var analytics: FirebaseAnalytics
     private lateinit var dateDialog: CalendarDatePickerDialogFragment
+    private var countInitialElements = 0
+
 
     private val usersObservers: Observer<Response<List<User>>> = Observer { response ->
         when (response?.status) {

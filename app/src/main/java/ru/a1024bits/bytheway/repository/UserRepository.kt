@@ -19,7 +19,6 @@ import ru.a1024bits.bytheway.algorithm.SearchTravelers
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.util.toJsonString
 import ru.a1024bits.bytheway.viewmodel.FilterAndInstallListener
-import javax.inject.Inject
 import kotlin.collections.HashMap
 
 import com.google.firebase.iid.FirebaseInstanceId
@@ -34,7 +33,7 @@ const val COLLECTION_USERS = "users"
  * Created by andrey.gusenkov on 19/09/2017
  */
 
-class UserRepository @Inject constructor(private val store: FirebaseFirestore, var mapService: MapWebService) : IUsersRepository {
+class UserRepository (private val store: FirebaseFirestore, var mapService: MapWebService) : IUsersRepository {
 
     override fun getUser(id: String): Single<User> =
             Single.create<User> { stream ->

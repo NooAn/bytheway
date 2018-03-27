@@ -47,6 +47,10 @@ class SimilarTravelsFragment : Fragment() {
         view?.let {
             it.findViewById<RecyclerView>(R.id.display_similar_user_travels).adapter = SimilarTravelsAdapter(this.context, listUser
                     ?: arrayListOf())
+
+            if (listUser?.size == 0) {
+                block_empty_users.visibility = View.VISIBLE
+            }
         }
     }
 

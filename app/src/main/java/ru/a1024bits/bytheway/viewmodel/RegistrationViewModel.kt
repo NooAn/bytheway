@@ -20,7 +20,6 @@ import ru.a1024bits.bytheway.repository.COLLECTION_USERS
 import ru.a1024bits.bytheway.repository.IUsersRepository
 import ru.a1024bits.bytheway.repository.UserRepository
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 /**
  * Created by Bit on 1/4/2018.

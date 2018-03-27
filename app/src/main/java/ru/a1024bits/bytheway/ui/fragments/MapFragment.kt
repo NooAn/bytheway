@@ -61,7 +61,6 @@ import ru.a1024bits.bytheway.util.toGeoPoint
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
 import ru.terrakok.cicerone.commands.Forward
 import java.util.*
-import javax.inject.Inject
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 

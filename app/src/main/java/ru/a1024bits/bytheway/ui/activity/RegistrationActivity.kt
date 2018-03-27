@@ -32,7 +32,6 @@ import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.ui.dialogs.ErrorStandartRegistrationDialog
 import ru.a1024bits.bytheway.viewmodel.RegistrationViewModel
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 
 class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener {

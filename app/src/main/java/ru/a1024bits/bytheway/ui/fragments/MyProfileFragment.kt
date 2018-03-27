@@ -66,7 +66,6 @@ import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import ru.terrakok.cicerone.commands.Replace
 import java.text.SimpleDateFormat
 import java.util.*
-import javax.inject.Inject
 import kotlin.collections.HashMap
 import ru.a1024bits.bytheway.model.Response as ResponseBtw
 
