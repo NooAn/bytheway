@@ -10,7 +10,6 @@ import android.animation.ObjectAnimator
 import android.animation.TypeEvaluator
 import android.annotation.TargetApi
 import android.os.Build
-import android.util.Log
 import android.util.Property
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker

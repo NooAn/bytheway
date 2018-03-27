@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.google.firebase.auth.PhoneAuthProvider
+import com.google.firebase.crash.FirebaseCrash
 import kotlinx.android.synthetic.main.error_registration_dialog.*
 import kotlinx.android.synthetic.main.error_registration_dialog.view.*
 import ru.a1024bits.bytheway.R
@@ -23,10 +24,15 @@ class ErrorStandartRegistrationDialog : DialogFragment() {
         isCancelable = false
         try {
             view?.sendButtonCode?.setOnClickListener({
-                activity.mVerificationId?.let {
-                    PhoneAuthProvider.getCredential(it, verificationsData.text.toString())?.let { credentialIt ->
-                        activity.signInGoogle(credentialIt, this@ErrorStandartRegistrationDialog)
+                try {
+                    activity.mVerificationId?.let {
+                        PhoneAuthProvider.getCredential(it, verificationsData.text.toString())?.let { credentialIt ->
+                            activity.signInGoogle(credentialIt, this@ErrorStandartRegistrationDialog)
+                        }
                     }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    FirebaseCrash.report(e)
                 }
             })
             view?.sendButtonPhone?.setOnClickListener({

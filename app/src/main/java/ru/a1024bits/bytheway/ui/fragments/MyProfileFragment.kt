@@ -18,7 +18,10 @@ import android.support.v7.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
-import android.view.*
+import android.view.KeyEvent
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import com.bumptech.glide.request.RequestOptions
@@ -51,7 +54,7 @@ import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.a1024bits.bytheway.ui.dialogs.SocialTipsDialog
-import ru.a1024bits.bytheway.util.*
+import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.util.Constants.END_DATE
 import ru.a1024bits.bytheway.util.Constants.FIRST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
@@ -62,6 +65,9 @@ import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT
 import ru.a1024bits.bytheway.util.Constants.START_DATE
 import ru.a1024bits.bytheway.util.Constants.TWO_DATE
 import ru.a1024bits.bytheway.util.Constants.TWO_INDEX_CITY
+import ru.a1024bits.bytheway.util.DateUtils
+import ru.a1024bits.bytheway.util.DecimalInputFilter
+import ru.a1024bits.bytheway.util.VK
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import ru.terrakok.cicerone.commands.Replace
 import java.text.SimpleDateFormat
@@ -1261,7 +1267,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         if (shouldVkButtonShow(socialNetworkLinkKey))
             dialogView.findViewById<Button>(R.id.vkAppSinch).visibility = View.GONE
 
-
         dialogView.findViewById<Button>(R.id.vkAppSinch).setOnClickListener {
             sinchVk()
             dialog.cancel()
@@ -1302,6 +1307,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     private fun sinchVk() {
         val s = VK()
+        mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_vk_sinch", null)
         if (!s.start(activity))
             Toast.makeText(activity, "Already", Toast.LENGTH_SHORT).show()
     }

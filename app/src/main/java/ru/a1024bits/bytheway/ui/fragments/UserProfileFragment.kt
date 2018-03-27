@@ -35,7 +35,6 @@ import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.START_DATE
 import ru.a1024bits.bytheway.util.Constants.TWO_DATE
 import ru.a1024bits.bytheway.util.Constants.TWO_INDEX_CITY
-import ru.a1024bits.bytheway.util.getBearing
 import ru.a1024bits.bytheway.viewmodel.UserProfileViewModel
 import java.text.SimpleDateFormat
 import java.util.*

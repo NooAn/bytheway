@@ -1,23 +1,21 @@
 package ru.a1024bits.bytheway.ui.fragments
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import kotlinx.android.synthetic.main.fragment_air_succesfull.*
-
+import android.widget.TextView
+import com.google.firebase.analytics.FirebaseAnalytics
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.terrakok.cicerone.commands.Replace
-import android.content.Intent
-import android.util.Log
-import android.widget.TextView
-import com.google.firebase.analytics.FirebaseAnalytics
 
 
 class AirSuccesfullFragment : Fragment() {

@@ -2,17 +2,13 @@ package ru.a1024bits.bytheway.service
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.iid.FirebaseInstanceIdService
 import ru.a1024bits.bytheway.repository.COLLECTION_USERS
-import ru.a1024bits.bytheway.repository.UserRepository
 import ru.a1024bits.bytheway.util.Constants
-import javax.inject.Inject
 
 class MyFirebaseInstanceIDService : FirebaseInstanceIdService() {
 

@@ -1,14 +1,17 @@
 package ru.a1024bits.bytheway.viewmodel
 
-import android.arch.lifecycle.*
+import android.arch.lifecycle.Lifecycle
+import android.arch.lifecycle.LifecycleObserver
+import android.arch.lifecycle.MutableLiveData
+import android.arch.lifecycle.ViewModel
 import android.content.Context
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import java.util.concurrent.TimeUnit
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.util.Constants
+import java.util.concurrent.TimeUnit
 
 /**
  * Created by Andrei_Gusenkov on 12/18/2017.

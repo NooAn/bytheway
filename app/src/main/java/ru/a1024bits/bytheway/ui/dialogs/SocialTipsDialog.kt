@@ -1,11 +1,10 @@
 package ru.a1024bits.bytheway.ui.dialogs
 
-import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
-import android.view.ViewGroup
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import ru.a1024bits.bytheway.R
 

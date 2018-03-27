@@ -1,7 +1,6 @@
 package ru.a1024bits.bytheway.util
 
 import android.text.TextUtils
-import android.util.Log
 import com.squareup.okhttp.Credentials
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor

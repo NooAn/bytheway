@@ -12,20 +12,16 @@ import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageException
 import io.reactivex.Completable
+import io.reactivex.Observable
 import io.reactivex.Single
 import ru.a1024bits.bytheway.MapWebService
-import ru.a1024bits.bytheway.algorithm.SearchTravelers
+import ru.a1024bits.bytheway.model.FireBaseNotification
 import ru.a1024bits.bytheway.model.User
+import ru.a1024bits.bytheway.model.map_directions.RoutesList
+import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.util.toJsonString
 import ru.a1024bits.bytheway.viewmodel.FilterAndInstallListener
 import javax.inject.Inject
-import kotlin.collections.HashMap
-
-import com.google.firebase.iid.FirebaseInstanceId
-import io.reactivex.Observable
-import ru.a1024bits.bytheway.model.FireBaseNotification
-import ru.a1024bits.bytheway.model.map_directions.RoutesList
-import ru.a1024bits.bytheway.util.Constants
 
 const val COLLECTION_USERS = "users"
 
@@ -163,6 +159,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                             .addOnSuccessListener { _ -> stream.onComplete() }
                 } catch (e: Exception) {
                     stream.onError(e)
+                    stream.onComplete()
                 }
             }
 
@@ -175,9 +172,8 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                 "sensor" to "false"))
     }
 
-    fun sendTime(id: String): Completable = Completable.create { stream ->
+    override fun sendTime(id: String): Completable = Completable.create { stream ->
         try {
-
             val documentRef = store.collection(COLLECTION_USERS).document(id)
             store.runTransaction {
                 val map = hashMapOf<String, Any>()
@@ -191,10 +187,11 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                     }
         } catch (e: Exception) {
             stream.onError(e)
+            stream.onComplete()
         }
     }
 
-    fun updateFcmToken(token: String?): Completable = Completable.create { stream ->
+    override fun updateFcmToken(token: String?): Completable = Completable.create { stream ->
         try {
             store.runTransaction({
                 val currentUid = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
@@ -209,10 +206,11 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
             }.addOnSuccessListener { stream.onComplete() }
         } catch (e: Exception) {
             stream.onError(e)
+            stream.onComplete()
         }
     }
 
-    fun sendNotifications(ids: String, notification: FireBaseNotification): Completable {
+    override fun sendNotifications(ids: String, notification: FireBaseNotification): Completable {
         return mapService.sendNotifications(hashMapOf(
                 "ids" to ids,
                 "title" to notification.title,

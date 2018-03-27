@@ -14,7 +14,6 @@ import android.support.v4.util.ArrayMap
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import ru.a1024bits.bytheway.util.toJsonString
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.Toast
@@ -56,6 +55,7 @@ import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.START_DATE
 import ru.a1024bits.bytheway.util.createMarker
 import ru.a1024bits.bytheway.util.toGeoPoint
+import ru.a1024bits.bytheway.util.toJsonString
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
 import ru.terrakok.cicerone.commands.Forward
 import java.util.*

@@ -1,11 +1,9 @@
 package ru.a1024bits.bytheway;
 
-import com.squareup.okhttp.ResponseBody
 import io.reactivex.Single
 import retrofit2.Call
-import retrofit2.Response
-import retrofit2.http.*
-import ru.a1024bits.bytheway.model.User
+import retrofit2.http.GET
+import retrofit2.http.Query
 import ru.a1024bits.bytheway.model.AccessToken
 import ru.a1024bits.bytheway.model.AirUser
 import ru.a1024bits.bytheway.model.Airport

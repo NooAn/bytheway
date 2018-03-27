@@ -1,7 +1,6 @@
 package ru.a1024bits.bytheway.algorithm
 
 import android.location.Location
-import android.util.Log
 import ru.a1024bits.bytheway.model.Method
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter

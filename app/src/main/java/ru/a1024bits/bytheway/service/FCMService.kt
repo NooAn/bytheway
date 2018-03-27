@@ -1,25 +1,23 @@
 package ru.a1024bits.bytheway.service
 
+import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.media.RingtoneManager
+import android.os.Build
 import android.support.v4.app.NotificationCompat
+import android.support.v4.content.LocalBroadcastManager
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-
-import android.graphics.BitmapFactory
-import android.support.v4.content.LocalBroadcastManager
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.util.Constants.NOTIFICATION_CMD
 import ru.a1024bits.bytheway.util.Constants.NOTIFICATION_TITLE
 import ru.a1024bits.bytheway.util.Constants.NOTIFICATION_VALUE
-import android.app.NotificationChannel
-import android.os.Build
-import android.support.v4.app.NotificationManagerCompat
 
 
 class FCMService : FirebaseMessagingService() {

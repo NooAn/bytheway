@@ -6,8 +6,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.QuerySnapshot
 import io.reactivex.Single
-import io.reactivex.functions.Function
-import io.reactivex.functions.Predicate
 import ru.a1024bits.bytheway.algorithm.SearchTravelers
 import ru.a1024bits.bytheway.model.FireBaseNotification
 import ru.a1024bits.bytheway.model.Response
