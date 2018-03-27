@@ -1,17 +1,13 @@
 package ru.a1024bits.bytheway.ui.activity
 
-import android.app.Activity
-import android.arch.lifecycle.ViewModelProvider
-import android.arch.lifecycle.ViewModelProviders
+
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import org.koin.android.architecture.ext.getViewModel
-import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.viewmodel.RegistrationViewModel
