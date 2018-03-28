@@ -16,12 +16,11 @@ import com.google.firebase.crash.FirebaseCrash
 import org.koin.android.architecture.ext.viewModel
 import org.koin.android.architecture.ext.viewModelByClass
 import ru.a1024bits.bytheway.viewmodel.BaseViewModel
-import ru.a1024bits.bytheway.viewmodel.UserProfileViewModel
 import uk.co.deanwild.materialshowcaseview.IShowcaseListener
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView
 import kotlin.reflect.KClass
 
-abstract class BaseFragment2<out T : BaseViewModel>(viewModelClass: KClass<T>) : Fragment() {
+abstract class BaseFragment<out T : BaseViewModel>(viewModelClass: KClass<T>) : Fragment() {
     protected val viewModel: T by viewModelByClass(true, viewModelClass)
 
     protected var glide: RequestManager? = null

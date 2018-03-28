@@ -1,7 +1,6 @@
 package ru.a1024bits.bytheway.ui.fragments
 
 import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProvider
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -40,7 +39,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-class UserProfileFragment : BaseFragment2<UserProfileViewModel>(UserProfileViewModel::class), OnMapReadyCallback {
+class UserProfileFragment : BaseFragment<UserProfileViewModel>(UserProfileViewModel::class), OnMapReadyCallback {
 
     private var mListener: OnFragmentInteractionListener? = null
     private val userLoad: Observer<Response<User>> = Observer { response ->

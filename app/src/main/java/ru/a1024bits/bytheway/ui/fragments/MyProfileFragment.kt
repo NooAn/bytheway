@@ -2,7 +2,6 @@ package ru.a1024bits.bytheway.ui.fragments
 
 import android.app.Activity
 import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProvider
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -43,7 +42,6 @@ import kotlinx.android.synthetic.main.fragment_my_user_profile.*
 import kotlinx.android.synthetic.main.profile_add_trip.*
 import kotlinx.android.synthetic.main.profile_direction.*
 import kotlinx.android.synthetic.main.profile_main_image.*
-import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.*
 import ru.a1024bits.bytheway.model.map_directions.RoutesList
@@ -70,7 +68,7 @@ import kotlin.collections.HashMap
 import ru.a1024bits.bytheway.model.Response as ResponseBtw
 
 
-class MyProfileFragment : BaseFragment2<MyProfileViewModel>(MyProfileViewModel::class), OnMapReadyCallback {
+class MyProfileFragment : BaseFragment<MyProfileViewModel>(MyProfileViewModel::class), OnMapReadyCallback {
 
     companion object {
         const val BUDGET = "budget"

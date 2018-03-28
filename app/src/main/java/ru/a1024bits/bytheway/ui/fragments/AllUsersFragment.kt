@@ -4,7 +4,6 @@ import android.animation.LayoutTransition
 import android.app.Activity
 import android.app.SearchManager
 import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProvider
 import android.content.Context
 import android.os.Bundle
 import android.support.v7.widget.SearchView
@@ -26,7 +25,6 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crash.FirebaseCrash
 import kotlinx.android.synthetic.main.fragment_display_all_users.*
 import kotlinx.android.synthetic.main.searching_parameters_block.*
-import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.adapter.DisplayAllUsersAdapter
 import ru.a1024bits.bytheway.model.Response
@@ -41,7 +39,7 @@ import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
 import java.util.*
 
 
-class AllUsersFragment : BaseFragment2<DisplayUsersViewModel>(DisplayUsersViewModel::class) {
+class AllUsersFragment : BaseFragment<DisplayUsersViewModel>(DisplayUsersViewModel::class) {
     companion object {
         const val SIZE_INITIAL_ELEMENTS = 2
         const val TAG_ANALYTICS = "AllUsersFragment_"

@@ -1,6 +1,5 @@
 package ru.a1024bits.bytheway.ui.fragments
 
-import android.arch.lifecycle.ViewModelProvider
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -33,7 +32,6 @@ import retrofit2.Callback
 import retrofit2.Response
 import ru.a1024bits.aviaanimation.ui.util.LatLngInterpolator
 import ru.a1024bits.aviaanimation.ui.util.MarkerAnimation
-import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.BuildConfig
 import ru.a1024bits.bytheway.MapWebService
 import ru.a1024bits.bytheway.R
@@ -68,14 +66,14 @@ import kotlin.collections.HashMap
 /**
  * Created by andrey.gusenkov on 30/09/2017//
  */
-class MapFragment : BaseFragment2<DisplayUsersViewModel>(DisplayUsersViewModel::class), OnMapReadyCallback {
+class MapFragment : BaseFragment<DisplayUsersViewModel>(DisplayUsersViewModel::class), OnMapReadyCallback {
+    val mapService by inject<MapWebService>()
 
     @LayoutRes
     override fun getLayoutRes(): Int {
         return R.layout.fragment_maps
     }
-
-
+    
     private var mMap: GoogleMap? = null
     private var mMapView: MapView? = null
 
@@ -83,8 +81,6 @@ class MapFragment : BaseFragment2<DisplayUsersViewModel>(DisplayUsersViewModel::
     private var routeString: String? = null
 
     private val uid: String by lazy { FirebaseAuth.getInstance().currentUser?.uid.orEmpty() }
-
-    val mapService by inject<MapWebService>()
 
     var user: User = User()
 

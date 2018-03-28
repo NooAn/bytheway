@@ -21,7 +21,6 @@ import java.util.concurrent.TimeUnit
 val remoteDatasourceModule = applicationContext {
     // provided web components
     bean { createOkHttpClient() }
-
     // Fill property
     bean { createWebService<MapWebService>(get(), SERVER_URL) }
 }
@@ -44,10 +43,7 @@ fun providesFirestoreSettings(): FirebaseFirestoreSettings = FirebaseFirestoreSe
 fun createOkHttpClient(): OkHttpClient {
     val httpLoggingInterceptor = HttpLoggingInterceptor()
     httpLoggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
-    val cacheSize = 10 * 1024 * 1024
-//    val cache = Cache(context.cacheDir, cacheSize.toLong())
     return OkHttpClient.Builder()
-            //          .cache(cache)
             .addInterceptor(httpLoggingInterceptor)
             .readTimeout(TIMEOUT, TimeUnit.SECONDS)
             .connectTimeout(TIMEOUT, TimeUnit.SECONDS)
