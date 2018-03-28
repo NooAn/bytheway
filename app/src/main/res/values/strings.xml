@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">bytheway</string>
     <string name="button_send">Отправить</string>
-    <integer name="com_vk_sdk_AppId">6416394</integer>
-    
+        <integer name="com_vk_sdk_AppId">6427726</integer>
+
     <string name="fullname">Andrey Petrov</string>
     <string name="type_money"> </string>
     <string name="money">Бюджет поездки</string>
