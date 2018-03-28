@@ -2,7 +2,6 @@ package ru.a1024bits.bytheway.adapter;
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -80,7 +79,7 @@ class SimilarTravelsAdapter(val context: Context, val users: List<User>) : Recyc
         init {
             view.setOnClickListener {
                 if (adapterPosition != RecyclerView.NO_POSITION && context is MenuActivity) {
-                    FirebaseAnalytics.getInstance(context.applicationContext).logEvent("SimilarTravelsFragment_SELECT_USER_" + adapterPosition, null)
+                    if (adapterPosition <= 10) FirebaseAnalytics.getInstance(context.applicationContext).logEvent("SimilarTravelsFragment_SELECT_USER_" + adapterPosition, null)
                     context.showUserSimpleProfile(users[adapterPosition])
                 }
             }

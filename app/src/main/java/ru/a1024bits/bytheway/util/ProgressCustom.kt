@@ -1,20 +1,19 @@
 package ru.a1024bits.bytheway.util
 
 import android.content.Context
-import android.graphics.*
+import android.graphics.RectF
 import android.util.AttributeSet
-import android.view.*
-import android.widget.LinearLayout
-
-import ru.a1024bits.bytheway.R
-
-import java.util.ArrayList
-import android.view.LayoutInflater
-import android.widget.ImageView
 import android.util.TypedValue
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
-import android.view.animation.AlphaAnimation
+import android.widget.ImageView
+import android.widget.LinearLayout
+import ru.a1024bits.bytheway.R
+import java.util.*
 
 class ProgressCustom : ViewGroup {
     private val mData = ArrayList<ImageView?>()

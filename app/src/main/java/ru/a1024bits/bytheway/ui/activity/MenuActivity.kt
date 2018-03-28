@@ -1,12 +1,12 @@
 package ru.a1024bits.bytheway.ui.activity
 
+import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
-import android.arch.lifecycle.Observer
 import android.content.*
 import android.net.ConnectivityManager
-import android.os.Build
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.support.design.widget.NavigationView
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
@@ -20,7 +20,8 @@ import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.*
+import android.widget.ImageView
+import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.request.RequestOptions
@@ -61,19 +62,24 @@ import ru.a1024bits.bytheway.util.ProgressCustom
 import ru.a1024bits.bytheway.util.ServiceGenerator
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import ru.terrakok.cicerone.NavigatorHolder
-import ru.terrakok.cicerone.Router
 import ru.terrakok.cicerone.android.SupportFragmentNavigator
-import ru.terrakok.cicerone.commands.*
+import ru.terrakok.cicerone.commands.Back
+import ru.terrakok.cicerone.commands.Command
+import ru.terrakok.cicerone.commands.Forward
+import ru.terrakok.cicerone.commands.Replace
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
 class MenuActivity : AppCompatActivity(),
         NavigationView.OnNavigationItemSelectedListener,
-        OnFragmentInteractionListener,
-        GoogleApiClient.OnConnectionFailedListener {
+        OnFragmentInteractionListener, GoogleApiClient.OnConnectionFailedListener {
 
-    val preferences: SharedPreferences by lazy { getSharedPreferences(Constants.APP_PREFERENCES, Context.MODE_PRIVATE) }
+    private companion object {
+        private const val STATE_SCREEN_NAMES = "state_screen_names"
+    }
+
+    private val preferences: SharedPreferences by lazy { getSharedPreferences(Constants.APP_PREFERENCES, Context.MODE_PRIVATE) }
 
     private var mGoogleApiClient: GoogleApiClient? = null
     var pLoader: ProgressCustom? = null
@@ -91,8 +97,13 @@ class MenuActivity : AppCompatActivity(),
     }
 
     override fun onSetPoint(l: LatLng, pos: Int, swap: Boolean) {
-        val mapFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as MapFragment
-        mapFragment.setMarker(l, pos, swap)
+        try {
+            val mapFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as MapFragment
+            mapFragment.setMarker(l, pos, swap)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            onBackPressed()
+        }
     }
 
     override fun onConnectionFailed(p0: ConnectionResult) {
@@ -100,12 +111,9 @@ class MenuActivity : AppCompatActivity(),
     }
 
     var screenNames: ArrayList<String> = arrayListOf()
-    private val STATE_SCREEN_NAMES = "state_screen_names"
 
     @Inject
     lateinit var navigatorHolder: NavigatorHolder
-    @Inject
-    lateinit var router: Router
 
     private var glide: RequestManager? = null
     var mainUser: User? = null
@@ -115,18 +123,26 @@ class MenuActivity : AppCompatActivity(),
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
+
     private fun isNetworkAvailable(): Boolean {
         val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetworkInfo = connectivityManager.getActiveNetworkInfo()
         return activeNetworkInfo != null && activeNetworkInfo.isConnected
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        Log.e("LOG", "onActiviyt")
+        super.onActivityResult(requestCode, resultCode, data)
+        fragmentProfile.onActivityResult(requestCode, resultCode, data)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.e("TEST", " onCreate")
         App.component.inject(this)
         glide = Glide.with(this)
-        FirebaseCrash.setCrashCollectionEnabled(BuildConfig.DEBUG)
-        FirebaseFirestore.setLoggingEnabled(BuildConfig.DEBUG)
+        FirebaseCrash.setCrashCollectionEnabled(!BuildConfig.DEBUG)
+        FirebaseFirestore.setLoggingEnabled(!BuildConfig.DEBUG)
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
         if (FirebaseAuth.getInstance().currentUser == null) {
@@ -186,7 +202,7 @@ class MenuActivity : AppCompatActivity(),
         if (!isNetworkAvailable()) showSnack(getString(R.string.no_internet))
     }
 
-    var snackbar: Snackbar? = null
+    private var snackbar: Snackbar? = null
 
 
     private fun showSnack(string: String) {
@@ -232,11 +248,11 @@ class MenuActivity : AppCompatActivity(),
                     SEARCH_MAP_SCREEN -> return MapFragment.newInstance(mainUser)
 
                     AIR_SUCCES_SCREEN -> {
-                        var name: String = ""
-                        var date: String = ""
+                        var name = ""
+                        var date = ""
                         if (data is List<*>) {
                             name = getNameFromFligths(data as List<Fligths>)
-                            date = getDateFromFligths(data as List<Fligths>)
+                            date = getDateFromFligths(data)
                         }
                         return AirSuccesfullFragment.newInstance(name, date)
                     }
@@ -246,6 +262,7 @@ class MenuActivity : AppCompatActivity(),
                     ALL_USERS_SCREEN -> return allUsersFragment
 
                     SIMILAR_TRAVELS_SCREEN -> {
+
                         SimilarTravelsFragment.newInstance(data as List<User>)
                     }
                     else -> return MapFragment()
@@ -317,7 +334,7 @@ class MenuActivity : AppCompatActivity(),
 
     override fun onResume() {
         super.onResume()
-        Log.e("LOG", "onResume")
+        Log.e("TEST", "onResume")
         // the intent filter defined in AndroidManifest will handle the return from ACTION_VIEW intent
         val uri = intent.data
         if (uri != null && uri.toString().startsWith(redirectUri)) {
@@ -381,6 +398,39 @@ class MenuActivity : AppCompatActivity(),
                 IntentFilter(Constants.FCM_SRV))
     }
 
+    override fun onStart() {
+        super.onStart()
+        Log.e("TEST", "onStart")
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
+        super.onRestoreInstanceState(savedInstanceState, persistentState)
+        Log.e("TEST", "onRestoreInstanceState")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mGoogleApiClient = null
+        Log.e("TEST", "onDestroy")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        navigatorHolder.removeNavigator()
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver)
+        Log.e("TEST", "onPause")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.e("TEST", "onStop")
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        Log.e("TEST", "onRestart")
+    }
+
     private fun getLatLngForAirports(code: String?) {
         code?.let {
             val generator = ServiceGenerator()
@@ -411,23 +461,6 @@ class MenuActivity : AppCompatActivity(),
         Log.e("LOG", "on back tap")
     }
 
-    override fun onPause() {
-        super.onPause()
-        navigatorHolder.removeNavigator()
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver)
-        Log.e("LOG", "onPause")
-    }
-
-    override fun onStop() {
-        super.onStop()
-        Log.e("LOG", "onStop")
-    }
-
-    override fun onRestart() {
-        super.onRestart()
-        Log.e("LOG", "onRestart")
-    }
-
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         return true
     }
@@ -435,12 +468,12 @@ class MenuActivity : AppCompatActivity(),
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
         if (!isNetworkAvailable()) showSnack(getString(R.string.no_internet))
-        if (this.profileChanged == true) {
+        return if (this.profileChanged == true) {
             openAwayFromProfileDialog({
                 this.profileChanged = false
                 onNavigationItemSelected(item)
             })
-            return false
+            false
         } else {
             when (item.itemId) {
                 R.id.profile_item -> navigator.applyCommand(Forward(Screens.MY_PROFILE_SCREEN, 1))
@@ -448,7 +481,7 @@ class MenuActivity : AppCompatActivity(),
                 R.id.all_users_item -> navigator.applyCommand(Forward(Screens.ALL_USERS_SCREEN, 1))
             }
             close()
-            return true
+            true
         }
     }
 
@@ -467,7 +500,7 @@ class MenuActivity : AppCompatActivity(),
         val dialogView = inflater.inflate(R.layout.confirm_dialog, null)
         simpleAlert.setView(dialogView)
         dialogView.textMessage.text = getString(R.string.text_away_from_profile)
-        simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.yes), { dialogInterface, i ->
+        simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.yes), { _, _ ->
             val myProfile = supportFragmentManager.findFragmentById(R.id.fragment_container) as MyProfileFragment
 
             viewModel?.saveProfile?.observe(this, android.arch.lifecycle.Observer<ru.a1024bits.bytheway.model.Response<Boolean>> { response ->
@@ -488,7 +521,7 @@ class MenuActivity : AppCompatActivity(),
             })
             viewModel?.sendUserData(myProfile.getHashMapUser(), FirebaseAuth.getInstance().currentUser?.uid.toString(), mainUser)
         })
-        simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.no), { dialogInterface, i ->
+        simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.no), { _, _ ->
             Log.e("LOG", " refused")
             callback()
         })
@@ -510,13 +543,17 @@ class MenuActivity : AppCompatActivity(),
         if (intent.extras != null) {
             val userId: String? = intent.getStringExtra(NOTIFICATION_VALUE)
             val cmd: String? = intent.getStringExtra(NOTIFICATION_CMD)
-
-            Log.e("notificationWork", "Command: $cmd Value: $userId")
             when (cmd) {
                 Constants.FCM_CMD_SHOW_USER -> {
                     userId?.let {
                         showUserSimpleProfile(User(id = userId))
                         mFirebaseAnalytics.logEvent("Menu_open_profile_from_push", null)
+                    }
+                }
+                Constants.GOOGLE_PLAY_CMD_SHOW_USER -> {
+                    userId?.let {
+                        showUserSimpleProfile(User(id = userId))
+                        mFirebaseAnalytics.logEvent("Menu_open_profile_play_link", null)
                     }
                 }
                 Constants.FCM_CMD_UPDATE -> {

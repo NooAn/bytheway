@@ -1,8 +1,6 @@
 package ru.a1024bits.bytheway.viewmodel
 
-import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
-import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.UserRepository
 import javax.inject.Inject
 

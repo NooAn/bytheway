@@ -15,10 +15,7 @@ import android.widget.TextView
 import android.widget.Toast
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.gms.maps.*
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.PolylineOptions
+import com.google.android.gms.maps.model.*
 import com.google.firebase.crash.FirebaseCrash
 import com.google.maps.android.PolyUtil
 import kotlinx.android.synthetic.main.fragment_user_profile.*
@@ -38,7 +35,6 @@ import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.START_DATE
 import ru.a1024bits.bytheway.util.Constants.TWO_DATE
 import ru.a1024bits.bytheway.util.Constants.TWO_INDEX_CITY
-import ru.a1024bits.bytheway.util.getBearing
 import ru.a1024bits.bytheway.viewmodel.UserProfileViewModel
 import java.text.SimpleDateFormat
 import java.util.*
@@ -66,8 +62,6 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
     companion object {
         const val TAG_ANALYTICS: String = "UserProfile_"
         private const val UID_KEY = "uid"
-        val CENTRE: LatLng = LatLng(-23.570991, -43.649886)
-        const val ZOOM = 9f
 
         fun newInstance(uid: String): UserProfileFragment {
             val fragment = UserProfileFragment()
@@ -86,7 +80,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
     private fun fillProfile(user: User) {
 
         setMarkers(user)
-        showRouteOnMap(user.route)
+        drawPolyline(user.route)
 
         username.text = StringBuilder().append(user.name).append(" ").append(user.lastName)
 
@@ -115,7 +109,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
             textCityTo2.text = user.cities[LAST_INDEX_CITY]
         }
 
-        val formatDate = SimpleDateFormat("dd.MM.yyyy", Locale.US)
+        val formatDate = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
 
         if (user.dates.size == 1 || user.dates.size == 2) {
             val dayBegin = formatDate.format(Date(user.dates[Constants.START_DATE] ?: 0))
@@ -154,6 +148,8 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
             glide?.load(user.urlPhoto)
                     ?.apply(RequestOptions.circleCropTransform())
                     ?.into(image_avatar)
+        else
+            image_avatar.setImageResource(R.drawable.default_avatar)
 
         for (name in user.socialNetwork) {
             when (name.key) {
@@ -168,7 +164,6 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
                             e.printStackTrace()
                             FirebaseCrash.report(e)
                             showErrorFroWrongSocValue(user, name)
-
                         }
                     }
                 }
@@ -264,7 +259,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
 
         addInfoUser.text = user.addInformation
         if (user.addInformation.isBlank()) descriptionProfile.visibility = View.GONE
-        userLastTime.text = if (user.timestamp != null) formatDate.format(user.timestamp) else "Очень давно"
+        userLastTime.text = if (user.timestamp != null) formatDate.format(user.timestamp) else getString(R.string.very_long)
     }
 
     private fun correctText(day: String, textView: TextView, icon: View) {
@@ -276,16 +271,16 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
     private fun openEmail(email: String) {
         val emailIntent = Intent(Intent.ACTION_SEND)
         emailIntent.setType("message/rfc822")
-        emailIntent.setData(Uri.parse("mailto:default@recipient.com"));
+        emailIntent.setData(Uri.parse("mailto:"));
         emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, arrayOf(email))
-        emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "ByTheWay - поиск попутчиков")
+        emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, getString(R.string.app_name))
         emailIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         if (emailIntent.resolveActivity(activity.packageManager) == null) {
             val dialog = SocNetworkdialog(activity, email)
             dialog.show()
         } else
             try {
-                context.startActivity(Intent.createChooser(emailIntent, "Отправка письма. Выберите почтовый клиент"))
+                context.startActivity(Intent.createChooser(emailIntent, getString(R.string.email_send)))
             } catch (e: Exception) {
                 Toast.makeText(activity, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
             }
@@ -303,8 +298,8 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
 
     private fun fillAgeSex(userAge: Int, userSex: Int) {
         val gender = when (userSex) {
-            1 -> "М"
-            2 -> "Ж"
+            1 -> getString(R.string.gender_male)
+            2 -> getString(R.string.gender_female)
             else -> {
                 ""
             }
@@ -314,7 +309,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
             if (userAge > 0) {
                 sexAndAge.text = StringBuilder(gender).append(", ").append(userAge)
             } else {
-                sexAndAge.text = StringBuilder(gender).append(", Бессмертный ")
+                sexAndAge.text = StringBuilder(gender).append(", ${getString(R.string.immortal)} ")
             }
         }
 
@@ -322,17 +317,14 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
             if (userSex != 0) {
                 sexAndAge.text = StringBuilder(gender).append(", ").append(userAge)
             } else {
-                sexAndAge.text = StringBuilder("Пол, ").append(userAge)
+                sexAndAge.text = StringBuilder(getString(R.string.sex)).append(", ").append(userAge)
             }
         }
         if (userAge == 0 && userSex == 0) {
-            sexAndAge.text = "Бессмертный"
+            sexAndAge.text = getString(R.string.immortal)
         }
     }
 
-    private fun showRouteOnMap(route: String) {
-        drawPolyline(route)
-    }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -341,7 +333,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
     }
 
     private fun showErrorLoading() {
-        Toast.makeText(activity, "Ошибка загрузки", Toast.LENGTH_SHORT).show()
+        Toast.makeText(activity, getString(R.string.error_upload), Toast.LENGTH_SHORT).show()
     }
 
     override fun getViewFactoryClass(): ViewModelProvider.Factory = viewModelFactory
@@ -365,14 +357,11 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
 
     override fun onMapReady(map: GoogleMap?) {
         this.googleMap = map
-        // Zooming to the Campus location
-        googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(CENTRE, ZOOM))
 
         if (arguments != null) {
             val userId: String = arguments.getString(UID_KEY, "")
             viewModel?.load(userId)
         } else {
-            // fix me error when don't load user
             showErrorLoading()
         }
     }
@@ -416,24 +405,14 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
 
     private fun setMarkers(user: User) {
         googleMap?.clear()
-        val coordFrom = LatLng(user.cityFromLatLng.latitude, user.cityFromLatLng.longitude)
-        val coordTo = LatLng(user.cityToLatLng.latitude, user.cityToLatLng.longitude)
-        var markerTitleStart: String? = ""
-        var markerTitleFinal: String? = ""
-        var markerPositionStart = LatLng(0.0, 0.0)
-        var markerPositionFinal = LatLng(0.0, 0.0)
-        val cityFrom = user.cities[Constants.FIRST_INDEX_CITY]
-        val cityTo = user.cities[Constants.LAST_INDEX_CITY]
-        markerTitleStart = cityTo
-        markerTitleFinal = cityFrom
-        markerPositionStart = coordTo
-        markerPositionFinal = coordFrom
+        val markerPositionFinal = LatLng(user.cityFromLatLng.latitude, user.cityFromLatLng.longitude)
+        val markerPositionStart = LatLng(user.cityToLatLng.latitude, user.cityToLatLng.longitude)
 
+        val markerTitleStart = user.cities[Constants.LAST_INDEX_CITY]
+        val markerTitleFinal = user.cities[Constants.FIRST_INDEX_CITY]
 
-        val midPointLat = (coordFrom.latitude + coordTo.latitude) / 2
-        val midPointLong = (coordFrom.longitude + coordTo.longitude) / 2
         val blueMarker = BitmapDescriptorFactory.fromResource(R.drawable.pin_blue)
-
+        val builder = LatLngBounds.Builder();
         if (user.cityTwoLatLng.latitude != 0.0 && user.cityTwoLatLng.longitude != 0.0) {
             googleMap?.addMarker(MarkerOptions()
                     .icon(blueMarker)
@@ -441,6 +420,8 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
                     .title(user.cities[Constants.TWO_INDEX_CITY])
                     .anchor(0.5F, 1.0F)
                     .flat(true))
+            builder.include(LatLng(user.cityTwoLatLng.latitude, user.cityTwoLatLng.longitude));
+
         }
         googleMap?.addMarker(MarkerOptions()
                 .icon(blueMarker)
@@ -448,18 +429,26 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
                 .title(markerTitleStart)
                 .anchor(0.5F, 1.0F)
                 .flat(true))
+        builder.include(markerPositionStart)
 
-        googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(markerPositionFinal, 6.0f))
         googleMap?.addMarker(MarkerOptions()
                 .icon(blueMarker)
                 .position(markerPositionFinal)
                 .title(markerTitleFinal)
                 .anchor(0.5F, 1.0F)
                 .flat(true))
-
-        val perfectZoom = 190 / coordFrom.getBearing(coordTo)
-
-        googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(midPointLat, midPointLong), perfectZoom))
+        builder.include(markerPositionFinal)
+        val bounds = builder.build();
+        val padding = resources.getDimensionPixelSize(R.dimen.latLngBoundsPadding);
+        val cu = CameraUpdateFactory.newLatLngBounds(bounds, padding)
+        if (mapView?.viewTreeObserver?.isAlive == true) {
+            mapView?.viewTreeObserver?.addOnGlobalLayoutListener({
+                if (markerPositionStart != LatLng(0.0, 0.0)) {
+                    googleMap?.animateCamera(cu)
+                } else
+                    googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(markerPositionFinal, 2.0f))
+            })
+        }
     }
 
     private fun drawPolyline(routeString: String) {
@@ -467,13 +456,13 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
         val options = PolylineOptions()
         options.color(blueColor)
         options.width(5f)
-        if (routeString != "") options.addAll(PolyUtil.decode(routeString))
+        if (routeString.isNotBlank()) options.addAll(PolyUtil.decode(routeString))
         googleMap?.addPolyline(options)
     }
 
     private fun intentMessageTelegram(id: String?) {
         try {
-            if (id?.isNumberPhone() == false) {
+            if (id?.isNumberPhone() == false && id?.startsWith("@") == true) {
                 startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/${id.replace("@", "")}")))
                 mFirebaseAnalytics.logEvent(TAG_ANALYTICS + "OPEN_TG", null)
             } else {
@@ -511,9 +500,10 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
     }
 }// Required empty public constructor
 
-private fun String.isNumberPhone(): Boolean {
-    return this.matches(Regex("^([0-9]|\\+[0-9]){11,13}\$")) ||
-            this.startsWith("+7") && !this.startsWith("@")
+fun String.isNumberPhone(): Boolean {
+    return this.matches(Regex("^([0-9]|\\+[0-9]){11,13}\$"))
+    //this.startsWith("+7")
+
 }
 
 

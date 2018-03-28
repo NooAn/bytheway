@@ -2,17 +2,13 @@ package ru.a1024bits.bytheway.viewmodel
 
 import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModel
 import android.util.Log
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
-import ru.a1024bits.bytheway.model.Response
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.COLLECTION_USERS
 import ru.a1024bits.bytheway.repository.UserRepository
@@ -22,20 +18,20 @@ import javax.inject.Inject
 /**
  * Created by Bit on 1/4/2018.
  */
-class RegistrationViewModel @Inject constructor(var userRepository: UserRepository) : ViewModel(), LifecycleObserver {
+class RegistrationViewModel @Inject constructor(var userRepository: UserRepository) : BaseViewModel(), LifecycleObserver {
     val load: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
-
     fun setTimestamp(uid: String) {
-        userRepository.sendTime(uid)
-                .subscribeOn(Schedulers.io())
+        disposables.add(userRepository.sendTime(uid)
+                .subscribeOn(getBackgroundScheduler())
                 .timeout(10, TimeUnit.SECONDS)
                 .retry(2)
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(getMainThreadScheduler())
                 .subscribe(
                         { Log.e("LOG", "complete") },
                         { throwable ->
                             Log.e("LOG", "Error", throwable)
-                        })
+                            FirebaseCrash.report(throwable)
+                        }))
     }
 
     fun ifUserNotExistThenSave(currentUser: FirebaseUser?) {

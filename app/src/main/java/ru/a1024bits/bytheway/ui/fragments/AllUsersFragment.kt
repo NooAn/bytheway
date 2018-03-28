@@ -24,7 +24,6 @@ import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialo
 import com.codetroopers.betterpickers.calendardatepicker.MonthAdapter
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crash.FirebaseCrash
-import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.fragment_display_all_users.*
 import kotlinx.android.synthetic.main.searching_parameters_block.*
 import ru.a1024bits.bytheway.App
@@ -36,7 +35,6 @@ import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.repository.M_SEX
 import ru.a1024bits.bytheway.repository.W_SEX
-import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.a1024bits.bytheway.util.DateUtils
 import ru.a1024bits.bytheway.util.DecimalInputFilter
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
@@ -48,14 +46,16 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
     companion object {
         const val SIZE_INITIAL_ELEMENTS = 2
         const val TAG_ANALYTICS = "AllUsersFragment_"
-        fun newInstance(): AllUsersFragment = AllUsersFragment()
+        fun newInstance(): AllUsersFragment {
+            Log.e("LOG", "AllUsersFragment install")
+            return AllUsersFragment()
+        }
     }
 
     private lateinit var filter: Filter
     private lateinit var displayUsersAdapter: DisplayAllUsersAdapter
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
-    private var sortString: String = ""
     private var countInitialElements = 0
     private lateinit var analytics: FirebaseAnalytics
     private lateinit var dateDialog: CalendarDatePickerDialogFragment
@@ -74,42 +74,49 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
         }
     }
 
+    private fun loadingObserver(): Observer<Boolean?> = Observer { loading ->
+        loadingWhereLoadUsers.visibility = if (loading == true) View.VISIBLE else View.GONE
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
         analytics = FirebaseAnalytics.getInstance(this.context)
+        Log.e("LOG", "AllUsersFragment onCreate")
+
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         App.component.inject(this)
         super.onActivityCreated(savedInstanceState)
         analytics.setCurrentScreen(this.activity, "AllUsersFragment", this.javaClass.simpleName)
-
         try {
             viewModel?.let {
                 filter = it.filter
             }
-
+            Log.e("LOG", "AllUsersFragment")
             displayUsersAdapter = DisplayAllUsersAdapter(this.context, viewModel ?: return)
             installLogicToUI()
             displayAllUsers.adapter = displayUsersAdapter
 
-            viewModel?.response?.observe(this, usersObservers)
-            viewModel?.loadingStatus?.observe(this, Observer<Boolean?> { t ->
-                if (t == true)
-                    loadingWhereLoadUsers.visibility = View.VISIBLE
-                else
-                    loadingWhereLoadUsers.visibility = View.GONE
-            })
-            viewModel?.getAllUsers(filter, sortString)
+            if (viewModel?.response?.hasObservers() == false)
+                viewModel?.response?.observe(this, usersObservers)
+
+            if (viewModel?.loadingStatus?.hasObservers() == false)
+                viewModel?.loadingStatus?.observe(this, loadingObserver())
+
+            viewModel?.getAllUsers(filter)
 
             showPrompt("isFirstEnterAllUsersFragment", context.resources.getString(R.string.close_hint),
                     context.resources.getString(R.string.hint_all_travelers), context.resources.getString(R.string.hint_all_travelers_description), searchParametersText)
         } catch (e: Throwable) {
             Log.e("LOG_AUF", e.toString())
             FirebaseCrash.report(e)
+            loadingWhereLoadUsers.visibility = View.GONE
+           // showErrorLoading()
         }
     }
+
 
     override fun onStart() {
         super.onStart()
@@ -130,12 +137,10 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
 
     override fun onResume() {
         super.onResume()
-
     }
 
     override fun onPause() {
         super.onPause()
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -225,7 +230,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
         }
         choseDateEnd.setOnTouchListener(DateUtils.onDateTouch)
         view_contain_block_parameters.layoutTransition.setDuration(700L)
-        saveParameters.setOnClickListener {
+        searchButtonParameters.setOnClickListener {
             analytics.logEvent(TAG_ANALYTICS + "CLICK_ON_SEARCH", null)
 
             try {
@@ -235,7 +240,6 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
                 e.printStackTrace()
                 filter.endBudget = -1
                 filter.startBudget = 0
-
             }
 
             filter.startCity = startCity.text.toString()
@@ -247,17 +251,13 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
         }
 
         cancelParameters.setOnClickListener {
+            if (filter == Filter()) {
+                block_search_parameters.visibility = View.GONE
+                return@setOnClickListener
+            }
             analytics.logEvent(TAG_ANALYTICS + "CLICK_ON_CANCEL", null)
 
-            filter.sex = 0
-            filter.startAge = -1
-            filter.endAge = viewModel?.yearsOldUsers?.size?.minus(1) ?: -1
-            filter.startCity = ""
-            filter.endCity = ""
-            filter.startBudget = -1
-            filter.endBudget = -1
-            filter.startDate = 0L
-            filter.endDate = 0L
+            filter = Filter()
 
             startAge.setSelection(filter.startAge)
             endAge.setSelection(filter.endAge)
@@ -356,7 +356,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             override fun endTransition(p0: LayoutTransition?, p1: ViewGroup?, view: View, p3: Int) {
                 if ((view.id == block_search_parameters.id) && (block_search_parameters.visibility == View.GONE)) {
                     updateViewsBeforeSearch()
-                    viewModel?.getAllUsers(filter, sortString)
+                    viewModel?.getAllUsers(filter)
                     view_contain_block_parameters.layoutTransition.removeTransitionListener(this)
                 }
             }

@@ -3,8 +3,10 @@ package ru.a1024bits.bytheway.viewmodel
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.QuerySnapshot
 import io.reactivex.Single
+import ru.a1024bits.bytheway.algorithm.SearchTravelers
 import ru.a1024bits.bytheway.model.FireBaseNotification
 import ru.a1024bits.bytheway.model.Response
 import ru.a1024bits.bytheway.model.User
@@ -18,6 +20,7 @@ import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.START_DATE
 import java.util.*
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 /**
  * Created by andrey.gusenkov on 25/09/2017.
@@ -29,37 +32,50 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
     override var filter = Filter()
 
     companion object {
-        const val TAG = "showUserViewModel"
+        const val TAG = "LOG UserRepository"
+        const val MIN_LIMIT = 1
     }
 
-    fun getAllUsers(f: Filter, sortString: String) {
-        this.filter = f
-        userRepository?.installAllUsers(this, sortString)
+    fun getAllUsers(f: Filter?) {
+        try {
+            this.filter = f ?: filter
+            if (users.size != 0 && filter.isNotDefault()) {
+                response.value = Response.success(users)
+            } else
+                userRepository?.installAllUsers(this)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            FirebaseCrash.report(e)
+            loadingStatus.postValue(false)
+        }
     }
 
-    override fun filterAndInstallUsers(sortString: String, vararg snapshots: QuerySnapshot) {
+    val TWO_MONTHS_IN_MLSECONDS: Long = 5270400000
+
+    override fun filterAndInstallUsers(vararg snapshots: QuerySnapshot) {
         Single.create<MutableList<User>> { stream ->
             try {
-                Log.e("LOG get filter users", Thread.currentThread().name)
-                var result: MutableList<User> = ArrayList()
+                val result: MutableList<User> = ArrayList()
                 snapshots.map {
                     for (document in it) {
                         try {
+                            //FIXME надо попытаться вынести это в условие запроса для сервера.
                             val user = document.toObject(User::class.java)
-                            if (user.cities.size > 0 && user.id != FirebaseAuth.getInstance().currentUser?.uid) {
-                                result.add(user)
+                            if (user.cities.size > 0
+                                    && user.id != FirebaseAuth.getInstance().currentUser?.uid) {
+                                if (!(user.dates[START_DATE] ?: 0L <= System.currentTimeMillis() - TWO_MONTHS_IN_MLSECONDS && (user.dates[END_DATE] == null || user.dates[END_DATE] ?: 0 != 0L)))
+                                    result.add(user)
                             }
                         } catch (e: Exception) {
+                            e.printStackTrace()
+                            FirebaseCrash.report(e)
                         }
                     }
                 }
-               // if (sortString.isNotEmpty()) result = filterUsersByString(sortString, result)
-                /*todo if filter by string XOR filter? then add: else*/
-                filterUsersByFilter(result, filter)
-              //  result.sortBy { it.dates[START_DATE] }
+                filterUsersByOptions(result, filter)
                 stream.onSuccess(result)
             } catch (exp: Exception) {
-                stream.onError(exp) // for fix bugs FirebaseFirestoreException: DEADLINE_EXCEEDED
+                stream.onError(exp)
             }
         }
                 .subscribeOn(getBackgroundScheduler())
@@ -68,11 +84,14 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
                 .doOnSubscribe({ loadingStatus.postValue(true) })
                 .doAfterTerminate({ loadingStatus.postValue(false) })
                 .subscribe({ resultUsers ->
-                    Log.e("LOG subscribe", Thread.currentThread().name)
+                    if (users.size == 0)
+                        users.addAll(resultUsers)
                     response.postValue(Response.success(resultUsers))
                 },
                         { throwable -> response.postValue(Response.error(throwable)) })
     }
+
+    var users: ArrayList<User> = ArrayList<User>()
 
     override fun onFailure(e: Throwable) {
         response.postValue(Response.error(e))
@@ -95,17 +114,36 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
         }
     }
 
-    fun getUsersWithSimilarTravel(paramSearch: Filter) {
+
+    fun getSearchUsers(paramSearch: Filter) {
         userRepository?.let {
             loadingStatus.value = true
-            disposables.add(it.getReallUsers(paramSearch)
+            disposables.add(it.getRealUsers()
+                    .subscribeOn(getBackgroundScheduler())
                     .timeout(TIMEOUT_SECONDS, timeoutUnit)
                     .retry(2)
-                    .subscribeOn(getBackgroundScheduler())
+                    .doOnNext { Log.e("LOG 1", Thread.currentThread().name) }
+                    .cache()
+                    .filter { user -> user.cities.size > 0 }
+                    .map { user ->
+                        // run search algorithm.
+                        Log.e("LOG", "users")
+                        val search = SearchTravelers(filter = paramSearch, user = user)
+                        user.percentsSimilarTravel = search.getEstimation()
+                        user
+                    }
+                    .filter { user ->
+                        user.percentsSimilarTravel > MIN_LIMIT && user.id != FirebaseAuth.getInstance().currentUser?.uid
+                    }
+                    .toSortedList(compareByDescending { l -> l.percentsSimilarTravel }) // перед отправкой сортируем по степени похожести маршрута.
                     .observeOn(getMainThreadScheduler())
+                    .doOnSuccess { Log.e("LOG 2", Thread.currentThread().name) }
                     .doAfterTerminate({ loadingStatus.setValue(false) })
                     .subscribe(
-                            { list -> response.setValue(Response.success(list)) },
+                            { list ->
+                                Log.e("LOG", "users2")
+                                response.setValue(Response.success(list))
+                            },
                             { throwable -> response.setValue(Response.error(throwable)) }
                     )
             )
@@ -161,8 +199,7 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
                 .toString()
     }
 
-    fun filterUsersByFilter(resultUsers: MutableList<User>, filter: Filter) {
-        Log.e("LOG filter", Thread.currentThread().name)
+    fun filterUsersByOptions(resultUsers: MutableList<User>, filter: Filter) {
         resultUsers.retainAll {
             var found = (!((filter.startBudget >= 0) && (filter.endBudget > 0)) ||
                     (it.budget >= filter.startBudget && it.budget <= filter.endBudget)) &&
@@ -185,6 +222,7 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
     }
 
     fun sendNotifications(ids: String, notification: FireBaseNotification) {
+        FirebaseCrash.log("send Notification")
         userRepository?.let {
             disposables.add(it.sendNotifications(ids, notification)
                     .timeout(TIMEOUT_SECONDS, timeoutUnit)
@@ -193,6 +231,7 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
                     .subscribe(
                             { Log.e("LOG", "notify complete") },
                             { t ->
+                                FirebaseCrash.report(t)
                                 Log.e("LOG view model", "notify", t)
                             }
                     )
@@ -202,8 +241,10 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
     }
 }
 
+private fun Filter.isNotDefault(): Boolean = (this == Filter())
+
 interface FilterAndInstallListener {
     var filter: Filter
-    fun filterAndInstallUsers(sortString: String, vararg snapshots: QuerySnapshot)
+    fun filterAndInstallUsers(vararg snapshots: QuerySnapshot)
     fun onFailure(e: Throwable)
 }

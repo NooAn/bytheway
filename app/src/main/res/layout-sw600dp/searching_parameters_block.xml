@@ -246,7 +246,7 @@
             android:theme="@style/UsersTextInFilters" />
 
         <Button
-            android:id="@+id/saveParameters"
+            android:id="@+id/searchButtonParameters"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
@@ -265,7 +265,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/budgetText"
-            android:layout_toStartOf="@id/saveParameters"
+            android:layout_toStartOf="@id/searchButtonParameters"
             android:stateListAnimator="@null"
             android:text="@string/cancel"
             android:textSize="17sp"

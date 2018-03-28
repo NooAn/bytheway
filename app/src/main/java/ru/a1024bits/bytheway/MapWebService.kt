@@ -3,7 +3,10 @@ package ru.a1024bits.bytheway
 import io.reactivex.Completable
 import io.reactivex.Single
 import retrofit2.Call
-import retrofit2.http.*
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.QueryMap
 import ru.a1024bits.bytheway.model.map_directions.RoutesList
 
 /**

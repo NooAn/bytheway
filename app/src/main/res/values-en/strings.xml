@@ -69,7 +69,7 @@
 
     <string name="text_away_from_profile">Save changed data?</string>
 
-    <string name="fill_required_fields">Fill mandatory fields please:</string>
+    <string name="fill_required_fields">Fill mandatory fields please: </string>
 
     <string name="fill_phone_invalid">Incorrect phone format</string>
 
@@ -110,7 +110,6 @@
     <string name="hint_all_travelers_description">If you want to connect to other trips, you can use this screen. Filter will help you :)</string>
 
     <string name="close_hint">NEXT</string>
-
 
 
     <string-array name="months_array">
@@ -241,15 +240,15 @@
 
     <string name="finish">Finish</string>
 
-    <string name="to_date">по</string>
+    <string name="to_date">to</string>
 
-    <string name="from_in">c</string>
+    <string name="from_in">from</string>
     <string name="attention">Attention</string>
     <string name="city_in_the_world">World citizen. </string>
     <string name="alternate_entry">Check internet, please. You can try to enter with sms</string>
     <string name="connect">Connect</string>
 
-    <string name="error_upload_image">Error upload</string>
+    <string name="error_upload">Error upload</string>
     <string name="phone">Phone</string>
 
     <string name="error_link_open">We were unable to open the link. It may be incorrect.</string>
@@ -263,5 +262,17 @@
     <string name="countries">countries</string>
     <string name="plainhours">in flight</string>
     <string name="km">km</string>
+    <string name="immortal">Immortal</string>
+    <string name="very_long">Really long time ago</string>
+    <string name="email_send">Sending letter. Select email client</string>
+    <string name="without_name">Traveler</string>
+    <string name="social_text_vk">Добавьте свой аккаунт VK, чтобы с Вами смогли связаться другие путешественники</string>
+    <string name="social_title_vk">Vkontakte</string>
+    <string name="social_title_wp">WhatsApp</string>
+    <string name="social_text_wp">Добавьте свой номер телефона, чтобы с Вами смогли связаться другие путешественники</string>
+    <string name="sinch_vk">Синхронизация с помощью приложение</string>
+    <string name="share_friends">Рассказать друзьям</string>
+    <string name="social_title_tg">Telegram</string>
+    <string name="social_text_tg">Добавьте свой аккаунт Telegram, чтобы с Вами смогли связаться другие путешественники</string>
 
 </resources>

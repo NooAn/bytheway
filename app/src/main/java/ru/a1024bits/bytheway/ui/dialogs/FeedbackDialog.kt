@@ -5,14 +5,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.TextInputEditText
-import android.view.View
 import android.view.Window
 import android.widget.Button
-import android.widget.TextView
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.f2_feedback_dialog.*
 import ru.a1024bits.bytheway.R
-import ru.a1024bits.bytheway.App
 
 
 /**

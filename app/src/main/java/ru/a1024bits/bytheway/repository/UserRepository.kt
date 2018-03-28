@@ -12,19 +12,16 @@ import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageException
 import io.reactivex.Completable
+import io.reactivex.Observable
 import io.reactivex.Single
 import ru.a1024bits.bytheway.MapWebService
-import ru.a1024bits.bytheway.algorithm.SearchTravelers
+import ru.a1024bits.bytheway.model.FireBaseNotification
 import ru.a1024bits.bytheway.model.User
+import ru.a1024bits.bytheway.model.map_directions.RoutesList
+import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.util.toJsonString
 import ru.a1024bits.bytheway.viewmodel.FilterAndInstallListener
 import javax.inject.Inject
-import kotlin.collections.HashMap
-
-import com.google.firebase.iid.FirebaseInstanceId
-import ru.a1024bits.bytheway.model.FireBaseNotification
-import ru.a1024bits.bytheway.model.map_directions.RoutesList
-import ru.a1024bits.bytheway.util.Constants
 
 const val COLLECTION_USERS = "users"
 
@@ -33,15 +30,9 @@ const val COLLECTION_USERS = "users"
  */
 class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapService: MapWebService) : IUsersRepository {
 
-    companion object {
-        const val TAG = "LOG UserRepository"
-        const val MIN_LIMIT = 1
-    }
-
     override fun getUser(id: String): Single<User> =
             Single.create<User> { stream ->
                 try {
-                    Log.e("LOG get user R", Thread.currentThread().name)
                     store.collection(COLLECTION_USERS).document(id).get().addOnSuccessListener({ document ->
                         val user = document.toObject(User::class.java)
                         stream.onSuccess(user)
@@ -55,7 +46,6 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
 
     override fun uploadPhotoLink(path: Uri, id: String): Single<String> = Single.create { stream ->
         try {
-            Log.e("LOG uploadPhotoLink R", Thread.currentThread().name)
             // Create a storage reference from our app
             val storageRef = FirebaseStorage.getInstance().reference
             val riversRef = storageRef.child("images/" + id)
@@ -81,7 +71,8 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
         }
     }
 
-    override fun installAllUsers(listener: FilterAndInstallListener, sortString: String) {
+
+    override fun installAllUsers(listener: FilterAndInstallListener) {
         try {
             var lastTime = listener.filter.endDate
             if (listener.filter.endDate == 0L) {
@@ -99,14 +90,17 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                     return@EventListener
                 }
                 if (listener.filter.endDate != 0L) {
-                    listener.filterAndInstallUsers(sortString, snapshot)
+                    listener.filterAndInstallUsers(snapshot)
                     return@EventListener
                 }
                 store.collection(COLLECTION_USERS)
-                        .whereEqualTo("dates.end_date", 0).whereGreaterThan("cities.first_city", "")
-                        .get().addOnCompleteListener({ task ->
-                    listener.filterAndInstallUsers(sortString, snapshot, task.result)
-                }).addOnFailureListener({ e -> listener.onFailure(e) })
+                        .whereEqualTo("dates.end_date", 0)
+                        .whereGreaterThan("cities.first_city", "")
+                        .get()
+                        .addOnCompleteListener({ task ->
+                            listener.filterAndInstallUsers(snapshot, task.result)
+                        })
+                        .addOnFailureListener({ e -> listener.onFailure(e) })
             })
         } catch (e: Exception) {
             e.printStackTrace()
@@ -114,54 +108,32 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
         }
     }
 
-    override fun getReallUsers(paramSearch: Filter): Single<List<User>> =
-            Single.create<List<User>> { stream ->
-                try {
-                    store.collection(COLLECTION_USERS).whereGreaterThanOrEqualTo("dates.start_date", System.currentTimeMillis())
-                            .get().addOnCompleteListener({ task ->
-                        if (task.isSuccessful) {
-                            Log.e("LOG get real users R", Thread.currentThread().name)
-
-                            val result: MutableList<User> = ArrayList()
-                            for (document in task.result) {
-
-                                var user = User()
-
-                                try {
-                                    user = document.toObject(User::class.java)
-
-                                } catch (ex2: Exception) {
-                                    ex2.printStackTrace()
-                                    FirebaseCrash.report(ex2)
-                                }
-
-                                try {
-                                    if (user.cities.size > 0) {
-                                        // run search algorithm. Для оптимизации запускаем сразу.
-                                        val search = SearchTravelers(filter = paramSearch, user = user)
-
-                                        user.percentsSimilarTravel = search.getEstimation()
-                                        if (user.percentsSimilarTravel > MIN_LIMIT &&
-                                                user.id != FirebaseAuth.getInstance().currentUser?.uid) {
-                                            result.add(user)
-                                        }
-                                    }
-                                } catch (ex: Exception) {
-                                    stream.onError(ex)
-                                    FirebaseCrash.report(ex)
-                                }
-                            }
-                            result.sortByDescending { it.percentsSimilarTravel } // перед отправкой сортируем по степени похожести маршрута.
-                            stream.onSuccess(result)
-
-                        } else {
-                            stream.onError(Exception("Not Successful load users"))
+    override fun getRealUsers(): Observable<User> = Observable.create<User> { stream ->
+        try {
+            store.collection(COLLECTION_USERS).whereGreaterThanOrEqualTo("dates.start_date", System.currentTimeMillis())
+                    .get().addOnCompleteListener({ task ->
+                if (task.isSuccessful) {
+                    for (document in task.result) {
+                        var user: User
+                        try {
+                            user = document.toObject(User::class.java)
+                            stream.onNext(user)
+                        } catch (ex2: Exception) {
+                            ex2.printStackTrace()
+                            FirebaseCrash.report(ex2)
                         }
-                    })
-                } catch (exp: Exception) {
-                    stream.onError(exp) // for fix bugs FirebaseFirestoreException: DEADLINE_EXCEEDED
+                    }
+                } else {
+                    stream.onError(Exception("Not Successful load users"))
                 }
-            }
+                stream.onComplete()
+            })
+        } catch (exp: Exception) {
+            stream.onError(exp) // for fix bugs FirebaseFirestoreException: DEADLINE_EXCEEDED
+            stream.onComplete()
+        }
+    }
+
 
     override fun getUserById(userID: String): Task<DocumentSnapshot> {
         return store.collection(COLLECTION_USERS).document(userID).get()
@@ -183,13 +155,11 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                             documentRef.update(map)
                             return null
                         }
-                    }).addOnFailureListener {
-                        stream.onError(it)
-                    }.addOnSuccessListener { _ ->
-                                stream.onComplete()
-                            }
+                    }).addOnFailureListener { stream.onError(it) }
+                            .addOnSuccessListener { _ -> stream.onComplete() }
                 } catch (e: Exception) {
                     stream.onError(e)
+                    stream.onComplete()
                 }
             }
 
@@ -202,9 +172,8 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                 "sensor" to "false"))
     }
 
-    fun sendTime(id: String): Completable = Completable.create { stream ->
+    override fun sendTime(id: String): Completable = Completable.create { stream ->
         try {
-
             val documentRef = store.collection(COLLECTION_USERS).document(id)
             store.runTransaction {
                 val map = hashMapOf<String, Any>()
@@ -218,10 +187,11 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                     }
         } catch (e: Exception) {
             stream.onError(e)
+            stream.onComplete()
         }
     }
 
-    fun updateFcmToken(token: String?): Completable = Completable.create { stream ->
+    override fun updateFcmToken(token: String?): Completable = Completable.create { stream ->
         try {
             store.runTransaction({
                 val currentUid = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
@@ -236,10 +206,11 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
             }.addOnSuccessListener { stream.onComplete() }
         } catch (e: Exception) {
             stream.onError(e)
+            stream.onComplete()
         }
     }
 
-    fun sendNotifications(ids: String, notification: FireBaseNotification): Completable {
+    override fun sendNotifications(ids: String, notification: FireBaseNotification): Completable {
         return mapService.sendNotifications(hashMapOf(
                 "ids" to ids,
                 "title" to notification.title,

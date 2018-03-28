@@ -3,10 +3,8 @@ package ru.a1024bits.bytheway.viewmodel
 
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
-
 import javax.inject.Inject
 import javax.inject.Provider
-import javax.inject.Singleton
 
 /**
  * Created by andrey.gusenkov on 03/11/2017.

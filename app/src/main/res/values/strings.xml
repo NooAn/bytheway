@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">bytheway</string>
     <string name="button_send">Отправить</string>
+        <integer name="com_vk_sdk_AppId">6427726</integer>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="fullname">Andrey Petrov</string>
     <string name="type_money"> </string>
     <string name="money">Бюджет поездки</string>
@@ -127,7 +127,7 @@
     <string name="to_date">по</string>
     <string name="from_in">c</string>
     <string name="city_in_the_world">Человек мира</string>
-    <string name="error_upload_image">Ошибка загрузки</string>
+    <string name="error_upload">Ошибка загрузки</string>
     <string name="error_link_open">Мы не смогли открыть ссылку. Возможно она некорректная.</string>
     <string name="last_see">Последний раз был</string>
     <string name="sms_code">Код из sms</string>
@@ -142,4 +142,16 @@
     <string name="countries">стран</string>
     <string name="plainhours">в полете</string>
     <string name="km">км</string>
+    <string name="immortal">Бессмертный</string>
+    <string name="very_long">Очень давно</string>
+    <string name="email_send">Отправка письма. Выберите почтовый клиент</string>
+    <string name="without_name">Путешественник</string>
+    <string name="social_text_vk">Добавьте свой аккаунт VK, чтобы с Вами смогли связаться другие путешественники</string>
+    <string name="social_title_vk">Vkontakte</string>
+    <string name="social_title_wp">WhatsApp</string>
+    <string name="social_text_wp">Добавьте свой номер телефона, чтобы с Вами смогли связаться другие путешественники</string>
+    <string name="sinch_vk">Синхронизация с помощью приложение</string>
+    <string name="share_friends">Рассказать друзьям</string>
+    <string name="social_title_tg">Telegram</string>
+    <string name="social_text_tg">Добавьте свой аккаунт Telegram, чтобы с Вами смогли связаться другие путешественники</string>
 </resources>

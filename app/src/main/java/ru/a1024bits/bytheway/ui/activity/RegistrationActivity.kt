@@ -5,7 +5,6 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.net.ConnectivityManager
 import android.os.Bundle
@@ -72,16 +71,14 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
         mFirebaseAnalytics.setCurrentScreen(this, "Registration", this.javaClass.getSimpleName())
         mFirebaseAnalytics.logEvent("RegistrationScreen_Enter", null)
 
-        viewModel?.load?.observe(this, object : Observer<Boolean> {
-            override fun onChanged(upload: Boolean?) {
-                if (upload == true) {
-                    mFirebaseAnalytics.logEvent("RegistrationScreen_Success", null)
-                    startActivity(Intent(this@RegistrationActivity, MenuActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
-                } else {
-                    mFirebaseAnalytics.logEvent("RegistrationScreen_Error_Checkin", null)
-                    updateUI(false)
-                    Toast.makeText(this@RegistrationActivity, "Error for registration", Toast.LENGTH_SHORT).show()
-                }
+        viewModel?.load?.observe(this, Observer<Boolean> { upload ->
+            if (upload == true) {
+                mFirebaseAnalytics.logEvent("RegistrationScreen_Success", null)
+                startActivity(Intent(this@RegistrationActivity, MenuActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
+            } else {
+                mFirebaseAnalytics.logEvent("RegistrationScreen_Error_Checkin", null)
+                updateUI(false)
+                Toast.makeText(this@RegistrationActivity, "Error for registration", Toast.LENGTH_SHORT).show()
             }
         })
         if (!isNetworkAvailable()) {
@@ -99,13 +96,10 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
         val alertDialog = AlertDialog.Builder(this).create();
         alertDialog.setTitle("Info");
         alertDialog.setMessage(resources.getString(R.string.no_internet));
-        alertDialog.setButton(Dialog.BUTTON_POSITIVE, "OK", object : DialogInterface.OnClickListener {
-            override fun onClick(dialog: DialogInterface?, which: Int) {
-                signIn()
-                alertDialog.dismiss()
-            }
-
-        })
+        alertDialog.setButton(Dialog.BUTTON_POSITIVE, "OK") { _, _ ->
+            signIn()
+            alertDialog.dismiss()
+        }
         alertDialog.show();
     }
 
@@ -124,9 +118,8 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
         super.onStart()
     }
 
-    public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+    public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        Log.e("LOG", "result activity registration")
         try {
             if (requestCode == RC_SIGN_IN) {
                 val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
@@ -152,7 +145,6 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
             if (result.status.statusCode != 200) {
                 mFirebaseAnalytics.logEvent("RegistrationScreen_Error_Not200", null)
                 mFirebaseAnalytics.logEvent("RegistrationScreen_status_${result.status.statusCode}", null)
-                Log.d("LOG", "Problems with enternet ${result.status.statusCode} and ${result.status.toString()}")
             } else {
                 mFirebaseAnalytics.logEvent("RegistrationScreen_Error_NotKnow", null)
             }
@@ -161,7 +153,6 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
     }
 
     private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount) {
-
         val credential = GoogleAuthProvider.getCredential(acct.idToken, null)
         signInGoogle(credential)
     }
@@ -173,11 +164,9 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
                         if (task.isSuccessful) {
                             // Sign in success, update UI with the signed-in user's information
                             errorDialog?.dismissAllowingStateLoss()
-                            Log.d("LOG", "signInWithCredential:success")
                             updateUI(true)
                         } else {
                             // If sign in fails, display a message to the user.
-                            Log.w("LOG", "signInWithCredential:failure", task.exception)
                             Toast.makeText(this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show()
                             mFirebaseAnalytics.logEvent("RegistrationScreen_Error_Login", null)
@@ -185,7 +174,6 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
                         }
                     }
                     ?.addOnFailureListener {
-                        Log.w("LOG", "signInWithCredential:failure")
                         Toast.makeText(this, "Authentication failed.", Toast.LENGTH_SHORT).show()
                         mFirebaseAnalytics.logEvent("RegistrationScreen_Error_Login", null)
                         FirebaseCrash.report(it)
@@ -227,7 +215,7 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
     fun authPhone(phone: EditText) {
         PhoneAuthProvider.getInstance().verifyPhoneNumber(
                 phone.text.toString(),        // Phone number to verify
-                60,                 // Timeout duration
+                30,                 // Timeout duration
                 TimeUnit.SECONDS,   // Unit of timeout
                 this,               // Activity (for callback binding)
                 object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {

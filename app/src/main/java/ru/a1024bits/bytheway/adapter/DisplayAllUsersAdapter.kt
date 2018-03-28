@@ -12,16 +12,18 @@ import com.bumptech.glide.RequestManager
 import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.analytics.FirebaseAnalytics
 import ru.a1024bits.bytheway.R
+import ru.a1024bits.bytheway.model.URL_PHOTO
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.model.contains
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
+import ru.a1024bits.bytheway.util.Translit
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
 
 
 class DisplayAllUsersAdapter(val context: Context, val viewModel: DisplayUsersViewModel) : RecyclerView.Adapter<DisplayAllUsersAdapter.UserViewHolder>() {
     private var glide: RequestManager = Glide.with(this.context)
     var users: MutableList<User> = ArrayList()
-    val originalUser: ArrayList<User> = ArrayList()
+    private val originalUser: ArrayList<User> = ArrayList()
 
 
     fun setItems(users: List<User>?) {
@@ -35,7 +37,7 @@ class DisplayAllUsersAdapter(val context: Context, val viewModel: DisplayUsersVi
 
     override fun onBindViewHolder(holder: UserViewHolder?, position: Int) {
         val currentUser = users[position]
-        holder?.name?.text = currentUser.name
+        holder?.name?.text = if (currentUser.name.isBlank()) context.getString(R.string.without_name) else currentUser.name
         holder?.dates?.text = if (currentUser.dates["start_date"] != null && currentUser.dates["end_date"] != null)
             viewModel.getTextFromDates(currentUser.dates["start_date"], currentUser.dates["end_date"], context.resources.getStringArray(R.array.months_array))
         else ""
@@ -46,7 +48,7 @@ class DisplayAllUsersAdapter(val context: Context, val viewModel: DisplayUsersVi
             StringBuilder(currentUser.cities["first_city"]).append(" - ").append(currentUser.cities["last_city"])
         else
             context.getString(R.string.not_cities)
-        glide.load(currentUser.urlPhoto)
+        glide.load(if (currentUser.urlPhoto.isBlank()) URL_PHOTO else currentUser.urlPhoto)
                 ?.apply(RequestOptions.circleCropTransform())
                 ?.into(holder?.avatar)
     }
@@ -57,7 +59,8 @@ class DisplayAllUsersAdapter(val context: Context, val viewModel: DisplayUsersVi
         init {
             view.setOnClickListener({ _ ->
                 if (adapterPosition != RecyclerView.NO_POSITION && context is MenuActivity) {
-                    FirebaseAnalytics.getInstance(context.applicationContext).logEvent("AllUsersFragment_SELECT_USER_" + adapterPosition, null)
+                    if (adapterPosition <= 10)
+                        FirebaseAnalytics.getInstance(context.applicationContext).logEvent("AllUsersFragment_SELECT_USER_" + adapterPosition, null)
                     context.showUserSimpleProfile(users[adapterPosition])
                 }
             })
@@ -72,12 +75,11 @@ class DisplayAllUsersAdapter(val context: Context, val viewModel: DisplayUsersVi
 
     /**
      *  Поиск.
-     *  Ищем вхождения query в каждом элементе из списка, если такое есть,
+     *  Ищем вхождения query в каждом элементе из списка, если такое есть, учитываем транслит в одну сторону тоже.
      *  значит добавляем для нового отображения.
      *  Так формируем новый список для вывода.
      * @param query строка для поиска
      */
-    // todo add https://habrahabr.ru/post/265455/
     fun filterData(stringSearch: String) {
         val query = stringSearch.toLowerCase()
         users.clear()
@@ -85,11 +87,13 @@ class DisplayAllUsersAdapter(val context: Context, val viewModel: DisplayUsersVi
             users.addAll(originalUser)
         } else {
             originalUser
-                    .filter { it.contains(query) }
+                    .filter { it.contains(query) || it.contains(translation.cyr2lat(query)) }
                     .forEach { users.add(it) }
         }
         notifyDataSetChanged()
     }
+
+    val translation = Translit()
 }
 
 

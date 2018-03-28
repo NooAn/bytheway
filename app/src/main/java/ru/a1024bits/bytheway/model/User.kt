@@ -20,7 +20,7 @@ enum class SocialNetwork(var link: String) {
     FB("FB"),
     TG("TG")
 }
-
+const val URL_PHOTO = "https://www.ischool.berkeley.edu/sites/default/files/default_images/avatar.jpeg"
 class SocialResponse(var link: String = "", var value: String = "")
 
 class FireBaseNotification(var title: String = "",
@@ -61,7 +61,7 @@ data class User(var name: String = "",
                 var socialNetwork: HashMap<String, String> = hashMapOf<String, String>(),
                 var data: Long = 0,
                 var token: String = "",
-                var urlPhoto: String = "https://www.ischool.berkeley.edu/sites/default/files/default_images/avatar.jpeg",
+                var urlPhoto: String = URL_PHOTO ,
                 @ServerTimestamp var timestamp: Date? = Date())
 
 fun User.contains(query: String): Boolean =

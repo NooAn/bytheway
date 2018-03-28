@@ -2,4 +2,6 @@
 <resources>
     <string name="app_name">bythewayTest</string>
     <string name="title_activity_menu">bythewayAppTest</string>
+    <integer name="com_vk_sdk_AppId">6416394</integer>
+
 </resources>

@@ -1,10 +1,8 @@
 package ru.a1024bits.bytheway
 
 import android.app.Application
-import android.location.Location
-import android.util.Log
-import com.google.android.gms.maps.model.LatLng
 import com.squareup.leakcanary.LeakCanary
+import com.vk.sdk.VKSdk
 import ru.a1024bits.bytheway.dagger.*
 import ru.terrakok.cicerone.Cicerone
 import ru.terrakok.cicerone.NavigatorHolder
@@ -24,6 +22,7 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         INSTANCE = this
+        VKSdk.initialize(this);
         component = DaggerAppComponent.builder()
                 .appModule(AppModule(this))
                 .networkModule(NetworkModule())

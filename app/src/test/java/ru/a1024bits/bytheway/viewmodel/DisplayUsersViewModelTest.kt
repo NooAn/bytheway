@@ -40,7 +40,7 @@ class DisplayUsersViewModelTest {
         filter.startAge = filtrationValue.toInt() - 1
         filter.endAge = filtrationValue.toInt() + 1
         var usersForFilterFiltration = generateUsersForFiltration(countAllUsers, countSimilarUsers, AGE_PARAMETER, filtrationValue)
-        displayUsersViewModel.filterUsersByFilter(usersForFilterFiltration, filter)
+        displayUsersViewModel.filterUsersByOptions(usersForFilterFiltration, filter)
         Assert.assertEquals(usersForFilterFiltration.size, countSimilarUsers)
 
         filter = Filter()
@@ -48,35 +48,35 @@ class DisplayUsersViewModelTest {
         filter.startBudget = filtrationValue.toInt() - 1
         filter.endBudget = filtrationValue.toInt() + 1
         usersForFilterFiltration = generateUsersForFiltration(countAllUsers, countSimilarUsers, BUDGET_PARAMETER, filtrationValue)
-        displayUsersViewModel.filterUsersByFilter(usersForFilterFiltration, filter)
+        displayUsersViewModel.filterUsersByOptions(usersForFilterFiltration, filter)
         Assert.assertEquals(usersForFilterFiltration.size, countSimilarUsers)
 
         filter = Filter()
         filtrationValue = Calendar.getInstance().timeInMillis.toString()
         filter.endDate = filtrationValue.toLong() + 10
         usersForFilterFiltration = generateUsersForFiltration(countAllUsers, countSimilarUsers, END_DATE, filtrationValue)
-        displayUsersViewModel.filterUsersByFilter(usersForFilterFiltration, filter)
+        displayUsersViewModel.filterUsersByOptions(usersForFilterFiltration, filter)
         Assert.assertEquals(usersForFilterFiltration.size, countSimilarUsers)
 
         filter = Filter()
         filtrationValue = Calendar.getInstance().timeInMillis.toString()
         filter.startDate = filtrationValue.toLong() - 10
         usersForFilterFiltration = generateUsersForFiltration(countAllUsers, countSimilarUsers, START_DATE, filtrationValue)
-        displayUsersViewModel.filterUsersByFilter(usersForFilterFiltration, filter)
+        displayUsersViewModel.filterUsersByOptions(usersForFilterFiltration, filter)
         Assert.assertEquals(usersForFilterFiltration.size, countSimilarUsers)
 
         filter = Filter()
         filtrationValue = "CityOne"
         filter.startCity = filtrationValue
         usersForFilterFiltration = generateUsersForFiltration(countAllUsers, countSimilarUsers, FIRST_INDEX_CITY, filtrationValue)
-        displayUsersViewModel.filterUsersByFilter(usersForFilterFiltration, filter)
+        displayUsersViewModel.filterUsersByOptions(usersForFilterFiltration, filter)
         Assert.assertEquals(usersForFilterFiltration.size, countSimilarUsers)
 
         filter = Filter()
         filtrationValue = "CityTwo"
         filter.endCity = filtrationValue
         usersForFilterFiltration = generateUsersForFiltration(countAllUsers, countSimilarUsers, LAST_INDEX_CITY, filtrationValue)
-        displayUsersViewModel.filterUsersByFilter(usersForFilterFiltration, filter)
+        displayUsersViewModel.filterUsersByOptions(usersForFilterFiltration, filter)
         Assert.assertEquals(usersForFilterFiltration.size, countSimilarUsers)
     }
 

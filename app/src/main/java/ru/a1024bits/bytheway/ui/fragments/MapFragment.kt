@@ -14,7 +14,6 @@ import android.support.v4.util.ArrayMap
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import ru.a1024bits.bytheway.util.toJsonString
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.Toast
@@ -47,6 +46,7 @@ import ru.a1024bits.bytheway.ui.dialogs.TravelSearchSaveDialog
 import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment.Companion.BUDGET
 import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment.Companion.CITY_FROM
 import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment.Companion.CITY_TO
+import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment.Companion.CITY_TWO
 import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.util.Constants.END_DATE
 import ru.a1024bits.bytheway.util.Constants.FCM_CMD_SHOW_USER
@@ -55,6 +55,7 @@ import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.START_DATE
 import ru.a1024bits.bytheway.util.createMarker
 import ru.a1024bits.bytheway.util.toGeoPoint
+import ru.a1024bits.bytheway.util.toJsonString
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
 import ru.terrakok.cicerone.commands.Forward
 import java.util.*
@@ -107,10 +108,6 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
             fragment.user = user ?: User()
             return fragment
         }
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -186,34 +183,28 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
 
         when (response?.status) {
             Status.SUCCESS -> {
-                if (response.data == null && activity != null) {
-                    showErrorLoading()
-                } else {
-
-                    val notifyIdsForUsers = arrayListOf<String>()
-                    val saveNotifiedIds = (activity as MenuActivity).getNotified()
-                    response.data?.map {
-                        if (it.percentsSimilarTravel >= Constants.FCM_MATCH_PERCENT && !saveNotifiedIds.contains(it.id)) {
-                            notifyIdsForUsers.add(it.id)
-                            saveNotifiedIds.add(it.id)
-                        }
+                val notifyIdsForUsers = arrayListOf<String>()
+                val saveNotifiedIds = (activity as MenuActivity).getNotified()
+                response.data?.map {
+                    if (it.percentsSimilarTravel >= Constants.FCM_MATCH_PERCENT && !saveNotifiedIds.contains(it.id)) {
+                        notifyIdsForUsers.add(it.id)
+                        saveNotifiedIds.add(it.id)
                     }
-                    if (notifyIdsForUsers.size > 0) {
-                        if (BuildConfig.DEBUG)
-                            notifyIdsForUsers.add(FirebaseAuth.getInstance().currentUser?.uid!!)
-                        viewModel?.sendNotifications(notifyIdsForUsers.joinToString(","), FireBaseNotification(
-                                getString(R.string.app_name),
-                                getString(R.string.traveller) + "  ${user.name} " + getString(R.string.notification_user_searching),
-                                FCM_CMD_SHOW_USER,
-                                FirebaseAuth.getInstance().currentUser?.uid
-                        ))
-                        (activity as MenuActivity).updateNotified(saveNotifiedIds)
-                    }
+                }
+                if (notifyIdsForUsers.size > 0) {
+                    if (BuildConfig.DEBUG)
+                        notifyIdsForUsers.add(FirebaseAuth.getInstance().currentUser?.uid!!)
+                    viewModel?.sendNotifications(notifyIdsForUsers.joinToString(","), FireBaseNotification(
+                            getString(R.string.app_name),
+                            getString(R.string.traveller) + "  ${user.name} " + getString(R.string.notification_user_searching),
+                            FCM_CMD_SHOW_USER,
+                            FirebaseAuth.getInstance().currentUser?.uid
+                    ))
+                    (activity as MenuActivity).updateNotified(saveNotifiedIds)
                 }
 
                 (activity as MenuActivity).navigator.applyCommand(Forward(Screens.SIMILAR_TRAVELS_SCREEN, response.data))
             }
-
 
             Status.ERROR -> {
                 Log.e("LOG", "log e:" + response.error)
@@ -223,7 +214,7 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
     }
 
     private fun showErrorLoading() {
-        Toast.makeText(activity, R.string.just_error, Toast.LENGTH_SHORT).show()
+        Toast.makeText(activity ?: return, R.string.just_error, Toast.LENGTH_SHORT).show()
     }
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
@@ -277,6 +268,7 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
             if (error != 0 && points.size < 2) {
                 Toast.makeText(this@MapFragment.context, getString(error), Toast.LENGTH_SHORT).show()
             } else {
+                appBarLayout.setExpanded(true)
                 goFlyPlan()
             }
         }
@@ -298,6 +290,8 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
 
         } catch (e: Exception) {
             e.printStackTrace()
+            FirebaseCrash.log("save data user's")
+            FirebaseCrash.report(e)
         }
     }
 
@@ -320,6 +314,7 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
         hashMap[COUNT_TRIP] = 1
         hashMap[BUDGET] = getCurrentBudget()
         hashMap[CITY_FROM] = searchFragment?.filter?.locationStartCity.toGeoPoint()
+        hashMap[CITY_TWO] = GeoPoint(0.0, 0.0)
         hashMap[CITY_TO] = searchFragment?.filter?.locationEndCity.toGeoPoint()
         hashMap[DATES] = getDatesMap()
         return hashMap
@@ -448,8 +443,7 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
                     LatLngInterpolator.CurveBezie(),
                     onAnimationEnd = {
                         viewModel?.response?.observe(this@MapFragment, listUsers)
-                        viewModel?.getUsersWithSimilarTravel(searchFragment?.filter
-                                ?: Filter())
+                        viewModel?.getSearchUsers(searchFragment?.filter ?: Filter())
                         listPointPath.clear()
                         markerAnimation.flag = false
                     })
@@ -470,17 +464,12 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
                     .commitAllowingStateLoss()
     }
 
-    private
-    val PATTERN_GAP_LENGTH_PX = 20F
-    private
-    val DOT = Dot()
-    private
-    val GAP = Gap(PATTERN_GAP_LENGTH_PX)
+    private val PATTERN_GAP_LENGTH_PX = 20F
+    private val DOT = Dot()
+    private val GAP = Gap(PATTERN_GAP_LENGTH_PX)
 
-    private
-    val PATTERN_POLYGON_ALPHA = Arrays.asList(GAP, DOT)
-    private
-    val COLOR_BLUE_ARGB = -0x657db
+    private val PATTERN_POLYGON_ALPHA = Arrays.asList(GAP, DOT)
+    private val COLOR_BLUE_ARGB = -0x657db
 
     // Draw polyline on map
     private fun drawPolyLineOnMap(list: List<LatLng>) {
@@ -543,6 +532,9 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
                 "destination" to points.valueAt(1).position.toJsonString(),
                 "sensor" to "false")).enqueue(object : Callback<RoutesList?> {
             override fun onResponse(call: Call<RoutesList?>?, response: Response<RoutesList?>?) {
+                if (response?.body()?.routes?.size == 0)
+                    this@MapFragment.routeString = ""
+
                 response?.body()?.routes?.map {
                     it.overviewPolyline?.encodedData?.let { routeString ->
                         this@MapFragment.routeString = routeString

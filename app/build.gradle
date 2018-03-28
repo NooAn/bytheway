@@ -34,8 +34,8 @@ android {
     productFlavors {
 
         bytheway {
-            versionCode 19
-            versionName "2.0.0"
+            versionCode 21
+            versionName "2.1.1"
             dimension "default"
         }
     }
@@ -72,6 +72,8 @@ dependencies {
     implementation('com.google.firebase:firebase-auth:11.8.0', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
+
+    implementation 'com.vk:androidsdk:1.6.9'
     implementation 'com.google.firebase:firebase-firestore:11.8.0'
     implementation 'com.google.firebase:firebase-perf:11.8.0'
     implementation 'com.google.firebase:firebase-crash:11.8.0'
@@ -79,10 +81,10 @@ dependencies {
     implementation 'com.google.firebase:firebase-storage:11.8.0'
 
 
-    implementation 'com.android.support:design:27.0.2'
-    implementation 'com.android.support:support-v4:27.0.2'
-    implementation 'com.android.support:appcompat-v7:27.0.2'
-    implementation 'com.android.support:support-annotations:27.0.0'
+    implementation 'com.android.support:design:27.1.0'
+    implementation 'com.android.support:support-v4:27.1.0'
+    implementation 'com.android.support:appcompat-v7:27.1.0'
+    implementation 'com.android.support:support-annotations:27.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation 'com.google.maps.android:android-maps-utils:0.5'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'

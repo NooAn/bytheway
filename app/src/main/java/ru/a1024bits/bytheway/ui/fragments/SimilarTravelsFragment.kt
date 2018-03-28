@@ -7,13 +7,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.fragment_display_similar_user_travels.*
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.adapter.SimilarTravelsAdapter
 import ru.a1024bits.bytheway.model.User
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 
 class SimilarTravelsFragment : Fragment() {
     var listUser: List<User>? = null
@@ -48,6 +48,9 @@ class SimilarTravelsFragment : Fragment() {
         view?.let {
             it.findViewById<RecyclerView>(R.id.display_similar_user_travels).adapter = SimilarTravelsAdapter(this.context, listUser
                     ?: arrayListOf())
+            if (listUser?.size == 0 ) {
+                block_empty_users.visibility = View.VISIBLE
+            }
         }
     }
 

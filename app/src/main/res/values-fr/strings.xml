@@ -194,7 +194,7 @@
     <string name="to_date">по</string>
     <string name="from_in">c</string>
     <string name="city_in_the_world">Citoyen du monde</string>
-    <string name="error_upload_image">Erreur de chargement</string>
+    <string name="error_upload">Erreur de chargement</string>
     <string name="traveller">Voyageur</string>
     <string name="error_link_open">Nous sommes incapable d\'ouvrir le lien. Il y a peut etre quelques de faux.</string>
     <string name="last_see">etait en ligne :</string>
@@ -202,4 +202,16 @@
     <string name="countries">des pays</string>
     <string name="plainhours">en vol</string>
     <string name="km">km</string>
+    <string name="immortal">Immortel</string>
+    <string name="very_long">Really long time ago</string>
+    <string name="email_send">Sending letter. Select email client</string>
+    <string name="without_name">Traveler</string>
+    <string name="social_text_vk">Добавьте свой аккаунт VK, чтобы с Вами смогли связаться другие путешественники</string>
+    <string name="social_title_vk">Vkontakte</string>
+    <string name="social_title_wp">WhatsApp</string>
+    <string name="social_text_wp">Добавьте свой номер телефона, чтобы с Вами смогли связаться другие путешественники</string>
+    <string name="sinch_vk">Синхронизация с помощью приложение</string>
+    <string name="share_friends">Рассказать друзьям</string>
+    <string name="social_title_tg">Telegram</string>
+    <string name="social_text_tg">Добавьте свой аккаунт Telegram, чтобы с Вами смогли связаться другие путешественники</string>
 </resources>
