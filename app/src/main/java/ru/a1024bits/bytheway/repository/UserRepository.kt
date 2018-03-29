@@ -61,7 +61,6 @@ class UserRepository (private val store: FirebaseFirestore, var mapService: MapW
                 try {
                     val errorCode = (it as StorageException).errorCode
                     val errorMessage = it.message
-                    Log.e("LOG", "file fail $errorMessage and $errorCode", it)
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
