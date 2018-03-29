@@ -60,11 +60,13 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
                     for (document in it) {
                         try {
                             //FIXME надо попытаться вынести это в условие запроса для сервера.
-                            val user = document.toObject(User::class.java)
-                            if (user.cities.size > 0
-                                    && user.id != FirebaseAuth.getInstance().currentUser?.uid) {
-                                if (!(user.dates[START_DATE] ?: 0L <= System.currentTimeMillis() - TWO_MONTHS_IN_MLSECONDS && (user.dates[END_DATE] == null || user.dates[END_DATE] ?: 0 != 0L)))
-                                    result.add(user)
+                            if (document.exists()) {
+                                val user = document.toObject(User::class.java)
+                                if (user.cities.size > 0
+                                        && user.id != FirebaseAuth.getInstance().currentUser?.uid) {
+                                    if (!(user.dates[START_DATE] ?: 0L <= System.currentTimeMillis() - TWO_MONTHS_IN_MLSECONDS && (user.dates[END_DATE] == null || user.dates[END_DATE] ?: 0 != 0L)))
+                                        result.add(user)
+                                }
                             }
                         } catch (e: Exception) {
                             e.printStackTrace()
@@ -105,10 +107,9 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
                     .retry(2)
                     .doAfterTerminate({ loadingStatus.setValue(false) })
                     .subscribe(
-                            { Log.e("LOG", "complete") },
+                            { },
                             { t ->
                                 response.value = Response.error(t)
-                                Log.e("LOG view model", "send User Data", t)
                             }
                     ))
         }
@@ -122,12 +123,10 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
                     .subscribeOn(getBackgroundScheduler())
                     .timeout(TIMEOUT_SECONDS, timeoutUnit)
                     .retry(2)
-                    .doOnNext { Log.e("LOG 1", Thread.currentThread().name) }
                     .cache()
                     .filter { user -> user.cities.size > 0 }
                     .map { user ->
                         // run search algorithm.
-                        Log.e("LOG", "users")
                         val search = SearchTravelers(filter = paramSearch, user = user)
                         user.percentsSimilarTravel = search.getEstimation()
                         user
@@ -141,7 +140,6 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
                     .doAfterTerminate({ loadingStatus.setValue(false) })
                     .subscribe(
                             { list ->
-                                Log.e("LOG", "users2")
                                 response.setValue(Response.success(list))
                             },
                             { throwable -> response.setValue(Response.error(throwable)) }

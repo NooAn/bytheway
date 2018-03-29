@@ -17,6 +17,7 @@ class ReferListener : BroadcastReceiver() {
         if (rawReferrerString != null) {
             Log.i("LOGGER", "Received the following intent $rawReferrerString")
             val intent = Intent(context, MenuActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             intent.putExtra(Constants.NOTIFICATION_CMD, Constants.GOOGLE_PLAY_CMD_SHOW_USER)
             intent.putExtra(Constants.NOTIFICATION_VALUE, rawReferrerString)
             context.startActivity(intent)

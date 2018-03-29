@@ -34,37 +34,29 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
             Single.create<User> { stream ->
                 try {
                     store.collection(COLLECTION_USERS).document(id).get().addOnSuccessListener({ document ->
-                        val user = document.toObject(User::class.java)
-                        stream.onSuccess(user)
+                        if (document.exists()) {
+                            val user = document.toObject(User::class.java)
+                            stream.onSuccess(user)
+                        }
                     }).addOnFailureListener({ t ->
                         stream.onError(t)
                     })
                 } catch (e: Exception) {
                     stream.onError(e)
                 }
+
             }
 
     override fun uploadPhotoLink(path: Uri, id: String): Single<String> = Single.create { stream ->
         try {
-            // Create a storage reference from our app
             val storageRef = FirebaseStorage.getInstance().reference
             val riversRef = storageRef.child("images/" + id)
             val uploadTask = riversRef.putFile(path)
-            // Register observers to listen for when the download is done or if it fails
             uploadTask.addOnFailureListener {
-                // Handle unsuccessful uploads
-                try {
-                    val errorCode = (it as StorageException).errorCode
-                    val errorMessage = it.message
-                    Log.e("LOG", "file fail $errorMessage and $errorCode", it)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
                 stream.onError(it)
             }.addOnSuccessListener { taskSnapshot ->
-                        // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-                        stream.onSuccess(taskSnapshot.downloadUrl.toString())
-                    }
+                stream.onSuccess(taskSnapshot.downloadUrl.toString())
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             stream.onError(e)
@@ -112,22 +104,22 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
         try {
             store.collection(COLLECTION_USERS).whereGreaterThanOrEqualTo("dates.start_date", System.currentTimeMillis())
                     .get().addOnCompleteListener({ task ->
-                if (task.isSuccessful) {
-                    for (document in task.result) {
-                        var user: User
-                        try {
-                            user = document.toObject(User::class.java)
-                            stream.onNext(user)
-                        } catch (ex2: Exception) {
-                            ex2.printStackTrace()
-                            FirebaseCrash.report(ex2)
+                        if (task.isSuccessful) {
+                            for (document in task.result) {
+                                var user: User
+                                try {
+                                    user = document.toObject(User::class.java)
+                                    stream.onNext(user)
+                                } catch (ex2: Exception) {
+                                    ex2.printStackTrace()
+                                    FirebaseCrash.report(ex2)
+                                }
+                            }
+                        } else {
+                            stream.onError(Exception("Not Successful load users"))
                         }
-                    }
-                } else {
-                    stream.onError(Exception("Not Successful load users"))
-                }
-                stream.onComplete()
-            })
+                        stream.onComplete()
+                    })
         } catch (exp: Exception) {
             stream.onError(exp) // for fix bugs FirebaseFirestoreException: DEADLINE_EXCEEDED
             stream.onComplete()
@@ -181,10 +173,10 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                 documentRef.update(map)
                 null
             }.addOnFailureListener {
-                        stream.onError(it)
-                    }.addOnSuccessListener { _ ->
-                        stream.onComplete()
-                    }
+                stream.onError(it)
+            }.addOnSuccessListener { _ ->
+                stream.onComplete()
+            }
         } catch (e: Exception) {
             stream.onError(e)
             stream.onComplete()
