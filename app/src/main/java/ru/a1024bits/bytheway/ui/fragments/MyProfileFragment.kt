@@ -345,10 +345,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                             }
 
                             override fun onError(error: VKError?) {
-                                Log.i("LOG", " Произошла ошибка авторизации  vk (например, пользователь запретил авторизацию" + error?.errorMessage
-                                        + " reason=" + error.toString())
                                 FirebaseCrash.report(error?.httpError)
-
                             }
                         }
                 )) {
@@ -374,7 +371,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                     }
                     else -> {
                         val status = PlaceAutocomplete.getStatus(activity, data)
-                        Log.i("LOG", status.statusMessage + " ")
                         if (textCityFrom.text.isEmpty())
                             textCityFrom.setText("")
                     }
@@ -400,7 +396,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                     }
                     else -> {
                         val status = PlaceAutocomplete.getStatus(activity, data)
-                        Log.i("LOG", status.statusMessage + " ")
                         if (textCityTo.text.isEmpty())
                             textCityTo.setText("")
                     }
@@ -425,7 +420,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                     }
                     else -> {
                         val status = PlaceAutocomplete.getStatus(activity, data)
-                        Log.i("LOG", status.statusMessage + " ")
                         if (textCityMiddleTwo.text.isEmpty())
                             textCityMiddleTwo.setText("")
                     }
@@ -450,7 +444,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                     }
                     else -> {
                         val status = PlaceAutocomplete.getStatus(activity, data)
-                        Log.i("LOG", status.statusMessage + " ")
                         if (textNewCity.text.isEmpty())
                             textNewCity.setText("")
                     }
@@ -464,7 +457,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                         var uri: Uri? = null
                         if (data != null) {
                             uri = data.getData()
-                            Log.i("LOG", "Uri: ${uri.path} ${uri.encodedPath}" + uri?.toString())
                             viewModel?.loadImage(uri, FirebaseAuth.getInstance().currentUser?.uid!!, mainUser)
                         }
                     }
