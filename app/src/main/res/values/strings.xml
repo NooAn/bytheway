@@ -154,4 +154,7 @@
     <string name="share_friends">Рассказать друзьям</string>
     <string name="social_title_tg">Telegram</string>
     <string name="social_text_tg">Добавьте свой аккаунт Telegram, чтобы с Вами смогли связаться другие путешественники</string>
+    <string name="call_me">Попросить связаться с вами</string>
+    <string name="request_done">Запрос был отправлен. Пользователь получит push уведомление.</string>
+    <string name="this_user_search_you">С вами хочет связаться этот путешественник.</string>
 </resources>

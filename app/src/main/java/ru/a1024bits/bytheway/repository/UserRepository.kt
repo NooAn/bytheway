@@ -173,7 +173,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                 documentRef.update(map)
                 null
             }.addOnFailureListener {
-                stream.onError(it)
+                stream.onComplete()
             }.addOnSuccessListener { _ ->
                 stream.onComplete()
             }

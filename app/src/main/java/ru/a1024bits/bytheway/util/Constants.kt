@@ -26,6 +26,7 @@ object Constants {
     const val GOOGLE_PLAY_CMD_SHOW_USER = "show_user_from_google"
     const val FCM_MATCH_PERCENT = 90
     const val FCM_SET = "notify_set"
+    const val FCM_SET_NOTIFY = "notify_set_for_call_user"
 
     val NOTIFICATION_TITLE = "title"
     val NOTIFICATION_VALUE = "value"

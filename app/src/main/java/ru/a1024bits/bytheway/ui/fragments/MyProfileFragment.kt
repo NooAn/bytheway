@@ -54,7 +54,7 @@ import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.a1024bits.bytheway.ui.dialogs.SocialTipsDialog
-import ru.a1024bits.bytheway.util.Constants
+import ru.a1024bits.bytheway.util.*
 import ru.a1024bits.bytheway.util.Constants.END_DATE
 import ru.a1024bits.bytheway.util.Constants.FIRST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
@@ -65,9 +65,6 @@ import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT
 import ru.a1024bits.bytheway.util.Constants.START_DATE
 import ru.a1024bits.bytheway.util.Constants.TWO_DATE
 import ru.a1024bits.bytheway.util.Constants.TWO_INDEX_CITY
-import ru.a1024bits.bytheway.util.DateUtils
-import ru.a1024bits.bytheway.util.DecimalInputFilter
-import ru.a1024bits.bytheway.util.VK
 import ru.a1024bits.bytheway.viewmodel.MyProfileViewModel
 import ru.terrakok.cicerone.commands.Replace
 import java.text.SimpleDateFormat
@@ -143,9 +140,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     )
     private var methodIcons: HashMap<String, RelativeLayout> = hashMapOf()
     private var methodTextViews: HashMap<String, TextView?> = hashMapOf()
-    /**
-     *
-     */
+
     private var socNet: HashMap<String, String> = hashMapOf()
     private var dates: HashMap<String, Long> = hashMapOf()
     private var sex: Int = 0
@@ -1698,8 +1693,3 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     }
 }
 
-private fun GeoPoint.toLatLng(): LatLng? = LatLng(this.latitude, this.longitude)
-
-private fun Int.toStringOrBlank(): String = if (this == 0) "" else this.toString()
-
-private fun Editable.toStringOrZero(): String = if (this.toString().isBlank()) "0" else this.toString()

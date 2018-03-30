@@ -34,6 +34,9 @@ import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT
 import ru.a1024bits.bytheway.util.Constants.START_DATE
 import ru.a1024bits.bytheway.util.DateUtils.Companion.getLongFromDate
 import ru.a1024bits.bytheway.util.DecimalInputFilter
+import ru.a1024bits.bytheway.util.getIntOrNothing
+import ru.a1024bits.bytheway.util.getNormallDate
+import ru.a1024bits.bytheway.util.toStringOrEmpty
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -348,13 +351,3 @@ class SearchFragment : Fragment() {
         }
     }
 }
-
-private fun String.getIntOrNothing(): Int = if (this.isBlank()) 0 else this.toInt()
-
-
-private val Long.toStringOrEmpty: String
-    get() {
-        return if (this == 0L) "" else this.toString()
-    }
-
-private fun Long.getNormallDate(): CharSequence? = SimpleDateFormat("dd.MM.yyyy", Locale.US).format(this)

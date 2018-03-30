@@ -80,11 +80,12 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
 
     fun load(userId: String) {
         disposables.add(userRepository.getUser(userId)
+                .subscribeOn(getBackgroundScheduler())
                 .timeout(TIMEOUT_SECONDS, timeoutUnit)
                 .retry(2)
-                .subscribeOn(getBackgroundScheduler())
                 .doOnSubscribe({ _ -> loadingStatus.setValue(true) })
                 .doOnError({ loadingStatus.setValue(false) })
+                .doAfterTerminate { loadingStatus.setValue(false) }
                 .observeOn(getMainThreadScheduler())
                 .subscribe(
                         { user -> response.setValue(Response.success(user)) },
@@ -166,8 +167,8 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
         val map = HashMap<String, Any>()
         val currentTime = System.currentTimeMillis()
 
-        if (body?.data?.trips?.isEmpty() == false && body?.data?.trips?.get(0)?.flights != null) {
-            for (flight in body?.data?.trips?.get(0)?.flights) {
+        if (body?.data?.trips?.isEmpty() == false && body.data.trips.get(0).flights != null) {
+            for (flight in body.data.trips.get(0).flights) {
                 Log.d("LOG", (flight.departureUtc.toLong().toString() + " " + currentTime / 1000 + " " + (flight.departureLocale.toLong() > currentTime)))
                 if (flight.departureUtc.toLong() > currentTime / 1000) {
                     val mapCities = hashMapOf<String, String>()

@@ -126,12 +126,12 @@ class MenuActivity : AppCompatActivity(),
 
     private fun isNetworkAvailable(): Boolean {
         val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetworkInfo = connectivityManager.getActiveNetworkInfo()
+        val activeNetworkInfo = connectivityManager.activeNetworkInfo
         return activeNetworkInfo != null && activeNetworkInfo.isConnected
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        Log.e("LOG", "onActiviyt")
+        Log.e("LOG", "onActivity")
         super.onActivityResult(requestCode, resultCode, data)
         fragmentProfile.onActivityResult(requestCode, resultCode, data)
     }
@@ -161,7 +161,8 @@ class MenuActivity : AppCompatActivity(),
         updateUsersInfo(FirebaseAuth.getInstance().currentUser?.photoUrl.toString())
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
-
+        pLoader = this.findViewById(R.id.pLoaderRes) as ProgressCustom
+        pLoader?.show()
         if (savedInstanceState == null) {
             if (preferences.getBoolean(Constants.FIRST_ENTER, true)) {
                 navigator.applyCommand(Replace(Screens.USER_SINHRONIZED_SCREEN, 1))
@@ -198,14 +199,13 @@ class MenuActivity : AppCompatActivity(),
             })
         }
         feedback.setOnClickListener { openDialogFeedback() }
-        pLoader = this.findViewById(R.id.pLoaderRes) as ProgressCustom
         if (!isNetworkAvailable()) showSnack(getString(R.string.no_internet))
     }
 
     private var snackbar: Snackbar? = null
 
 
-    private fun showSnack(string: String) {
+    fun showSnack(string: String) {
         snackbar = Snackbar.make(this.findViewById(android.R.id.content), string, Snackbar.LENGTH_LONG)
         snackbar?.show()
         pLoader?.hide()
@@ -226,6 +226,7 @@ class MenuActivity : AppCompatActivity(),
             .putStringSet(Constants.FCM_SET, set).apply()
 
     fun getNotified() = preferences.getStringSet(Constants.FCM_SET, HashSet<String>())
+    fun getCallNotified() = preferences.getStringSet(Constants.FCM_SET_NOTIFY, HashSet<String>())
 
     fun showUserSimpleProfile(displayingUser: User) {
         navigator.applyCommand(Forward(Screens.USER_PROFILE_SCREEN, displayingUser))
@@ -418,6 +419,7 @@ class MenuActivity : AppCompatActivity(),
         super.onPause()
         navigatorHolder.removeNavigator()
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver)
+        pLoader?.hide()
         Log.e("TEST", "onPause")
     }
 

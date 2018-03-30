@@ -6,16 +6,39 @@
     android:padding="16dp">
 
     <TextView
-        android:id="@+id/numberPhone"
+        android:id="@+id/text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_marginTop="16dp"
         android:paddingEnd="28dp"
         android:paddingStart="28dp"
+        android:text="Нажмите что бы скопировать"
+        android:textAlignment="center" />
+
+    <Button
+        android:id="@+id/numberPhone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/text"
+        android:paddingEnd="28dp"
+        android:paddingStart="28dp"
         android:textAlignment="center"
-        android:textSize="18sp"
+        android:textSize="12sp"
+        android:theme="@style/WhiteButton"
         tools:text="899997373" />
+
+    <Button
+        android:id="@+id/callMe"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/numberPhone"
+        android:layout_marginTop="8dp"
+        android:paddingEnd="28dp"
+        android:paddingStart="28dp"
+        android:text="@string/call_me"
+        android:textAlignment="center"
+        android:theme="@style/WhiteButton" />
 
 </RelativeLayout>

@@ -20,7 +20,7 @@ interface MapWebService {
     @GET("https://maps.googleapis.com/maps/api/directions/json")
     fun getDirection(@QueryMap queryMap: Map<String, String>): Single<RoutesList>
 
-    //@POST("https://bytheway-f98ba.firebaseapp.com/sendnotifications")
-    @POST("https://bytheway-c7b6a.firebaseapp.com/sendnotifications") // for release
+    @POST("https://bytheway-f98ba.firebaseapp.com/sendnotifications")
+    //@POST("https://bytheway-c7b6a.firebaseapp.com/sendnotifications") // for release
     fun sendNotifications(@Body queryMap: Map<String, String>): Completable
 }

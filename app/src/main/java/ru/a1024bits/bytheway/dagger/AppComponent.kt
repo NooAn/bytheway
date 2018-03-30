@@ -4,6 +4,7 @@ import dagger.Component
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
 import ru.a1024bits.bytheway.ui.activity.RegistrationActivity
 import ru.a1024bits.bytheway.ui.activity.SplashActivity
+import ru.a1024bits.bytheway.ui.dialogs.SocNetworkdialog
 import ru.a1024bits.bytheway.ui.fragments.*
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
 import ru.a1024bits.bytheway.viewmodel.RegistrationViewModel
@@ -32,4 +33,5 @@ interface AppComponent {
     fun inject(registrationActivity: RegistrationActivity)
     fun inject(mapFragment: MapFragment)
     fun inject(userProfileFragment: UserProfileFragment)
+    fun inject(socNetworkdialog: SocNetworkdialog)
 }

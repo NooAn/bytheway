@@ -35,6 +35,7 @@ import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.START_DATE
 import ru.a1024bits.bytheway.util.Constants.TWO_DATE
 import ru.a1024bits.bytheway.util.Constants.TWO_INDEX_CITY
+import ru.a1024bits.bytheway.util.isNumberPhone
 import ru.a1024bits.bytheway.viewmodel.UserProfileViewModel
 import java.text.SimpleDateFormat
 import java.util.*
@@ -114,13 +115,13 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
         if (user.dates.size == 1 || user.dates.size == 2) {
             val dayBegin = formatDate.format(Date(user.dates[Constants.START_DATE] ?: 0))
             val dayArrival = formatDate.format(Date(user.dates[Constants.END_DATE] ?: 0))
-
             correctText(dayBegin, textDateFrom, iconDateFromEmpty)
             correctText(dayArrival, textDateArrived, iconDateArrivedEmpty)
 
         } else if (user.dates.size == 0 || (user.dates[START_DATE]?.compareTo(0) == 0 && user.dates[END_DATE]?.compareTo(0) == 0)) {
             textDateEmpty.visibility = View.VISIBLE
             textDateEmpty2.visibility = View.VISIBLE
+
         } else if (user.dates.size == 3) {
             val dayBegin = formatDate.format(Date(user.dates[Constants.START_DATE] ?: 0))
             val middleDay = formatDate.format(Date(user.dates[Constants.TWO_DATE] ?: 0))
@@ -208,7 +209,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
                 SocialNetwork.TG.link -> {
                     tgIcon.setImageResource(R.drawable.ic_tg_color)
                     tgIcon.setOnClickListener {
-                        intentMessageTelegram(user.socialNetwork[name.key])
+                        intentMessageTelegram(user.socialNetwork[name.key], user.id)
                     }
                 }
             }
@@ -224,7 +225,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
             emailIcon.visibility = View.VISIBLE
             tgIcon.visibility = View.GONE
             emailIcon.setOnClickListener {
-                openEmail(user.email)
+                openEmail(user.email, user.id)
             }
         }
         for (method in user.method.keys) {
@@ -268,15 +269,15 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
         else icon.visibility = View.VISIBLE
     }
 
-    private fun openEmail(email: String) {
+    private fun openEmail(email: String, id: String) {
         val emailIntent = Intent(Intent.ACTION_SEND)
         emailIntent.setType("message/rfc822")
-        emailIntent.setData(Uri.parse("mailto:"));
+        emailIntent.setData(Uri.parse("mailto:"))
         emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, arrayOf(email))
         emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, getString(R.string.app_name))
         emailIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         if (emailIntent.resolveActivity(activity.packageManager) == null) {
-            val dialog = SocNetworkdialog(activity, email)
+            val dialog = SocNetworkdialog(activity, email,id, mFirebaseAnalytics)
             dialog.show()
         } else
             try {
@@ -288,7 +289,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
 
     private fun showErrorFroWrongSocValue(user: User, name: MutableMap.MutableEntry<String, String>) {
         Toast.makeText(activity.applicationContext, R.string.error_link_open, Toast.LENGTH_SHORT).show()
-        val dialog = SocNetworkdialog(activity, user.socialNetwork[name.key])
+        val dialog = SocNetworkdialog(activity, user.socialNetwork[name.key],user.id, mFirebaseAnalytics)
         dialog.show()
     }
 
@@ -460,21 +461,21 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
         googleMap?.addPolyline(options)
     }
 
-    private fun intentMessageTelegram(id: String?) {
+    private fun intentMessageTelegram(id: String?, userId: String) {
         try {
             if (id?.isNumberPhone() == false && id?.startsWith("@") == true) {
                 startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/${id.replace("@", "")}")))
                 mFirebaseAnalytics.logEvent(TAG_ANALYTICS + "OPEN_TG", null)
             } else {
                 mFirebaseAnalytics.logEvent(TAG_ANALYTICS + "NOT_OPEN_TG", null)
-                val dialog = SocNetworkdialog(activity, id)
+                val dialog = SocNetworkdialog(activity, id, userId, mFirebaseAnalytics)
                 dialog.show()
             }
         } catch (e: Exception) {
             e.printStackTrace()
             FirebaseCrash.report(e)
             Toast.makeText(activity.applicationContext, R.string.error_link_open, Toast.LENGTH_SHORT).show()
-            val dialog = SocNetworkdialog(activity, "https://t.me/${id?.replace("@", "")}")
+            val dialog = SocNetworkdialog(activity, "https://t.me/${id?.replace("@", "")}", userId, mFirebaseAnalytics)
             dialog.show()
         }
     }
@@ -500,10 +501,5 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
     }
 }// Required empty public constructor
 
-fun String.isNumberPhone(): Boolean {
-    return this.matches(Regex("^([0-9]|\\+[0-9]){11,13}\$"))
-    //this.startsWith("+7")
-
-}
 
 

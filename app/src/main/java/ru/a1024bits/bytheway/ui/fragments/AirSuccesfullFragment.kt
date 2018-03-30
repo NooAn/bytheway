@@ -32,7 +32,7 @@ class AirSuccesfullFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
+        // Inflate the layout for this menuActivity
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this.context)
         val view: View?
 

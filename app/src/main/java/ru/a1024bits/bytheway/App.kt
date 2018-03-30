@@ -68,12 +68,5 @@ class App : Application() {
         cicerone = Cicerone.create()
     }
 
-    val navigatorHolder: NavigatorHolder
-        get() = cicerone.navigatorHolder
-
-    val router: Router
-        get() = cicerone.router
-
-    fun appComponent(): AppComponent = component
 
 }
