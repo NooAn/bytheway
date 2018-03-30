@@ -224,6 +224,8 @@ class MenuActivity : AppCompatActivity(),
 
     fun updateNotified(set: Set<String>) = preferences.edit()
             .putStringSet(Constants.FCM_SET, set).apply()
+    fun updateSetCallNotify(set: Set<String>) = preferences.edit()
+            .putStringSet(Constants.FCM_SET_NOTIFY, set).apply()
 
     fun getNotified() = preferences.getStringSet(Constants.FCM_SET, HashSet<String>())
     fun getCallNotified() = preferences.getStringSet(Constants.FCM_SET_NOTIFY, HashSet<String>())

@@ -157,4 +157,5 @@
     <string name="call_me">Попросить связаться с вами</string>
     <string name="request_done">Запрос был отправлен. Пользователь получит push уведомление.</string>
     <string name="this_user_search_you">С вами хочет связаться этот путешественник.</string>
+    <string name="click_for_copy">Нажмите что бы скопировать</string>
 </resources>

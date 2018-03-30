@@ -4,6 +4,7 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.support.annotation.LayoutRes
@@ -277,7 +278,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
         emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, getString(R.string.app_name))
         emailIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         if (emailIntent.resolveActivity(activity.packageManager) == null) {
-            val dialog = SocNetworkdialog(activity, email,id, mFirebaseAnalytics)
+            val dialog = SocNetworkdialog(activity, email, id, mFirebaseAnalytics)
             dialog.show()
         } else
             try {
@@ -289,7 +290,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
 
     private fun showErrorFroWrongSocValue(user: User, name: MutableMap.MutableEntry<String, String>) {
         Toast.makeText(activity.applicationContext, R.string.error_link_open, Toast.LENGTH_SHORT).show()
-        val dialog = SocNetworkdialog(activity, user.socialNetwork[name.key],user.id, mFirebaseAnalytics)
+        val dialog = SocNetworkdialog(activity, user.socialNetwork[name.key], user.id, mFirebaseAnalytics)
         dialog.show()
     }
 
@@ -499,7 +500,8 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
         mMapView?.onLowMemory()
         mListener = null
     }
-}// Required empty public constructor
+
+}
 
 
 

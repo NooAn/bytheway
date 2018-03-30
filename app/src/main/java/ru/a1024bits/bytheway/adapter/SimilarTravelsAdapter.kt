@@ -62,7 +62,7 @@ class SimilarTravelsAdapter(val context: Context, val users: List<User>) : Recyc
         return if (shortCity.length == city.length) {
             city
         } else {
-            shortCity + "..."
+            "$shortCity..."
         }
     }
 

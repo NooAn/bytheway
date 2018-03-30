@@ -46,8 +46,7 @@ class SimilarTravelsFragment : Fragment() {
         App.component.inject(this)
         block_empty_users.visibility = View.GONE
         view?.let {
-            it.findViewById<RecyclerView>(R.id.display_similar_user_travels).adapter = SimilarTravelsAdapter(this.context, listUser
-                    ?: arrayListOf())
+            it.findViewById<RecyclerView>(R.id.display_similar_user_travels).adapter = SimilarTravelsAdapter(this.context, listUser ?: arrayListOf())
             if (listUser?.size == 0 ) {
                 block_empty_users.visibility = View.VISIBLE
             }
