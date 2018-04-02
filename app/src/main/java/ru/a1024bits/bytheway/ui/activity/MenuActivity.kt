@@ -159,14 +159,14 @@ class MenuActivity : AppCompatActivity(),
         toggle.syncState()
 
         updateUsersInfo(FirebaseAuth.getInstance().currentUser?.photoUrl.toString())
-
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
         pLoader = this.findViewById(R.id.pLoaderRes) as ProgressCustom
         pLoader?.show()
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
         if (savedInstanceState == null) {
             if (preferences.getBoolean(Constants.FIRST_ENTER, true)) {
                 navigator.applyCommand(Replace(Screens.USER_SINHRONIZED_SCREEN, 1))
                 markFirstEnter()
+                pLoader?.hide()
             } else {
                 if (intent.data != null && intent.data.host.contains("appintheair", true)) {
 
@@ -181,7 +181,6 @@ class MenuActivity : AppCompatActivity(),
             }
         } else {
             screenNames = savedInstanceState.getSerializable(STATE_SCREEN_NAMES) as ArrayList<String>
-            Log.e("LOGGER", "hash code ${viewModel?.hashCode()}")
         }
 
         mGoogleApiClient = GoogleApiClient.Builder(this)
