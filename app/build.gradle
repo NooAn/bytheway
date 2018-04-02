@@ -34,8 +34,8 @@ android {
     productFlavors {
 
         bytheway {
-            versionCode 22
-            versionName "2.1.2"
+            versionCode 23
+            versionName "2.1.3"
             dimension "default"
         }
     }
