@@ -28,10 +28,8 @@ class RegistrationViewModel @Inject constructor(var userRepository: UserReposito
                 .observeOn(getMainThreadScheduler())
                 .subscribe(
                         { Log.e("LOG", "complete") },
-                        { throwable ->
-                            Log.e("LOG", "Error", throwable)
-                            FirebaseCrash.report(throwable)
-                        }))
+                        { throwable -> FirebaseCrash.report(throwable) }
+                ))
     }
 
     fun ifUserNotExistThenSave(currentUser: FirebaseUser?) {
@@ -54,8 +52,8 @@ class RegistrationViewModel @Inject constructor(var userRepository: UserReposito
                         }).addOnCompleteListener {
                             load.value = true
                         }.addOnFailureListener {
-                                    load.value = false
-                                }
+                            load.value = false
+                        }
                     } else {
                         // Пользователь уже существует и не нужно тогда добавлять его
                         load.value = true

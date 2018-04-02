@@ -51,7 +51,10 @@ class SocNetworkdialog(context: Context, idPhone: String?, uid: String, mFirebas
         val text = view.findViewById<Button>(R.id.numberPhone)
         text.text = idPhone
         if (idPhone.compareTo("Ошибка") == 0) view.findViewById<TextView>(R.id.text).visibility = View.GONE
-
+        val setIds = menuActivity.getCallNotified()
+        if (setIds.contains(userId)) {
+            view.findViewById<Button>(R.id.callMe).visibility = View.GONE
+        }
         text.setOnClickListener {
             val clipboard = context.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
             val clip = ClipData.newPlainText("telegram", idPhone)
@@ -62,7 +65,6 @@ class SocNetworkdialog(context: Context, idPhone: String?, uid: String, mFirebas
 
         view.findViewById<Button>(R.id.callMe).setOnClickListener {
             analitic.logEvent("soc_network_dialog_click_call_me", savedInstanceState)
-            val setIds = menuActivity.getCallNotified()
             if (!setIds.contains(userId)) {
                 setIds.add(userId)
                 viewModel.sendNotifications(userId, FireBaseNotification(
@@ -76,20 +78,20 @@ class SocNetworkdialog(context: Context, idPhone: String?, uid: String, mFirebas
                 menuActivity.showSnack(menuActivity.getString(R.string.request_done))
             }
         }
-        val rview = view.findViewById<RecyclerView>(R.id.recyclerIconsSocNetwork)
-        val listApp = getSocNetworkOnPhone(menuActivity)
-        if (listApp.size > 0)
-            rview.adapter = SocIconsAdapter(listApp) {
-                when (it) {
-                    R.drawable.ic_tg_color -> clickTG()
-                    R.drawable.ic_whats_icon_color -> clickWh()
-                    R.drawable.ic_fb_color -> clickFb()
-                    R.drawable.ic_vk_color -> clickVK()
-                    else -> Log.e("LOG", "click")
-                }
-            }
-        else
-            rview.visibility = View.GONE
+//        val rview = view.findViewById<RecyclerView>(R.id.recyclerIconsSocNetwork)
+//        val listApp = getSocNetworkOnPhone(menuActivity)
+//        if (listApp.size > 0)
+//            rview.adapter = SocIconsAdapter(listApp) {
+//                when (it) {
+//                    R.drawable.ic_tg_color -> clickTG()
+//                    R.drawable.ic_whats_icon_color -> clickWh()
+//                    R.drawable.ic_fb_color -> clickFb()
+//                    R.drawable.ic_vk_color -> clickVK()
+//                    else -> Log.e("LOG", "click")
+//                }
+//            }
+//        else
+//            rview.visibility = View.GONE
         setContentView(view)
     }
 

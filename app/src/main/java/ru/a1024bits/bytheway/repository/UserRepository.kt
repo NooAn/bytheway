@@ -39,10 +39,10 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                             stream.onSuccess(user)
                         }
                     }).addOnFailureListener({ t ->
-                        stream.onError(t)
+                        stream.tryOnError(t)
                     })
                 } catch (e: Exception) {
-                    stream.onError(e)
+                    stream.tryOnError(e)
                 }
 
             }
@@ -53,13 +53,12 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
             val riversRef = storageRef.child("images/" + id)
             val uploadTask = riversRef.putFile(path)
             uploadTask.addOnFailureListener {
-                stream.onError(it)
+                stream.tryOnError(it)
             }.addOnSuccessListener { taskSnapshot ->
                 stream.onSuccess(taskSnapshot.downloadUrl.toString())
             }
         } catch (e: Exception) {
-            e.printStackTrace()
-            stream.onError(e)
+            stream.tryOnError(e)
         }
     }
 
@@ -95,7 +94,6 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                         .addOnFailureListener({ e -> listener.onFailure(e) })
             })
         } catch (e: Exception) {
-            e.printStackTrace()
             FirebaseCrash.report(e)
         }
     }
@@ -111,17 +109,16 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                                     user = document.toObject(User::class.java)
                                     stream.onNext(user)
                                 } catch (ex2: Exception) {
-                                    ex2.printStackTrace()
                                     FirebaseCrash.report(ex2)
                                 }
                             }
                         } else {
-                            stream.onError(Exception("Not Successful load users"))
+                            stream.tryOnError(Exception("Not Successful load users"))
                         }
                         stream.onComplete()
                     })
         } catch (exp: Exception) {
-            stream.onError(exp) // for fix bugs FirebaseFirestoreException: DEADLINE_EXCEEDED
+            stream.tryOnError(exp) // for fix bugs FirebaseFirestoreException: DEADLINE_EXCEEDED
             stream.onComplete()
         }
     }
@@ -139,7 +136,6 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
     override fun changeUserProfile(map: HashMap<String, Any>, id: String): Completable =
             Completable.create { stream ->
                 try {
-
                     val documentRef = store.collection(COLLECTION_USERS).document(id)
                     store.runTransaction(object : Transaction.Function<Void> {
                         override fun apply(transaction: Transaction): Void? {
@@ -147,11 +143,10 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                             documentRef.update(map)
                             return null
                         }
-                    }).addOnFailureListener { stream.onError(it) }
+                    }).addOnFailureListener { stream.tryOnError(it) }
                             .addOnSuccessListener { _ -> stream.onComplete() }
                 } catch (e: Exception) {
-                    stream.onError(e)
-                    stream.onComplete()
+                    stream.tryOnError(e)
                 }
             }
 
@@ -172,13 +167,12 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                 map["timestamp"] = FieldValue.serverTimestamp()
                 documentRef.update(map)
                 null
-            }.addOnFailureListener {
-                stream.onComplete()
             }.addOnSuccessListener { _ ->
                 stream.onComplete()
+            }.addOnFailureListener {
+                stream.tryOnError(it)
             }
         } catch (e: Exception) {
-            stream.onError(e)
             stream.onComplete()
         }
     }
@@ -194,11 +188,10 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                     docRef.update(Constants.FCM_TOKEN, token)
                 }
             }).addOnFailureListener {
-                stream.onError(it)
+                stream.tryOnError(it)
             }.addOnSuccessListener { stream.onComplete() }
         } catch (e: Exception) {
-            stream.onError(e)
-            stream.onComplete()
+            stream.tryOnError(e)
         }
     }
 

@@ -35,7 +35,7 @@ class SplashActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        checkRegistrationAndForward()
+       // checkRegistrationAndForward()
     }
 
     private fun checkRegistrationAndForward() {
