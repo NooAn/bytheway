@@ -6,6 +6,7 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.*
 import android.net.ConnectivityManager
 import android.os.Bundle
+import android.os.Parcelable
 import android.os.PersistableBundle
 import android.support.design.widget.NavigationView
 import android.support.design.widget.Snackbar
@@ -223,6 +224,7 @@ class MenuActivity : AppCompatActivity(),
 
     fun updateNotified(set: Set<String>) = preferences.edit()
             .putStringSet(Constants.FCM_SET, set).apply()
+
     fun updateSetCallNotify(set: Set<String>) = preferences.edit()
             .putStringSet(Constants.FCM_SET_NOTIFY, set).apply()
 
@@ -310,8 +312,10 @@ class MenuActivity : AppCompatActivity(),
 
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
+        outState?.clear()
         outState?.putSerializable(STATE_SCREEN_NAMES, screenNames as java.io.Serializable)
     }
+
 
     override fun onFragmentInteraction(user: User?) {
         mainUser = user
@@ -403,11 +407,6 @@ class MenuActivity : AppCompatActivity(),
     override fun onStart() {
         super.onStart()
         Log.e("TEST", "onStart")
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onRestoreInstanceState(savedInstanceState, persistentState)
-        Log.e("TEST", "onRestoreInstanceState")
     }
 
     override fun onDestroy() {

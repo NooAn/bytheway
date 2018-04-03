@@ -6,7 +6,6 @@ import android.arch.lifecycle.ViewModelProvider
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.res.Resources
 import android.graphics.*
 import android.net.Uri
 import android.os.Build
@@ -280,17 +279,17 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        methodIcons.put(Method.CAR.link, iconCar)
-        methodIcons.put(Method.TRAIN.link, iconTrain)
-        methodIcons.put(Method.BUS.link, iconBus)
-        methodIcons.put(Method.PLANE.link, iconPlane)
-        methodIcons.put(Method.HITCHHIKING.link, iconHitchHicking)
+        methodIcons[Method.CAR.link] = iconCar
+        methodIcons[Method.TRAIN.link] = iconTrain
+        methodIcons[Method.BUS.link] = iconBus
+        methodIcons[Method.PLANE.link] = iconPlane
+        methodIcons[Method.HITCHHIKING.link] = iconHitchHicking
 
-        methodTextViews.put(Method.CAR.link, travelCarText)
-        methodTextViews.put(Method.TRAIN.link, travelTrainText)
-        methodTextViews.put(Method.BUS.link, travelBusText)
-        methodTextViews.put(Method.PLANE.link, travelPlaneText)
-        methodTextViews.put(Method.HITCHHIKING.link, travelHitchHikingText)
+        methodTextViews[Method.CAR.link] = travelCarText
+        methodTextViews[Method.TRAIN.link] = travelTrainText
+        methodTextViews[Method.BUS.link] = travelBusText
+        methodTextViews[Method.PLANE.link] = travelPlaneText
+        methodTextViews[Method.HITCHHIKING.link] = travelHitchHikingText
 
         viewModel?.routes?.observe(this, routsObserver)
         viewModel?.response?.observe(this, responseObserver)
@@ -768,10 +767,10 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     private fun shareVKPost() {
         thisActionIsVkShare = true
-        val s = VK()
+        val vk = VK()
         val cityArrived = textCityFrom.text.toString()
         val cityTo = getLastCity()
-        val text = "Ищу попутчика в $cityTo \n Даты ${getDates()}\nhttps://www.google.ru/maps/dir/$cityArrived/$cityTo \n\n\n ${getHashTags()}"
+        val text = "Ищу попутчика в $cityTo \n${getDates()}${getBudgetText()}${getInfoText()}${getMapsLink(cityArrived, cityTo)}${getHashTags()}"
         scrollProfile.scrollTo(0, appinTheAirEnter.top)
         val totalHeight = scrollProfile.getChildAt(0).height
         val pos = totalHeight - appinTheAirEnter.top
@@ -784,18 +783,34 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                 text1 = cityArrived,
                 text2 = cityTo)
 
-        if (!s.start(activity))
-            s.postToWall(activity, text, bitmap, linkUri)
+        if (!vk.start(activity))
+            vk.postToWall(activity, text, bitmap, linkUri)
     }
 
+    private fun getMapsLink(cityArrived: String, cityTo: String) =
+            "\nhttps://www.google.ru/maps/dir/$cityArrived/$cityTo \n\n\n"
+
+    private fun getInfoText(): String =
+            if (addInfoUser.text.isNotEmpty()) addInfoUser.text.toString().plus("\n") else ""
+
+
+    val format = SimpleDateFormat("dd.MM.yyyy", Locale.US)
+
     private fun getDates(): String {
-        return "0"
+        val end = dates[END_DATE] ?: 0
+        val start = dates[START_DATE] ?: 0
+        if (start == 0L && end == 0L) return ""
+        if (start == 0L) return "Даты: до ${end.formatDates(format)}\n"
+        if (end == 0L) return "Даты: с ${start.formatDates(format)}\n"
+        return "Даты: ".plus(start.formatDates(format)).plus(" - ").plus(end.formatDates(format)).plus("\n")
     }
+
+    private fun getBudgetText(): String =
+            if (budget > 0) "Бюджет: ".plus(budget.toString()).plus("$\n") else ""
 
 
     private fun getTextSize(text1: String, text2: String) =
             if (text1.length >= 21 || text2.length >= 20) 90 else 125
-
 
     private fun drawTextToBitmap(context: Context, gResId: Int, textSize: Int = 78, text1: String, text2: String): Bitmap {
         val resources = context.resources
@@ -814,7 +829,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         val canvas = Canvas(bitmap)
         // new antialised Paint
         val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-        // text color - #3D3D3D
         paint.color = Color.rgb(93, 101, 67)
         // text size in pixels
         paint.textSize = (textSize * scale).roundToInt().toFloat()
@@ -847,7 +861,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     private fun getHashTags(): String {
         val hashTagText = StringBuilder("#bytheway ")
         hashTagText.append("#поискпопутчиков ")
-        hashTagText.append("#ищупопутчика")
+        hashTagText.append("#ищупопутчика ")
         hashTagText.append("#").append(textCityFrom.text.toString()).append(" ")
         hashTagText.append("#").append(getLastCity()).append("2018 ")
         if (mainUser?.method!![Method.HITCHHIKING.link] == true) {
@@ -868,15 +882,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                 textCityTo.text.toString()
             else
                 textNewCity.text.toString()
-
-
-    private fun screenShot(view: View): Bitmap {
-        view.isDrawingCacheEnabled = true
-        view.drawingCacheQuality = View.DRAWING_CACHE_QUALITY_AUTO
-        val screenshot = Bitmap.createBitmap(view.drawingCache)
-        view.isDrawingCacheEnabled = false;
-        return screenshot;
-    }
 
     private fun addNewCity() {
         mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_add_new_city", null)
@@ -1578,34 +1583,32 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
         }
 
-        val formatDate = SimpleDateFormat("dd.MM.yyyy", Locale.US)
-
         if (user.dates.size > 0) {
             if (user.cities.size == 2) {
                 if (user.dates[START_DATE] != null && user.dates[START_DATE] != 0L) {
-                    textDateFrom.setText(formatDate.format(Date(user.dates[START_DATE]
+                    textDateFrom.setText(format.format(Date(user.dates[START_DATE]
                             ?: 0)))
                     textDateFrom.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector, 0)
                 }
                 if (user.dates[END_DATE] != null && user.dates[END_DATE] != 0L) {
-                    textDateArrived.setText(formatDate.format(Date(user.dates[END_DATE]
+                    textDateArrived.setText(format.format(Date(user.dates[END_DATE]
                             ?: 0)))
                     textDateArrived.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector, 0)
                 }
             } else {
                 // Для случая когда у нас три города
                 if (user.dates[START_DATE] != null && user.dates[START_DATE] != 0L) {
-                    dateStartTwo.setText(formatDate.format(Date(user.dates[START_DATE]
+                    dateStartTwo.setText(format.format(Date(user.dates[START_DATE]
                             ?: 0)))
                     dateStartTwo.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector, 0)
                 }
                 if (user.dates[END_DATE] != null && user.dates[END_DATE] != 0L) {
-                    dateFinish.setText(formatDate.format(Date(user.dates[END_DATE]
+                    dateFinish.setText(format.format(Date(user.dates[END_DATE]
                             ?: 0)))
                     dateFinish.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector, 0)
                 }
                 if (user.dates[TWO_DATE] != null && user.dates[TWO_DATE] != 0L) {
-                    textDateArrived.setText(formatDate.format(Date(user.dates[TWO_DATE]
+                    textDateArrived.setText(format.format(Date(user.dates[TWO_DATE]
                             ?: 0)))
                     textDateArrived.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector, 0)
                 }
@@ -1751,4 +1754,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         viewModel?.getRoute(cityFromLatLng = cityFromLatLng, cityToLatLng = cityToLatLng, waypoint = cityTwoLatLng)
     }
 }
+
+private fun Long.formatDates(formatDate: SimpleDateFormat): String = formatDate.format(Date(this))
+
 

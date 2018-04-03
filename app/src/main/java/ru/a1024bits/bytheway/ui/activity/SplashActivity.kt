@@ -33,20 +33,20 @@ class SplashActivity : AppCompatActivity() {
         App.component.inject(this)
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(RegistrationViewModel::class.java)
-       // viewModel?.setTimestamp(FirebaseAuth.getInstance().currentUser?.uid ?: return)
-        val s = "НИЖEГОРОДСКАЯ ОБЛАСТЬ"
-        val s1 = "САНКТ-ПЕТЕРБУРГ"
-        val s2 = "МОСКВА"
-        val s3 = "СОЧИ"
-        val s4 = "MOSCOW"
-        val s5 = "AMSTERDAM"
-        val textSize = getTextSize(s4, s5)
-        val bitmap = drawTextToBitmap(context = baseContext,
-                gResId = R.drawable.template_for_posting,
-                textSize = textSize,
-                text1 = s4,
-                text2 = s5)
-        findViewById<ImageView>(R.id.test).setImageBitmap(bitmap)
+        viewModel?.setTimestamp(FirebaseAuth.getInstance().currentUser?.uid ?: return)
+//        val s = "НИЖEГОРОДСКАЯ ОБЛАСТЬ"
+//        val s1 = "САНКТ-ПЕТЕРБУРГ"
+//        val s2 = "МОСКВА"
+//        val s3 = "СОЧИ"
+//        val s4 = "MOSCOW"
+//        val s5 = "AMSTERDAM"
+//        val textSize = getTextSize(s4, s5)
+//        val bitmap = drawTextToBitmap(context = baseContext,
+//                gResId = R.drawable.template_for_posting,
+//                textSize = textSize,
+//                text1 = s4,
+//                text2 = s5)
+      //  findViewById<ImageView>(R.id.test).setImageBitmap(bitmap)
     }
 
     private fun getTextSize(text1: String, text2: String) =
@@ -96,7 +96,7 @@ class SplashActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // checkRegistrationAndForward()
+         checkRegistrationAndForward()
     }
 
     private fun checkRegistrationAndForward() {
