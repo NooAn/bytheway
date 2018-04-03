@@ -6,12 +6,14 @@ import android.arch.lifecycle.ViewModelProvider
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
+import android.content.res.Resources
+import android.graphics.*
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.support.annotation.LayoutRes
 import android.support.design.widget.NavigationView
+import android.support.v4.content.res.ResourcesCompat
 import android.support.v4.widget.NestedScrollView
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
@@ -71,6 +73,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.HashMap
+import kotlin.math.roundToInt
 import ru.a1024bits.bytheway.model.Response as ResponseBtw
 
 
@@ -768,15 +771,71 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         val s = VK()
         val cityArrived = textCityFrom.text.toString()
         val cityTo = getLastCity()
-        val text = "Ищу попутчика в $cityTo \nhttps://www.google.ru/maps/dir/$cityArrived/$cityTo \n\n\n ${getHashTags()}"
+        val text = "Ищу попутчика в $cityTo \n Даты ${getDates()}\nhttps://www.google.ru/maps/dir/$cityArrived/$cityTo \n\n\n ${getHashTags()}"
         scrollProfile.scrollTo(0, appinTheAirEnter.top)
         val totalHeight = scrollProfile.getChildAt(0).height
         val pos = totalHeight - appinTheAirEnter.top
         scrollProfile.scrollBy(0, -pos)
         val linkUri = "https://play.google.com/store/apps/details?id=ru.a1024bits.bytheway.release&hl=${getCurrentLocale(activity)}&referrer=${mainUser?.id}"
+        val textSize = getTextSize(cityArrived, cityTo)
+        val bitmap = drawTextToBitmap(context = activity.baseContext,
+                gResId = R.drawable.template_for_posting,
+                textSize = textSize,
+                text1 = cityArrived,
+                text2 = cityTo)
 
         if (!s.start(activity))
-            s.postToWall(activity, text, screenShot(view ?: return), linkUri)
+            s.postToWall(activity, text, bitmap, linkUri)
+    }
+
+    private fun getDates(): String {
+        return "0"
+    }
+
+
+    private fun getTextSize(text1: String, text2: String) =
+            if (text1.length >= 21 || text2.length >= 20) 90 else 125
+
+
+    private fun drawTextToBitmap(context: Context, gResId: Int, textSize: Int = 78, text1: String, text2: String): Bitmap {
+        val resources = context.resources
+        val scale = resources.displayMetrics.density
+        var bitmap = BitmapFactory.decodeResource(resources, gResId)
+
+        var bitmapConfig = bitmap.config;
+        // set default bitmap config if none
+        if (bitmapConfig == null) {
+            bitmapConfig = android.graphics.Bitmap.Config.ARGB_8888
+        }
+        // resource bitmaps are imutable,
+        // so we need to convert it to mutable one
+        bitmap = bitmap.copy(bitmapConfig, true)
+
+        val canvas = Canvas(bitmap)
+        // new antialised Paint
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+        // text color - #3D3D3D
+        paint.color = Color.rgb(93, 101, 67)
+        // text size in pixels
+        paint.textSize = (textSize * scale).roundToInt().toFloat()
+        val fontFace = ResourcesCompat.getFont(context, R.font.acrobat)
+        paint.typeface = Typeface.create(fontFace, Typeface.NORMAL)
+        // text shadow
+        paint.setShadowLayer(1f, 0f, 1f, Color.WHITE)
+
+        // draw text to the Canvas center
+        val bounds = Rect()
+        paint.getTextBounds(text1, 0, text1.length, bounds)
+        var x = (bitmap.width - bounds.width()) / 2f - 470
+        var y = (bitmap.height + bounds.height()) / 2f - 140
+        canvas.drawText(text1, x, y, paint)
+
+        paint.getTextBounds(text2, 0, text2.length, bounds)
+        x = (bitmap.width - bounds.width()) / 2f - 470
+        y = (bitmap.height + bounds.height()) / 2f + 235
+        canvas.drawText(text2, x, y, paint)
+
+        return bitmap
     }
 
     private fun getCurrentLocale(context: Context): Locale =

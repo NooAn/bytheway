@@ -5,5 +5,9 @@
     android:layout_height="match_parent"
     android:background="@color/white"
     tools:context=".ui.activity.SplashActivity">
-
+<ImageView
+    android:layout_width="match_parent"
+    android:id="@+id/test"
+    android:layout_height="match_parent"
+    android:contentDescription="@string/feedback_text1" />
 </RelativeLayout>
