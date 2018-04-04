@@ -278,5 +278,6 @@
     <string name="request_done">Запрос был отправлен. Пользователь получит push уведомление.</string>
     <string name="this_user_search_you">This traveler wants to contact you.</string>
     <string name="click_for_copy">Click to copy</string>
+    <string name="text_for_soc_link_user">У вас нет контактов для связи, вы можете добавить их здесь.</string>
 
 </resources>

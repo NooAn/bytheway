@@ -271,21 +271,8 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
     }
 
     private fun openEmail(email: String, id: String) {
-        val emailIntent = Intent(Intent.ACTION_SEND)
-        emailIntent.setType("message/rfc822")
-        emailIntent.setData(Uri.parse("mailto:"))
-        emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, arrayOf(email))
-        emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, getString(R.string.app_name))
-        emailIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        if (emailIntent.resolveActivity(activity.packageManager) == null) {
-            val dialog = SocNetworkdialog(activity, email, id, mFirebaseAnalytics)
-            dialog.show()
-        } else
-            try {
-                context.startActivity(Intent.createChooser(emailIntent, getString(R.string.email_send)))
-            } catch (e: Exception) {
-                Toast.makeText(activity, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
-            }
+        val dialog = SocNetworkdialog(activity, email, id, mFirebaseAnalytics)
+        dialog.show()
     }
 
     private fun showErrorFroWrongSocValue(user: User, name: MutableMap.MutableEntry<String, String>) {

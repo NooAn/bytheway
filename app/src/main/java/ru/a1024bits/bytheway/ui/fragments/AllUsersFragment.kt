@@ -7,6 +7,8 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
 import android.content.Context
 import android.os.Bundle
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SearchView
 import android.text.Editable
 import android.text.TextWatcher
@@ -16,10 +18,7 @@ import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.EditText
-import android.widget.TextView
+import android.widget.*
 import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment
 import com.codetroopers.betterpickers.calendardatepicker.MonthAdapter
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -97,6 +96,8 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             Log.e("LOG", "AllUsersFragment")
             displayUsersAdapter = DisplayAllUsersAdapter(this.context, viewModel ?: return)
             installLogicToUI()
+            displayAllUsers.layoutManager = LinearLayoutManager(context, LinearLayout.VERTICAL, false)
+            displayAllUsers.hasFixedSize()
             displayAllUsers.adapter = displayUsersAdapter
 
             if (viewModel?.response?.hasObservers() == false)
@@ -110,10 +111,9 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             showPrompt("isFirstEnterAllUsersFragment", context.resources.getString(R.string.close_hint),
                     context.resources.getString(R.string.hint_all_travelers), context.resources.getString(R.string.hint_all_travelers_description), searchParametersText)
         } catch (e: Throwable) {
-            Log.e("LOG_AUF", e.toString())
             FirebaseCrash.report(e)
             loadingWhereLoadUsers.visibility = View.GONE
-           // showErrorLoading()
+
         }
     }
 
@@ -229,7 +229,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             openDateArrivedDialog(choseDateEnd)
         }
         choseDateEnd.setOnTouchListener(DateUtils.onDateTouch)
-        view_contain_block_parameters.layoutTransition.setDuration(700L)
+        view_contain_block_parameters.layoutTransition.setDuration(650L)
         searchButtonParameters.setOnClickListener {
             analytics.logEvent(TAG_ANALYTICS + "CLICK_ON_SEARCH", null)
 

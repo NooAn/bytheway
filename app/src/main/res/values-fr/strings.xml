@@ -218,4 +218,5 @@
     <string name="request_done">La demande a été envoyée. L\'utilisateur recevra une notification push.</string>
     <string name="this_user_search_you">Ce voyageur veut vous contacter.</string>
     <string name="click_for_copy">Cliquez pour copier</string>
+    <string name="text_for_soc_link_user">У вас нет контактов для связи, вы можете добавить их здесь.</string>
 </resources>
