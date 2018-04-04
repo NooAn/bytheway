@@ -312,7 +312,6 @@ class MenuActivity : AppCompatActivity(),
 
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
-        outState?.clear()
         outState?.putSerializable(STATE_SCREEN_NAMES, screenNames as java.io.Serializable)
     }
 

@@ -52,6 +52,7 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
         disposables.add(userRepository.uploadPhotoLink(path = pathFile, id = userId)
                 .subscribeOn(getBackgroundScheduler())
                 .doOnSubscribe({ _ -> loadingStatus.setValue(true) })
+                .doOnError({ loadingStatus.postValue(false) })
                 .doAfterTerminate({ loadingStatus.setValue(false) })
                 .flatMap({ urlPhoto -> savePhotoLink(urlPhoto, userId).subscribeOn(getBackgroundScheduler()) })
                 .observeOn(getMainThreadScheduler())
@@ -84,8 +85,8 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                 .timeout(TIMEOUT_SECONDS, timeoutUnit)
                 .retry(2)
                 .doOnSubscribe({ _ -> loadingStatus.setValue(true) })
-                .doOnError({ loadingStatus.setValue(false) })
-                .doAfterTerminate { loadingStatus.setValue(false) }
+                .doOnError({ loadingStatus.postValue(false) })
+                .doAfterTerminate { loadingStatus.postValue(false) }
                 .observeOn(getMainThreadScheduler())
                 .subscribe(
                         { user -> response.setValue(Response.success(user)) },
@@ -102,6 +103,7 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                 .retry(2)
                 .subscribeOn(getBackgroundScheduler())
                 .doOnSubscribe({ _ -> loadingStatus.setValue(true) })
+                .doOnError({ loadingStatus.postValue(false) })
                 .doAfterTerminate({ loadingStatus.setValue(false) })
                 .observeOn(getMainThreadScheduler())
                 .subscribe(
@@ -120,7 +122,7 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                 .doAfterTerminate({ loadingStatus.setValue(false) })
                 .observeOn(getMainThreadScheduler())
                 .subscribe({
-                    saveProfile.setValue(Response.success(true))
+                    saveProfile.value = Response.success(true)
                     user.value = makeUserFromMap(map, oldUser)
                 }, { throwable ->
                     saveProfile.setValue(Response.error(throwable))

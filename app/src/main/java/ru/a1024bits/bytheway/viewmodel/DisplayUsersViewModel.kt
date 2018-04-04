@@ -109,7 +109,7 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
                     .subscribe(
                             { },
                             { t ->
-                                response.value = Response.error(t)
+                                response.postValue(Response.error(t))
                             }
                     ))
         }

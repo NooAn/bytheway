@@ -12,6 +12,7 @@ import android.os.Build
 import android.os.Bundle
 import android.support.annotation.LayoutRes
 import android.support.design.widget.NavigationView
+import android.support.v4.content.ContextCompat
 import android.support.v4.content.res.ResourcesCompat
 import android.support.v4.widget.NestedScrollView
 import android.support.v7.app.AlertDialog
@@ -636,7 +637,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     override fun onStart() {
         super.onStart()
 
-        displayPriceTravel.text = StringBuilder(getString(R.string.type_money)).append(budget)
+        displayPriceTravel.text = budget.toString()
 
         val now = Calendar.getInstance()
 
@@ -652,7 +653,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
         add_city.setOnClickListener {
             MODE_TWO_CITY = !MODE_TWO_CITY
-            Log.e("LOG", "mode:" + MODE_TWO_CITY)
             if (MODE_TWO_CITY == true) {
                 // DELETE CITY
                 clearLastCity()
@@ -765,16 +765,16 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         }
     }
 
+    val MIN_LENGHT_TEXT = 158
+    val MIN_LENGHT_INFO_TEXT_FOR_POST = 40
     private fun shareVKPost() {
         thisActionIsVkShare = true
         val vk = VK()
         val cityArrived = textCityFrom.text.toString()
         val cityTo = getLastCity()
-        val text = "Ищу попутчика в $cityTo \n${getDates()}${getBudgetText()}${getInfoText()}${getMapsLink(cityArrived, cityTo)}${getHashTags()}"
-        scrollProfile.scrollTo(0, appinTheAirEnter.top)
-        val totalHeight = scrollProfile.getChildAt(0).height
-        val pos = totalHeight - appinTheAirEnter.top
-        scrollProfile.scrollBy(0, -pos)
+        var text = "Ищу попутчика в $cityTo \n${getDates()}${getBudgetText()}${getInfoText()}${getMapsLink(cityArrived, cityTo)}"
+        if (text.length < MIN_LENGHT_TEXT)
+            text += getHashTags(text.length)
         val linkUri = "https://play.google.com/store/apps/details?id=ru.a1024bits.bytheway.release&hl=${getCurrentLocale(activity)}&referrer=${mainUser?.id}"
         val textSize = getTextSize(cityArrived, cityTo)
         val bitmap = drawTextToBitmap(context = activity.baseContext,
@@ -788,10 +788,10 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     }
 
     private fun getMapsLink(cityArrived: String, cityTo: String) =
-            "\nhttps://www.google.ru/maps/dir/$cityArrived/$cityTo \n\n\n"
+            "\nhttps://www.google.ru/maps/dir/$cityArrived/$cityTo \n\n"
 
     private fun getInfoText(): String =
-            if (addInfoUser.text.isNotEmpty()) addInfoUser.text.toString().plus("\n") else ""
+            if (addInfoUser.text.isNotEmpty() && addInfoUser.text.length < MIN_LENGHT_INFO_TEXT_FOR_POST) addInfoUser.text.toString().plus("\n") else ""
 
 
     val format = SimpleDateFormat("dd.MM.yyyy", Locale.US)
@@ -858,20 +858,21 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             else
                 context.resources.configuration.locale;
 
-    private fun getHashTags(): String {
+    private fun getHashTags(len: Int): String {
         val hashTagText = StringBuilder("#bytheway ")
         hashTagText.append("#поискпопутчиков ")
         hashTagText.append("#ищупопутчика ")
         hashTagText.append("#").append(textCityFrom.text.toString()).append(" ")
         hashTagText.append("#").append(getLastCity()).append("2018 ")
-        if (mainUser?.method!![Method.HITCHHIKING.link] == true) {
+        Log.e("LOG", len.toString())
+        if (methodIcons[Method.HITCHHIKING.link]?.isActivated == true && len < 126) {
             hashTagText.append("#автостоп ")
-            hashTagText.append("#HITCHHIKING2018 ")
+            hashTagText.append("#hitchhiking2018 ")
         }
-        if (mainUser?.method!![Method.TRAIN.link] == true) {
+        if (methodIcons[Method.TRAIN.link]?.isActivated == true && len < 140) {
             hashTagText.append("#напоезде ")
         }
-        if (mainUser?.method!![Method.PLANE.link] == true) {
+        if (methodIcons[Method.PLANE.link]?.isActivated == true && len < 150) {
             hashTagText.append("#самолетом ")
         }
         return hashTagText.toString()
@@ -1530,6 +1531,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             glide?.load(link)
                     ?.apply(RequestOptions.circleCropTransform())
                     ?.into(image_avatar)
+        else
+            image_avatar.setImageDrawable(ContextCompat.getDrawable(activity, R.drawable.ic_add_user_to_social_network))
     }
 
     private fun fillProfile(user: User) {
