@@ -500,7 +500,8 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             val success = googleMap?.setMapStyle(
                     MapStyleOptions.loadRawResourceStyle(activity, R.raw.style))
 
-        } catch (e: Resources.NotFoundException) { }
+        } catch (e: Resources.NotFoundException) {
+        }
         viewModel?.load(uid)
     }
 
@@ -788,12 +789,17 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             text += getHashTags(text.length)
         val linkUri = "https://play.google.com/store/apps/details?id=ru.a1024bits.bytheway.release&hl=${getCurrentLocale(activity)}&referrer=${mainUser?.id}"
         val textSize = getTextSize(cityArrived, cityTo)
-        val bitmap = drawTextToBitmap(context = activity.baseContext,
-                gResId = R.drawable.template_for_posting,
-                textSize = textSize,
-                text1 = cityArrived,
-                text2 = cityTo)
-
+        var bitmap: Bitmap? = null
+        try {
+            bitmap = drawTextToBitmap(context = activity.baseContext,
+                    gResId = R.drawable.template_for_posting,
+                    textSize = textSize,
+                    text1 = cityArrived,
+                    text2 = cityTo)
+        } catch (e: Exception) {
+            if (!vk.start(activity))
+                vk.postToWall(activity, text, linkUri = linkUri)
+        }
         if (!vk.start(activity))
             vk.postToWall(activity, text, bitmap, linkUri)
     }

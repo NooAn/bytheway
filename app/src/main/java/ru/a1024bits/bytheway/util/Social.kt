@@ -1,12 +1,8 @@
 package ru.a1024bits.bytheway.util
 
 import android.app.Activity
-import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.net.Uri
 import android.support.v4.app.FragmentActivity
-import android.util.Log
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crash.FirebaseCrash
 import com.vk.sdk.VKScope
@@ -17,7 +13,6 @@ import com.vk.sdk.api.photo.VKUploadImage
 import com.vk.sdk.dialogs.VKShareDialog
 import com.vk.sdk.dialogs.VKShareDialogBuilder
 import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment
-import java.io.IOException
 
 
 /**
@@ -35,11 +30,10 @@ class VK {
         return false;
     }
 
-    fun postToWall(activity: FragmentActivity, text: String, bitmap: Bitmap, linkUri: String) {
+    fun postToWall(activity: FragmentActivity, text: String, bitmap: Bitmap? = null, linkUri: String) {
 
-        VKShareDialogBuilder()
+        val build = VKShareDialogBuilder()
                 .setText(text)
-                .setAttachmentImages(arrayOf(VKUploadImage(bitmap, VKImageParameters.pngImage())))
                 .setAttachmentLink("Опубликованно с помощью ByTheWay", linkUri) // fixme locale
                 .setShareDialogListener(object : VKShareDialog.VKShareDialogListener {
                     override fun onVkShareComplete(postId: Int) {
@@ -55,6 +49,9 @@ class VK {
                         FirebaseAnalytics.getInstance(activity).logEvent("${MyProfileFragment.TAG_ANALYTICS}_vk_error", null)
                     }
                 })
-                .show(activity.fragmentManager, "VK")
+        bitmap?.let {
+            build.setAttachmentImages(arrayOf(VKUploadImage(it, VKImageParameters.pngImage())))
+        }
+        build.show(activity.fragmentManager, "VK")
     }
 }
