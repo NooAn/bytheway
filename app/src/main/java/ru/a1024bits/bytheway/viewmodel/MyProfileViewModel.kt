@@ -51,17 +51,17 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
     fun loadImage(pathFile: Uri, userId: String, oldUser: User?) {
         disposables.add(userRepository.uploadPhotoLink(path = pathFile, id = userId)
                 .subscribeOn(getBackgroundScheduler())
-                .doOnSubscribe({ _ -> loadingStatus.setValue(true) })
-                .doAfterTerminate({ loadingStatus.setValue(false) })
+                .doOnSubscribe({ _ -> loadingStatus.postValue(true) })
+                .doAfterTerminate({ loadingStatus.postValue(false) })
                 .flatMap({ urlPhoto -> savePhotoLink(urlPhoto, userId).subscribeOn(getBackgroundScheduler()) })
                 .observeOn(getMainThreadScheduler())
                 .subscribe({
                     Log.e("LOG S :", Thread.currentThread().name)
-                    photoUrl.setValue(Response.success(it))
+                    photoUrl.postValue(Response.success(it))
                     oldUser?.urlPhoto = it
                     user.value = oldUser
                 }, { throwable ->
-                    photoUrl.setValue(Response.error(throwable))
+                    photoUrl.postValue(Response.error(throwable))
                 }))
     }
 
@@ -83,13 +83,13 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                 .subscribeOn(getBackgroundScheduler())
                 .timeout(TIMEOUT_SECONDS, timeoutUnit)
                 .retry(2)
-                .doOnSubscribe({ _ -> loadingStatus.setValue(true) })
-                .doOnError({ loadingStatus.setValue(false) })
-                .doAfterTerminate { loadingStatus.setValue(false) }
+                .doOnSubscribe({ _ -> loadingStatus.postValue(true) })
+                .doOnError({ loadingStatus.postValue(false) })
+                .doAfterTerminate { loadingStatus.postValue(false) }
                 .observeOn(getMainThreadScheduler())
                 .subscribe(
-                        { user -> response.setValue(Response.success(user)) },
-                        { throwable -> response.setValue(Response.error(throwable)) }
+                        { user -> response.postValue(Response.success(user)) },
+                        { throwable -> response.postValue(Response.error(throwable)) }
                 )
         )
     }
@@ -101,13 +101,13 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                 .timeout(TIMEOUT_SECONDS, timeoutUnit)
                 .retry(2)
                 .subscribeOn(getBackgroundScheduler())
-                .doOnSubscribe({ _ -> loadingStatus.setValue(true) })
-                .doAfterTerminate({ loadingStatus.setValue(false) })
+                .doOnSubscribe({ _ -> loadingStatus.postValue(true) })
+                .doAfterTerminate({ loadingStatus.postValue(false) })
                 .observeOn(getMainThreadScheduler())
                 .subscribe(
-                        { saveSocial.setValue(link) },
+                        { saveSocial.postValue(link) },
                         { throwable ->
-                            response.setValue(Response.error(throwable))
+                            response.postValue(Response.error(throwable))
                         }))
     }
 
@@ -116,14 +116,14 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                 .timeout(TIMEOUT_SECONDS, timeoutUnit)
                 .retry(2)
                 .subscribeOn(getBackgroundScheduler())
-                .doOnSubscribe({ _ -> loadingStatus.setValue(true) })
-                .doAfterTerminate({ loadingStatus.setValue(false) })
+                .doOnSubscribe({ _ -> loadingStatus.postValue(true) })
+                .doAfterTerminate({ loadingStatus.postValue(false) })
                 .observeOn(getMainThreadScheduler())
                 .subscribe({
-                    saveProfile.setValue(Response.success(true))
+                    saveProfile.postValue(Response.success(true))
                     user.value = makeUserFromMap(map, oldUser)
                 }, { throwable ->
-                    saveProfile.setValue(Response.error(throwable))
+                    saveProfile.postValue(Response.error(throwable))
                 })
         )
     }
@@ -194,9 +194,9 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                 .subscribeOn(getBackgroundScheduler())
                 .observeOn(getMainThreadScheduler())
                 .subscribe({
-                    routes.setValue(Response.success(it))
+                    routes.postValue(Response.success(it))
                 }, { throwable ->
-                    routes.setValue(Response.error(throwable))
+                    routes.postValue(Response.error(throwable))
                 })
         )
     }
@@ -207,9 +207,9 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                 .observeOn(getMainThreadScheduler())
                 .subscribe({
                     Log.e("LOG S :", Thread.currentThread().name)
-                    token.setValue(Response.success(true))
+                    token.postValue(Response.success(true))
                 }, { throwable ->
-                    token.setValue(Response.error(throwable))
+                    token.postValue(Response.error(throwable))
                 }))
     }
 }

@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.android.synthetic.main.fragment_app_in_the_air_sinchronized.*
 import ru.a1024bits.bytheway.R
@@ -62,6 +63,12 @@ class AppInTheAirSinchronizedFragment : Fragment() {
         val intent = Intent(
                 Intent.ACTION_VIEW,
                 Uri.parse(API_BASE_URL + "/oauth/authorize" + "?client_id=" + clientId + "&redirect_uri=" + redirectUri + "&response_type=code&scope=user_info%20user_flights%20user_email"))
-        startActivity(intent)
+        try {
+            startActivity(intent)
+        }catch (e: Exception) {
+            Toast.makeText(activity, "Error",Toast.LENGTH_SHORT).show()
+            startActivity(Intent(activity, MenuActivity::class.java))
+        }
+
     }
 }

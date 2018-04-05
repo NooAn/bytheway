@@ -105,11 +105,12 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
             disposables.add(it.changeUserProfile(map, id)
                     .timeout(TIMEOUT_SECONDS, timeoutUnit)
                     .retry(2)
-                    .doAfterTerminate({ loadingStatus.setValue(false) })
+                    .doAfterTerminate({ loadingStatus.postValue(false) })
                     .subscribe(
                             { },
                             { t ->
-                                response.value = Response.error(t)
+                                response.postValue(Response.error(t))
+
                             }
                     ))
         }
@@ -142,7 +143,7 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
                             { list ->
                                 response.setValue(Response.success(list))
                             },
-                            { throwable -> response.setValue(Response.error(throwable)) }
+                            { throwable -> response.postValue(Response.error(throwable)) }
                     )
             )
         }
