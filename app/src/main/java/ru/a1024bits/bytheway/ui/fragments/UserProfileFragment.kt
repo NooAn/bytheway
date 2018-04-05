@@ -4,7 +4,7 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
+import android.content.res.Resources
 import android.net.Uri
 import android.os.Bundle
 import android.support.annotation.LayoutRes
@@ -346,7 +346,14 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
 
     override fun onMapReady(map: GoogleMap?) {
         this.googleMap = map
+        try {
+            googleMap?.uiSettings?.isZoomControlsEnabled = true
+            // Customise the styling of the base map using a JSON object defined
+            // in a raw resource file.
+            val success = googleMap?.setMapStyle(
+                    MapStyleOptions.loadRawResourceStyle(activity, R.raw.style))
 
+        } catch (e: Resources.NotFoundException) { }
         if (arguments != null) {
             val userId: String = arguments.getString(UID_KEY, "")
             viewModel?.load(userId)
@@ -441,7 +448,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
     }
 
     private fun drawPolyline(routeString: String) {
-        val blueColor = ContextCompat.getColor(context, R.color.blueRouteLine)
+        val blueColor = ContextCompat.getColor(context, R.color.routeLine)
         val options = PolylineOptions()
         options.color(blueColor)
         options.width(5f)

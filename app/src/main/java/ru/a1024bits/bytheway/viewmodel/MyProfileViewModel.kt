@@ -27,6 +27,7 @@ import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment.Companion.DATES
 import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment.Companion.LASTNAME
 import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment.Companion.METHOD
 import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment.Companion.NAME
+import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment.Companion.NETWORK
 import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment.Companion.ROUTE
 import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment.Companion.SEX
 import ru.a1024bits.bytheway.util.Constants.END_DATE
@@ -68,7 +69,7 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
 
     private fun savePhotoLink(downloadUrl: String, id: String): Single<String> {
         val map: HashMap<String, Any> = hashMapOf()
-        map.put("urlPhoto", downloadUrl)
+        map["urlPhoto"] = downloadUrl
         return userRepository.changeUserProfile(map, id)
                 .timeout(TIMEOUT_SECONDS, timeoutUnit)
                 .retry(2)
@@ -95,9 +96,9 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
         )
     }
 
-    fun saveLinks(arraySocNetwork: HashMap<String, String>, id: String, link: SocialResponse) {
+    fun saveLinks(arraySocNetwork: HashMap<String, String>, id: String, link: SocialResponse, oldUser: User?) {
         val map: HashMap<String, Any> = hashMapOf()
-        map.put("socialNetwork", arraySocNetwork)
+        map.put(NETWORK, arraySocNetwork)
         disposables.add(userRepository.changeUserProfile(map, id)
                 .timeout(TIMEOUT_SECONDS, timeoutUnit)
                 .retry(2)
@@ -107,7 +108,10 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                 .doAfterTerminate({ loadingStatus.setValue(false) })
                 .observeOn(getMainThreadScheduler())
                 .subscribe(
-                        { saveSocial.setValue(link) },
+                        {
+                            saveSocial.value = link
+                            user.value = makeUserFromMap(map, oldUser)
+                        },
                         { throwable ->
                             response.setValue(Response.error(throwable))
                         }))
@@ -148,12 +152,12 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
         if (map.containsKey(NAME)) user?.name = map[NAME] as String
         if (map.containsKey(LASTNAME)) user?.lastName = map[LASTNAME] as String
         if (map.containsKey(CITY)) user?.city = map[CITY] as String
+        if (map.containsKey(NETWORK)) user?.socialNetwork = map[NETWORK] as java.util.HashMap<String, String>
 
         return user
     }
 
     fun updateStaticalInfo(airUser: AirUser?, id: String, user: User?) {
-        Log.d("LOG", "update statical")
         val map = HashMap<String, Any>()
         map.put("flightHours", airUser?.data?.hours?.toLong() ?: 0)
         val set = HashSet<String>()
@@ -171,7 +175,6 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
 
         if (body?.data?.trips?.isEmpty() == false && body.data.trips.get(0).flights != null) {
             for (flight in body.data.trips.get(0).flights) {
-                Log.d("LOG", (flight.departureUtc.toLong().toString() + " " + currentTime / 1000 + " " + (flight.departureLocale.toLong() > currentTime)))
                 if (flight.departureUtc.toLong() > currentTime / 1000) {
                     val mapCities = hashMapOf<String, String>()
                     mapCities.put(FIRST_INDEX_CITY, flight.origin.name)

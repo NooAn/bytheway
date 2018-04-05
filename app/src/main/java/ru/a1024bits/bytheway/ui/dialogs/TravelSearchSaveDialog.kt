@@ -23,7 +23,7 @@ class TravelSearchSaveDialog(mapFragment: MapFragment) : Dialog(mapFragment.acti
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(context)
         val view = layoutInflater.inflate(R.layout.d5_save_search_dialog, null)
-        view.findViewById<Button>(R.id.saveButton).setOnClickListener({ v ->
+        view.findViewById<Button>(R.id.sendButton).setOnClickListener({ v ->
             fragment.saveData()
             mFirebaseAnalytics.logEvent("Search_screen_save", null)
             this.dismiss()

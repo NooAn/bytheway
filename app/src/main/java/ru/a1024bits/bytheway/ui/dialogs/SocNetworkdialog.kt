@@ -15,27 +15,24 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.View
-import android.view.ViewGroup
 import android.view.Window
-import android.view.animation.Animation
-import android.view.animation.Transformation
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.android.synthetic.main.profile_main_image.*
 import kotlinx.android.synthetic.main.socnetwork_dialog.*
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
-import ru.a1024bits.bytheway.adapter.SimilarTravelsAdapter
 import ru.a1024bits.bytheway.adapter.SocIconsAdapter
 import ru.a1024bits.bytheway.model.FireBaseNotification
+import ru.a1024bits.bytheway.model.SocialNetwork
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
+import ru.a1024bits.bytheway.ui.fragments.MyProfileFragment.Companion.NETWORK
 import ru.a1024bits.bytheway.util.Constants
+import ru.a1024bits.bytheway.util.closeKeyboard
 import ru.a1024bits.bytheway.util.isNumberPhone
-import ru.a1024bits.bytheway.util.joinToString
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
 import javax.inject.Inject
 
@@ -46,13 +43,14 @@ import javax.inject.Inject
 
 class SocNetworkdialog(context: Context, idPhone: String?, uid: String, mFirebaseAnalytics: FirebaseAnalytics) : Dialog(context) {
     lateinit var viewModel: DisplayUsersViewModel
-    private val idPhone: String = idPhone ?: "Ошибка"
+    val error = "Ошибка"
+    private val idPhone: String = idPhone ?: error
     private val analitic = mFirebaseAnalytics
     val menuActivity: MenuActivity = context as MenuActivity
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
     val userId = uid
-
+    val ANALTAG = "soc_network_dialog"
     override fun onCreate(savedInstanceState: Bundle?) {
         App.component.inject(this)
         viewModel = ViewModelProviders.of(menuActivity, viewModelFactory).get(DisplayUsersViewModel::class.java)
@@ -60,15 +58,16 @@ class SocNetworkdialog(context: Context, idPhone: String?, uid: String, mFirebas
         val view = layoutInflater.inflate(R.layout.socnetwork_dialog, null)
         val text = view.findViewById<Button>(R.id.numberPhone)
         text.text = idPhone
-        if (idPhone.compareTo("Ошибка") == 0) view.findViewById<TextView>(R.id.text).visibility = View.GONE
+
+        if (idPhone.compareTo(error) == 0) view.findViewById<TextView>(R.id.text).visibility = View.GONE
         val setIds = menuActivity.getCallNotified()
         if (setIds.contains(userId)) {
             view.findViewById<Button>(R.id.callMe).visibility = View.GONE
         }
         text.setOnClickListener {
             val emailIntent = Intent(Intent.ACTION_SEND)
-            emailIntent.setType("message/rfc822")
-            emailIntent.setData(Uri.parse("mailto:"))
+            emailIntent.type = "message/rfc822"
+            emailIntent.data = Uri.parse("mailto:")
             emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, arrayOf(text.text))
             emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, context.getString(R.string.app_name))
             emailIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -79,7 +78,7 @@ class SocNetworkdialog(context: Context, idPhone: String?, uid: String, mFirebas
                 val clipboard = context.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
                 val clip = ClipData.newPlainText("telegram", idPhone)
                 clipboard.primaryClip = clip
-                analitic.logEvent("soc_network_dialog_click_copy", savedInstanceState)
+                analitic.logEvent("${ANALTAG}_click_copy", savedInstanceState)
                 Toast.makeText(context, R.string.copy_done, Toast.LENGTH_SHORT).show()
             } else
                 try {
@@ -91,7 +90,7 @@ class SocNetworkdialog(context: Context, idPhone: String?, uid: String, mFirebas
         }
 
         view.findViewById<Button>(R.id.callMe).setOnClickListener {
-            analitic.logEvent("soc_network_dialog_click_call_me", savedInstanceState)
+            analitic.logEvent("${ANALTAG}_click_call_me", savedInstanceState)
             if (!setIds.contains(userId)) {
                 setIds.add(userId)
                 viewModel.sendNotifications(userId, FireBaseNotification(
@@ -108,12 +107,12 @@ class SocNetworkdialog(context: Context, idPhone: String?, uid: String, mFirebas
         val textForSocNetwork = view.findViewById<TextView>(R.id.textForSocNetwork)
         val rview = view.findViewById<RecyclerView>(R.id.recyclerIconsSocNetwork)
         val listApp = getSocNetworkOnPhone(menuActivity)
-        //        if (listApp.size > 0)
 
         rview.layoutManager = LinearLayoutManager(context, LinearLayout.HORIZONTAL, false)
         rview.hasFixedSize()
-        if (menuActivity.mainUser?.socialNetwork?.size == 0) {
-            rview.adapter = SocIconsAdapter(getLists()) {
+        if (menuActivity.mainUser?.socialNetwork?.size == 0 && listApp.size > 0) {
+            rview.adapter = SocIconsAdapter(listApp) {
+                showLinkEditText()
                 when (it) {
                     R.drawable.ic_tg_color -> clickTG()
                     R.drawable.ic_whats_icon_color -> clickWh()
@@ -124,46 +123,79 @@ class SocNetworkdialog(context: Context, idPhone: String?, uid: String, mFirebas
             }
             textForSocNetwork.visibility = View.VISIBLE
         } else {
-            textForSocNetwork.visibility = View.VISIBLE
+            textForSocNetwork.visibility = View.GONE
             rview.visibility = View.GONE
         }
         setContentView(view)
     }
 
-    private fun getLists(): ArrayList<Int> {
-        val lists = ArrayList<Int>()
-        lists.add(R.drawable.ic_tg_color)
-        lists.add(R.drawable.ic_whats_icon_color)
-        lists.add(R.drawable.ic_fb_color)
-        lists.add(R.drawable.ic_vk_color)
-        return lists;
+    private fun send(s: SocialNetwork, text: String) {
+        var arraySocNetwork = hashMapOf<String, String>()
+        menuActivity.mainUser?.socialNetwork?.let {
+            arraySocNetwork = it
+        }
+        val map: HashMap<String, Any> = hashMapOf()
+        arraySocNetwork[s.link] = text
+        map[NETWORK] = arraySocNetwork
+        viewModel.sendUserData(map, FirebaseAuth.getInstance().currentUser?.uid.toString())
+        menuActivity.closeKeyboard()
+        link.visibility = View.GONE
+        sendButton.visibility = View.GONE
+        recyclerIconsSocNetwork.visibility = View.GONE
+        textForSocNetwork.visibility = View.GONE
+    }
+
+    private fun initListener(text: String, net: SocialNetwork, error: String?, isCorrectValue: (s: String) -> Boolean) {
+        link.setText(text)
+        sendButton.setOnClickListener {
+            val s = link.text.toString().replace("\\s".toRegex(), "")
+            if (isCorrectValue(s))
+                send(net, s)
+            else link.error = error
+        }
     }
 
     private fun clickTG() {
-        Log.e("LOG", "click1")
-        link.animate().alpha(1f).start()
+        analitic.logEvent("${ANALTAG}_save_dTG", null)
+        var number = "+7"
+        if (menuActivity.mainUser?.phone?.isNotBlank() == true && menuActivity.mainUser?.phone != "+7")
+            number = menuActivity.mainUser?.phone.toString()
+
+        initListener(number, SocialNetwork.TG, context.getString(R.string.error_link_open)) {
+            it.isNumberPhone() || it.startsWith("@")
+        }
+
     }
 
     private fun clickFb() {
-        Log.e("LOG", "click4")
-        val v = link
-        val anim = Animation() {
-            fun applyTransformation(float interpolatedTime, Transformation t) {
-                super.applyTransformation(interpolatedTime, t);
-                // Do relevant calculations here using the interpolatedTime that runs from 0 to 1
-                v.setLayoutParams(LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, (30 * interpolatedTime).toInt()));
-            }
-        };
-        anim.setDuration(500);
-        v.startAnimation(anim);
+        analitic.logEvent("${ANALTAG}_save_dFB", null)
+        val fb = "https://www.facebook.com/"
+        initListener(fb, SocialNetwork.FB, context.getString(R.string.error_link_open)) {
+            it.startsWith(fb) && it.length > fb.length
+        }
     }
 
     private fun clickWh() {
-        Log.e("LOG", "click13")
+        analitic.logEvent("${ANALTAG}_save_dWH", null)
+        var number = "+7"
+        if (menuActivity.mainUser?.phone?.isNotBlank() == true) number = menuActivity.mainUser?.phone.toString()
+
+        initListener(number, SocialNetwork.WHATSAPP, context.getString(R.string.fill_phone_invalid)) {
+            it.isNumberPhone()
+        }
     }
 
     private fun clickVK() {
-        Log.e("LOG", "click12")
+        analitic.logEvent("${ANALTAG}_save_dVK", null)
+        val vk = "https://www.vk.com/"
+        initListener(vk, SocialNetwork.VK, context.getString(R.string.error_link_open)) {
+            it.startsWith(vk) && it.length > vk.length
+        }
+    }
+
+    private fun showLinkEditText() {
+        link.visibility = View.VISIBLE
+        sendButton.visibility = View.VISIBLE
     }
 
     fun getSocNetworkOnPhone(context: Context): ArrayList<Int> {
@@ -173,10 +205,10 @@ class SocNetworkdialog(context: Context, idPhone: String?, uid: String, mFirebas
         val tg = isAppAvailable(context, "org.telegram.messenger")
         // val line = isAppAvailable(context, "jp.naver.line.android") // for future
         val list = ArrayList<Int>()
-        if (!wh) list.add(R.drawable.ic_whats_icon_color)
-        if (!fb) list.add(R.drawable.ic_fb_color)
-        if (!vk) list.add(R.drawable.ic_vk_color)
-        if (!tg) list.add(R.drawable.ic_tg_color)
+        if (wh) list.add(R.drawable.ic_whats_icon_color)
+        if (fb) list.add(R.drawable.ic_fb_color)
+        if (vk) list.add(R.drawable.ic_vk_color)
+        if (tg) list.add(R.drawable.ic_tg_color)
         return list
     }
 

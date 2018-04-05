@@ -1,72 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scrollProfile"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:animateLayoutChanges="true"
-    android:padding="16dp">
+    android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/text"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="16dp"
-        android:paddingEnd="28dp"
-        android:paddingStart="28dp"
-        android:text="@string/click_for_copy"
-        android:textAlignment="center"
-        android:visibility="visible" />
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
+        android:padding="16dp">
 
-    <Button
-        android:id="@+id/numberPhone"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@id/text"
-        android:paddingEnd="28dp"
-        android:paddingStart="28dp"
-        android:textAlignment="center"
-        android:textSize="12sp"
-        android:theme="@style/WhiteButton"
-        tools:text="899997373" />
+        <TextView
+            android:id="@+id/text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="16dp"
+            android:paddingEnd="28dp"
+            android:paddingStart="28dp"
+            android:text="@string/click_for_copy"
+            android:textAlignment="center"
+            android:visibility="visible" />
 
-    <Button
-        android:id="@+id/callMe"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/numberPhone"
-        android:paddingEnd="28dp"
-        android:paddingStart="28dp"
-        android:text="@string/call_me"
-        android:textAlignment="center"
-        android:theme="@style/WhiteButton" />
+        <Button
+            android:id="@+id/numberPhone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/text"
+            android:paddingEnd="28dp"
+            android:paddingStart="28dp"
+            android:textAlignment="center"
+            android:textSize="12sp"
+            android:theme="@style/WhiteButton"
+            tools:text="899997373" />
 
-    <TextView
-        android:id="@+id/textForSocNetwork"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/callMe"
-        android:paddingEnd="28dp"
-        android:paddingStart="28dp"
-        android:text="@string/text_for_soc_link_user"
-        android:textAlignment="center"
-        android:visibility="gone" />
+        <Button
+            android:id="@+id/callMe"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/numberPhone"
+            android:paddingEnd="28dp"
+            android:paddingStart="28dp"
+            android:text="@string/call_me"
+            android:textAlignment="center"
+            android:theme="@style/WhiteButton" />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerIconsSocNetwork"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/textForSocNetwork"
-        android:orientation="vertical" />
-    <EditText
-        android:layout_width="match_parent"
-        android:id="@+id/link"
-        android:paddingEnd="28dp"
-        android:paddingStart="28dp"
-        android:visibility="gone"
-        android:layout_below="@+id/recyclerIconsSocNetwork"
-        android:hint="@string/yes"
-        android:layout_height="0dp" />
+        <TextView
+            android:id="@+id/textForSocNetwork"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/callMe"
+            android:paddingEnd="28dp"
+            android:paddingStart="28dp"
+            android:text="@string/text_for_soc_link_user"
+            android:textAlignment="center"
+            android:visibility="gone"
+            tools:visibility="visible" />
 
-</RelativeLayout>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerIconsSocNetwork"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/textForSocNetwork"
+            android:layout_marginStart="28dp"
+            android:orientation="vertical" />
+
+        <EditText
+            android:id="@+id/link"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/recyclerIconsSocNetwork"
+            android:layout_marginEnd="28dp"
+            android:layout_marginStart="28dp"
+            android:hint="@string/phone"
+            android:textSize="14sp"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <Button
+            android:id="@+id/sendButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@+id/link"
+            android:layout_below="@id/link"
+            android:text="@string/button_send"
+            android:theme="@style/WhiteButton"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+    </RelativeLayout>
+</android.support.v4.widget.NestedScrollView>

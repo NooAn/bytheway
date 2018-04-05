@@ -7,6 +7,7 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
 import android.content.Context
 import android.os.Bundle
+import android.support.v4.app.FragmentActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SearchView
@@ -36,6 +37,7 @@ import ru.a1024bits.bytheway.repository.M_SEX
 import ru.a1024bits.bytheway.repository.W_SEX
 import ru.a1024bits.bytheway.util.DateUtils
 import ru.a1024bits.bytheway.util.DecimalInputFilter
+import ru.a1024bits.bytheway.util.closeKeyboard
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
 import java.util.*
 import javax.inject.Inject
@@ -155,7 +157,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             override fun onQueryTextSubmit(query: String): Boolean {
                 displayUsersAdapter.filterData(query)
                 analytics.logEvent(TAG_ANALYTICS + "SEARCH_QUERY", null)
-                closeKeyboard()
+                activity.closeKeyboard()
                 return true
             }
 
@@ -165,18 +167,6 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             }
         })
     }
-
-    private fun closeKeyboard() {
-        val imm = activity?.getSystemService(Activity.INPUT_METHOD_SERVICE) as (InputMethodManager?)
-        //Find the currently focused view, so we can grab the correct window token from it.
-        var view: View? = activity?.getCurrentFocus()
-        //If no view currently has focus, create a new one, just so we can grab a window token from it
-        if (view == null && activity != null) {
-            view = View(activity)
-        }
-        imm?.hideSoftInputFromWindow(view?.getWindowToken(), 0);
-    }
-
 
     private fun installLogicToUI() {
 
@@ -392,18 +382,5 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
     private fun showErrorLoading() {
         loadingWhereLoadUsers
     }
-
-    fun EditText.afterTextChanged(afterTextChanged: (String) -> Unit) {
-        this.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-            }
-
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-            }
-
-            override fun afterTextChanged(editable: Editable?) {
-                afterTextChanged.invoke(editable.toString())
-            }
-        })
-    }
 }
+

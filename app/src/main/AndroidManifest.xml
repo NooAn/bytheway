@@ -32,7 +32,8 @@
         </activity>
         <activity
             android:name=".ui.activity.RegistrationActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize" />
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait" />
 
         <activity
             android:name=".ui.activity.SplashActivity"
@@ -44,6 +45,7 @@
         </activity>
         <activity
             android:name="com.vk.sdk.VKServiceActivity"
+            android:configChanges="orientation|keyboardHidden"
             android:label="ServiceActivity"
             android:theme="@style/VK.Transparent" />
 

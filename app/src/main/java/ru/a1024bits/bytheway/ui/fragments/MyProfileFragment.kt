@@ -6,6 +6,7 @@ import android.arch.lifecycle.ViewModelProvider
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Resources
 import android.graphics.*
 import android.net.Uri
 import android.os.Build
@@ -94,6 +95,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         const val SEX = "sex"
         const val AGE = "age"
         const val NAME = "name"
+        const val NETWORK = "socialNetwork"
         const val LASTNAME = "lastName"
         const val ROUTE = "route"
         const val CITY = "city"
@@ -490,6 +492,15 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     override fun onMapReady(map: GoogleMap?) {
         this.googleMap = map
+
+        try {
+            googleMap?.uiSettings?.isZoomControlsEnabled = true
+            // Customise the styling of the base map using a JSON object defined
+            // in a raw resource file.
+            val success = googleMap?.setMapStyle(
+                    MapStyleOptions.loadRawResourceStyle(activity, R.raw.style))
+
+        } catch (e: Resources.NotFoundException) { }
         viewModel?.load(uid)
     }
 
@@ -582,7 +593,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     private fun drawPolyline() {
 
-        val blueColor = activity.resources.getColor(R.color.blueRouteLine)
+        val blueColor = activity.resources.getColor(R.color.routeLine)
         val options = PolylineOptions()
         options.color(blueColor)
 
@@ -1081,6 +1092,9 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     private fun checkingCityText(): Boolean {
         var errorString = ""
 
+        textCityFrom.error = null
+        textNewCity.error = null
+        textCityTo.error = null
 
         if (textCityFrom.text.isEmpty()) {
             textCityFrom.error = getString(R.string.name)
@@ -1229,7 +1243,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     }
 
     private fun savingUserData(name: String, lastName: String, city: String, age: Int, sex: Int) {
-
         val hashMap = hashMapOf(
                 NAME to name,
                 LASTNAME to lastName,
@@ -1237,7 +1250,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                 AGE to age,
                 SEX to sex
         )
-
         viewModel?.sendUserData(hashMap, uid, mainUser)
     }
 
@@ -1258,7 +1270,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         })
 
         dialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.save), { _, _ ->
-            val newLink = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString()
+            val newLink = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString().replace("\\s".toRegex(), "")
             if (!newLink.isNumberPhone()) {
                 dialogView.findViewById<EditText>(R.id.socLinkText).error = getString(R.string.fill_phone_invalid)
             } else {
@@ -1294,7 +1306,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         })
 
         dialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.save), { _, _ ->
-            val newLink = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString()
+            val newLink = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString().replace("\\s".toRegex(), "")
             if (newLink in defaultSocialValues.values) return@setButton
             addNewSocLink(socialNetworkLinkKey, newLink)
 
@@ -1333,7 +1345,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         })
 
         dialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.save), { _, _ ->
-            val newLink = dialogView.findViewById<EditText>(R.id.socLinkText)?.text.toString()
+            val newLink = dialogView.findViewById<EditText>(R.id.socLinkText)?.text.toString().replace("\\s".toRegex(), "")
             if (newLink in defaultSocialValues.values) return@setButton
             addNewSocLink(socialNetworkLinkKey, newLink)
         })
@@ -1385,7 +1397,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         })
 
         simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.save), { _, _ ->
-            val newLink = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString()
+            val newLink = dialogView.findViewById<EditText>(R.id.socLinkText).text.toString().replace("\\s".toRegex(), "")
             if (newLink in defaultSocialValues.values) return@setButton
             addNewSocLink(socialNetwork.link, newLink)
         })
@@ -1394,14 +1406,14 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     private fun addNewSocLink(socialNetworkLink: String, newLink: String) {
         socNet[socialNetworkLink] = newLink
-        viewModel?.saveLinks(socNet, uid, SocialResponse(socialNetworkLink, newLink))
+        viewModel?.saveLinks(socNet, uid, SocialResponse(socialNetworkLink, newLink), mainUser)
         mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_save_links", null)
     }
 
     private fun removeSocNet(socialNetworkLink: String) {
         mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_remove_links", null)
         socNet.remove(socialNetworkLink)
-        viewModel?.saveLinks(socNet, uid, SocialResponse(socialNetworkLink))
+        viewModel?.saveLinks(socNet, uid, SocialResponse(socialNetworkLink), mainUser)
     }
 
     private fun openAlertDialog(callback: () -> Unit) {

@@ -2,6 +2,7 @@ package ru.a1024bits.bytheway.ui.fragments
 
 import android.arch.lifecycle.ViewModelProvider
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
@@ -334,6 +335,14 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         this.mMap = googleMap
+        try {
+            // Customise the styling of the base map using a JSON object defined
+            // in a raw resource file.
+            val success = mMap?.setMapStyle(
+                    MapStyleOptions.loadRawResourceStyle(activity, R.raw.style))
+
+        } catch (e: Resources.NotFoundException) {
+        }
         val constLocation = LatLng(50.0, 50.0)
         try {
             if (points.size > 0) {
