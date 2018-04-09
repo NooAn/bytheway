@@ -827,9 +827,15 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
 
     private fun getTextSize(text1: String, text2: String) =
-            if (text1.length >= 21 || text2.length >= 20) 90 else 125
+            if (text1.length > 24 || text2.length >= 24) 25 else
+                if (text1.length > 22 || text2.length >= 22) 29 else
+                    if (text1.length > 20 || text2.length >= 20) 31 else
+                        if (text1.length > 19 || text2.length >= 19) 32 else
+                            if (text1.length > 18 || text2.length >= 18) 35 else
+                                if (text1.length > 16 || text2.length >= 16) 42 else 48
 
-    private fun drawTextToBitmap(context: Context, gResId: Int, textSize: Int = 78, text1: String, text2: String): Bitmap {
+
+    private fun drawTextToBitmap(context: Context, gResId: Int, textSize: Int = 50, text1: String, text2: String): Bitmap {
         val resources = context.resources
         val scale = resources.displayMetrics.density
         var bitmap = BitmapFactory.decodeResource(resources, gResId)
@@ -857,13 +863,13 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         // draw text to the Canvas center
         val bounds = Rect()
         paint.getTextBounds(text1, 0, text1.length, bounds)
-        var x = (bitmap.width - bounds.width()) / 2f - 470
-        var y = (bitmap.height + bounds.height()) / 2f - 140
+        var x = (bitmap.width - bounds.width()) / 2f - 270
+        var y = (bitmap.height + bounds.height()) / 2f - 60
         canvas.drawText(text1, x, y, paint)
 
         paint.getTextBounds(text2, 0, text2.length, bounds)
-        x = (bitmap.width - bounds.width()) / 2f - 470
-        y = (bitmap.height + bounds.height()) / 2f + 235
+        x = (bitmap.width - bounds.width()) / 2f - 270
+        y = (bitmap.height + bounds.height()) / 2f + 120
         canvas.drawText(text2, x, y, paint)
 
         return bitmap
