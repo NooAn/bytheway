@@ -34,10 +34,10 @@ class SplashActivity : AppCompatActivity() {
         App.component.inject(this)
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(RegistrationViewModel::class.java)
-        viewModel?.setTimestamp(FirebaseAuth.getInstance().currentUser?.uid ?: return)
+          viewModel?.setTimestamp(FirebaseAuth.getInstance().currentUser?.uid ?: return)
 
-//        val text = "MOSCOW"
-//        val text2 = "AMSTERDAM"
+//        val text = "ROME1"
+//        val text2 = "КРАСНОДАР"
 //        Log.e("Log", text2.length.toString())
 //        val bitmap = drawTextToBitmap(context = baseContext,
 //                gResId = R.drawable.template_for_posting,
@@ -47,54 +47,7 @@ class SplashActivity : AppCompatActivity() {
 //        findViewById<ImageView>(R.id.test).setImageBitmap(bitmap)
     }
 
-//    private fun getTextSize(text1: String, text2: String) =
-//            if (text1.length > 24 || text2.length >= 24) 25 else
-//                if (text1.length > 22 || text2.length >= 22) 29 else
-//                    if (text1.length > 20 || text2.length >= 20) 31 else
-//                        if (text1.length > 19 || text2.length >= 19) 32 else
-//                            if (text1.length > 18 || text2.length >= 18) 35 else
-//                                if (text1.length > 16 || text2.length >= 16) 42 else 48
-//
-//
-//    private fun drawTextToBitmap(context: Context, gResId: Int, textSize: Int = 50, text1: String, text2: String): Bitmap {
-//        val resources = context.resources
-//        val scale = resources.displayMetrics.density
-//        var bitmap = BitmapFactory.decodeResource(resources, gResId)
-//
-//        var bitmapConfig = bitmap.config;
-//        // set default bitmap config if none
-//        if (bitmapConfig == null) {
-//            bitmapConfig = android.graphics.Bitmap.Config.ARGB_8888
-//        }
-//        // resource bitmaps are imutable,
-//        // so we need to convert it to mutable one
-//        bitmap = bitmap.copy(bitmapConfig, true)
-//
-//        val canvas = Canvas(bitmap)
-//        // new antialised Paint
-//        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-//        paint.color = Color.rgb(93, 101, 67)
-//        // text size in pixels
-//        paint.textSize = (textSize * scale).roundToInt().toFloat()
-//        val fontFace = ResourcesCompat.getFont(context, R.font.acrobat)
-//        paint.typeface = Typeface.create(fontFace, Typeface.NORMAL)
-//        // text shadow
-//        paint.setShadowLayer(1f, 0f, 1f, Color.WHITE)
-//
-//        // draw text to the Canvas center
-//        val bounds = Rect()
-//        paint.getTextBounds(text1, 0, text1.length, bounds)
-//        var x = (bitmap.width - bounds.width()) / 2f - 270
-//        var y = (bitmap.height + bounds.height()) / 2f - 60
-//        canvas.drawText(text1, x, y, paint)
-//
-//        paint.getTextBounds(text2, 0, text2.length, bounds)
-//        x = (bitmap.width - bounds.width()) / 2f - 270
-//        y = (bitmap.height + bounds.height()) / 2f + 115
-//        canvas.drawText(text2, x, y, paint)
-//
-//        return bitmap
-//    }
+
 
     override fun onResume() {
         super.onResume()

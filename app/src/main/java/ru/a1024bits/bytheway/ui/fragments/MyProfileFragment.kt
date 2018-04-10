@@ -824,8 +824,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     private fun getBudgetText(): String =
             if (budget > 0) "Бюджет: ".plus(budget.toString()).plus("$\n") else ""
-
-
+    
     private fun getTextSize(text1: String, text2: String) =
             if (text1.length > 24 || text2.length >= 24) 25 else
                 if (text1.length > 22 || text2.length >= 22) 29 else
@@ -863,13 +862,14 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         // draw text to the Canvas center
         val bounds = Rect()
         paint.getTextBounds(text1, 0, text1.length, bounds)
-        var x = (bitmap.width - bounds.width()) / 2f - 270
-        var y = (bitmap.height + bounds.height()) / 2f - 60
-        canvas.drawText(text1, x, y, paint)
 
+        var x = (bitmap.width - bounds.width()) / 2f - ((bitmap.width / 100) * 12.89f) // this percent of image
+        var y = (bitmap.height + bounds.height()) / 2f - ((bitmap.height / 100) * 2.72f)
+        canvas.drawText(text1, x, y, paint)
         paint.getTextBounds(text2, 0, text2.length, bounds)
-        x = (bitmap.width - bounds.width()) / 2f - 270
-        y = (bitmap.height + bounds.height()) / 2f + 120
+
+        x = ((bitmap.width - bounds.width()) / 2f) - ((bitmap.width / 100) * 12.89f)
+        y = (bitmap.height + bounds.height()) / 2f + ((bitmap.height / 100) * 5.45f)
         canvas.drawText(text2, x, y, paint)
 
         return bitmap
