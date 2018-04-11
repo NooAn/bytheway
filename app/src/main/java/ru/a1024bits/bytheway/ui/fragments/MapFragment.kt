@@ -1,5 +1,7 @@
 package ru.a1024bits.bytheway.ui.fragments
 
+import android.arch.lifecycle.MutableLiveData
+import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
 import android.content.Context
 import android.content.res.Resources
@@ -180,7 +182,19 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
         mMapView?.onLowMemory()
     }
 
-    private val listUsers: android.arch.lifecycle.Observer<ru.a1024bits.bytheway.model.Response<List<User>>> = android.arch.lifecycle.Observer { response ->
+    var countEvents = 0
+    var usersData: List<User>? = null
+    private val transition: Observer<Int> = Observer { data ->
+        countEvents += data ?: 0
+        Log.e("LOGe", countEvents.toString())
+        when (countEvents) {
+            3 -> {
+                countEvents = 0 // summary 1 + 2 (events from animation and events from servers)
+                (activity as MenuActivity).navigator.applyCommand(Forward(Screens.SIMILAR_TRAVELS_SCREEN, usersData))
+            }
+        }
+    }
+    private val listUsers: Observer<ru.a1024bits.bytheway.model.Response<List<User>>> = Observer { response ->
 
         when (response?.status) {
             Status.SUCCESS -> {
@@ -203,8 +217,9 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
                     ))
                     (activity as MenuActivity).updateNotified(saveNotifiedIds)
                 }
-
-                (activity as MenuActivity).navigator.applyCommand(Forward(Screens.SIMILAR_TRAVELS_SCREEN, response.data))
+                usersData = response.data
+                Log.e("LOGe", usersData.toString())
+                viewModel?.liveData?.value = 2
             }
 
             Status.ERROR -> {
@@ -356,6 +371,8 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
             e.printStackTrace()
             FirebaseCrash.report(e)
         }
+        if (viewModel?.liveData?.hasObservers() == false)
+            viewModel?.liveData?.observe(this@MapFragment, transition)
     }
 
     private fun goFlyPlan() {
@@ -448,11 +465,14 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
 
             marker = mMap?.addMarker(markerOptions)
 
+            viewModel?.response?.observe(this@MapFragment, listUsers)
+            viewModel?.getSearchUsers(searchFragment?.filter ?: Filter())
+
+
             markerAnimation.animateMarker(marker, listPointPath.first(), listPointPath.last(),
                     LatLngInterpolator.CurveBezie(),
                     onAnimationEnd = {
-                        viewModel?.response?.observe(this@MapFragment, listUsers)
-                        viewModel?.getSearchUsers(searchFragment?.filter ?: Filter())
+                        viewModel?.liveData?.value = 1
                         listPointPath.clear()
                         markerAnimation.flag = false
                     })

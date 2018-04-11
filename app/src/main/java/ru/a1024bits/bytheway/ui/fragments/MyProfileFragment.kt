@@ -824,7 +824,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     private fun getBudgetText(): String =
             if (budget > 0) "Бюджет: ".plus(budget.toString()).plus("$\n") else ""
-    
+
     private fun getTextSize(text1: String, text2: String) =
             if (text1.length > 24 || text2.length >= 24) 25 else
                 if (text1.length > 22 || text2.length >= 22) 29 else

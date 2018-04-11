@@ -27,7 +27,8 @@ import kotlin.collections.ArrayList
  */
 
 class DisplayUsersViewModel @Inject constructor(private var userRepository: UserRepository?) : BaseViewModel(), FilterAndInstallListener {
-    var response: MutableLiveData<Response<List<User>>> = MutableLiveData()
+    val response: MutableLiveData<Response<List<User>>> = MutableLiveData()
+    val liveData = MutableLiveData<Int>()
     var yearsOldUsers = (0..MAX_AGE).mapTo(ArrayList()) { it.toString() }
     override var filter = Filter()
 
@@ -40,7 +41,7 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
         try {
             this.filter = f ?: filter
             if (users.size != 0 && filter.isNotDefault()) {
-                response.value = Response.success(users)
+                response.postValue(Response.success(users))
             } else
                 userRepository?.installAllUsers(this)
         } catch (e: Exception) {
@@ -105,7 +106,7 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
             disposables.add(it.changeUserProfile(map, id)
                     .timeout(TIMEOUT_SECONDS, timeoutUnit)
                     .retry(2)
-                    .doAfterTerminate({ loadingStatus.setValue(false) })
+                    .doAfterTerminate({ loadingStatus.postValue(false) })
                     .subscribe(
                             { },
                             { t ->
@@ -137,12 +138,12 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
                     .toSortedList(compareByDescending { l -> l.percentsSimilarTravel }) // перед отправкой сортируем по степени похожести маршрута.
                     .observeOn(getMainThreadScheduler())
                     .doOnSuccess { Log.e("LOG 2", Thread.currentThread().name) }
-                    .doAfterTerminate({ loadingStatus.setValue(false) })
+                    .doAfterTerminate({ loadingStatus.postValue(false) })
                     .subscribe(
                             { list ->
-                                response.setValue(Response.success(list))
+                                response.postValue(Response.success(list))
                             },
-                            { throwable -> response.setValue(Response.error(throwable)) }
+                            { throwable -> response.postValue(Response.error(throwable)) }
                     )
             )
         }

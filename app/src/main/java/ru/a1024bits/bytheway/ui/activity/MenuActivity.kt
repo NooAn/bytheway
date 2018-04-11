@@ -161,7 +161,7 @@ class MenuActivity : AppCompatActivity(),
 
         updateUsersInfo(FirebaseAuth.getInstance().currentUser?.photoUrl.toString())
         pLoader = this.findViewById(R.id.pLoaderRes) as ProgressCustom
-        pLoader?.show()
+
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
         if (savedInstanceState == null) {
             if (preferences.getBoolean(Constants.FIRST_ENTER, true)) {
