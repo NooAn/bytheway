@@ -24,11 +24,11 @@ android {
     }
     signingConfigs {
         release {
-            // storeFile file(RELEASE_STORE_FILE)
-//            storePassword RELEASE_STORE_PASSWORD
-//            keyAlias RELEASE_KEY_ALIAS
-//            keyPassword RELEASE_KEY_PASSWORD
-//            storeFile file("C:/Users/Bit/Desktop/key_for_by_the_way.jks")
+            storeFile file(RELEASE_STORE_FILE)
+            storePassword RELEASE_STORE_PASSWORD
+            keyAlias RELEASE_KEY_ALIAS
+            keyPassword RELEASE_KEY_PASSWORD
+            storeFile file("C:/Users/Bit/Desktop/key_for_by_the_way.jks")
         }
     }
     productFlavors {
@@ -42,10 +42,10 @@ android {
 
     buildTypes {
         release {
-            applicationIdSuffix ".release"
-//               signingConfig signingConfigs.release
-            //minifyEnabled true
-            //   proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+//            applicationIdSuffix ".release"
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
 

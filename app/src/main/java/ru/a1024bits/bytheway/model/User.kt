@@ -2,7 +2,9 @@ package ru.a1024bits.bytheway.model
 
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.ServerTimestamp
+import java.io.Serializable
 import java.util.*
+
 
 enum class Method(var link: String) {
     TRAIN("train"),
@@ -20,7 +22,9 @@ enum class SocialNetwork(var link: String) {
     FB("FB"),
     TG("TG")
 }
+
 const val URL_PHOTO = "https://www.ischool.berkeley.edu/sites/default/files/default_images/avatar.jpeg"
+
 class SocialResponse(var link: String = "", var value: String = "")
 
 class FireBaseNotification(var title: String = "",
@@ -28,9 +32,6 @@ class FireBaseNotification(var title: String = "",
                            var cmd: String = "",
                            var value: String? = "")
 
-/**
- *
- */
 data class User(var name: String = "",
                 var lastName: String = "",
                 var age: Int = 0,
@@ -45,24 +46,24 @@ data class User(var name: String = "",
                 var countries: Long = 0,
                 var kilometers: Long = 0,
                 var route: String = "",
-                var cities: HashMap<String, String> = hashMapOf<String, String>(),
+                var cities: HashMap<String, String> = hashMapOf(),
                 var method: HashMap<String, Boolean> = hashMapOf(Method.BUS.link to false,
                         Method.TRAIN.link to false,
                         Method.PLANE.link to false,
                         Method.CAR.link to false,
                         Method.HITCHHIKING.link to false),
-                var dates: HashMap<String, Long> = hashMapOf<String, Long>(),
+                var dates: HashMap<String, Long> = hashMapOf(),
                 var budget: Long = 0,
                 var budgetPosition: Int = 0,
                 var city: String = "",
                 var percentsSimilarTravel: Int = 0,
                 var addInformation: String = "",
                 var sex: Int = 0,
-                var socialNetwork: HashMap<String, String> = hashMapOf<String, String>(),
+                var socialNetwork: HashMap<String, String> = hashMapOf(),
                 var data: Long = 0,
                 var token: String = "",
-                var urlPhoto: String = URL_PHOTO ,
-                @ServerTimestamp var timestamp: Date? = Date())
+                var urlPhoto: String = URL_PHOTO,
+                @ServerTimestamp var timestamp: Date? = Date()) : Serializable
 
 fun User.contains(query: String): Boolean =
         this.cities.filterValues { city -> city.contains(query, true) }.isNotEmpty() ||
