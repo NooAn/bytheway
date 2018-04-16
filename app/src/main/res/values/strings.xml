@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">bytheway</string>
     <string name="button_send">Отправить</string>
-        <integer name="com_vk_sdk_AppId">6427726</integer>
+    <integer name="com_vk_sdk_AppId">6427726</integer>
 
     <string name="fullname">Andrey Petrov</string>
     <string name="type_money"> </string>
@@ -45,7 +45,7 @@
     <string name="social_links">Ссылки на социальные сети</string>
     <string name="error_update">Ошибка обновления</string>
     <string name="just_error">Ошибка c сервером. Может попозже?</string>
-    <string name="text_confirm_remove_trip">Все изменения будет потеряны. \n Вы действительно хотите удалить поездку?</string>
+    <string name="text_confirm_remove_trip">Все изменения будет потеряны. \nВы действительно хотите удалить поездку?</string>
     <string name="sex_and_age">Пол, возраст</string>
     <string name="age">Возраст</string>
     <string name="add_new_trip">+ Создать поездку</string>
@@ -159,6 +159,6 @@
     <string name="this_user_search_you">С вами хочет связаться этот путешественник.</string>
     <string name="click_for_copy">Нажмите, что бы, скопировать</string>
     <string name="text_for_soc_link_user">У вас нет контактов, добавьте их здесь:</string>
-
     <string name="or">или</string>
+    <string name="text_for_empty_search">С такими параметрами сюда никто не едет. \nПопробуйте ввести другие параметры запроса.</string>
 </resources>

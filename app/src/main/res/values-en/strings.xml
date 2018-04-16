@@ -280,5 +280,6 @@
     <string name="click_for_copy">Click to copy</string>
     <string name="text_for_soc_link_user">You do not have any contacts for communication, you can add them here.</string>
     <string name="or">или</string>
+    <string name="text_for_empty_search">With these parameters, no one is coming here. \nTry to enter other query parameters.</string>
 
 </resources>

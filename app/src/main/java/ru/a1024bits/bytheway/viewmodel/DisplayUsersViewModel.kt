@@ -54,7 +54,7 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
     val TWO_MONTHS_IN_MLSECONDS: Long = 5270400000
 
     override fun filterAndInstallUsers(vararg snapshots: QuerySnapshot) {
-        Single.create<MutableList<User>> { stream ->
+        disposables.add(Single.create<MutableList<User>> { stream ->
             try {
                 val result: MutableList<User> = ArrayList()
                 snapshots.map {
@@ -65,8 +65,7 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
                                 val user = document.toObject(User::class.java)
                                 if (user.cities.size > 0
                                         && user.id != FirebaseAuth.getInstance().currentUser?.uid) {
-                                    if (!(user.dates[START_DATE] ?: 0L <= System.currentTimeMillis() - TWO_MONTHS_IN_MLSECONDS && (user.dates[END_DATE] == null || user.dates[END_DATE] ?: 0 != 0L)))
-                                        result.add(user)
+                                    result.add(user)
                                 }
                             }
                         } catch (e: Exception) {
@@ -82,16 +81,17 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
             }
         }
                 .subscribeOn(getBackgroundScheduler())
-                .timeout(TIMEOUT_SECONDS, timeoutUnit)
+                .timeout(TIMEOUT_SECONDS, timeoutUnit, getBackgroundScheduler())
                 .retry(2)
                 .doOnSubscribe({ loadingStatus.postValue(true) })
                 .doAfterTerminate({ loadingStatus.postValue(false) })
                 .subscribe({ resultUsers ->
+                    Log.e("LOG", "count users: ${resultUsers.size}")
                     if (users.size == 0)
                         users.addAll(resultUsers)
                     response.postValue(Response.success(resultUsers))
                 },
-                        { throwable -> response.postValue(Response.error(throwable)) })
+                        { throwable -> response.postValue(Response.error(throwable)) }))
     }
 
     var users: ArrayList<User> = ArrayList<User>()
@@ -104,7 +104,7 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
         userRepository?.let {
             loadingStatus.value = true
             disposables.add(it.changeUserProfile(map, id)
-                    .timeout(TIMEOUT_SECONDS, timeoutUnit)
+                    .timeout(TIMEOUT_SECONDS, timeoutUnit, getBackgroundScheduler())
                     .retry(2)
                     .doAfterTerminate({ loadingStatus.postValue(false) })
                     .subscribe(
@@ -122,7 +122,7 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
             loadingStatus.value = true
             disposables.add(it.getRealUsers()
                     .subscribeOn(getBackgroundScheduler())
-                    .timeout(TIMEOUT_SECONDS, timeoutUnit)
+                    .timeout(TIMEOUT_SECONDS, timeoutUnit, getBackgroundScheduler())
                     .retry(2)
                     .cache()
                     .filter { user -> user.cities.size > 0 }

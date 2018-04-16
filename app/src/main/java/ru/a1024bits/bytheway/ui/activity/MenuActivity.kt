@@ -283,7 +283,6 @@ class MenuActivity : AppCompatActivity(),
 
         override fun applyCommand(command: Command?) {
             super.applyCommand(command)
-            Log.e("LOG command", command.toString())
         }
     }
 
@@ -339,11 +338,9 @@ class MenuActivity : AppCompatActivity(),
 
     override fun onResume() {
         super.onResume()
-        Log.e("TEST", "onResume")
         // the intent filter defined in AndroidManifest will handle the return from ACTION_VIEW intent
         val uri = intent.data
         if (uri != null && uri.toString().startsWith(redirectUri)) {
-            Log.e("LOGI:", uri.toString())
             // use the parameter your API exposes for the code (mostly it's "code")
             val code = uri.getQueryParameter("code")
             if (code != null) {

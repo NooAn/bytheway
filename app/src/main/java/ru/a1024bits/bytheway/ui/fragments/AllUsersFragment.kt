@@ -83,8 +83,6 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
         analytics = FirebaseAnalytics.getInstance(this.context)
-        Log.e("LOG", "AllUsersFragment onCreate")
-
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -95,7 +93,6 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             viewModel?.let {
                 filter = it.filter
             }
-            Log.e("LOG", "AllUsersFragment")
             displayUsersAdapter = DisplayAllUsersAdapter(this.context, viewModel ?: return)
             installLogicToUI()
             displayAllUsers.layoutManager = LinearLayoutManager(context, LinearLayout.VERTICAL, false)
