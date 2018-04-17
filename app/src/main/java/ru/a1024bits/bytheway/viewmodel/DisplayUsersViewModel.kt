@@ -7,7 +7,10 @@ import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.QuerySnapshot
 import io.reactivex.Single
 import ru.a1024bits.bytheway.algorithm.SearchTravelers
-import ru.a1024bits.bytheway.model.*
+import ru.a1024bits.bytheway.model.FireBaseNotification
+import ru.a1024bits.bytheway.model.Response
+import ru.a1024bits.bytheway.model.User
+import ru.a1024bits.bytheway.model.contains
 import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.repository.MAX_AGE
 import ru.a1024bits.bytheway.repository.UserRepository
@@ -218,13 +221,8 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
             (!((filter.startBudget >= 0) && (filter.endBudget > 0)) ||
                     (it.budget >= filter.startBudget && it.budget <= filter.endBudget))
 
-    private fun checkMethod(it: User, filter: Filter): Boolean {
-        return !((it.method[Method.BUS.link] == true && filter.method[Method.BUS.link] == true)
-                || (it.method[Method.HITCHHIKING.link] == true && filter.method[Method.HITCHHIKING.link] == true)
-                || (it.method[Method.CAR.link] == true && filter.method[Method.CAR.link] == true)
-                || (it.method[Method.PLANE.link] == true && filter.method[Method.PLANE.link] == true)
-                || (it.method[Method.TRAIN.link] == true && filter.method[Method.TRAIN.link] == true))
-    }
+    private fun checkMethod(user: User, filter: Filter) =
+            filter.method.isEmpty() || (filter.method.filter { it.value && user.method[it.key] == true }.count() > 0)
 
     private fun checkEndDate(filter: Filter, it: User) =
             (filter.endDate == 0L || (it.dates[END_DATE] != null && it.dates[END_DATE] != 0L &&
