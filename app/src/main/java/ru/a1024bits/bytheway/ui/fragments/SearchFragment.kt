@@ -156,8 +156,6 @@ class SearchFragment : Fragment() {
                 dateToValue.text = user.dates[END_DATE]?.getNormallDate()
         }
 
-
-
         swap_cities.setOnClickListener {
             val tempString = text_from_city.text
             text_from_city.text = text_to_city.text

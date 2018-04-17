@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/all_users_sv"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -257,12 +258,150 @@
             android:saveEnabled="true"
             android:theme="@style/UsersTextInFilters" />
 
+        <!-- Travel types -->
+        <LinearLayout
+            android:id="@+id/layoutTravelMethod"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/endBudget"
+            android:layout_marginBottom="8dp"
+            android:gravity="bottom"
+            android:orientation="horizontal"
+            android:visibility="visible">
+            <!-- Car -->
+            <RelativeLayout
+                android:id="@+id/iconCar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?android:attr/selectableItemBackgroundBorderless">
+
+                <TextView
+                    android:id="@+id/travelCarText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:drawablePadding="10dp"
+                    android:drawableTop="@drawable/ic_search_car_selector"
+                    android:gravity="center_horizontal"
+                    android:text="@string/travelCar"
+                    android:textSize="@dimen/travelTypeHintTextSize" />
+
+                <View
+                    android:layout_width="2dp"
+                    android:layout_height="match_parent"
+                    android:layout_alignBottom="@+id/travelCarText"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginBottom="@dimen/travelTypeHintTextMarginBottom"
+                    android:background="@color/greyTravelTypeDivider" />
+            </RelativeLayout>
+            <!-- Train -->
+            <RelativeLayout
+                android:id="@+id/iconTrain"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <TextView
+                    android:id="@+id/travelTrainText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:drawablePadding="10dp"
+                    android:drawableTop="@drawable/ic_search_train_selector"
+                    android:gravity="center_horizontal"
+                    android:text="@string/travelTrain"
+                    android:textSize="@dimen/travelTypeHintTextSize" />
+
+                <View
+                    android:layout_width="2dp"
+                    android:layout_height="match_parent"
+                    android:layout_alignBottom="@+id/travelTrainText"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginBottom="@dimen/travelTypeHintTextMarginBottom"
+                    android:background="@color/greyTravelTypeDivider" />
+            </RelativeLayout>
+            <!-- Bus -->
+            <RelativeLayout
+                android:id="@+id/iconBus"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?android:attr/selectableItemBackgroundBorderless">
+
+                <TextView
+                    android:id="@+id/travelBusText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:drawablePadding="10dp"
+                    android:drawableTop="@drawable/ic_search_bus_selector"
+                    android:gravity="center_horizontal"
+                    android:text="@string/travelBus"
+                    android:textSize="@dimen/travelTypeHintTextSize" />
+
+                <View
+                    android:layout_width="2dp"
+                    android:layout_height="match_parent"
+                    android:layout_alignBottom="@+id/travelBusText"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginBottom="@dimen/travelTypeHintTextMarginBottom"
+                    android:background="@color/greyTravelTypeDivider" />
+            </RelativeLayout>
+            <!-- Plane -->
+            <RelativeLayout
+                android:id="@+id/iconPlane"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?android:attr/selectableItemBackgroundBorderless">
+
+                <TextView
+                    android:id="@+id/travelPlaneText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:drawablePadding="10dp"
+                    android:drawableTop="@drawable/ic_search_plane_selector"
+                    android:gravity="center_horizontal"
+                    android:text="@string/travelPlane"
+                    android:textSize="@dimen/travelTypeHintTextSize" />
+
+                <View
+                    android:layout_width="2dp"
+                    android:layout_height="match_parent"
+                    android:layout_alignBottom="@+id/travelPlaneText"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginBottom="@dimen/travelTypeHintTextMarginBottom"
+                    android:background="@color/greyTravelTypeDivider" />
+            </RelativeLayout>
+            <!-- Hitch hicking -->
+            <RelativeLayout
+                android:id="@+id/iconHitchHicking"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?android:attr/selectableItemBackgroundBorderless">
+
+                <TextView
+                    android:id="@+id/travelHitchHikingText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:drawablePadding="10dp"
+                    android:drawableTop="@drawable/ic_search_hitch_hiking_selector"
+                    android:gravity="center_horizontal"
+                    android:text="@string/travelHitchHicking"
+                    android:textSize="@dimen/travelTypeHintTextSize" />
+            </RelativeLayout>
+        </LinearLayout>
+
         <Button
             android:id="@+id/searchButtonParameters"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:layout_below="@id/budgetText"
+            android:layout_below="@id/layoutTravelMethod"
             android:layout_marginStart="10dp"
             android:drawablePadding="10dp"
             android:drawableStart="@drawable/ic_search_black_24dp"
@@ -275,7 +414,7 @@
             android:id="@+id/cancelParameters"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/budgetText"
+            android:layout_below="@id/layoutTravelMethod"
             android:layout_toStartOf="@id/searchButtonParameters"
             android:stateListAnimator="@null"
             android:text="@string/cancel"

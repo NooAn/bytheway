@@ -7,10 +7,7 @@ import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.QuerySnapshot
 import io.reactivex.Single
 import ru.a1024bits.bytheway.algorithm.SearchTravelers
-import ru.a1024bits.bytheway.model.FireBaseNotification
-import ru.a1024bits.bytheway.model.Response
-import ru.a1024bits.bytheway.model.User
-import ru.a1024bits.bytheway.model.contains
+import ru.a1024bits.bytheway.model.*
 import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.repository.MAX_AGE
 import ru.a1024bits.bytheway.repository.UserRepository
@@ -201,13 +198,16 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
     fun filterUsersByOptions(resultUsers: MutableList<User>, filter: Filter) {
         resultUsers.retainAll {
             var found = (!((filter.startBudget >= 0) && (filter.endBudget > 0)) ||
-                    (it.budget >= filter.startBudget && it.budget <= filter.endBudget)) &&
-                    ((it.age >= filter.startAge && it.age <= filter.endAge)) &&
-                    ((filter.sex == 0) || (it.sex == filter.sex)) &&
-                    ((filter.startCity.isEmpty()) ||
-                            (it.cities[FIRST_INDEX_CITY]?.contains(filter.startCity, true) == true)) &&
-                    ((filter.endCity.isEmpty()) ||
-                            (it.cities[LAST_INDEX_CITY]?.contains(filter.endCity, true) == true))
+                    (it.budget >= filter.startBudget && it.budget <= filter.endBudget))
+                    && ((it.age >= filter.startAge && it.age <= filter.endAge))
+                    && ((filter.sex == 0) || (it.sex == filter.sex))
+                    && ((filter.startCity.isEmpty()) || (it.cities[FIRST_INDEX_CITY]?.contains(filter.startCity, true) == true))
+                    && ((filter.endCity.isEmpty()) || (it.cities[LAST_INDEX_CITY]?.contains(filter.endCity, true) == true))
+                    && !((it.method[Method.BUS.link] == true && filter.method[Method.BUS.link] == true)
+                    || (it.method[Method.HITCHHIKING.link] == true && filter.method[Method.HITCHHIKING.link] == true)
+                    || (it.method[Method.CAR.link] == true && filter.method[Method.CAR.link] == true)
+                    || (it.method[Method.PLANE.link] == true && filter.method[Method.PLANE.link] == true)
+                    || (it.method[Method.TRAIN.link] == true && filter.method[Method.TRAIN.link] == true))
             if (found && filter.startDate > 0L) {
                 found = (it.dates[START_DATE] != null && it.dates[START_DATE] != 0L &&
                         it.dates[START_DATE] ?: 0 >= filter.startDate)
