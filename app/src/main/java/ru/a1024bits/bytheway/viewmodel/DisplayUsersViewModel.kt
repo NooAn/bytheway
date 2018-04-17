@@ -200,8 +200,8 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
 
     fun filterUsersByOptions(resultUsers: MutableList<User>, filter: Filter) {
         resultUsers.retainAll {
-            checkBudget(filter, it) && checkAge(it, filter) && checkSex(filter, it) && checkFirstCity(filter, it)
-                    && checkEndCity(filter, it) && checkMethod(it, filter) && checkStartDate(filter, it) && checkEndDate(filter, it)
+            checkBudget(filter, it) && checkAge(filter, it) && checkSex(filter, it) && checkFirstCity(filter, it)
+                    && checkEndCity(filter, it) && checkMethod(filter, it) && checkStartDate(filter, it) && checkEndDate(filter, it)
         }
     }
 
@@ -214,14 +214,14 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
     private fun checkSex(filter: Filter, user: User) =
             ((filter.sex == 0) || (user.sex == filter.sex))
 
-    private fun checkAge(user: User, filter: Filter) =
+    private fun checkAge(filter: Filter, user: User) =
             ((user.age >= filter.startAge && user.age <= filter.endAge))
 
     private fun checkBudget(filter: Filter, user: User) =
             (!((filter.startBudget >= 0) && (filter.endBudget > 0)) ||
                     (user.budget >= filter.startBudget && user.budget <= filter.endBudget))
 
-    private fun checkMethod(user: User, filter: Filter) =
+    private fun checkMethod(filter: Filter, user: User) =
             filter.method.isEmpty() || (filter.method.filter { it.value && user.method[it.key] == true }.count() > 0)
 
     private fun checkEndDate(filter: Filter, user: User) =
