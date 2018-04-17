@@ -56,7 +56,7 @@
     "elementType": "geometry.stroke",
     "stylers": [
       {
-        "color": "#fdcf9d"
+        "color": "#fbdd84"
       },
       {
         "visibility": "on"
@@ -244,7 +244,7 @@
     "elementType": "geometry",
     "stylers": [
       {
-        "color": "#4d8bca"
+        "color": "#d9ecff"
       }
     ]
   },
