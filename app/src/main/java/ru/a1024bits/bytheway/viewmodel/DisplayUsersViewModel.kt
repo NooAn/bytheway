@@ -205,32 +205,32 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
         }
     }
 
-    private fun checkEndCity(filter: Filter, it: User) =
-            ((filter.endCity.isEmpty()) || (it.cities[LAST_INDEX_CITY]?.contains(filter.endCity, true) == true))
+    private fun checkEndCity(filter: Filter, user: User) =
+            ((filter.endCity.isEmpty()) || (user.cities[LAST_INDEX_CITY]?.contains(filter.endCity, true) == true))
 
-    private fun checkFirstCity(filter: Filter, it: User) =
-            ((filter.startCity.isEmpty()) || (it.cities[FIRST_INDEX_CITY]?.contains(filter.startCity, true) == true))
+    private fun checkFirstCity(filter: Filter, user: User) =
+            ((filter.startCity.isEmpty()) || (user.cities[FIRST_INDEX_CITY]?.contains(filter.startCity, true) == true))
 
-    private fun checkSex(filter: Filter, it: User) =
-            ((filter.sex == 0) || (it.sex == filter.sex))
+    private fun checkSex(filter: Filter, user: User) =
+            ((filter.sex == 0) || (user.sex == filter.sex))
 
-    private fun checkAge(it: User, filter: Filter) =
-            ((it.age >= filter.startAge && it.age <= filter.endAge))
+    private fun checkAge(user: User, filter: Filter) =
+            ((user.age >= filter.startAge && user.age <= filter.endAge))
 
-    private fun checkBudget(filter: Filter, it: User) =
+    private fun checkBudget(filter: Filter, user: User) =
             (!((filter.startBudget >= 0) && (filter.endBudget > 0)) ||
-                    (it.budget >= filter.startBudget && it.budget <= filter.endBudget))
+                    (user.budget >= filter.startBudget && user.budget <= filter.endBudget))
 
     private fun checkMethod(user: User, filter: Filter) =
             filter.method.isEmpty() || (filter.method.filter { it.value && user.method[it.key] == true }.count() > 0)
 
-    private fun checkEndDate(filter: Filter, it: User) =
-            (filter.endDate == 0L || (it.dates[END_DATE] != null && it.dates[END_DATE] != 0L &&
-                    it.dates[END_DATE] ?: 0 <= filter.endDate))
+    private fun checkEndDate(filter: Filter, user: User) =
+            (filter.endDate == 0L || (user.dates[END_DATE] != null && user.dates[END_DATE] != 0L &&
+                    user.dates[END_DATE] ?: 0 <= filter.endDate))
 
-    private fun checkStartDate(filter: Filter, it: User) =
-            (filter.startDate == 0L || (it.dates[START_DATE] != null && it.dates[START_DATE] != 0L &&
-                    it.dates[START_DATE] ?: 0L >= filter.startDate))
+    private fun checkStartDate(filter: Filter, user: User) =
+            (filter.startDate == 0L || (user.dates[START_DATE] != null && user.dates[START_DATE] != 0L &&
+                    user.dates[START_DATE] ?: 0L >= filter.startDate))
 
     fun sendNotifications(ids: String, notification: FireBaseNotification) {
         FirebaseCrash.log("send Notification")
