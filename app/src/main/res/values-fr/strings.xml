@@ -219,5 +219,7 @@
     <string name="this_user_search_you">Ce voyageur veut vous contacter.</string>
     <string name="click_for_copy">Cliquez pour copier</string>
     <string name="text_for_soc_link_user">Vous n\'avez aucun contact pour la communication.</string>
-    <string name="or">или</string>
+    <string name="or">or</string>
+    <string name="text_for_empty_search">With these parameters, no one is coming here. \nTry to enter other query parameters.</string>
+
 </resources>

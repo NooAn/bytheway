@@ -22,7 +22,7 @@ open class BaseViewModel : ViewModel(), LifecycleObserver {
     val timeoutUnit = TimeUnit.SECONDS
 
     companion object {
-        const val TIMEOUT_SECONDS = 16L
+        const val TIMEOUT_SECONDS = 14L
     }
 
     fun addObserver(lifecycle: Lifecycle) {

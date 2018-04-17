@@ -38,7 +38,7 @@ class DisplayAllUsersAdapter(val context: Context, val viewModel: DisplayUsersVi
     override fun onBindViewHolder(holder: UserViewHolder?, position: Int) {
         val currentUser = users[position]
         holder?.name?.text = if (currentUser.name.isBlank()) context.getString(R.string.without_name) else currentUser.name
-        holder?.dates?.text = if (currentUser.dates["start_date"] != null && currentUser.dates["end_date"] != null)
+        holder?.dates?.text = if (checkDate(currentUser))
             viewModel.getTextFromDates(currentUser.dates["start_date"], currentUser.dates["end_date"], context.resources.getStringArray(R.array.months_array))
         else ""
         if (currentUser.age >= 0)
@@ -52,6 +52,10 @@ class DisplayAllUsersAdapter(val context: Context, val viewModel: DisplayUsersVi
                 ?.apply(RequestOptions.circleCropTransform())
                 ?.into(holder?.avatar)
     }
+
+    private fun checkDate(currentUser: User): Boolean =
+            currentUser.dates["start_date"] != null && currentUser.dates["end_date"] != null
+                    && currentUser.dates["start_date"]?.compareTo(0) != 0 && currentUser.dates["end_date"]?.compareTo(0) != 0
 
     override fun getItemCount(): Int = users.size
 

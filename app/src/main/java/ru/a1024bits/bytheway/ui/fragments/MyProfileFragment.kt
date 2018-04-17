@@ -887,7 +887,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         hashTagText.append("#ищупопутчика ")
         hashTagText.append("#").append(textCityFrom.text.toString()).append(" ")
         hashTagText.append("#").append(getLastCity()).append("2018 ")
-        Log.e("LOG", len.toString())
         if (methodIcons[Method.HITCHHIKING.link]?.isActivated == true && len < 126) {
             hashTagText.append("#автостоп ")
             hashTagText.append("#hitchhiking2018 ")

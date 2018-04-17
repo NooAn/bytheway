@@ -7,10 +7,7 @@ import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.QuerySnapshot
 import io.reactivex.Single
 import ru.a1024bits.bytheway.algorithm.SearchTravelers
-import ru.a1024bits.bytheway.model.FireBaseNotification
-import ru.a1024bits.bytheway.model.Response
-import ru.a1024bits.bytheway.model.User
-import ru.a1024bits.bytheway.model.contains
+import ru.a1024bits.bytheway.model.*
 import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.repository.MAX_AGE
 import ru.a1024bits.bytheway.repository.UserRepository
@@ -54,7 +51,7 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
     val TWO_MONTHS_IN_MLSECONDS: Long = 5270400000
 
     override fun filterAndInstallUsers(vararg snapshots: QuerySnapshot) {
-        Single.create<MutableList<User>> { stream ->
+        disposables.add(Single.create<MutableList<User>> { stream ->
             try {
                 val result: MutableList<User> = ArrayList()
                 snapshots.map {
@@ -65,8 +62,7 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
                                 val user = document.toObject(User::class.java)
                                 if (user.cities.size > 0
                                         && user.id != FirebaseAuth.getInstance().currentUser?.uid) {
-                                    if (!(user.dates[START_DATE] ?: 0L <= System.currentTimeMillis() - TWO_MONTHS_IN_MLSECONDS && (user.dates[END_DATE] == null || user.dates[END_DATE] ?: 0 != 0L)))
-                                        result.add(user)
+                                    result.add(user)
                                 }
                             }
                         } catch (e: Exception) {
@@ -82,16 +78,17 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
             }
         }
                 .subscribeOn(getBackgroundScheduler())
-                .timeout(TIMEOUT_SECONDS, timeoutUnit)
+                .timeout(TIMEOUT_SECONDS, timeoutUnit, getBackgroundScheduler())
                 .retry(2)
                 .doOnSubscribe({ loadingStatus.postValue(true) })
                 .doAfterTerminate({ loadingStatus.postValue(false) })
                 .subscribe({ resultUsers ->
+                    Log.e("LOG", "count users: ${resultUsers.size}")
                     if (users.size == 0)
                         users.addAll(resultUsers)
                     response.postValue(Response.success(resultUsers))
                 },
-                        { throwable -> response.postValue(Response.error(throwable)) })
+                        { throwable -> response.postValue(Response.error(throwable)) }))
     }
 
     var users: ArrayList<User> = ArrayList<User>()
@@ -104,7 +101,7 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
         userRepository?.let {
             loadingStatus.value = true
             disposables.add(it.changeUserProfile(map, id)
-                    .timeout(TIMEOUT_SECONDS, timeoutUnit)
+                    .timeout(TIMEOUT_SECONDS, timeoutUnit, getBackgroundScheduler())
                     .retry(2)
                     .doAfterTerminate({ loadingStatus.postValue(false) })
                     .subscribe(
@@ -122,7 +119,7 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
             loadingStatus.value = true
             disposables.add(it.getRealUsers()
                     .subscribeOn(getBackgroundScheduler())
-                    .timeout(TIMEOUT_SECONDS, timeoutUnit)
+                    .timeout(TIMEOUT_SECONDS, timeoutUnit, getBackgroundScheduler())
                     .retry(2)
                     .cache()
                     .filter { user -> user.cities.size > 0 }
@@ -201,13 +198,16 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
     fun filterUsersByOptions(resultUsers: MutableList<User>, filter: Filter) {
         resultUsers.retainAll {
             var found = (!((filter.startBudget >= 0) && (filter.endBudget > 0)) ||
-                    (it.budget >= filter.startBudget && it.budget <= filter.endBudget)) &&
-                    ((it.age >= filter.startAge && it.age <= filter.endAge)) &&
-                    ((filter.sex == 0) || (it.sex == filter.sex)) &&
-                    ((filter.startCity.isEmpty()) ||
-                            (it.cities[FIRST_INDEX_CITY]?.contains(filter.startCity, true) == true)) &&
-                    ((filter.endCity.isEmpty()) ||
-                            (it.cities[LAST_INDEX_CITY]?.contains(filter.endCity, true) == true))
+                    (it.budget >= filter.startBudget && it.budget <= filter.endBudget))
+                    && ((it.age >= filter.startAge && it.age <= filter.endAge))
+                    && ((filter.sex == 0) || (it.sex == filter.sex))
+                    && ((filter.startCity.isEmpty()) || (it.cities[FIRST_INDEX_CITY]?.contains(filter.startCity, true) == true))
+                    && ((filter.endCity.isEmpty()) || (it.cities[LAST_INDEX_CITY]?.contains(filter.endCity, true) == true))
+                    && !((it.method[Method.BUS.link] == true && filter.method[Method.BUS.link] == true)
+                    || (it.method[Method.HITCHHIKING.link] == true && filter.method[Method.HITCHHIKING.link] == true)
+                    || (it.method[Method.CAR.link] == true && filter.method[Method.CAR.link] == true)
+                    || (it.method[Method.PLANE.link] == true && filter.method[Method.PLANE.link] == true)
+                    || (it.method[Method.TRAIN.link] == true && filter.method[Method.TRAIN.link] == true))
             if (found && filter.startDate > 0L) {
                 found = (it.dates[START_DATE] != null && it.dates[START_DATE] != 0L &&
                         it.dates[START_DATE] ?: 0 >= filter.startDate)

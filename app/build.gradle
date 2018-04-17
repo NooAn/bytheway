@@ -35,7 +35,7 @@ android {
 
         bytheway {
             versionCode 26
-            versionName "2.2.0"
+            versionName "2.3.0"
             dimension "default"
         }
     }

@@ -5,13 +5,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageView
+
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_marginEnd="84dp"
-        android:layout_marginStart="72dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
         android:layout_marginTop="67dp"
-        android:src="@drawable/ic_for_empty_search"
+        android:text="@string/text_for_empty_search"
+        android:textAlignment="center"
+        android:textColor="#003D5C"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView

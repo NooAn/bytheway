@@ -29,6 +29,7 @@ import kotlinx.android.synthetic.main.searching_parameters_block.*
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.adapter.DisplayAllUsersAdapter
+import ru.a1024bits.bytheway.model.Method
 import ru.a1024bits.bytheway.model.Response
 import ru.a1024bits.bytheway.model.Status
 import ru.a1024bits.bytheway.model.User
@@ -83,8 +84,6 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
         analytics = FirebaseAnalytics.getInstance(this.context)
-        Log.e("LOG", "AllUsersFragment onCreate")
-
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -95,7 +94,6 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             viewModel?.let {
                 filter = it.filter
             }
-            Log.e("LOG", "AllUsersFragment")
             displayUsersAdapter = DisplayAllUsersAdapter(this.context, viewModel ?: return)
             installLogicToUI()
             displayAllUsers.layoutManager = LinearLayoutManager(context, LinearLayout.VERTICAL, false)
@@ -209,6 +207,39 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             W_SEX -> sexW.id
             else -> sexAny.id
         })
+
+        iconCar.setOnClickListener {
+            with(travelCarText) {
+                isActivated = !isActivated
+                filter.method.put(Method.CAR.link, isActivated)
+            }
+        }
+        iconTrain.setOnClickListener {
+            with(travelTrainText) {
+                isActivated = !isActivated
+                filter.method.put(Method.TRAIN.link, isActivated)
+            }
+        }
+        iconBus.setOnClickListener {
+            with(travelBusText) {
+                isActivated = !isActivated
+                filter.method.put(Method.BUS.link, isActivated)
+
+            }
+        }
+        iconPlane.setOnClickListener {
+            with(travelPlaneText) {
+                isActivated = !isActivated
+                filter.method.put(Method.PLANE.link, isActivated)
+            }
+        }
+        iconHitchHicking.setOnClickListener {
+            with(travelHitchHikingText) {
+                isActivated = !isActivated
+                filter.method.put(Method.HITCHHIKING.link, isActivated)
+            }
+        }
+
         updateChoseDateButtons()
         choseDateStart.setOnClickListener {
             openDateFromDialog(choseDateStart)
@@ -259,6 +290,11 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             choseDateEnd.setCompoundDrawables(null, null, null, null)
             updateChoseDateButtons()
             sexButtons.check(sexAny.id)
+            iconCar.isActivated = false
+            iconTrain.isActivated = false
+            iconBus.isActivated = false
+            iconPlane.isActivated = false
+            iconHitchHicking.isActivated = false
         }
 
         searchParametersText.setOnClickListener {
@@ -338,6 +374,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
         if (filter.sex != 0) analytics.logEvent(TAG_ANALYTICS + "SEX_ANY", null)
         if (filter.sex != W_SEX) analytics.logEvent(TAG_ANALYTICS + "SEX_FEMALE", null)
         if (filter.sex != M_SEX) analytics.logEvent(TAG_ANALYTICS + "SEX_MALE", null)
+       // if (filter.method.size != M_SEX) analytics.logEvent(TAG_ANALYTICS + "SEX_MALE", null)
     }
 
     private fun animationSlide() {
