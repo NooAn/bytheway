@@ -7,7 +7,10 @@ import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.QuerySnapshot
 import io.reactivex.Single
 import ru.a1024bits.bytheway.algorithm.SearchTravelers
-import ru.a1024bits.bytheway.model.*
+import ru.a1024bits.bytheway.model.FireBaseNotification
+import ru.a1024bits.bytheway.model.Response
+import ru.a1024bits.bytheway.model.User
+import ru.a1024bits.bytheway.model.contains
 import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.repository.MAX_AGE
 import ru.a1024bits.bytheway.repository.UserRepository
@@ -197,28 +200,37 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
 
     fun filterUsersByOptions(resultUsers: MutableList<User>, filter: Filter) {
         resultUsers.retainAll {
-            var found = (!((filter.startBudget >= 0) && (filter.endBudget > 0)) ||
-                    (it.budget >= filter.startBudget && it.budget <= filter.endBudget))
-                    && ((it.age >= filter.startAge && it.age <= filter.endAge))
-                    && ((filter.sex == 0) || (it.sex == filter.sex))
-                    && ((filter.startCity.isEmpty()) || (it.cities[FIRST_INDEX_CITY]?.contains(filter.startCity, true) == true))
-                    && ((filter.endCity.isEmpty()) || (it.cities[LAST_INDEX_CITY]?.contains(filter.endCity, true) == true))
-                    && !((it.method[Method.BUS.link] == true && filter.method[Method.BUS.link] == true)
-                    || (it.method[Method.HITCHHIKING.link] == true && filter.method[Method.HITCHHIKING.link] == true)
-                    || (it.method[Method.CAR.link] == true && filter.method[Method.CAR.link] == true)
-                    || (it.method[Method.PLANE.link] == true && filter.method[Method.PLANE.link] == true)
-                    || (it.method[Method.TRAIN.link] == true && filter.method[Method.TRAIN.link] == true))
-            if (found && filter.startDate > 0L) {
-                found = (it.dates[START_DATE] != null && it.dates[START_DATE] != 0L &&
-                        it.dates[START_DATE] ?: 0 >= filter.startDate)
-            }
-            if (found && filter.endDate > 0L) {
-                found = (it.dates[END_DATE] != null && it.dates[END_DATE] != 0L &&
-                        it.dates[END_DATE] ?: 0 <= filter.endDate)
-            }
-            found
+            checkBudget(filter, it) && checkAge(filter, it) && checkSex(filter, it) && checkFirstCity(filter, it)
+                    && checkEndCity(filter, it) && checkMethod(filter, it) && checkStartDate(filter, it) && checkEndDate(filter, it)
         }
     }
+
+    private fun checkEndCity(filter: Filter, user: User) =
+            ((filter.endCity.isEmpty()) || (user.cities[LAST_INDEX_CITY]?.contains(filter.endCity, true) == true))
+
+    private fun checkFirstCity(filter: Filter, user: User) =
+            ((filter.startCity.isEmpty()) || (user.cities[FIRST_INDEX_CITY]?.contains(filter.startCity, true) == true))
+
+    private fun checkSex(filter: Filter, user: User) =
+            ((filter.sex == 0) || (user.sex == filter.sex))
+
+    private fun checkAge(filter: Filter, user: User) =
+            ((user.age >= filter.startAge && user.age <= filter.endAge))
+
+    private fun checkBudget(filter: Filter, user: User) =
+            (!((filter.startBudget >= 0) && (filter.endBudget > 0)) ||
+                    (user.budget >= filter.startBudget && user.budget <= filter.endBudget))
+
+    private fun checkMethod(filter: Filter, user: User) =
+            filter.method.isEmpty() || (filter.method.filter { it.value && user.method[it.key] == true }.count() > 0)
+
+    private fun checkEndDate(filter: Filter, user: User) =
+            (filter.endDate == 0L || (user.dates[END_DATE] != null && user.dates[END_DATE] != 0L &&
+                    user.dates[END_DATE] ?: 0 <= filter.endDate))
+
+    private fun checkStartDate(filter: Filter, user: User) =
+            (filter.startDate == 0L || (user.dates[START_DATE] != null && user.dates[START_DATE] != 0L &&
+                    user.dates[START_DATE] ?: 0L >= filter.startDate))
 
     fun sendNotifications(ids: String, notification: FireBaseNotification) {
         FirebaseCrash.log("send Notification")
