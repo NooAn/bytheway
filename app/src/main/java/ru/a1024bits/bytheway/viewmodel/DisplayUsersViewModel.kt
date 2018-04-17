@@ -197,28 +197,42 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
 
     fun filterUsersByOptions(resultUsers: MutableList<User>, filter: Filter) {
         resultUsers.retainAll {
-            var found = (!((filter.startBudget >= 0) && (filter.endBudget > 0)) ||
-                    (it.budget >= filter.startBudget && it.budget <= filter.endBudget))
-                    && ((it.age >= filter.startAge && it.age <= filter.endAge))
-                    && ((filter.sex == 0) || (it.sex == filter.sex))
-                    && ((filter.startCity.isEmpty()) || (it.cities[FIRST_INDEX_CITY]?.contains(filter.startCity, true) == true))
-                    && ((filter.endCity.isEmpty()) || (it.cities[LAST_INDEX_CITY]?.contains(filter.endCity, true) == true))
-                    && !((it.method[Method.BUS.link] == true && filter.method[Method.BUS.link] == true)
-                    || (it.method[Method.HITCHHIKING.link] == true && filter.method[Method.HITCHHIKING.link] == true)
-                    || (it.method[Method.CAR.link] == true && filter.method[Method.CAR.link] == true)
-                    || (it.method[Method.PLANE.link] == true && filter.method[Method.PLANE.link] == true)
-                    || (it.method[Method.TRAIN.link] == true && filter.method[Method.TRAIN.link] == true))
-            if (found && filter.startDate > 0L) {
-                found = (it.dates[START_DATE] != null && it.dates[START_DATE] != 0L &&
-                        it.dates[START_DATE] ?: 0 >= filter.startDate)
-            }
-            if (found && filter.endDate > 0L) {
-                found = (it.dates[END_DATE] != null && it.dates[END_DATE] != 0L &&
-                        it.dates[END_DATE] ?: 0 <= filter.endDate)
-            }
-            found
+            checkBudget(filter, it) && checkAge(it, filter) && checkSex(filter, it) && checkFirstCity(filter, it)
+                    && checkEndCity(filter, it) && checkMethod(it, filter) && checkStartDate(filter, it) && checkEndDate(filter, it)
         }
     }
+
+    private fun checkEndCity(filter: Filter, it: User) =
+            ((filter.endCity.isEmpty()) || (it.cities[LAST_INDEX_CITY]?.contains(filter.endCity, true) == true))
+
+    private fun checkFirstCity(filter: Filter, it: User) =
+            ((filter.startCity.isEmpty()) || (it.cities[FIRST_INDEX_CITY]?.contains(filter.startCity, true) == true))
+
+    private fun checkSex(filter: Filter, it: User) =
+            ((filter.sex == 0) || (it.sex == filter.sex))
+
+    private fun checkAge(it: User, filter: Filter) =
+            ((it.age >= filter.startAge && it.age <= filter.endAge))
+
+    private fun checkBudget(filter: Filter, it: User) =
+            (!((filter.startBudget >= 0) && (filter.endBudget > 0)) ||
+                    (it.budget >= filter.startBudget && it.budget <= filter.endBudget))
+
+    private fun checkMethod(it: User, filter: Filter): Boolean {
+        return !((it.method[Method.BUS.link] == true && filter.method[Method.BUS.link] == true)
+                || (it.method[Method.HITCHHIKING.link] == true && filter.method[Method.HITCHHIKING.link] == true)
+                || (it.method[Method.CAR.link] == true && filter.method[Method.CAR.link] == true)
+                || (it.method[Method.PLANE.link] == true && filter.method[Method.PLANE.link] == true)
+                || (it.method[Method.TRAIN.link] == true && filter.method[Method.TRAIN.link] == true))
+    }
+
+    private fun checkEndDate(filter: Filter, it: User) =
+            (filter.endDate == 0L || (it.dates[END_DATE] != null && it.dates[END_DATE] != 0L &&
+                    it.dates[END_DATE] ?: 0 <= filter.endDate))
+
+    private fun checkStartDate(filter: Filter, it: User) =
+            (filter.startDate == 0L || (it.dates[START_DATE] != null && it.dates[START_DATE] != 0L &&
+                    it.dates[START_DATE] ?: 0L >= filter.startDate))
 
     fun sendNotifications(ids: String, notification: FireBaseNotification) {
         FirebaseCrash.log("send Notification")
