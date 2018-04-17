@@ -692,8 +692,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         })
         for ((key, me) in methodIcons) {
             me.setOnClickListener {
-                val textView = methodTextViews[key]
-                textView?.let {
+                methodTextViews[key]?.let {
                     me.isActivated = !it.isActivated
                     methods.put(key, it.isActivated)
                 }

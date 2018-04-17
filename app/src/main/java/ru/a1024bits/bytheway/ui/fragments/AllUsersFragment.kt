@@ -1,31 +1,27 @@
 package ru.a1024bits.bytheway.ui.fragments
 
 import android.animation.LayoutTransition
-import android.app.Activity
 import android.app.SearchManager
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
 import android.content.Context
 import android.os.Bundle
-import android.support.v4.app.FragmentActivity
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SearchView
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment
 import com.codetroopers.betterpickers.calendardatepicker.MonthAdapter
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crash.FirebaseCrash
 import kotlinx.android.synthetic.main.fragment_display_all_users.*
+import kotlinx.android.synthetic.main.fragment_my_user_profile.view.*
 import kotlinx.android.synthetic.main.searching_parameters_block.*
+import kotlinx.android.synthetic.main.searching_parameters_block.view.*
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.adapter.DisplayAllUsersAdapter
@@ -39,6 +35,7 @@ import ru.a1024bits.bytheway.repository.W_SEX
 import ru.a1024bits.bytheway.util.DateUtils
 import ru.a1024bits.bytheway.util.DecimalInputFilter
 import ru.a1024bits.bytheway.util.closeKeyboard
+import ru.a1024bits.bytheway.util.putIntoFilter
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
 import java.util.*
 import javax.inject.Inject
@@ -208,35 +205,15 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             else -> sexAny.id
         })
 
-        iconCar.setOnClickListener {
-            with(travelCarText) {
-                isActivated = !isActivated
-                filter.method.put(Method.CAR.link, isActivated)
-            }
-        }
-        iconTrain.setOnClickListener {
-            with(travelTrainText) {
-                isActivated = !isActivated
-                filter.method.put(Method.TRAIN.link, isActivated)
-            }
-        }
-        iconBus.setOnClickListener {
-            with(travelBusText) {
-                isActivated = !isActivated
-                filter.method.put(Method.BUS.link, isActivated)
-
-            }
-        }
-        iconPlane.setOnClickListener {
-            with(travelPlaneText) {
-                isActivated = !isActivated
-                filter.method.put(Method.PLANE.link, isActivated)
-            }
-        }
-        iconHitchHicking.setOnClickListener {
-            with(travelHitchHikingText) {
-                isActivated = !isActivated
-                filter.method.put(Method.HITCHHIKING.link, isActivated)
+        listOf(iconCar, iconHitchHicking, iconPlane, iconBus, iconTrain).map {
+            it.setOnClickListener {
+                when (it) {
+                    iconCar -> travelCarText.putIntoFilter(Method.CAR.link, filter)
+                    iconTrain -> travelTrainText.putIntoFilter(Method.TRAIN.link, filter)
+                    iconBus -> travelBusText.putIntoFilter(Method.BUS.link, filter)
+                    iconHitchHicking -> travelHitchHikingText.putIntoFilter(Method.HITCHHIKING.link, filter)
+                    iconPlane -> travelPlaneText.putIntoFilter(Method.PLANE.link, filter)
+                }
             }
         }
 
@@ -290,11 +267,11 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             choseDateEnd.setCompoundDrawables(null, null, null, null)
             updateChoseDateButtons()
             sexButtons.check(sexAny.id)
-            iconCar.isActivated = false
-            iconTrain.isActivated = false
-            iconBus.isActivated = false
-            iconPlane.isActivated = false
-            iconHitchHicking.isActivated = false
+            travelCarText.isActivated = false
+            travelBusText.isActivated = false
+            travelPlaneText.isActivated = false
+            travelTrainText.isActivated = false
+            travelHitchHikingText.isActivated = false
         }
 
         searchParametersText.setOnClickListener {
@@ -305,6 +282,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             }
         }
     }
+
 
     private fun openDateArrivedDialog(view: TextView) {
         if (view.text.contains("  ")) {
@@ -374,7 +352,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
         if (filter.sex != 0) analytics.logEvent(TAG_ANALYTICS + "SEX_ANY", null)
         if (filter.sex != W_SEX) analytics.logEvent(TAG_ANALYTICS + "SEX_FEMALE", null)
         if (filter.sex != M_SEX) analytics.logEvent(TAG_ANALYTICS + "SEX_MALE", null)
-       // if (filter.method.size != M_SEX) analytics.logEvent(TAG_ANALYTICS + "SEX_MALE", null)
+        // if (filter.method.size != M_SEX) analytics.logEvent(TAG_ANALYTICS + "SEX_MALE", null)
     }
 
     private fun animationSlide() {

@@ -10,7 +10,7 @@
     android:padding="16dp">
 
     <TextView
-        android:id="@+id/text_from_city"
+        android:id="@+id/textFromCity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -32,7 +32,7 @@
         android:layout_height="76dp"
         android:layout_alignBottom="@+id/text_to_city"
         android:layout_alignParentStart="true"
-        android:layout_alignTop="@+id/text_from_city"
+        android:layout_alignTop="@+id/textFromCity"
         android:layout_marginStart="4dp"
         android:layout_marginTop="22dp"
         android:src="@drawable/ic_search_route_gps"
@@ -42,7 +42,7 @@
         android:id="@+id/text_to_city"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/text_from_city"
+        android:layout_below="@+id/textFromCity"
         android:layout_marginStart="34dp"
         android:layout_marginTop="12dp"
         android:layout_toEndOf="@+id/startMarkerView"
@@ -60,7 +60,7 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_alignParentEnd="true"
-        android:layout_below="@+id/text_from_city"
+        android:layout_below="@+id/textFromCity"
         android:layout_marginStart="28dp"
         android:background="@drawable/swap_cities"
         android:padding="12dp"

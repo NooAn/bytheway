@@ -1,6 +1,5 @@
 package ru.a1024bits.bytheway.ui.fragments
 
-import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
 import android.content.Context
@@ -268,10 +267,10 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
 
         buttonSearch.setOnClickListener {
             var error = 0
-            val departure = text_from_city.text.isNotEmpty()
+            val departure = textFromCity.text.isNotEmpty()
             val destination = text_to_city.text.isNotEmpty()
 
-            if (departure && text_from_city.text == text_to_city.text) {
+            if (departure && textFromCity.text == text_to_city.text) {
                 error = R.string.fill_diff_cities
             } else if (!departure && destination) {
                 error = R.string.fill_from_location
