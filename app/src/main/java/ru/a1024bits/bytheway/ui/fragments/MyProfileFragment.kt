@@ -1,5 +1,6 @@
 package ru.a1024bits.bytheway.ui.fragments
 
+import android.animation.ObjectAnimator
 import android.app.Activity
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
@@ -704,7 +705,9 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         newTripText.setOnClickListener {
             hideBlockNewTrip()
             showBlockTravelInformation()
+            ObjectAnimator.ofInt(scrollProfile, "scrollY", socnetwork.bottom).setDuration(750L).start()
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_create_click", null)
+
         }
         vkIcon.setOnClickListener {
             /*
@@ -1071,7 +1074,10 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                 .setFirstDayOfWeek(Calendar.MONDAY)
                 .setThemeCustom(R.style.BythewayDatePickerDialogTheme)
                 .setPreselectedDate(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH))
-        val currentDate = System.currentTimeMillis()
+
+        val currentDate =
+                if (key == END_DATE && dates[START_DATE] != null) dates[START_DATE]
+                        ?: 0 else System.currentTimeMillis()
 
         dateDialog.setDateRange(MonthAdapter.CalendarDay(currentDate), null)
         dateDialog.setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
@@ -1605,7 +1611,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             textCityMiddleTwo.setText(user.cities[TWO_INDEX_CITY])
             textNewCity.setText(user.cities[LAST_INDEX_CITY])
             cities = user.cities
-
         }
 
         if (user.dates.size > 0) {
