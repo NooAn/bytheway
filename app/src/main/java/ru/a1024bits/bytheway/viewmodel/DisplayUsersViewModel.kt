@@ -222,7 +222,7 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
                     (user.budget >= filter.startBudget && user.budget <= filter.endBudget))
 
     private fun checkMethod(filter: Filter, user: User) =
-            filter.method.isEmpty() || (filter.method.filter { it.value && user.method[it.key] == true }.count() > 0)
+            (filter.method.count { it.value } == 0) || (filter.method.count { it.value && user.method[it.key] == true } > 0)
 
     private fun checkEndDate(filter: Filter, user: User) =
             (filter.endDate == 0L || (user.dates[END_DATE] != null && user.dates[END_DATE] != 0L &&
