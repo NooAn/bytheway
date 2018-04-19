@@ -13,7 +13,10 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.LinearLayout
+import android.widget.TextView
 import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment
 import com.codetroopers.betterpickers.calendardatepicker.MonthAdapter
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -205,6 +208,8 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             else -> sexAny.id
         })
 
+        restoreMethods()
+
         listOf(iconCar, iconHitchHicking, iconPlane, iconBus, iconTrain).map {
             it.setOnClickListener {
                 when (it) {
@@ -283,6 +288,20 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
         }
     }
 
+    private fun restoreMethods() {
+        for (filterMethod in filter.method) {
+            if (filterMethod.value) {
+                when (filterMethod.key) {
+                    Method.TRAIN.link -> travelTrainText
+                    Method.CAR.link -> travelCarText
+                    Method.BUS.link -> travelBusText
+                    Method.PLANE.link -> travelPlaneText
+                    Method.HITCHHIKING.link -> travelHitchHikingText
+                    else -> throw NullPointerException("Not find Key")
+                }.isActivated = true
+            }
+        }
+    }
 
     private fun openDateArrivedDialog(view: TextView) {
         if (view.text.contains("  ")) {
