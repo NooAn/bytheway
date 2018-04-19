@@ -289,11 +289,11 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             choseDateEnd.setCompoundDrawables(null, null, null, null)
             updateChoseDateButtons()
             sexButtons.check(sexAny.id)
-            iconCar.isActivated = false
-            iconTrain.isActivated = false
-            iconBus.isActivated = false
-            iconPlane.isActivated = false
-            iconHitchHicking.isActivated = false
+            travelCarText.isActivated = false
+            travelTrainText.isActivated = false
+            travelBusText.isActivated = false
+            travelPlaneText.isActivated = false
+            travelHitchHikingText.isActivated = false
         }
 
         searchParametersText.setOnClickListener {
