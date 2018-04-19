@@ -1,8 +1,6 @@
 package ru.a1024bits.bytheway.ui.fragments
 
-import android.animation.ArgbEvaluator
 import android.animation.ObjectAnimator
-import android.animation.ValueAnimator
 import android.app.Activity
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
@@ -16,7 +14,6 @@ import android.os.Build
 import android.os.Bundle
 import android.support.annotation.LayoutRes
 import android.support.design.widget.NavigationView
-import android.support.v4.app.DialogFragment
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.res.ResourcesCompat
 import android.support.v4.widget.NestedScrollView
@@ -60,7 +57,6 @@ import ru.a1024bits.bytheway.model.map_directions.RoutesList
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
-import ru.a1024bits.bytheway.ui.dialogs.NoticeDialog
 import ru.a1024bits.bytheway.ui.dialogs.SocialTipsDialog
 import ru.a1024bits.bytheway.util.*
 import ru.a1024bits.bytheway.util.Constants.END_DATE
@@ -1717,8 +1713,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     }
 
     private fun showTipsForEmptySocialLink() {
-        val tips = SocialTipsDialog()
-        tips.show(fragmentManager, "Tips") {
+        SocialTipsDialog().show(fragmentManager, "Tips") {
             ObjectAnimator.ofInt(scrollProfile, "scrollY", headerprofile.bottom).setDuration(650L).start()
         }
     }
