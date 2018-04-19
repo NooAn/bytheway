@@ -22,7 +22,9 @@ import com.codetroopers.betterpickers.calendardatepicker.MonthAdapter
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crash.FirebaseCrash
 import kotlinx.android.synthetic.main.fragment_display_all_users.*
+import kotlinx.android.synthetic.main.fragment_my_user_profile.view.*
 import kotlinx.android.synthetic.main.searching_parameters_block.*
+import kotlinx.android.synthetic.main.searching_parameters_block.view.*
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.adapter.DisplayAllUsersAdapter
@@ -36,6 +38,7 @@ import ru.a1024bits.bytheway.repository.W_SEX
 import ru.a1024bits.bytheway.util.DateUtils
 import ru.a1024bits.bytheway.util.DecimalInputFilter
 import ru.a1024bits.bytheway.util.closeKeyboard
+import ru.a1024bits.bytheway.util.putIntoFilter
 import ru.a1024bits.bytheway.viewmodel.DisplayUsersViewModel
 import java.util.*
 import javax.inject.Inject
@@ -207,35 +210,15 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
 
         restoreMethods()
 
-        iconCar.setOnClickListener {
-            with(travelCarText) {
-                isActivated = !isActivated
-                filter.method.put(Method.CAR.link, isActivated)
-            }
-        }
-        iconTrain.setOnClickListener {
-            with(travelTrainText) {
-                isActivated = !isActivated
-                filter.method.put(Method.TRAIN.link, isActivated)
-            }
-        }
-        iconBus.setOnClickListener {
-            with(travelBusText) {
-                isActivated = !isActivated
-                filter.method.put(Method.BUS.link, isActivated)
-
-            }
-        }
-        iconPlane.setOnClickListener {
-            with(travelPlaneText) {
-                isActivated = !isActivated
-                filter.method.put(Method.PLANE.link, isActivated)
-            }
-        }
-        iconHitchHicking.setOnClickListener {
-            with(travelHitchHikingText) {
-                isActivated = !isActivated
-                filter.method.put(Method.HITCHHIKING.link, isActivated)
+        listOf(iconCar, iconHitchHicking, iconPlane, iconBus, iconTrain).map {
+            it.setOnClickListener {
+                when (it) {
+                    iconCar -> travelCarText.putIntoFilter(Method.CAR.link, filter)
+                    iconTrain -> travelTrainText.putIntoFilter(Method.TRAIN.link, filter)
+                    iconBus -> travelBusText.putIntoFilter(Method.BUS.link, filter)
+                    iconHitchHicking -> travelHitchHikingText.putIntoFilter(Method.HITCHHIKING.link, filter)
+                    iconPlane -> travelPlaneText.putIntoFilter(Method.PLANE.link, filter)
+                }
             }
         }
 
@@ -290,9 +273,9 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             updateChoseDateButtons()
             sexButtons.check(sexAny.id)
             travelCarText.isActivated = false
-            travelTrainText.isActivated = false
             travelBusText.isActivated = false
             travelPlaneText.isActivated = false
+            travelTrainText.isActivated = false
             travelHitchHikingText.isActivated = false
         }
 

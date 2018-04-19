@@ -1,8 +1,10 @@
 package ru.a1024bits.bytheway.util
 
 import android.text.Editable
+import android.widget.TextView
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.firestore.GeoPoint
+import ru.a1024bits.bytheway.repository.Filter
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -31,3 +33,10 @@ fun GeoPoint.toLatLng(): LatLng? = LatLng(this.latitude, this.longitude)
 fun Int.toStringOrBlank(): String = if (this == 0) "" else this.toString()
 
 fun Editable.toStringOrZero(): String = if (this.toString().isBlank()) "0" else this.toString()
+
+fun TextView.putIntoFilter(key: String, filter: Filter) {
+    isActivated = !isActivated
+    filter.method.put(key, isActivated)
+}
+
+fun Long.formatDates(formatDate: SimpleDateFormat): String = formatDate.format(Date(this))

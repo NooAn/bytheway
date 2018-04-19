@@ -26,6 +26,7 @@ import ru.a1024bits.bytheway.model.Method
 import ru.a1024bits.bytheway.model.User
 import ru.a1024bits.bytheway.repository.Filter
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
+import ru.a1024bits.bytheway.util.*
 import ru.a1024bits.bytheway.util.Constants.END_DATE
 import ru.a1024bits.bytheway.util.Constants.FIRST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
@@ -33,11 +34,6 @@ import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT
 import ru.a1024bits.bytheway.util.Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO
 import ru.a1024bits.bytheway.util.Constants.START_DATE
 import ru.a1024bits.bytheway.util.DateUtils.Companion.getLongFromDate
-import ru.a1024bits.bytheway.util.DecimalInputFilter
-import ru.a1024bits.bytheway.util.getIntOrNothing
-import ru.a1024bits.bytheway.util.getNormallDate
-import ru.a1024bits.bytheway.util.toStringOrEmpty
-import java.text.SimpleDateFormat
 import java.util.*
 
 
@@ -89,58 +85,30 @@ class SearchFragment : Fragment() {
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         for (method in user.method.keys) {
-            when (method) {
-                Method.CAR.link -> {
-                    iconCar.isActivated = user.method[method] == true
-                }
-                Method.TRAIN.link -> {
-                    iconTrain.isActivated = user.method[method] == true
-                }
-                Method.BUS.link -> {
-                    iconBus.isActivated = user.method[method] == true
-                }
-                Method.PLANE.link -> {
-                    iconPlane.isActivated = user.method[method] == true
-                }
-                Method.HITCHHIKING.link -> {
-                    iconHitchHicking.isActivated = user.method[method] == true
-                }
+            val icon = when (method) {
+                Method.CAR.link -> iconCar
+                Method.TRAIN.link -> iconTrain
+                Method.BUS.link -> iconBus
+                Method.PLANE.link -> iconPlane
+                Method.HITCHHIKING.link -> iconHitchHicking
+                else -> iconCar
             }
+            icon.isActivated = user.method[method] == true
         }
-        iconCar.setOnClickListener {
-            with(travelCarText) {
-                isActivated = !isActivated
-                filter.method.put(Method.CAR.link, isActivated)
-            }
-        }
-        iconTrain.setOnClickListener {
-            with(travelTrainText) {
-                isActivated = !isActivated
-                filter.method.put(Method.TRAIN.link, isActivated)
-            }
-        }
-        iconBus.setOnClickListener {
-            with(travelBusText) {
-                isActivated = !isActivated
-                filter.method.put(Method.BUS.link, isActivated)
-
-            }
-        }
-        iconPlane.setOnClickListener {
-            with(travelPlaneText) {
-                isActivated = !isActivated
-                filter.method.put(Method.PLANE.link, isActivated)
-            }
-        }
-        iconHitchHicking.setOnClickListener {
-            with(travelHitchHikingText) {
-                isActivated = !isActivated
-                filter.method.put(Method.HITCHHIKING.link, isActivated)
+        listOf(iconCar, iconHitchHicking, iconPlane, iconBus, iconTrain).map {
+            it.setOnClickListener {
+                when (it) {
+                    iconCar -> travelCarText.putIntoFilter(Method.CAR.link, filter)
+                    iconTrain -> travelTrainText.putIntoFilter(Method.TRAIN.link, filter)
+                    iconBus -> travelBusText.putIntoFilter(Method.BUS.link, filter)
+                    iconHitchHicking -> travelHitchHikingText.putIntoFilter(Method.HITCHHIKING.link, filter)
+                    iconPlane -> travelPlaneText.putIntoFilter(Method.PLANE.link, filter)
+                }
             }
         }
 
-        text_from_city.text = user.cities[FIRST_INDEX_CITY]
-        text_from_city.setOnClickListener {
+        textFromCity.text = user.cities[FIRST_INDEX_CITY]
+        textFromCity.setOnClickListener {
             sendIntentForSearch(PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM)
         }
 
@@ -157,12 +125,12 @@ class SearchFragment : Fragment() {
         }
 
         swap_cities.setOnClickListener {
-            val tempString = text_from_city.text
-            text_from_city.text = text_to_city.text
+            val tempString = textFromCity.text
+            textFromCity.text = text_to_city.text
             text_to_city.text = tempString
 
             filter.endCity = text_to_city.text.toString()
-            filter.startCity = text_from_city.text.toString()
+            filter.startCity = textFromCity.text.toString()
 
             val tempLng = filter.locationStartCity
             filter.locationStartCity = filter.locationEndCity
@@ -281,19 +249,19 @@ class SearchFragment : Fragment() {
             PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM -> when (resultCode) {
                 AppCompatActivity.RESULT_OK -> {
                     val place = PlaceAutocomplete.getPlace(activity, data)
-                    text_from_city?.text = place.name
+                    textFromCity?.text = place.name
                     firstPoint = place.latLng
                     filter.startCity = place.name.toString()
                     filter.locationStartCity = place.latLng
-                    text_from_city?.error = null
+                    textFromCity?.error = null
                     manageErrorCityEquals(secondPoint)
                     firstPoint?.let { latLng -> (activity as OnFragmentInteractionListener).onSetPoint(latLng, FIRST_MARKER_POSITION) }
                 }
                 else -> {
                     val status = PlaceAutocomplete.getStatus(activity, data)
                     Log.i("LOG", status.statusMessage + " ")
-                    if (text_from_city != null) {
-                        text_from_city.text = filter.startCity
+                    if (textFromCity != null) {
+                        textFromCity.text = filter.startCity
                     }
                 }
             }
@@ -311,14 +279,13 @@ class SearchFragment : Fragment() {
                         secondPoint?.let { latLng ->
                             (activity as OnFragmentInteractionListener).onSetPoint(latLng, SECOND_MARKER_POSITION)
                         }
-                    }catch (e: Exception) {
+                    } catch (e: Exception) {
                         e.printStackTrace()
                         FirebaseCrash.report(e)
                     }
                 }
                 else -> {
                     val status = PlaceAutocomplete.getStatus(activity, data)
-                    Log.i("LOG", status.statusMessage + " ")
                     if (text_to_city != null)
                         text_to_city.text = filter.endCity
                 }
@@ -329,10 +296,10 @@ class SearchFragment : Fragment() {
     private fun manageErrorCityEquals(point: LatLng?) {
         if (point != null && this.firstPoint?.latitude == this.secondPoint?.latitude && this.firstPoint?.longitude == this.secondPoint?.longitude) {
             text_to_city?.error = "true"
-            text_from_city?.error = "true"
+            textFromCity?.error = "true"
             Toast.makeText(this@SearchFragment.context, getString(R.string.fill_diff_cities), Toast.LENGTH_SHORT).show()
         } else {
-            text_from_city?.error = null
+            textFromCity?.error = null
             text_to_city?.error = null
         }
     }
