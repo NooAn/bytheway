@@ -1,25 +1,22 @@
 package ru.a1024bits.bytheway.ui.fragments
 
 import android.animation.LayoutTransition
-import android.app.Activity
 import android.app.SearchManager
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
 import android.content.Context
 import android.os.Bundle
-import android.support.v4.app.FragmentActivity
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SearchView
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
-import android.widget.*
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.LinearLayout
+import android.widget.TextView
 import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment
 import com.codetroopers.betterpickers.calendardatepicker.MonthAdapter
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -208,6 +205,8 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             else -> sexAny.id
         })
 
+        restoreMethods()
+
         iconCar.setOnClickListener {
             with(travelCarText) {
                 isActivated = !isActivated
@@ -306,6 +305,21 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
         }
     }
 
+    private fun restoreMethods() {
+        for (filterMethod in filter.method) {
+            if (filterMethod.value) {
+                when (filterMethod.key) {
+                    Method.TRAIN.link -> travelTrainText
+                    Method.CAR.link -> travelCarText
+                    Method.BUS.link -> travelBusText
+                    Method.PLANE.link -> travelPlaneText
+                    Method.HITCHHIKING.link -> travelHitchHikingText
+                    else -> throw NullPointerException("Not find Key")
+                }.isActivated = true
+            }
+        }
+    }
+
     private fun openDateArrivedDialog(view: TextView) {
         if (view.text.contains("  ")) {
             view.text = getString(R.string.filters_all_users_empty_date)
@@ -374,7 +388,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
         if (filter.sex != 0) analytics.logEvent(TAG_ANALYTICS + "SEX_ANY", null)
         if (filter.sex != W_SEX) analytics.logEvent(TAG_ANALYTICS + "SEX_FEMALE", null)
         if (filter.sex != M_SEX) analytics.logEvent(TAG_ANALYTICS + "SEX_MALE", null)
-       // if (filter.method.size != M_SEX) analytics.logEvent(TAG_ANALYTICS + "SEX_MALE", null)
+        // if (filter.method.size != M_SEX) analytics.logEvent(TAG_ANALYTICS + "SEX_MALE", null)
     }
 
     private fun animationSlide() {
