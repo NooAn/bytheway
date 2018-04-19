@@ -1,6 +1,8 @@
 package ru.a1024bits.bytheway.ui.fragments
 
+import android.animation.ArgbEvaluator
 import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.app.Activity
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
@@ -14,6 +16,7 @@ import android.os.Build
 import android.os.Bundle
 import android.support.annotation.LayoutRes
 import android.support.design.widget.NavigationView
+import android.support.v4.app.DialogFragment
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.res.ResourcesCompat
 import android.support.v4.widget.NestedScrollView
@@ -57,6 +60,7 @@ import ru.a1024bits.bytheway.model.map_directions.RoutesList
 import ru.a1024bits.bytheway.router.OnFragmentInteractionListener
 import ru.a1024bits.bytheway.router.Screens
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
+import ru.a1024bits.bytheway.ui.dialogs.NoticeDialog
 import ru.a1024bits.bytheway.ui.dialogs.SocialTipsDialog
 import ru.a1024bits.bytheway.util.*
 import ru.a1024bits.bytheway.util.Constants.END_DATE
@@ -80,7 +84,6 @@ import ru.a1024bits.bytheway.model.Response as ResponseBtw
 
 
 class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback {
-
     companion object {
         const val BUDGET = "budget"
         const val BUDGET_POSITION = "budgetPosition"
@@ -705,7 +708,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         newTripText.setOnClickListener {
             hideBlockNewTrip()
             showBlockTravelInformation()
-            ObjectAnimator.ofInt(scrollProfile, "scrollY", socnetwork.bottom).setDuration(750L).start()
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_create_click", null)
 
         }
@@ -779,11 +781,12 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         }
     }
 
+    var bitmap: Bitmap? = null
+
     val MIN_LENGHT_TEXT = 158
     val MIN_LENGHT_INFO_TEXT_FOR_POST = 40
     private fun shareVKPost() {
         thisActionIsVkShare = true
-        val vk = VK()
         val cityArrived = textCityFrom.text.toString()
         val cityTo = getLastCity()
         var text = "Ищу попутчика в $cityTo \n${getDates()}${getBudgetText()}${getInfoText()}${getMapsLink(cityArrived, cityTo)}"
@@ -791,7 +794,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             text += getHashTags(text.length)
         val linkUri = "https://play.google.com/store/apps/details?id=ru.a1024bits.bytheway.release&hl=${getCurrentLocale(activity)}&referrer=${mainUser?.id}"
         val textSize = getTextSize(cityArrived, cityTo)
-        var bitmap: Bitmap? = null
         try {
             bitmap = drawTextToBitmap(context = activity.baseContext,
                     gResId = R.drawable.template_for_posting,
@@ -804,6 +806,12 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         }
         if (!vk.start(activity))
             vk.postToWall(activity, text, bitmap, linkUri)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        bitmap = null
+        vk.destroyDialog()
     }
 
     private fun getMapsLink(cityArrived: String, cityTo: String) =
@@ -1385,10 +1393,11 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     private fun isLinkNotDefault(key: String) = !(socialValues[key] in defaultSocialValues.values)
 
+    val vk: VK by lazy { VK() }
+
     private fun sinchVk() {
-        val s = VK()
         mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_vk_sinch", null)
-        if (!s.start(activity))
+        if (!vk.start(activity))
             Toast.makeText(activity, "Already", Toast.LENGTH_SHORT).show()
     }
 
@@ -1709,8 +1718,9 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
     private fun showTipsForEmptySocialLink() {
         val tips = SocialTipsDialog()
-        tips.show(fragmentManager, "Tips")
-        scrollProfile?.fullScroll(ScrollView.FOCUS_UP)
+        tips.show(fragmentManager, "Tips") {
+            ObjectAnimator.ofInt(scrollProfile, "scrollY", headerprofile.bottom).setDuration(650L).start()
+        }
     }
 
 
@@ -1783,8 +1793,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     private fun obtainDirection() {
         viewModel?.getRoute(cityFromLatLng = cityFromLatLng, cityToLatLng = cityToLatLng, waypoint = cityTwoLatLng)
     }
-}
 
-private fun Long.formatDates(formatDate: SimpleDateFormat): String = formatDate.format(Date(this))
+}
 
 

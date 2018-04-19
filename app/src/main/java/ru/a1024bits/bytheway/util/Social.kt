@@ -30,9 +30,11 @@ class VK {
         return false;
     }
 
+    var build: VKShareDialogBuilder? = null
+
     fun postToWall(activity: FragmentActivity, text: String, bitmap: Bitmap? = null, linkUri: String) {
 
-        val build = VKShareDialogBuilder()
+        build = VKShareDialogBuilder()
                 .setText(text)
                 .setAttachmentLink("Опубликованно с помощью ByTheWay", linkUri) // fixme locale
                 .setShareDialogListener(object : VKShareDialog.VKShareDialogListener {
@@ -50,8 +52,12 @@ class VK {
                     }
                 })
         bitmap?.let {
-            build.setAttachmentImages(arrayOf(VKUploadImage(it, VKImageParameters.pngImage())))
+            build?.setAttachmentImages(arrayOf(VKUploadImage(it, VKImageParameters.pngImage())))
         }
-        build.show(activity.fragmentManager, "VK")
+        build?.show(activity.fragmentManager, "VK")
+    }
+
+    fun destroyDialog() {
+        build = null
     }
 }

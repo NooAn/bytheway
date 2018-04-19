@@ -38,3 +38,5 @@ fun TextView.putIntoFilter(key: String, filter: Filter) {
     isActivated = !isActivated
     filter.method.put(key, isActivated)
 }
+
+fun Long.formatDates(formatDate: SimpleDateFormat): String = formatDate.format(Date(this))
