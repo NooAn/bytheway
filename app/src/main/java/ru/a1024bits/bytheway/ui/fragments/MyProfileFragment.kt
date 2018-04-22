@@ -357,11 +357,21 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                         textCityFrom.setText(place.name)
                         textCityFrom.error = null
                         cityFromLatLng = GeoPoint(place.latLng.latitude, place.latLng.longitude)
-                        if (cityFromLatLng.hashCode() == cityToLatLng.hashCode()) {
+                        if (cityFromLatLng.hashCode() == cityToLatLng.hashCode() ||
+                                cityFromLatLng == cityToLatLng || cityFromLatLng == cityTwoLatLng) {
                             textCityFrom.error = "true"
                             Toast.makeText(this@MyProfileFragment.context,
                                     getString(R.string.fill_diff_cities), Toast.LENGTH_LONG).show()
                         } else {
+                            if(!textCityTo.error.isNullOrEmpty()){
+                                textCityTo.error = null
+                            }
+                            if(!textNewCity.error.isNullOrEmpty()){
+                                textNewCity.error = null
+                            }
+                            if(!textCityMiddleTwo.error.isNullOrEmpty()){
+                                textCityMiddleTwo.error = null
+                            }
                             cities[FIRST_INDEX_CITY] = place.name.toString()
                             profileStateHashMap[CITY_FROM] = cityFromLatLng.hashCode().toString()
                             getRoutes()
@@ -387,6 +397,15 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                             Toast.makeText(this@MyProfileFragment.context,
                                     getString(R.string.fill_diff_cities), Toast.LENGTH_LONG).show()
                         } else {
+                            if(!textCityFrom.error.isNullOrEmpty()){
+                                textCityFrom.error = null
+                            }
+                            if(!textNewCity.error.isNullOrEmpty()){
+                                textNewCity.error = null
+                            }
+                            if(!textCityMiddleTwo.error.isNullOrEmpty()){
+                                textCityMiddleTwo.error = null
+                            }
                             cities[LAST_INDEX_CITY] = place.name.toString()
                             profileStateHashMap[CITY_TO] = cityToLatLng.hashCode().toString()
                             getRoutes()
@@ -407,10 +426,19 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                         textCityMiddleTwo.error = null
                         cityTwoLatLng = GeoPoint(place.latLng.latitude, place.latLng.longitude)
                         if (cityTwoLatLng.hashCode() == cityFromLatLng.hashCode() || cityTwoLatLng == cityToLatLng) {
-                            textCityTo.error = "true"
+                            textCityMiddleTwo.error = "true"
                             Toast.makeText(this@MyProfileFragment.context,
                                     getString(R.string.fill_diff_cities), Toast.LENGTH_LONG).show()
                         } else {
+                            if(!textCityFrom.error.isNullOrEmpty()){
+                                textCityFrom.error = null
+                            }
+                            if(!textCityTo.error.isNullOrEmpty()){
+                                textCityTo.error = null
+                            }
+                            if(!textNewCity.error.isNullOrEmpty()){
+                                textNewCity.error = null
+                            }
                             cities[TWO_INDEX_CITY] = place.name.toString()
                             profileStateHashMap[CITY_TWO] = cityTwoLatLng.hashCode().toString()
                             getRoutes()
@@ -430,11 +458,21 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                         textNewCity?.setText(place.name)
                         textNewCity?.error = null
                         cityToLatLng = GeoPoint(place.latLng.latitude, place.latLng.longitude)
-                        if (cityToLatLng.hashCode() == cityFromLatLng.hashCode() || cityToLatLng.hashCode() == cityTwoLatLng.hashCode()) {
-                            textCityTo.error = "true"
+                        if (cityToLatLng.hashCode() == cityFromLatLng.hashCode() ||
+                                cityToLatLng.hashCode() == cityTwoLatLng.hashCode()) {
+                            textNewCity.error = "true"
                             Toast.makeText(this@MyProfileFragment.context,
                                     getString(R.string.fill_diff_cities), Toast.LENGTH_LONG).show()
                         } else {
+                            if(!textCityFrom.error.isNullOrEmpty()){
+                                textCityFrom.error = null
+                            }
+                            if(!textCityTo.error.isNullOrEmpty()){
+                                textCityTo.error = null
+                            }
+                            if(!textCityMiddleTwo.error.isNullOrEmpty()){
+                                textCityMiddleTwo.error = null
+                            }
                             cities[LAST_INDEX_CITY] = place.name.toString()
                             profileStateHashMap[CITY_TO] = cityToLatLng.hashCode().toString()
                             getRoutes()
@@ -665,7 +703,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
         add_city.setOnClickListener {
             MODE_TWO_CITY = !MODE_TWO_CITY
-            if (MODE_TWO_CITY == true) {
+            if (MODE_TWO_CITY) {
                 // DELETE CITY
                 clearLastCity()
             } else {
@@ -940,7 +978,9 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
 
         textCityTo.text = textCityMiddleTwo.text
         textDateFrom.text = dateStartTwo.text
-        textDateFrom.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector, 0)
+        if (textDateFrom.text.isNotEmpty()) {
+            textDateFrom.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector, 0)
+        }
 
         textCityMiddleTwo.visibility = View.GONE
         dateStartTwo.visibility = View.GONE
@@ -970,8 +1010,13 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         textCityMiddleTwo.visibility = View.VISIBLE
         textCityMiddleTwo.text = textCityTo.text
         dateStartTwo.text = textDateFrom.text
-        dateStartTwo.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector, 0)
-        dateFinish.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector, 0)
+
+        if (dateStartTwo.text.isNotEmpty()) {
+            dateStartTwo.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector, 0)
+        }
+        if (dateFinish.text.isNotEmpty()) {
+            dateFinish.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close_vector, 0)
+        }
 
         dateStartTwo.setOnClickListener {
             openDateDialog(START_DATE, dateStartTwo)
@@ -1112,37 +1157,33 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
     private fun checkingCityText(): Boolean {
         var errorString = ""
 
-        textCityFrom.error = null
-        textNewCity.error = null
-        textCityTo.error = null
-
         if (textCityFrom.text.isEmpty()) {
             textCityFrom.error = getString(R.string.name)
             errorString = getString(R.string.fill_required_fields) + " " + getString(R.string.city_from)
-        } else
-            textCityFrom.error = null
+        }
 
         if (textCityTo.text.isEmpty() && MODE_TWO_CITY) {
             textCityTo.error = getString(R.string.yes)
             errorString += getString(R.string.fill_required_fields) + " " + getString(R.string.city_to)
-        } else
-            textCityTo.error = null
+        }
 
         if (textNewCity.text.isEmpty() && !MODE_TWO_CITY) {
             textNewCity.error = getString(R.string.yes)
             errorString += getString(R.string.fill_required_fields) + " " + getString(R.string.city_to)
-        } else
-            textNewCity.error = null
+        }
 
         if (textCityMiddleTwo.text.isEmpty() && !MODE_TWO_CITY) {
             textCityMiddleTwo.error = getString(R.string.yes)
             errorString += getString(R.string.fill_required_fields) + " " + getString(R.string.city_to)
-        } else
-            textCityMiddleTwo.error = null
+        }
 
         textCityFrom.parent.requestChildFocus(textCityFrom, textCityFrom)
 
         if (isDifferentLocationCity()) {
+            textCityFrom.error = "true"
+            textNewCity.error = "true"
+            textCityTo.error = "true"
+            textCityMiddleTwo.error = "true"
             errorString += " " + getString(R.string.fill_diff_cities)
             mFirebaseAnalytics.logEvent("${TAG_ANALYTICS}_city_equals_err", null)
         }
@@ -1151,6 +1192,11 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             Toast.makeText(this@MyProfileFragment.context, errorString, Toast.LENGTH_LONG).show()
             return false
         }
+        textCityFrom.error = null
+        textNewCity.error = null
+        textCityTo.error = null
+        textCityMiddleTwo.error = null
+
         return true
     }
 
@@ -1380,11 +1426,11 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         val pm = activity.packageManager
         try {
             pm.getPackageInfo("com.vkontakte.android", PackageManager.GET_ACTIVITIES);
-            return true;
+            return true
         } catch (e: PackageManager.NameNotFoundException) {
-            e.printStackTrace()
+            //e.printStackTrace()
         }
-        return false;
+        return false
     }
 
     private fun isLinkNotDefault(key: String) = !(socialValues[key] in defaultSocialValues.values)
