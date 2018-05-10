@@ -13,7 +13,7 @@ import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.ui.activity.RegistrationActivity
 
 class ErrorStandartRegistrationDialog : DialogFragment() {
-    lateinit var activity: RegistrationActivity
+    var activity: RegistrationActivity? = null
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return layoutInflater.inflate(R.layout.error_registration_dialog, container, false)
@@ -25,9 +25,9 @@ class ErrorStandartRegistrationDialog : DialogFragment() {
         try {
             view?.sendButtonCode?.setOnClickListener({
                 try {
-                    activity.mVerificationId?.let {
+                    activity?.mVerificationId?.let {
                         PhoneAuthProvider.getCredential(it, verificationsData.text.toString())?.let { credentialIt ->
-                            activity.signInGoogle(credentialIt, this@ErrorStandartRegistrationDialog)
+                            activity?.signInGoogle(credentialIt, this@ErrorStandartRegistrationDialog)
                         }
                     }
                 } catch (e: Exception) {
@@ -38,13 +38,13 @@ class ErrorStandartRegistrationDialog : DialogFragment() {
             view?.sendButtonPhone?.setOnClickListener({
                 if (verificationsData.text.toString().contains(Regex("^((380)|(7))")))
                     verificationsData.setText(StringBuilder("+").append(verificationsData.text.toString()))
-                if (!activity.validatePhoneNumber(verificationsData))
+                if (activity?.validatePhoneNumber(verificationsData) == false)
                     return@setOnClickListener
 
-                view.verificationsData.hint = activity.getString(R.string.sms_code)
+                view.verificationsData.hint = activity?.getString(R.string.sms_code)
                 view.sendButtonCode.visibility = View.VISIBLE
                 view.sendButtonPhone.visibility = View.GONE
-                activity.authPhone(verificationsData)
+                activity?.authPhone(verificationsData)
                 verificationsData.setText("")
             })
         } catch (e: Exception) {

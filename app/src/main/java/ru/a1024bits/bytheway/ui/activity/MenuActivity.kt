@@ -181,7 +181,11 @@ class MenuActivity : AppCompatActivity(),
                 }
             }
         } else {
-            screenNames = savedInstanceState.getSerializable(STATE_SCREEN_NAMES) as ArrayList<String>
+            try {
+                screenNames = savedInstanceState.getSerializable(STATE_SCREEN_NAMES) as ArrayList<String>
+            } catch (e: ClassCastException) {
+                e.printStackTrace()
+            }
         }
 
         mGoogleApiClient = GoogleApiClient.Builder(this)
@@ -266,8 +270,12 @@ class MenuActivity : AppCompatActivity(),
                     ALL_USERS_SCREEN -> return allUsersFragment
 
                     SIMILAR_TRAVELS_SCREEN -> {
-
-                        SimilarTravelsFragment.newInstance(data as List<User>)
+                        try {
+                            SimilarTravelsFragment.newInstance(data as List<User>)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            SimilarTravelsFragment.newInstance(arrayListOf())
+                        }
                     }
                     else -> return MapFragment()
                 }
@@ -499,28 +507,32 @@ class MenuActivity : AppCompatActivity(),
         simpleAlert.setView(dialogView)
         dialogView.textMessage.text = getString(R.string.text_away_from_profile)
         simpleAlert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.yes), { _, _ ->
-            val myProfile = supportFragmentManager.findFragmentById(R.id.fragment_container) as MyProfileFragment
+            try {
+                val myProfile = supportFragmentManager.findFragmentById(R.id.fragment_container) as MyProfileFragment
 
-            viewModel?.saveProfile?.observe(this, android.arch.lifecycle.Observer<ru.a1024bits.bytheway.model.Response<Boolean>> { response ->
-                when (response?.status) {
-                    Status.SUCCESS -> {
-                        if (response.data == true) {
-                            Toast.makeText(this, resources.getString(R.string.save_succesfull), Toast.LENGTH_SHORT).show()
-                            callback()
-                        } else {
+                viewModel?.saveProfile?.observe(this, android.arch.lifecycle.Observer<ru.a1024bits.bytheway.model.Response<Boolean>> { response ->
+                    when (response?.status) {
+                        Status.SUCCESS -> {
+                            if (response.data == true) {
+                                Toast.makeText(this, resources.getString(R.string.save_succesfull), Toast.LENGTH_SHORT).show()
+                                callback()
+                            } else {
+                                showErrorOnSave()
+                            }
+                        }
+                        Status.ERROR -> {
                             showErrorOnSave()
+                            Log.e("LOG", "log e:" + response.error)
                         }
                     }
-                    Status.ERROR -> {
-                        showErrorOnSave()
-                        Log.e("LOG", "log e:" + response.error)
-                    }
-                }
-            })
-            viewModel?.sendUserData(myProfile.getHashMapUser(), FirebaseAuth.getInstance().currentUser?.uid.toString(), mainUser)
+                })
+                viewModel?.sendUserData(myProfile.getHashMapUser(), FirebaseAuth.getInstance().currentUser?.uid.toString(), mainUser)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                showErrorOnSave()
+            }
         })
         simpleAlert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.no), { _, _ ->
-            Log.e("LOG", " refused")
             callback()
         })
         simpleAlert.show()
