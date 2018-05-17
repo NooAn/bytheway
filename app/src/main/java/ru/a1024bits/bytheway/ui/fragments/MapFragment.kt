@@ -185,7 +185,6 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
     var usersData: List<User>? = null
     private val transition: Observer<Int> = Observer { data ->
         countEvents += data ?: 0
-        Log.e("LOGe", countEvents.toString())
         when (countEvents) {
             3 -> {
                 countEvents = 0 // summary 1 + 2 (events from animation and events from servers)

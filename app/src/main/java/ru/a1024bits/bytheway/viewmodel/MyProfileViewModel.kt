@@ -52,18 +52,18 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
     fun loadImage(pathFile: Uri, userId: String, oldUser: User?) {
         disposables.add(userRepository.uploadPhotoLink(path = pathFile, id = userId)
                 .subscribeOn(getBackgroundScheduler())
-                .doOnSubscribe({ _ -> loadingStatus.setValue(true) })
+                .doOnSubscribe({ _ -> loadingStatus.postValue(true) })
                 .doOnError({ loadingStatus.postValue(false) })
-                .doAfterTerminate({ loadingStatus.setValue(false) })
+                .doAfterTerminate({ loadingStatus.postValue(false) })
                 .flatMap({ urlPhoto -> savePhotoLink(urlPhoto, userId).subscribeOn(getBackgroundScheduler()) })
                 .observeOn(getMainThreadScheduler())
                 .subscribe({
                     Log.e("LOG S :", Thread.currentThread().name)
-                    photoUrl.setValue(Response.success(it))
+                    photoUrl.postValue(Response.success(it))
                     oldUser?.urlPhoto = it
                     user.value = oldUser
                 }, { throwable ->
-                    photoUrl.setValue(Response.error(throwable))
+                    photoUrl.postValue(Response.error(throwable))
                 }))
     }
 
@@ -73,11 +73,7 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
         return userRepository.changeUserProfile(map, id)
                 .timeout(TIMEOUT_SECONDS, timeoutUnit)
                 .retry(2)
-                .toSingle(object : Callable<String> {
-                    override fun call(): String {
-                        return downloadUrl
-                    }
-                })
+                .toSingle { downloadUrl }
     }
 
     fun load(userId: String) {
@@ -85,13 +81,13 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                 .subscribeOn(getBackgroundScheduler())
                 .timeout(TIMEOUT_SECONDS, timeoutUnit)
                 .retry(2)
-                .doOnSubscribe({ _ -> loadingStatus.setValue(true) })
+                .doOnSubscribe({ _ -> loadingStatus.postValue(true) })
                 .doOnError({ loadingStatus.postValue(false) })
                 .doAfterTerminate { loadingStatus.postValue(false) }
                 .observeOn(getMainThreadScheduler())
                 .subscribe(
-                        { user -> response.setValue(Response.success(user)) },
-                        { throwable -> response.setValue(Response.error(throwable)) }
+                        { user -> response.postValue(Response.success(user)) },
+                        { throwable -> response.postValue(Response.error(throwable)) }
                 )
         )
     }
@@ -103,9 +99,9 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                 .timeout(TIMEOUT_SECONDS, timeoutUnit)
                 .retry(2)
                 .subscribeOn(getBackgroundScheduler())
-                .doOnSubscribe({ _ -> loadingStatus.setValue(true) })
+                .doOnSubscribe({ _ -> loadingStatus.postValue(true) })
                 .doOnError({ loadingStatus.postValue(false) })
-                .doAfterTerminate({ loadingStatus.setValue(false) })
+                .doAfterTerminate({ loadingStatus.postValue(false) })
                 .observeOn(getMainThreadScheduler())
                 .subscribe(
                         {
@@ -113,7 +109,7 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                             user.value = makeUserFromMap(map, oldUser)
                         },
                         { throwable ->
-                            response.setValue(Response.error(throwable))
+                            response.postValue(Response.error(throwable))
                         }))
     }
 
