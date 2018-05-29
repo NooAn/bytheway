@@ -19,11 +19,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.Toast
+import com.crashlytics.android.Crashlytics
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.GeoPoint
 import kotlinx.android.synthetic.main.fragment_maps.*
 import kotlinx.android.synthetic.main.fragment_search_block.*
@@ -304,8 +304,8 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
 
         } catch (e: Exception) {
             e.printStackTrace()
-            FirebaseCrash.log("save data user's")
-            FirebaseCrash.report(e)
+            Crashlytics.log("save data user's")
+            Crashlytics.logException(e)
         }
     }
 
@@ -367,7 +367,7 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            FirebaseCrash.report(e)
+            Crashlytics.logException(e)
         }
         if (viewModel?.liveData?.hasObservers() == false)
             viewModel?.liveData?.observe(this@MapFragment, transition)
@@ -543,7 +543,7 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            FirebaseCrash.report(e)
+            Crashlytics.logException(e)
         }
     }
 

@@ -2,8 +2,8 @@ package ru.a1024bits.bytheway.viewmodel
 
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
+import com.crashlytics.android.Crashlytics
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.QuerySnapshot
 import io.reactivex.Single
 import ru.a1024bits.bytheway.algorithm.SearchTravelers
@@ -46,7 +46,7 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
                 userRepository?.installAllUsers(this)
         } catch (e: Exception) {
             e.printStackTrace()
-            FirebaseCrash.report(e)
+            Crashlytics.logException(e)
             loadingStatus.postValue(false)
         }
     }
@@ -70,7 +70,7 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
                             }
                         } catch (e: Exception) {
                             e.printStackTrace()
-                            FirebaseCrash.report(e)
+                            Crashlytics.logException(e)
                         }
                     }
                 }
@@ -233,7 +233,7 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
                     user.dates[START_DATE] ?: 0L >= filter.startDate))
 
     fun sendNotifications(ids: String, notification: FireBaseNotification) {
-        FirebaseCrash.log("send Notification")
+        Crashlytics.log("send Notification")
         userRepository?.let {
             disposables.add(it.sendNotifications(ids, notification)
                     .timeout(TIMEOUT_SECONDS, timeoutUnit)
@@ -242,7 +242,7 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
                     .subscribe(
                             { Log.e("LOG", "notify complete") },
                             { t ->
-                                FirebaseCrash.report(t)
+                                Crashlytics.logException(t)
                                 Log.e("LOG view model", "notify", t)
                             }
                     )

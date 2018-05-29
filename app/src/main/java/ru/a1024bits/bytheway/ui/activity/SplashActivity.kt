@@ -18,6 +18,10 @@ import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.viewmodel.RegistrationViewModel
 import javax.inject.Inject
 import kotlin.math.roundToInt
+import io.fabric.sdk.android.Fabric
+import com.crashlytics.android.Crashlytics
+
+
 
 class SplashActivity : AppCompatActivity() {
 
@@ -35,6 +39,8 @@ class SplashActivity : AppCompatActivity() {
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(RegistrationViewModel::class.java)
           viewModel?.setTimestamp(FirebaseAuth.getInstance().currentUser?.uid ?: return)
+
+        Fabric.with(Fabric.Builder(this).kits(Crashlytics()).debuggable(true).build())
 
 //        val text = "ROME1"
 //        val text2 = "КРАСНОДАР"

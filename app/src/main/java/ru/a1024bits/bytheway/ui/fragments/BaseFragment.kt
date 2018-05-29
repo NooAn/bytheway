@@ -11,8 +11,8 @@ import android.view.View
 import android.view.ViewGroup
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
+import com.crashlytics.android.Crashlytics
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.crash.FirebaseCrash
 import ru.a1024bits.bytheway.viewmodel.BaseViewModel
 import uk.co.deanwild.materialshowcaseview.IShowcaseListener
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView
@@ -59,7 +59,7 @@ abstract class BaseFragment<T : BaseViewModel> : Fragment() {
                         .show()
         } catch (e: Exception) {
             e.printStackTrace()
-            FirebaseCrash.report(e)
+            Crashlytics.logException(e)
         }
     }
 

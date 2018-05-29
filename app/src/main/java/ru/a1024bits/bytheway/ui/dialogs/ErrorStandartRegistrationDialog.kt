@@ -5,8 +5,8 @@ import android.support.v4.app.DialogFragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.crashlytics.android.Crashlytics
 import com.google.firebase.auth.PhoneAuthProvider
-import com.google.firebase.crash.FirebaseCrash
 import kotlinx.android.synthetic.main.error_registration_dialog.*
 import kotlinx.android.synthetic.main.error_registration_dialog.view.*
 import ru.a1024bits.bytheway.R
@@ -32,7 +32,7 @@ class ErrorStandartRegistrationDialog : DialogFragment() {
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    FirebaseCrash.report(e)
+                    Crashlytics.logException(e);
                 }
             })
             view?.sendButtonPhone?.setOnClickListener({

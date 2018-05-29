@@ -15,11 +15,11 @@ import android.view.WindowManager
 import android.widget.Toast
 import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment
 import com.codetroopers.betterpickers.calendardatepicker.MonthAdapter
+import com.crashlytics.android.Crashlytics
 import com.google.android.gms.location.places.AutocompleteFilter
 import com.google.android.gms.location.places.ui.PlaceAutocomplete
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.crash.FirebaseCrash
 import kotlinx.android.synthetic.main.fragment_search_block.*
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.model.Method
@@ -281,7 +281,7 @@ class SearchFragment : Fragment() {
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
-                        FirebaseCrash.report(e)
+                        Crashlytics.logException(e)
                     }
                 }
                 else -> {

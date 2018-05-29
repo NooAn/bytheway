@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.EditText
 import android.widget.Toast
+import com.crashlytics.android.Crashlytics
 import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -24,7 +25,6 @@ import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.*
-import com.google.firebase.crash.FirebaseCrash
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.ui.dialogs.ErrorStandartRegistrationDialog
@@ -37,7 +37,7 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
 
     override fun onConnectionFailed(p0: ConnectionResult) {
         mFirebaseAnalytics.logEvent("RegistrationScreen_Connect_Fail", null)
-        FirebaseCrash.report(Exception(p0.errorMessage + " " + p0.errorCode))
+        Crashlytics.logException(Exception(p0.errorMessage + " " + p0.errorCode))
     }
 
     private var viewModel: RegistrationViewModel? = null
@@ -176,11 +176,11 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
                     ?.addOnFailureListener {
                         Toast.makeText(this, "Authentication failed.", Toast.LENGTH_SHORT).show()
                         mFirebaseAnalytics.logEvent("RegistrationScreen_Error_Login", null)
-                        FirebaseCrash.report(it)
+                        Crashlytics.logException(it)
                         showErrorText()
                     }
         } catch (e: Exception) {
-            FirebaseCrash.report(e)
+            Crashlytics.logException(e)
             showErrorText()
         }
     }

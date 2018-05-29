@@ -1,16 +1,14 @@
 package ru.a1024bits.bytheway.repository
 
 import android.net.Uri
-import android.util.Log
+import com.crashlytics.android.Crashlytics
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.*
 import com.google.firebase.firestore.EventListener
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageException
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -94,7 +92,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                         .addOnFailureListener({ e -> listener.onFailure(e) })
             })
         } catch (e: Exception) {
-            FirebaseCrash.report(e)
+            Crashlytics.logException(e)
         }
     }
 
@@ -109,7 +107,7 @@ class UserRepository @Inject constructor(val store: FirebaseFirestore, var mapSe
                                     user = document.toObject(User::class.java)
                                     stream.onNext(user)
                                 } catch (ex2: Exception) {
-                                    FirebaseCrash.report(ex2)
+                                    Crashlytics.logException(ex2)
                                 }
                             }
                         } else {

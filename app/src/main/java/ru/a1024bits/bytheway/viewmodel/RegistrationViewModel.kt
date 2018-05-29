@@ -3,10 +3,10 @@ package ru.a1024bits.bytheway.viewmodel
 import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
+import com.crashlytics.android.Crashlytics
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import ru.a1024bits.bytheway.model.User
@@ -28,7 +28,7 @@ class RegistrationViewModel @Inject constructor(var userRepository: UserReposito
                 .observeOn(getMainThreadScheduler())
                 .subscribe(
                         { Log.e("LOG", "complete") },
-                        { throwable -> FirebaseCrash.report(throwable) }
+                        { throwable -> Crashlytics.logException(throwable) }
                 ))
     }
 
