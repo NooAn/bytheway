@@ -221,5 +221,9 @@
     <string name="text_for_soc_link_user">Vous n\'avez aucun contact pour la communication.</string>
     <string name="or">or</string>
     <string name="text_for_empty_search">With these parameters, no one is coming here. \nTry to enter other query parameters.</string>
+    <string name="error_registration">An internal error occurred. Retrying should resolve the problem.</string>
+    <string name="many_request">Many request to server. Waite 5 min</string>
+    <string name="invalid_sms">Неправильный смс-код.</string>
+    <string name="problem_google_acc">\"Проблемы с гугл аккаунтом\"</string>
 
 </resources>

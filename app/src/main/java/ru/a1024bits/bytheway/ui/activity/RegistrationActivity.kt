@@ -91,8 +91,7 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
     var snackbar: Snackbar? = null
 
     private fun showDialogInternet() {
-//        snackbar = Snackbar.make(this.findViewById(android.R.id.content), R.string.no_internet, Snackbar.LENGTH_LONG)
-//        snackbar?.show()
+
         val alertDialog = AlertDialog.Builder(this).create();
         alertDialog.setTitle("Info");
         alertDialog.setMessage(resources.getString(R.string.no_internet));
@@ -105,8 +104,8 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
 
     private fun isNetworkAvailable(): Boolean {
         val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetworkInfo = connectivityManager.getActiveNetworkInfo()
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected()
+        val activeNetworkInfo = connectivityManager.activeNetworkInfo
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected
     }
 
     private fun signIn() {
@@ -148,6 +147,16 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
             } else {
                 mFirebaseAnalytics.logEvent("RegistrationScreen_Error_NotKnow", null)
             }
+            when (result.status.statusCode) {
+                12501, 12502 -> {
+                    Toast.makeText(this, "Проблемы с гугл аккаунтом", Toast.LENGTH_SHORT).show()
+                    //startActivity(Intent(this, RegistrationActivity::class.java))
+                }
+                8 -> {
+                    Toast.makeText(this, R.string.error_registration, Toast.LENGTH_SHORT).show()
+                    showPhoneDialog()
+                }
+            }
             updateUI(false)
         }
     }
@@ -177,11 +186,11 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
                         Toast.makeText(this, "Authentication failed.", Toast.LENGTH_SHORT).show()
                         mFirebaseAnalytics.logEvent("RegistrationScreen_Error_Login", null)
                         FirebaseCrash.report(it)
-                        showErrorText()
+                        showPhoneDialog()
                     }
         } catch (e: Exception) {
             FirebaseCrash.report(e)
-            showErrorText()
+            showPhoneDialog()
         }
     }
 
@@ -190,18 +199,21 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
             mFirebaseAnalytics.logEvent("RegistrationScreen_Success_Login", null)
             viewModel?.ifUserNotExistThenSave(mAuth.currentUser)
         } else {
-            showErrorText()
-            Toast.makeText(this, "Проблемы с гугл аккаунтом", Toast.LENGTH_SHORT).show()
+            showPhoneDialog()
+            Toast.makeText(this, R.string.problem_google_acc, Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun showErrorText() {
+    private fun showPhoneDialog() {
         if (!isNetworkAvailable()) showDialogInternet() else
             ErrorStandartRegistrationDialog.newInstance(this).show(supportFragmentManager, "dialogRegistrationOnNumber")
     }
 
     fun validatePhoneNumber(phone: EditText): Boolean {
         val phoneNumber = phone.text.toString()
+        val bundle = Bundle()
+        bundle.putString("number", phone.toString())
+        mFirebaseAnalytics.logEvent("Registration_number", bundle)
         if (phoneNumber.isBlank() || !phoneNumber.matches(Regex("^\\+?\\d{10,12}$"))) {
             phone.error = "Invalid phone number."//falseui
             return false
@@ -209,6 +221,10 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
         return true
     }
 
+    override fun onBackPressed() {
+        super.onBackPressed()
+        finish()
+    }
 
     var mVerificationId: String? = null
 
@@ -237,15 +253,20 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
                             // Invalid request
                             Log.w("LOG", "Invalid Credintial");
                             mFirebaseAnalytics.logEvent("RegistrationScreen_invalid_sms", null)
+                            snackbar = Snackbar.make(findViewById(android.R.id.content), R.string.invalid_sms, Snackbar.LENGTH_LONG)
+                            snackbar?.show()
 
                         } else if (e is FirebaseTooManyRequestsException) {
                             // The SMS quota for the project has been exceeded
                             Log.w("LOG", "many request", e);
+                            snackbar = Snackbar.make(findViewById(android.R.id.content), R.string.many_request, Snackbar.LENGTH_LONG)
+                            snackbar?.show()
                             mFirebaseAnalytics.logEvent("RegistrationScreen_error_lot_req", null)
 
+                        } else {
+                            mFirebaseAnalytics.logEvent("RegistrationScreen_error_doesnknow", null)
+                            Toast.makeText(this@RegistrationActivity, R.string.just_error, Toast.LENGTH_SHORT).show()
                         }
-                        Toast.makeText(this@RegistrationActivity, R.string.just_error, Toast.LENGTH_SHORT).show()
-
                     }
 
                     override fun onCodeSent(verificationId: String?, token: PhoneAuthProvider.ForceResendingToken?) {
@@ -254,8 +275,6 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
                         // now need to ask the user to enter the code and then construct a credential
                         // by combining the code with a verification ID.
                         mVerificationId = verificationId;
-
-
                         // Save verification ID and resending token so we can use them later
 
                     }

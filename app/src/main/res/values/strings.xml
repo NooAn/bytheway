@@ -161,4 +161,8 @@
     <string name="text_for_soc_link_user">У вас нет контактов, добавьте их здесь:</string>
     <string name="or">или</string>
     <string name="text_for_empty_search">С такими параметрами сюда никто не едет. \nПопробуйте ввести другие параметры запроса.</string>
+    <string name="error_registration">Попробуйте авторизоваться еще раз или через какое-то время. Google.com не отвечает.</string>
+    <string name="many_request">Many request to server. Waite 5 min</string>
+    <string name="invalid_sms">Неправильный смс-код.</string>
+    <string name="problem_google_acc">\"Проблемы с гугл аккаунтом\"</string>
 </resources>

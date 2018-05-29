@@ -57,3 +57,4 @@ freeline_project_description.json
 bytheway/release/output.json
 app/bytheway/release/output.json
 gradle.properties
+*.aab

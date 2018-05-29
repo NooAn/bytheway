@@ -454,10 +454,14 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                         // Instead, a URI to that document will be contained in the return intent
                         // provided to this method as a parameter.
                         // Pull that URI using resultData.getData().
-                        var uri: Uri? = null
-                        if (data != null) {
-                            uri = data.getData()
-                            viewModel?.loadImage(uri, FirebaseAuth.getInstance().currentUser?.uid!!, mainUser)
+                        try {
+                            var uri: Uri? = null
+                            if (data != null) {
+                                uri = data.getData()
+                                viewModel?.loadImage(uri, FirebaseAuth.getInstance().currentUser?.uid!!, mainUser)
+                            }
+                        } catch (e: Exception) {
+                            Toast.makeText(activity, "Ошибка, попробуйте позже", Toast.LENGTH_SHORT).show()
                         }
                     }
                 }

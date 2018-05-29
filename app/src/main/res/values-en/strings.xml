@@ -273,7 +273,7 @@
     <string name="sinch_vk">Синхронизация с помощью приложение</string>
     <string name="share_friends">Рассказать друзьям</string>
     <string name="social_title_tg">Telegram</string>
-    <string name="social_text_tg">Добавьте свой аккаунт Telegram, чтобы с Вами смогли связаться другие путешественники</string>
+    <string name="social_text_tg">Add your Telegram, so others travellers can communication to you</string>
     <string name="call_me">Ask to contact with you</string>
     <string name="request_done">Запрос был отправлен. Пользователь получит push уведомление.</string>
     <string name="this_user_search_you">This traveler wants to contact you.</string>
@@ -281,5 +281,9 @@
     <string name="text_for_soc_link_user">You do not have any contacts for communication, you can add them here.</string>
     <string name="or">или</string>
     <string name="text_for_empty_search">With these parameters, no one is coming here. \nTry to enter other query parameters.</string>
+    <string name="error_registration">An internal error occurred. Retrying should resolve the problem.</string>
+    <string name="many_request">Many request to server. Waite 5 min</string>
+    <string name="invalid_sms">Invalid sms</string>
+    <string name="problem_google_acc">Problem with Google Account</string>
 
 </resources>

@@ -188,11 +188,12 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
         when (countEvents) {
             3 -> {
                 countEvents = 0 // summary 1 + 2 (events from animation and events from servers)
+                if (usersData == null) usersData = arrayListOf()
                 (activity as MenuActivity).navigator.applyCommand(Forward(Screens.SIMILAR_TRAVELS_SCREEN, usersData))
             }
         }
     }
-    private val listUsers: Observer<ru.a1024bits.bytheway.model.Response<List<User>>> = Observer { response ->
+    private val observerListUsers: Observer<ru.a1024bits.bytheway.model.Response<List<User>>> = Observer { response ->
 
         when (response?.status) {
             Status.SUCCESS -> {
@@ -216,7 +217,6 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
                     (activity as MenuActivity).updateNotified(saveNotifiedIds)
                 }
                 usersData = response.data
-                Log.e("LOGe", usersData.toString())
                 viewModel?.liveData?.value = 2
             }
 
@@ -278,13 +278,18 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
             } else if (!departure && !destination) {
                 error = R.string.fill_all_location
             }
-
-            if (error != 0 && points.size < 2) {
-                Toast.makeText(this@MapFragment.context, getString(error), Toast.LENGTH_SHORT).show()
-            } else {
-                appBarLayout.setExpanded(true)
-                goFlyPlan()
+            try {
+                if (error != 0 && points.size < 2) {
+                    Toast.makeText(this@MapFragment.context, getString(error), Toast.LENGTH_SHORT).show()
+                } else {
+                    appBarLayout.setExpanded(true)
+                    goFlyPlan()
+                }
+            } catch (e: Exception) {
+                FirebaseCrash.report(e)
+                e.printStackTrace()
             }
+
         }
         showPrompt("isFirstEnterMapFragment", context.resources.getString(R.string.close_hint),
                 getString(R.string.hint_save_and_search), getString(R.string.hint_save_and_search_description), buttonSaveTravelInfo)
@@ -463,7 +468,7 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
 
             marker = mMap?.addMarker(markerOptions)
 
-            viewModel?.response?.observe(this@MapFragment, listUsers)
+            viewModel?.response?.observe(this@MapFragment, observerListUsers)
             viewModel?.getSearchUsers(searchFragment?.filter ?: Filter())
 
 

@@ -40,7 +40,7 @@ class SimilarTravelsAdapter(val context: Context, val users: List<User>) : Recyc
         if (currentUser.age > 0) nameText.append(", ").append(currentUser.age)
         holder.name.text = nameText
 
-        holder.percentSimilarTravel.text = StringBuilder().append(currentUser.percentsSimilarTravel).append(" %")
+        holder.percentSimilarTravel.text = currentUser.percentsSimilarTravel.toString().plus(" %")
 
         holder.percentSimilarTravel.setTextColor(when (position) {
             0 -> context.resources.getColor(R.color.one_level)
@@ -57,7 +57,7 @@ class SimilarTravelsAdapter(val context: Context, val users: List<User>) : Recyc
     }
 
     private fun getShortCity(city: String): String? {
-        val n = if (city.length > 19) 19 else city.length
+        val n = if (city.length > 20) 20 else city.length
         val shortCity = city.substring(0, n)
         return if (shortCity.length == city.length) {
             city

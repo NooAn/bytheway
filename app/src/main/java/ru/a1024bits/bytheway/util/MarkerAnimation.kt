@@ -29,7 +29,7 @@ class MarkerAnimation {
             try {
                 val v = animation.animatedFraction
                 val newPosition = latLngInterpolator.interpolate(v, startPosition, finalPosition)
-                marker?.setRotation(getBearing(marker.position, newPosition))
+                marker?.rotation = marker?.position?.let { getBearing(it, newPosition) } ?: return@addUpdateListener
             } catch (ex: Exception) {
                 ex.printStackTrace()
             }

@@ -12,7 +12,6 @@
 -keep public enum ru.a1024bits.bytheway.model.User.**
 -keepclassmembers class ru.a1024bits.bytheway.model.** { *; }
 
-
 # RxJava
 -keep class rx.schedulers.Schedulers {
     public static <methods>;
@@ -79,9 +78,10 @@
 
 
 # Maps
--keep class com.google.android.gms.maps.** { *; }
+-keep class com.google.android.gms.** { *; }
 -keep interface com.google.android.gms.maps.** { *; }
 -keep class android.location.** { *; }
+
 
 -keepnames class com.google.android.maps.** {*;}
 -keep public class com.google.android.maps.** {*;}
