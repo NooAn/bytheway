@@ -6,8 +6,6 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.*
 import android.net.ConnectivityManager
 import android.os.Bundle
-import android.os.Parcelable
-import android.os.PersistableBundle
 import android.support.design.widget.NavigationView
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
@@ -147,7 +145,7 @@ class MenuActivity : AppCompatActivity(),
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
         if (FirebaseAuth.getInstance().currentUser == null) {
-            startActivity(Intent(this, RegistrationActivity::class.java))
+            startActivity(Intent(this, LoginActivity::class.java))
         }
 
         setContentView(R.layout.activity_menu)

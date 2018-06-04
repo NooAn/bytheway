@@ -4,20 +4,14 @@ import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
-import android.graphics.*
 import android.os.Bundle
-import android.support.v4.content.res.ResourcesCompat
 import android.support.v7.app.AppCompatActivity
-import android.text.TextPaint
-import android.util.Log
-import android.widget.ImageView
 import com.google.firebase.auth.FirebaseAuth
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.viewmodel.RegistrationViewModel
 import javax.inject.Inject
-import kotlin.math.roundToInt
 
 class SplashActivity : AppCompatActivity() {
 
@@ -34,7 +28,7 @@ class SplashActivity : AppCompatActivity() {
         App.component.inject(this)
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(RegistrationViewModel::class.java)
-          viewModel?.setTimestamp(FirebaseAuth.getInstance().currentUser?.uid ?: return)
+        viewModel?.setTimestamp(FirebaseAuth.getInstance().currentUser?.uid ?: return)
 
 //        val text = "ROME1"
 //        val text2 = "КРАСНОДАР"
@@ -48,7 +42,6 @@ class SplashActivity : AppCompatActivity() {
     }
 
 
-
     override fun onResume() {
         super.onResume()
         checkRegistrationAndForward()
@@ -57,7 +50,7 @@ class SplashActivity : AppCompatActivity() {
     private fun checkRegistrationAndForward() {
         //checks first enter
         if (preferences.getBoolean(Constants.FIRST_ENTER, true)) {
-            startActivity(Intent(this, RegistrationActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
+            startActivity(Intent(this, LoginActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
         } else {
             val menuActivityIntent = Intent(this, MenuActivity::class.java)
             if (intent.extras != null) {

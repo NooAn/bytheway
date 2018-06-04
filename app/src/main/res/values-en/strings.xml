@@ -285,5 +285,6 @@
     <string name="many_request">Many request to server. Waite 5 min</string>
     <string name="invalid_sms">Invalid sms</string>
     <string name="problem_google_acc">Problem with Google Account</string>
+    <string name="problem_with_this_way_authorization">Problems with this method of registration</string>
 
 </resources>

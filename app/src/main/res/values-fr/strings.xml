@@ -225,5 +225,6 @@
     <string name="many_request">Many request to server. Waite 5 min</string>
     <string name="invalid_sms">Неправильный смс-код.</string>
     <string name="problem_google_acc">\"Проблемы с гугл аккаунтом\"</string>
+    <string name="problem_with_this_way_authorization">Problèmes avec cette méthode d\'enregistrement</string>
 
 </resources>

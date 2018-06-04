@@ -31,9 +31,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.activity.RegistrationActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-            android:screenOrientation="portrait" />
+            android:name=".ui.activity.LoginActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize" />
 
         <activity
             android:name=".ui.activity.SplashActivity"

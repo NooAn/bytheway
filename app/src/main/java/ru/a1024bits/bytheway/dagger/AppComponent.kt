@@ -1,8 +1,8 @@
 package ru.a1024bits.bytheway.dagger
 
 import dagger.Component
+import ru.a1024bits.bytheway.ui.activity.LoginActivity
 import ru.a1024bits.bytheway.ui.activity.MenuActivity
-import ru.a1024bits.bytheway.ui.activity.RegistrationActivity
 import ru.a1024bits.bytheway.ui.activity.SplashActivity
 import ru.a1024bits.bytheway.ui.dialogs.SocNetworkdialog
 import ru.a1024bits.bytheway.ui.fragments.*
@@ -22,6 +22,7 @@ import javax.inject.Singleton
         UserRepositoryModule::class))
 
 interface AppComponent {
+    fun inject(activity: LoginActivity)
     fun inject(activity: MenuActivity)
     fun inject(fragment: AllUsersFragment)
     fun inject(fragment: SimilarTravelsFragment)
@@ -30,7 +31,6 @@ interface AppComponent {
     fun inject(fragment: RegistrationViewModel)
     fun inject(fragment: SearchFragment)
     fun inject(activity: SplashActivity)
-    fun inject(registrationActivity: RegistrationActivity)
     fun inject(mapFragment: MapFragment)
     fun inject(userProfileFragment: UserProfileFragment)
     fun inject(socNetworkdialog: SocNetworkdialog)

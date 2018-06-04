@@ -34,32 +34,41 @@ class RegistrationViewModel @Inject constructor(var userRepository: UserReposito
 
     fun ifUserNotExistThenSave(currentUser: FirebaseUser?) {
         val docRef = FirebaseFirestore.getInstance().collection(COLLECTION_USERS).document(currentUser?.uid.toString());
-        docRef.get().addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val document = task.result
-                if (!document.exists()) {
-                    // Пользователя нет в системе, добавляем.
-                    userRepository.addUser(User().apply {
-                        val list = currentUser?.displayName?.split(" ")
-                        name = list?.get(0).orEmpty()
-                        if (list?.getOrNull(1) != null) lastName = list[1]
-                        id = currentUser?.uid.orEmpty()
-                        email = currentUser?.email.toString()
-                        phone = currentUser?.phoneNumber ?: "+7"
-                        urlPhoto = currentUser?.photoUrl.toString()
-                        currentUser?.uid
-                    }).addOnCompleteListener {
+        docRef.get().addOnCompleteListener(object : OnCompleteListener<DocumentSnapshot> {
+            override fun onComplete(task: Task<DocumentSnapshot>) {
+                if (task.isSuccessful()) {
+                    val document = task.getResult()
+                    if (!document.exists()) {
+                        // Пользователя нет в системе, добавляем.
+                        userRepository.addUser(User().apply {
+                            val list = currentUser?.displayName?.split(" ")
+                            name = list?.get(0).orEmpty()
+                            if (list?.getOrNull(1) != null) lastName = list[1]
+                            id = currentUser?.uid.orEmpty()
+                            email = currentUser?.email.toString()
+                            phone = currentUser?.phoneNumber ?: "+7"
+                            urlPhoto = currentUser?.photoUrl.toString()
+                            currentUser?.getUid()
+                        }).addOnCompleteListener {
+                            load.value = true
+                        }.addOnFailureListener {
+                            load.value = false
+                        }
+                    } else {
+                        // Пользователь уже существует и не нужно тогда добавлять его
                         load.value = true
-                    }.addOnFailureListener {
-                        load.value = false
                     }
                 } else {
-                    // Пользователь уже существует и не нужно тогда добавлять его
-                    load.value = true
+                    load.value = false
                 }
-            } else {
-                load.value = false
             }
-        }
+        })
     }
+
+    fun validatePhoneNumber(phoneNumber: String): Boolean =
+            phoneNumber.isNotBlank() && phoneNumber.matches(Regex("^\\+?\\d{10,12}$"))
+
+    fun prepareNumber(number: String): String =
+            if (number.contains(Regex("^((380)|(7))")))
+                (StringBuilder("+").append(number)).toString() else number
 }
