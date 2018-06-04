@@ -137,8 +137,7 @@ class RegistrationActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFa
     private fun handleSignInResult(result: GoogleSignInResult) {
         if (result.isSuccess) {
             // Signed in successfully, show authenticated UI.
-            val acct = result.signInAccount
-            acct?.let { account -> firebaseAuthWithGoogle(account) } //maybe not this variant
+            result.signInAccount?.let { account -> firebaseAuthWithGoogle(account) } //maybe not this variant
         } else {
             // Signed out, show unauthenticated UI.
             if (result.status.statusCode != 200) {

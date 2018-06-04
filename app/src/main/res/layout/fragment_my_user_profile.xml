@@ -501,7 +501,6 @@
                 android:backgroundTint="@color/colorPrimary"
                 android:hint="@string/description"
                 android:inputType="textMultiLine|textCapSentences"
-                android:textIsSelectable="true"
                 android:textSize="16sp" />
         </LinearLayout>
 
