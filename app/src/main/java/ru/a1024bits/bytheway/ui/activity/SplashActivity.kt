@@ -36,6 +36,7 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
         App.component.inject(this)
+        Fabric.with(this, Crashlytics())
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(RegistrationViewModel::class.java)
           viewModel?.setTimestamp(FirebaseAuth.getInstance().currentUser?.uid ?: return)
