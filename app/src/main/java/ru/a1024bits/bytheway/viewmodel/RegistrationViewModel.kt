@@ -3,13 +3,14 @@ package ru.a1024bits.bytheway.viewmodel
 import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.crash.FirebaseCrash
-import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import io.reactivex.Completable
+import io.reactivex.schedulers.Schedulers
 import ru.a1024bits.bytheway.model.User
+import ru.a1024bits.bytheway.randomString
 import ru.a1024bits.bytheway.repository.COLLECTION_USERS
 import ru.a1024bits.bytheway.repository.UserRepository
 import java.util.concurrent.TimeUnit
@@ -18,8 +19,51 @@ import javax.inject.Inject
 /**
  * Created by Bit on 1/4/2018.
  */
-class RegistrationViewModel @Inject constructor(var userRepository: UserRepository) : BaseViewModel(), LifecycleObserver {
-    val load: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
+class RegistrationViewModel @Inject constructor(private val userRepository: UserRepository, private val authManager: FirebaseAuth,
+                                                private val fireStore: FirebaseFirestore) : BaseViewModel(), LifecycleObserver {
+    val load: MutableLiveData<Boolean> = MutableLiveData()
+    var currentUser: User = User()
+
+
+    fun registrationUserWithVk(vkUserId: String): Completable =
+            Completable.create { emitter ->
+                authManager.createUserWithEmailAndPassword("vk_$vkUserId@forVkEmailsInByTheWay.com", "vk_$vkUserId-password")
+                        .addOnSuccessListener { emitter.onComplete() }
+                        .addOnFailureListener {
+                            if (it is FirebaseAuthUserCollisionException)
+                                authManager.signInWithEmailAndPassword("vk_$vkUserId@forVkEmails.com", "vk_$vkUserId-password")
+                                        .addOnSuccessListener { emitter.onComplete() }
+                                        .addOnFailureListener { emitter.onError(it) }
+                             else
+                                emitter.onError(it)
+                        }
+            }
+                    .subscribeOn(Schedulers.io())
+
+    fun initUserWithVkSignIn(avatarUrlVk: String, firstNameVk: String, lastNameVk: String) {
+        currentUser = User().apply {
+            urlPhoto = avatarUrlVk
+            name = firstNameVk
+            lastName = lastNameVk
+            authManager.currentUser?.uid?.let { currentUser.id = it }
+        }
+    }
+
+    fun initUserWithGoogleOrPhoneSignIn() {
+        authManager.currentUser?.let { fireBaseUser ->
+            currentUser = User().apply {
+                with(fireBaseUser.displayName?.split(" ") ?: emptyList()) {
+                    name = getOrElse(0) { "" }
+                    lastName = getOrElse(1) { "" }
+                }
+                id = fireBaseUser.uid
+                email = fireBaseUser.email.toString()
+                phone = fireBaseUser.phoneNumber ?: "+7"
+                urlPhoto = fireBaseUser.photoUrl.toString()
+            }
+        }
+    }
+
     fun setTimestamp(uid: String) {
         disposables.add(userRepository.sendTime(uid)
                 .subscribeOn(getBackgroundScheduler())
@@ -32,37 +76,21 @@ class RegistrationViewModel @Inject constructor(var userRepository: UserReposito
                 ))
     }
 
-    fun ifUserNotExistThenSave(currentUser: FirebaseUser?) {
-        val docRef = FirebaseFirestore.getInstance().collection(COLLECTION_USERS).document(currentUser?.uid.toString());
-        docRef.get().addOnCompleteListener(object : OnCompleteListener<DocumentSnapshot> {
-            override fun onComplete(task: Task<DocumentSnapshot>) {
-                if (task.isSuccessful()) {
-                    val document = task.getResult()
-                    if (!document.exists()) {
+    fun ifUserNotExistThenSave() {
+        fireStore.collection(COLLECTION_USERS).document(currentUser.id).get()
+                .addOnSuccessListener { task ->
+                    if (!task.exists()) {
                         // Пользователя нет в системе, добавляем.
-                        userRepository.addUser(User().apply {
-                            val list = currentUser?.displayName?.split(" ")
-                            name = list?.get(0).orEmpty()
-                            if (list?.getOrNull(1) != null) lastName = list[1]
-                            id = currentUser?.uid.orEmpty()
-                            email = currentUser?.email.toString()
-                            phone = currentUser?.phoneNumber ?: "+7"
-                            urlPhoto = currentUser?.photoUrl.toString()
-                            currentUser?.getUid()
-                        }).addOnCompleteListener {
-                            load.value = true
-                        }.addOnFailureListener {
-                            load.value = false
-                        }
+                        userRepository.addUser(currentUser)
+                                .addOnCompleteListener { Log.d("tag", "1111: ${it.isSuccessful}  : ${it.exception} ") }
+                                .addOnSuccessListener { load.value = true }
+                                .addOnFailureListener { load.value = false }
                     } else {
                         // Пользователь уже существует и не нужно тогда добавлять его
                         load.value = true
                     }
-                } else {
-                    load.value = false
                 }
-            }
-        })
+                .addOnFailureListener { load.value = false }
     }
 
     fun validatePhoneNumber(phoneNumber: String): Boolean =

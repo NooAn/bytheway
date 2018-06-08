@@ -1,5 +1,6 @@
 package ru.a1024bits.bytheway.dagger
 
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import dagger.Module
@@ -25,6 +26,10 @@ class UserRepositoryModule {
         store.firestoreSettings = settings
         return store
     }
+
+    @Provides
+    @Singleton
+    fun providesFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
 
     @Provides
     @Singleton

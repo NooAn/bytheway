@@ -28,7 +28,7 @@ interface AppComponent {
     fun inject(fragment: SimilarTravelsFragment)
     fun inject(mainViewModel: DisplayUsersViewModel)
     fun inject(myProfileFragment: MyProfileFragment)
-    fun inject(fragment: RegistrationViewModel)
+    fun inject(viewModel: RegistrationViewModel)
     fun inject(fragment: SearchFragment)
     fun inject(activity: SplashActivity)
     fun inject(mapFragment: MapFragment)

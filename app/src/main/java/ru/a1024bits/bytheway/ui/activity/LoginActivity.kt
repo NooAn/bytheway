@@ -23,6 +23,10 @@ import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.*
 import com.google.firebase.crash.FirebaseCrash
+import com.vk.sdk.VKAccessToken
+import com.vk.sdk.VKCallback
+import com.vk.sdk.VKSdk
+import com.vk.sdk.api.*
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -37,6 +41,7 @@ import javax.inject.Inject
 
 private const val GOOGLE_SIGN_IN_ACTIVITY_CODE = 9001
 private const val GOOGLE_SIGN_IN_CODE = "GOOGLE"
+private const val VK_SIGN_IN_CODE = "VK"
 private const val ANALYTICS_TAG = "RegS"
 
 class LoginActivity : AppCompatActivity() {
@@ -66,9 +71,10 @@ class LoginActivity : AppCompatActivity() {
 
         numberLogIn.setOnClickListener { startRegistrationByNumber() }
 
-        googleLogIn.setOnClickListener { startSignInGoogleIfPossible() }
-    }
+        googleLogIn.setOnClickListener { startRegistrationIfPossible(GOOGLE_SIGN_IN_CODE) }
 
+        vkLogIn.setOnClickListener { startRegistrationIfPossible(VK_SIGN_IN_CODE) }
+    }
 
     fun validatePhoneNumber(phoneNumber: String): Boolean =
             viewModel.validatePhoneNumber(phoneNumber)
@@ -118,22 +124,52 @@ class LoginActivity : AppCompatActivity() {
                     .observeOn(AndroidSchedulers.mainThread())
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        try {
+        if (isResultOfVkLogIn(requestCode, resultCode, data))
+        else {
+            super.onActivityResult(requestCode, resultCode, data)
             when (requestCode) {
-                GOOGLE_SIGN_IN_ACTIVITY_CODE -> Auth.GoogleSignInApi.getSignInResultFromIntent(data)
-                        ?.let { handleSignInGoogleResult(it) }
+                GOOGLE_SIGN_IN_ACTIVITY_CODE ->
+                    data?.let { handleSignInGoogleResult(Auth.GoogleSignInApi.getSignInResultFromIntent(data)) }
+                            ?: let { createValidUser(false) }
                 else -> createValidUser(false)
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            createValidUser(false)
         }
     }
+
+    private fun isResultOfVkLogIn(requestCode: Int, resultCode: Int, data: Intent?) =
+            VKSdk.onActivityResult(requestCode, resultCode, data, onVkRegistrationCallback())
+
+    private fun onVkRegistrationCallback(): VKCallback<VKAccessToken> =
+            object : VKCallback<VKAccessToken> {
+                override fun onResult(vkToken: VKAccessToken) {
+                    VKApi.users().get(VKParameters.from(VKApiConst.ACCESS_TOKEN, vkToken.accessToken,
+                            VKApiConst.FIELDS, "first_name_{mom}", VKApiConst.FIELDS, "last_name_{mom}",
+                            VKApiConst.FIELDS, "photo_max"))
+                            .executeWithListener(object : VKRequest.VKRequestListener() {
+                                override fun onComplete(response: VKResponse) {
+                                    super.onComplete(response)
+                                    viewModel.registrationUserWithVk(vkToken.userId)
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe({
+                                                with(response.json.getJSONArray("response").getJSONObject(0)) {
+                                                    viewModel.initUserWithVkSignIn(getString("photo_max"),
+                                                            getString("first_name"), getString("last_name"))
+                                                    createValidUser(true)
+                                                }
+                                            }, { createValidUser(false) })
+                                }
+                            })
+                }
+
+                override fun onError(error: VKError?) {
+                    showMessageIntoToast("vk login not completed")
+                }
+            }
 
     fun signInGoogle(credential: AuthCredential) {
         authManager.signInWithCredential(credential)
                 .addOnSuccessListener(this) {
+                    viewModel.initUserWithGoogleOrPhoneSignIn()
                     createValidUser(true)
                 }
                 .addOnFailureListener {
@@ -145,6 +181,28 @@ class LoginActivity : AppCompatActivity() {
     }
 
 
+    private fun startRegistrationIfPossible(logInCode: String) {
+        if (isNetworkAvailable())
+            startRegistration(logInCode)
+        else
+            showDialogInternet(logInCode)
+    }
+
+    private fun startRegistration(logInCode: String) {
+        when (logInCode) {
+            GOOGLE_SIGN_IN_CODE -> signInGoogle()
+            VK_SIGN_IN_CODE -> signInVk()
+        }
+    }
+
+    private fun signInGoogle() {
+        startActivityForResult(Auth.GoogleSignInApi.getSignInIntent(googleApiClient), GOOGLE_SIGN_IN_ACTIVITY_CODE)
+    }
+
+    private fun signInVk() {
+        VKSdk.login(this@LoginActivity)
+    }
+
     private fun subscribeOnRegistration() {
         viewModel.load.observe(this, Observer<Boolean> { upload ->
             upload?.let { if (upload) onSuchRegistration() else onFailRegistration() }
@@ -155,13 +213,6 @@ class LoginActivity : AppCompatActivity() {
         analyticsManager.setUserId(authManager?.currentUser.toString())
         analyticsManager.setCurrentScreen(this, "Registration", this.javaClass.simpleName)
         logEvent("Enter")
-    }
-
-    private fun startSignInGoogleIfPossible() {
-        if (isNetworkAvailable())
-            signInGoogle()
-        else
-            showDialogInternet(GOOGLE_SIGN_IN_CODE)
     }
 
     private fun onFailRegistration() {
@@ -205,9 +256,7 @@ class LoginActivity : AppCompatActivity() {
             setTitle("Info")
             setMessage(resources.getString(R.string.no_internet))
             setButton(Dialog.BUTTON_POSITIVE, "OK") { _, _ ->
-                when (logInCode) {
-                    GOOGLE_SIGN_IN_CODE -> signInGoogle()
-                }
+                startRegistration(logInCode)
                 dismiss()
             }
             show()
@@ -216,10 +265,6 @@ class LoginActivity : AppCompatActivity() {
 
     private fun isNetworkAvailable(): Boolean =
             with((getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager).activeNetworkInfo) { isConnected }
-
-    private fun signInGoogle() {
-        startActivityForResult(Auth.GoogleSignInApi.getSignInIntent(googleApiClient), GOOGLE_SIGN_IN_ACTIVITY_CODE)
-    }
 
     private fun handleSignInGoogleResult(result: GoogleSignInResult) {
         if (result.isSuccess) {
@@ -241,14 +286,18 @@ class LoginActivity : AppCompatActivity() {
     private fun createValidUser(signedIn: Boolean) {
         if (signedIn) {
             logEvent("Success_Login")
-            viewModel.ifUserNotExistThenSave(authManager.currentUser)
+            viewModel.ifUserNotExistThenSave()
         } else {
             showMessageIntoToast(R.string.problem_with_this_way_authorization)
         }
     }
 
     private fun showMessageIntoToast(stringId: Int) {
-        Toast.makeText(this, applicationContext.getString(stringId), Toast.LENGTH_SHORT).show()
+        showMessageIntoToast(applicationContext.getString(stringId))
+    }
+
+    private fun showMessageIntoToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun startRegistrationByNumber() {
