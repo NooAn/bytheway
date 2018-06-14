@@ -19,12 +19,10 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment
 import com.codetroopers.betterpickers.calendardatepicker.MonthAdapter
+import com.crashlytics.android.Crashlytics
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.crash.FirebaseCrash
 import kotlinx.android.synthetic.main.fragment_display_all_users.*
-import kotlinx.android.synthetic.main.fragment_my_user_profile.view.*
 import kotlinx.android.synthetic.main.searching_parameters_block.*
-import kotlinx.android.synthetic.main.searching_parameters_block.view.*
 import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.adapter.DisplayAllUsersAdapter
@@ -111,7 +109,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
             showPrompt("isFirstEnterAllUsersFragment", context.resources.getString(R.string.close_hint),
                     context.resources.getString(R.string.hint_all_travelers), context.resources.getString(R.string.hint_all_travelers_description), searchParametersText)
         } catch (e: Throwable) {
-            FirebaseCrash.report(e)
+            Crashlytics.logException(e)
             loadingWhereLoadUsers.visibility = View.GONE
 
         }

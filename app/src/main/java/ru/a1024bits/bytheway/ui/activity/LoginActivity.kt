@@ -12,6 +12,7 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.Toast
+import com.crashlytics.android.Crashlytics
 import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -22,11 +23,11 @@ import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.*
-import com.google.firebase.crash.FirebaseCrash
 import com.vk.sdk.VKAccessToken
 import com.vk.sdk.VKCallback
 import com.vk.sdk.VKSdk
 import com.vk.sdk.api.*
+import io.fabric.sdk.android.Fabric
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -89,7 +90,7 @@ class LoginActivity : AppCompatActivity() {
 
                     override fun onVerificationFailed(e: FirebaseException?) {
                         if (e is FirebaseAuthInvalidCredentialsException) {
-                            Log.w("LOG", "Invalid Credential")
+                            Log.w("LOG", "Invalid Credential", e)
                             logEvent("invalid_sms")
 
                         } else if (e is FirebaseTooManyRequestsException) {
@@ -306,9 +307,10 @@ class LoginActivity : AppCompatActivity() {
 
     private fun logEvent(event: String) {
         analyticsManager.logEvent("${ANALYTICS_TAG}_$event", null)
+        Log.e("LOG", "event: $event")
     }
 
     private fun logException(exception: Exception) {
-        FirebaseCrash.report(exception)
+        Crashlytics.logException(exception)
     }
 }

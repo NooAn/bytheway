@@ -5,8 +5,11 @@ import android.support.v4.app.DialogFragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.google.firebase.crash.FirebaseCrash
+import com.crashlytics.android.Crashlytics
+import io.fabric.sdk.android.Fabric
+import io.reactivex.CompletableObserver
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.error_registration_dialog.*
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.ui.activity.LoginActivity
@@ -21,13 +24,22 @@ class RegistrationByPhone : DialogFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         activity = super.getActivity() as LoginActivity
-        isCancelable = false
         view?.let {
             sendButtonCode.setOnClickListener {
                 activity.registerUserByNumber(getPhoneNumber())
                         .subscribeOn(AndroidSchedulers.mainThread())
-                        .doOnError { FirebaseCrash.report(it) }
-                        .subscribe { dismissAllowingStateLoss() }
+                        .subscribe(object : CompletableObserver {
+                            override fun onComplete() {
+                                dismissAllowingStateLoss()
+                            }
+
+                            override fun onSubscribe(d: Disposable) {
+                            }
+
+                            override fun onError(e: Throwable) {
+                                Crashlytics.logException(e)
+                            }
+                        })
             }
             sendButtonPhone.setOnClickListener {
                 if (getPhoneNumber().isNotBlank()) {

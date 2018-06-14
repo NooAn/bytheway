@@ -26,7 +26,7 @@ class FeedbackDialog(context: Context) : Dialog(context) {
         val view = layoutInflater.inflate(R.layout.f2_feedback_dialog, null)
         view.findViewById<TextInputEditText>(R.id.emailText).setText(FirebaseAuth.getInstance().currentUser?.email.toString())
         view.findViewById<TextInputEditText>(R.id.textFeedback).requestFocus()
-        view.findViewById<Button>(R.id.sendButton).setOnClickListener({ v ->
+        view.findViewById<Button>(R.id.sendButton).setOnClickListener({
             val emailIntent = Intent(Intent.ACTION_SEND)
             emailIntent.setType("message/rfc822")
             emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, arrayOf("travells2323@gmail.com"))
@@ -37,7 +37,7 @@ class FeedbackDialog(context: Context) : Dialog(context) {
             this.cancel()
         })
 
-        view.findViewById<Button>(R.id.cancelButton).setOnClickListener({ v ->
+        view.findViewById<Button>(R.id.cancelButton).setOnClickListener({
             this.cancel()
         })
 

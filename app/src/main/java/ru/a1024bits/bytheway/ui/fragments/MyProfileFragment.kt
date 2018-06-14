@@ -31,6 +31,7 @@ import android.widget.*
 import com.bumptech.glide.request.RequestOptions
 import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment
 import com.codetroopers.betterpickers.calendardatepicker.MonthAdapter
+import com.crashlytics.android.Crashlytics
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException
 import com.google.android.gms.common.GooglePlayServicesRepairableException
 import com.google.android.gms.location.places.AutocompleteFilter
@@ -38,7 +39,6 @@ import com.google.android.gms.location.places.ui.PlaceAutocomplete
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.GeoPoint
 import com.google.maps.android.PolyUtil
 import com.vk.sdk.VKAccessToken
@@ -345,7 +345,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                             }
 
                             override fun onError(error: VKError?) {
-                                FirebaseCrash.report(error?.httpError)
+                                Crashlytics.logException(error?.httpError)
                             }
                         }
                 )) {
@@ -370,7 +370,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                         }
                     }
                     else -> {
-                        val status = PlaceAutocomplete.getStatus(activity, data)
                         if (textCityFrom.text.isEmpty())
                             textCityFrom.setText("")
                     }
@@ -395,7 +394,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                         }
                     }
                     else -> {
-                        val status = PlaceAutocomplete.getStatus(activity, data)
                         if (textCityTo.text.isEmpty())
                             textCityTo.setText("")
                     }
@@ -419,7 +417,6 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                         }
                     }
                     else -> {
-                        val status = PlaceAutocomplete.getStatus(activity, data)
                         if (textCityMiddleTwo.text.isEmpty())
                             textCityMiddleTwo.setText("")
                     }
@@ -1031,7 +1028,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            FirebaseCrash.report(e)
+            Crashlytics.logException(e)
         }
     }
 
@@ -1493,7 +1490,7 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
             it?.isActivated = false
         }
         methodIcons.values.map {
-            it?.isActivated = false
+            it.isActivated = false
         }
         appinTheAirEnter.visibility = View.GONE
         vkApp.visibility = View.GONE

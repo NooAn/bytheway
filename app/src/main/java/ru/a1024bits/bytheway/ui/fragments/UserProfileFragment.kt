@@ -15,9 +15,9 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import com.bumptech.glide.request.RequestOptions
+import com.crashlytics.android.Crashlytics
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
-import com.google.firebase.crash.FirebaseCrash
 import com.google.maps.android.PolyUtil
 import kotlinx.android.synthetic.main.fragment_user_profile.*
 import kotlinx.android.synthetic.main.profile_main_image.*
@@ -164,7 +164,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
                                     ?: ""))
                         } catch (e: Exception) {
                             e.printStackTrace()
-                            FirebaseCrash.report(e)
+                            Crashlytics.logException(e)
                             showErrorFroWrongSocValue(user, name)
                         }
                     }
@@ -178,7 +178,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
                             mFirebaseAnalytics.logEvent(TAG_ANALYTICS + "OPEN_CS", null)
                         } catch (e: Exception) {
                             e.printStackTrace()
-                            FirebaseCrash.report(e)
+                            Crashlytics.logException(e)
                             showErrorFroWrongSocValue(user, name)
                         }
                     }
@@ -353,7 +353,8 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
             val success = googleMap?.setMapStyle(
                     MapStyleOptions.loadRawResourceStyle(activity, R.raw.style))
 
-        } catch (e: Resources.NotFoundException) { }
+        } catch (e: Resources.NotFoundException) {
+        }
         if (arguments != null) {
             val userId: String = arguments.getString(UID_KEY, "")
             viewModel?.load(userId)
@@ -468,7 +469,7 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            FirebaseCrash.report(e)
+            Crashlytics.logException(e)
             Toast.makeText(activity.applicationContext, R.string.error_link_open, Toast.LENGTH_SHORT).show()
             val dialog = SocNetworkdialog(activity, "https://t.me/${id?.replace("@", "")}", userId, mFirebaseAnalytics)
             dialog.show()

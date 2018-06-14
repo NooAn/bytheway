@@ -3,8 +3,8 @@ package ru.a1024bits.bytheway.util
 import android.app.Activity
 import android.graphics.Bitmap
 import android.support.v4.app.FragmentActivity
+import com.crashlytics.android.Crashlytics
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.crash.FirebaseCrash
 import com.vk.sdk.VKScope
 import com.vk.sdk.VKSdk
 import com.vk.sdk.api.VKError
@@ -47,7 +47,7 @@ class VK {
                     }
 
                     override fun onVkShareError(error: VKError) {
-                        FirebaseCrash.report(error.httpError)
+                        Crashlytics.logException(error.httpError)
                         FirebaseAnalytics.getInstance(activity).logEvent("${MyProfileFragment.TAG_ANALYTICS}_vk_error", null)
                     }
                 })

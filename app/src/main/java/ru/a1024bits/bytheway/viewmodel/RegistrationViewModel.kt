@@ -5,7 +5,6 @@ import android.arch.lifecycle.MutableLiveData
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
-import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.FirebaseFirestore
 import io.reactivex.Completable
 import io.reactivex.schedulers.Schedulers
@@ -34,7 +33,7 @@ class RegistrationViewModel @Inject constructor(private val userRepository: User
                                 authManager.signInWithEmailAndPassword("vk_$vkUserId@forVkEmails.com", "vk_$vkUserId-password")
                                         .addOnSuccessListener { emitter.onComplete() }
                                         .addOnFailureListener { emitter.onError(it) }
-                             else
+                            else
                                 emitter.onError(it)
                         }
             }
@@ -72,7 +71,7 @@ class RegistrationViewModel @Inject constructor(private val userRepository: User
                 .observeOn(getMainThreadScheduler())
                 .subscribe(
                         { Log.e("LOG", "complete") },
-                        { throwable -> FirebaseCrash.report(throwable) }
+                        { throwable -> Log.e("LOG", "timestamp", throwable) }
                 ))
     }
 

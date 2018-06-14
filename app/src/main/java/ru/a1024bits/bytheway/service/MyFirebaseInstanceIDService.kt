@@ -2,8 +2,8 @@ package ru.a1024bits.bytheway.service
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.crashlytics.android.Crashlytics
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.iid.FirebaseInstanceIdService
@@ -40,7 +40,7 @@ class MyFirebaseInstanceIDService : FirebaseInstanceIdService() {
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            FirebaseCrash.report(e)
+            Crashlytics.logException(e)
         }
 
     }

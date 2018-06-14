@@ -202,3 +202,7 @@
 #GMS
 -keep class com.google.android.gms.** { *; }
 -dontwarn com.google.android.gms.**
+
+#Crashlytics
+-keep class com.crashlytics.** { *; }
+-dontwarn com.crashlytics.**

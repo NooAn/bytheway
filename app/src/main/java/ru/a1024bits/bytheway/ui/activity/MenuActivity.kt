@@ -24,13 +24,13 @@ import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.request.RequestOptions
+import com.crashlytics.android.Crashlytics
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.places.Places
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.crash.FirebaseCrash
 import com.google.firebase.firestore.FirebaseFirestore
 import io.reactivex.SingleObserver
 import io.reactivex.disposables.Disposable
@@ -140,8 +140,9 @@ class MenuActivity : AppCompatActivity(),
         Log.e("TEST", " onCreate")
         App.component.inject(this)
         glide = Glide.with(this)
-        FirebaseCrash.setCrashCollectionEnabled(!BuildConfig.DEBUG)
         FirebaseFirestore.setLoggingEnabled(!BuildConfig.DEBUG)
+        Crashlytics.setUserIdentifier(FirebaseAuth.getInstance().currentUser?.uid)
+        Crashlytics.setUserEmail(FirebaseAuth.getInstance().currentUser?.email)
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
         if (FirebaseAuth.getInstance().currentUser == null) {

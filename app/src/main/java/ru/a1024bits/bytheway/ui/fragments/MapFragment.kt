@@ -19,11 +19,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.Toast
+import com.crashlytics.android.Crashlytics
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.crash.FirebaseCrash
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import kotlinx.android.synthetic.main.fragment_maps.*
 import kotlinx.android.synthetic.main.fragment_search_block.*
@@ -286,14 +287,12 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
                     goFlyPlan()
                 }
             } catch (e: Exception) {
-                FirebaseCrash.report(e)
+                Crashlytics.logException(e)
                 e.printStackTrace()
             }
-
         }
         showPrompt("isFirstEnterMapFragment", context.resources.getString(R.string.close_hint),
                 getString(R.string.hint_save_and_search), getString(R.string.hint_save_and_search_description), buttonSaveTravelInfo)
-
     }
 
     private fun openDialogSave() {
@@ -309,8 +308,8 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
 
         } catch (e: Exception) {
             e.printStackTrace()
-            FirebaseCrash.log("save data user's")
-            FirebaseCrash.report(e)
+            Crashlytics.log("save data user's")
+            Crashlytics.logException(e)
         }
     }
 
@@ -356,7 +355,7 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
         try {
             // Customise the styling of the base map using a JSON object defined
             // in a raw resource file.
-            val success = mMap?.setMapStyle(
+            mMap?.setMapStyle(
                     MapStyleOptions.loadRawResourceStyle(activity, R.raw.style))
 
         } catch (e: Resources.NotFoundException) {
@@ -372,7 +371,7 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            FirebaseCrash.report(e)
+            Crashlytics.logException(e)
         }
         if (viewModel?.liveData?.hasObservers() == false)
             viewModel?.liveData?.observe(this@MapFragment, transition)
@@ -548,7 +547,7 @@ class MapFragment : BaseFragment<DisplayUsersViewModel>(), OnMapReadyCallback {
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            FirebaseCrash.report(e)
+            Crashlytics.logException(e)
         }
     }
 
