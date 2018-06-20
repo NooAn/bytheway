@@ -137,7 +137,6 @@ class DisplayUsersViewModel @Inject constructor(private var userRepository: User
                     }
                     .toSortedList(compareByDescending { l -> l.percentsSimilarTravel }) // перед отправкой сортируем по степени похожести маршрута.
                     .observeOn(getMainThreadScheduler())
-                    .doOnSuccess { Log.e("LOG 2", Thread.currentThread().name) }
                     .doAfterTerminate({ loadingStatus.postValue(false) })
                     .subscribe(
                             { list ->

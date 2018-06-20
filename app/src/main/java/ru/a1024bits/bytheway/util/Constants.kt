@@ -4,15 +4,13 @@ package ru.a1024bits.bytheway.util
  * Created by tikhon.osipov on 26.11.17
  */
 object Constants {
-    val APP_PREFERENCES = "string_save"
-    val FIRST_ENTER = "first_enter_in_app"
+    const val APP_PREFERENCES = "string_save"
+    const val FIRST_ENTER = "first_enter_in_app"
 
-    var PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM = 1
-    var PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO = 2
-    val PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM_MIDDLE_CITY: Int = 3
-    val PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO_NEW_CITY: Int = 4
-    val ERROR: Int = -1
-    val SUCCESS: Int = 1
+    const val PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM = 1
+    const val PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO = 2
+    const val PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_FROM_MIDDLE_CITY: Int = 3
+    const val PLACE_AUTOCOMPLETE_REQUEST_CODE_TEXT_TO_NEW_CITY: Int = 4
     val LAST_INDEX_CITY = "last_city"
     val TWO_INDEX_CITY = "two_city"
     val FIRST_INDEX_CITY = "first_city"

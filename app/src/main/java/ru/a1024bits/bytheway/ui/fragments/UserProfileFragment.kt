@@ -5,6 +5,8 @@ import android.arch.lifecycle.ViewModelProvider
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.support.annotation.LayoutRes
@@ -94,6 +96,8 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
 
         if (user.city.isNotEmpty()) {
             cityview.text = user.city
+        } else {
+            cityview.text = getString(R.string.city_in_the_world)
         }
 
         if (user.cities.size == 1 || user.cities.size == 2) {
@@ -144,7 +148,6 @@ class UserProfileFragment : BaseFragment<UserProfileViewModel>(), OnMapReadyCall
         iconDateFromEmpty.setOnClickListener {
             clickForIconDateEmpty()
         }
-
         fillAgeSex(user.age, user.sex)
         if (user.urlPhoto.isNotBlank())
             glide?.load(user.urlPhoto)

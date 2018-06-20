@@ -6,6 +6,7 @@ import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.ConnectivityManager
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
@@ -36,6 +37,7 @@ import ru.a1024bits.bytheway.App
 import ru.a1024bits.bytheway.R
 import ru.a1024bits.bytheway.exception.InvalidCredentialsException
 import ru.a1024bits.bytheway.ui.dialogs.newRegistrationByPhone
+import ru.a1024bits.bytheway.util.Constants
 import ru.a1024bits.bytheway.viewmodel.RegistrationViewModel
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -53,6 +55,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var googleApiClient: GoogleApiClient
     private lateinit var analyticsManager: FirebaseAnalytics
     var mVerificationId: String = ""
+    private val preferences: SharedPreferences by lazy { getSharedPreferences(Constants.APP_PREFERENCES, Context.MODE_PRIVATE) }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -231,6 +234,8 @@ class LoginActivity : AppCompatActivity() {
     private fun openMainActivity() {
         startActivity(Intent(this@LoginActivity, MenuActivity::class.java)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
+        preferences.edit()
+                .putBoolean(Constants.FIRST_ENTER, false).apply()
     }
 
     private fun createGoogleApiClient(): GoogleApiClient =

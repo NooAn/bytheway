@@ -109,7 +109,7 @@ class MenuActivity : AppCompatActivity(),
         Log.e("LOG", "${p0.errorMessage}")
     }
 
-    var screenNames: ArrayList<String> = arrayListOf()
+    private var screenNames: ArrayList<String> = arrayListOf()
 
     @Inject
     lateinit var navigatorHolder: NavigatorHolder
@@ -139,15 +139,31 @@ class MenuActivity : AppCompatActivity(),
         super.onCreate(savedInstanceState)
         Log.e("TEST", " onCreate")
         App.component.inject(this)
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
+
+        // vk login = firebase == null preferences == false
+        if (preferences.getBoolean(Constants.FIRST_ENTER, true)) {
+            startActivity(Intent(this, LoginActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
+            finish()
+        } else {
+            val menuActivityIntent = Intent(this, MenuActivity::class.java)
+            if (intent.extras != null) {
+                menuActivityIntent.putExtras(intent.extras)
+            }
+            menuActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            //if it isn't first start
+            // startActivity(menuActivityIntent)
+        }
+        viewModel?.setTimestamp(FirebaseAuth.getInstance().currentUser?.uid ?: return)
+
         glide = Glide.with(this)
         FirebaseFirestore.setLoggingEnabled(!BuildConfig.DEBUG)
         Crashlytics.setUserIdentifier(FirebaseAuth.getInstance().currentUser?.uid)
         Crashlytics.setUserEmail(FirebaseAuth.getInstance().currentUser?.email)
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
-        if (FirebaseAuth.getInstance().currentUser == null) {
-            startActivity(Intent(this, LoginActivity::class.java))
-        }
+
 
         setContentView(R.layout.activity_menu)
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
@@ -161,7 +177,7 @@ class MenuActivity : AppCompatActivity(),
         updateUsersInfo(FirebaseAuth.getInstance().currentUser?.photoUrl.toString())
         pLoader = this.findViewById(R.id.pLoaderRes) as ProgressCustom
 
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(MyProfileViewModel::class.java)
+
         if (savedInstanceState == null) {
             if (preferences.getBoolean(Constants.FIRST_ENTER, true)) {
                 navigator.applyCommand(Replace(Screens.USER_SINHRONIZED_SCREEN, 1))

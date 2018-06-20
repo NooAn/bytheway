@@ -35,6 +35,7 @@ import ru.a1024bits.bytheway.util.Constants.FIRST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.LAST_INDEX_CITY
 import ru.a1024bits.bytheway.util.Constants.START_DATE
 import java.util.concurrent.Callable
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 
@@ -67,6 +68,17 @@ class MyProfileViewModel @Inject constructor(var userRepository: UserRepository)
                 }))
     }
 
+    fun setTimestamp(uid: String) {
+        disposables.add(userRepository.sendTime(uid)
+                .subscribeOn(getBackgroundScheduler())
+                .timeout(10, TimeUnit.SECONDS)
+                .retry(2)
+                .observeOn(getMainThreadScheduler())
+                .subscribe(
+                        { Log.e("LOG", "complete") },
+                        { throwable -> Log.e("LOG", "timestamp", throwable) }
+                ))
+    }
     private fun savePhotoLink(downloadUrl: String, id: String): Single<String> {
         val map: HashMap<String, Any> = hashMapOf()
         map["urlPhoto"] = downloadUrl

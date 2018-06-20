@@ -39,7 +39,7 @@
                 android:layout_marginTop="10dp"
                 android:fontFamily="sans-serif"
                 android:freezesText="true"
-                android:text="@string/city_in_the_world"
+                tools:text="@string/city_in_the_world"
                 android:textAlignment="center"
                 android:textSize="16sp" />
 
@@ -50,7 +50,7 @@
                 android:layout_marginTop="5dp"
                 android:fontFamily="sans-serif"
                 android:freezesText="true"
-                android:text="@string/sex_and_age"
+                tools:text="@string/sex_and_age"
                 android:textAlignment="center"
                 android:textSize="16sp" />
         </LinearLayout>

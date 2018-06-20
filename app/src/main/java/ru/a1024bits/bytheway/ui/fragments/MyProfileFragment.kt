@@ -363,13 +363,13 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                             Toast.makeText(this@MyProfileFragment.context,
                                     getString(R.string.fill_diff_cities), Toast.LENGTH_LONG).show()
                         } else {
-                            if(!textCityTo.error.isNullOrEmpty()){
+                            if (!textCityTo.error.isNullOrEmpty()) {
                                 textCityTo.error = null
                             }
-                            if(!textNewCity.error.isNullOrEmpty()){
+                            if (!textNewCity.error.isNullOrEmpty()) {
                                 textNewCity.error = null
                             }
-                            if(!textCityMiddleTwo.error.isNullOrEmpty()){
+                            if (!textCityMiddleTwo.error.isNullOrEmpty()) {
                                 textCityMiddleTwo.error = null
                             }
                             cities[FIRST_INDEX_CITY] = place.name.toString()
@@ -396,13 +396,13 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                             Toast.makeText(this@MyProfileFragment.context,
                                     getString(R.string.fill_diff_cities), Toast.LENGTH_LONG).show()
                         } else {
-                            if(!textCityFrom.error.isNullOrEmpty()){
+                            if (!textCityFrom.error.isNullOrEmpty()) {
                                 textCityFrom.error = null
                             }
-                            if(!textNewCity.error.isNullOrEmpty()){
+                            if (!textNewCity.error.isNullOrEmpty()) {
                                 textNewCity.error = null
                             }
-                            if(!textCityMiddleTwo.error.isNullOrEmpty()){
+                            if (!textCityMiddleTwo.error.isNullOrEmpty()) {
                                 textCityMiddleTwo.error = null
                             }
                             cities[LAST_INDEX_CITY] = place.name.toString()
@@ -428,13 +428,13 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                             Toast.makeText(this@MyProfileFragment.context,
                                     getString(R.string.fill_diff_cities), Toast.LENGTH_LONG).show()
                         } else {
-                            if(!textCityFrom.error.isNullOrEmpty()){
+                            if (!textCityFrom.error.isNullOrEmpty()) {
                                 textCityFrom.error = null
                             }
-                            if(!textCityTo.error.isNullOrEmpty()){
+                            if (!textCityTo.error.isNullOrEmpty()) {
                                 textCityTo.error = null
                             }
-                            if(!textNewCity.error.isNullOrEmpty()){
+                            if (!textNewCity.error.isNullOrEmpty()) {
                                 textNewCity.error = null
                             }
                             cities[TWO_INDEX_CITY] = place.name.toString()
@@ -461,13 +461,13 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
                             Toast.makeText(this@MyProfileFragment.context,
                                     getString(R.string.fill_diff_cities), Toast.LENGTH_LONG).show()
                         } else {
-                            if(!textCityFrom.error.isNullOrEmpty()){
+                            if (!textCityFrom.error.isNullOrEmpty()) {
                                 textCityFrom.error = null
                             }
-                            if(!textCityTo.error.isNullOrEmpty()){
+                            if (!textCityTo.error.isNullOrEmpty()) {
                                 textCityTo.error = null
                             }
-                            if(!textCityMiddleTwo.error.isNullOrEmpty()){
+                            if (!textCityMiddleTwo.error.isNullOrEmpty()) {
                                 textCityMiddleTwo.error = null
                             }
                             cities[LAST_INDEX_CITY] = place.name.toString()
@@ -1755,8 +1755,11 @@ class MyProfileFragment : BaseFragment<MyProfileViewModel>(), OnMapReadyCallback
         val cityName = hView.findViewById<TextView>(R.id.menu_city_name)
         cityName.text = user.city
         val fullName = hView.findViewById<TextView>(R.id.menu_fullname)
-        fullName.text = StringBuilder().append(user.name).append(" ").append(user.lastName)
-        username.text = StringBuilder(user.name).append(" ").append(user.lastName)
+        val fullnameValue = user.name.plus(" ").plus(user.lastName)
+        fullName.text = fullnameValue
+        if (user.name.isBlank() && user.lastName.isBlank()) {
+            username.text = getString(R.string.name)
+        } else username.text = fullnameValue
     }
 
     private fun showTipsForEmptySocialLink() {

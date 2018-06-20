@@ -1,8 +1,10 @@
 package ru.a1024bits.bytheway
 
 import android.app.Application
+import com.crashlytics.android.Crashlytics
 import com.squareup.leakcanary.LeakCanary
 import com.vk.sdk.VKSdk
+import io.fabric.sdk.android.Fabric
 import ru.a1024bits.bytheway.dagger.*
 import ru.terrakok.cicerone.Cicerone
 import ru.terrakok.cicerone.NavigatorHolder
@@ -36,32 +38,8 @@ class App : Application() {
             return;
         }
         LeakCanary.install(this);
-
-//        var latStart = 5.5
-//        val lonStart = 15.00
-//        val latEnd = 10.00
-//        val lonEnd = 10.00
-//        //user location
-//        val latStartUser = 5.546454
-//        val lonStartUSer = 14.909738
-//        val latEndUser = 8.0
-//        val lonEndUser = 15.00
-//        var location = Location("GPS")
-//        location.latitude = latStart
-//        location.longitude = lonStart
-//        var locationEnd = Location("GPS2")
-//        locationEnd.latitude = latStartUser
-//        locationEnd.longitude = lonStartUSer
-//        var locationFinish = Location("END")
-//        locationFinish.latitude = latEnd
-//        locationFinish.longitude = lonEnd
-//        var locationFinisjUser = Location("GPS user end")
-//        locationFinisjUser.latitude = latEndUser
-//        locationFinisjUser.longitude = lonEndUser
-//        Log.e("LOG", location.distanceTo(locationEnd).toString())
-//
-//        Log.e("LOG", locationFinish.distanceTo(locationFinisjUser).toString())
-
+        Fabric.with(this, Crashlytics())
+        Fabric.with(Fabric.Builder(this).kits(Crashlytics()).debuggable(true).build())
     }
 
     private fun initCicerone() {

@@ -47,13 +47,14 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
         const val SIZE_INITIAL_ELEMENTS = 2
         const val TAG_ANALYTICS = "AllUsersFragment_"
         fun newInstance(): AllUsersFragment {
-            Log.e("LOG", "AllUsersFragment install")
-            return AllUsersFragment()
+            val fragment = AllUsersFragment()
+            fragment.arguments = Bundle().apply { putBoolean("flag", true) }
+            return fragment
         }
     }
 
     private lateinit var filter: Filter
-    private lateinit var displayUsersAdapter: DisplayAllUsersAdapter
+    private var displayUsersAdapter: DisplayAllUsersAdapter? = null
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
     private var countInitialElements = 0
@@ -64,7 +65,7 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
         when (response?.status) {
             Status.SUCCESS -> if (response.data == null) showErrorLoading() else {
                 if (response.data.isNotEmpty())
-                    displayUsersAdapter.setItems(response.data)
+                    displayUsersAdapter?.setItems(response.data)
                 updateViewsAfterSearch(isNotEmptyListUsers = response.data.isNotEmpty())
             }
             Status.ERROR -> {
@@ -88,30 +89,36 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
         App.component.inject(this)
         super.onActivityCreated(savedInstanceState)
         analytics.setCurrentScreen(this.activity, "AllUsersFragment", this.javaClass.simpleName)
+        arguments.getBoolean("flag")
         try {
             viewModel?.let {
                 filter = it.filter
             }
-            displayUsersAdapter = DisplayAllUsersAdapter(this.context, viewModel ?: return)
             installLogicToUI()
             displayAllUsers.layoutManager = LinearLayoutManager(context, LinearLayout.VERTICAL, false)
             displayAllUsers.hasFixedSize()
             displayAllUsers.adapter = displayUsersAdapter
 
-            if (viewModel?.response?.hasObservers() == false)
-                viewModel?.response?.observe(this, usersObservers)
+            if (displayUsersAdapter == null) {
+                displayUsersAdapter = DisplayAllUsersAdapter(this.context, viewModel ?: return)
+                displayAllUsers.adapter = displayUsersAdapter // this lime is double because need don't update page after go back pressed
+                if (viewModel?.response?.hasObservers() == false)
+                    viewModel?.response?.observe(this, usersObservers)
 
-            if (viewModel?.loadingStatus?.hasObservers() == false)
-                viewModel?.loadingStatus?.observe(this, loadingObserver())
+                if (viewModel?.loadingStatus?.hasObservers() == false)
+                    viewModel?.loadingStatus?.observe(this, loadingObserver())
 
-            viewModel?.getAllUsers(filter)
+                viewModel?.getAllUsers(filter)
+
+            } else {
+                loadingWhereLoadUsers.visibility = View.GONE
+            }
 
             showPrompt("isFirstEnterAllUsersFragment", context.resources.getString(R.string.close_hint),
                     context.resources.getString(R.string.hint_all_travelers), context.resources.getString(R.string.hint_all_travelers_description), searchParametersText)
         } catch (e: Throwable) {
             Crashlytics.logException(e)
             loadingWhereLoadUsers.visibility = View.GONE
-
         }
     }
 
@@ -133,14 +140,6 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
 
     override fun getViewModelClass(): Class<DisplayUsersViewModel> = DisplayUsersViewModel::class.java
 
-    override fun onResume() {
-        super.onResume()
-    }
-
-    override fun onPause() {
-        super.onPause()
-    }
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.all_users_menu, menu)
@@ -151,14 +150,14 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
-                displayUsersAdapter.filterData(query)
+                displayUsersAdapter?.filterData(query)
                 analytics.logEvent(TAG_ANALYTICS + "SEARCH_QUERY", null)
                 activity.closeKeyboard()
                 return true
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-                displayUsersAdapter.filterData(newText)
+                displayUsersAdapter?.filterData(newText)
                 return false
             }
         })
@@ -369,7 +368,6 @@ class AllUsersFragment : BaseFragment<DisplayUsersViewModel>() {
         if (filter.sex != 0) analytics.logEvent(TAG_ANALYTICS + "SEX_ANY", null)
         if (filter.sex != W_SEX) analytics.logEvent(TAG_ANALYTICS + "SEX_FEMALE", null)
         if (filter.sex != M_SEX) analytics.logEvent(TAG_ANALYTICS + "SEX_MALE", null)
-        // if (filter.method.size != M_SEX) analytics.logEvent(TAG_ANALYTICS + "SEX_MALE", null)
     }
 
     private fun animationSlide() {

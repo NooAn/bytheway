@@ -15,11 +15,9 @@ class UserProfileViewModel @Inject constructor(var userRepository: UserRepositor
 
     fun load(uid: String) {
         disposables.add(userRepository.getUser(uid)
-                .timeout(TIMEOUT_SECONDS, timeoutUnit)
+                .timeout(TIMEOUT_SECONDS, timeoutUnit, getBackgroundScheduler())
                 .retry(2)
                 .subscribeOn(getBackgroundScheduler())
-                .doOnSubscribe({ _ -> loadingStatus.postValue(true) })
-                .doAfterTerminate({ loadingStatus.postValue(false) })
                 .observeOn(getMainThreadScheduler())
                 .subscribe(
                         { newUser -> response.setValue(Response.success(newUser)) },
